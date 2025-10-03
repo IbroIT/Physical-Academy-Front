@@ -191,7 +191,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
         isScrolled
           ? 'bg-white py-2 shadow-lg'
-          : 'bg-gradient-to-r from-blue-900 to-blue-800 py-1'
+          : 'bg-gradient-to-r from-blue-700 to-blue-600 py-1'
       }`}
       ref={menuRef}
     >
@@ -239,8 +239,8 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                       href={item.link}
                       className={`relative px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 group ${
                         isScrolled
-                          ? 'text-blue-800 hover:text-blue-600 hover:bg-blue-50'
-                          : 'text-blue-100 hover:text-white hover:bg-blue-700/50'
+                          ? 'text-blue-700 hover:text-blue-600 hover:bg-blue-50'
+                          : 'text-blue-100 hover:text-white hover:bg-blue-600/50'
                       }`}
                     >
                       <span className="relative z-10">{item.title}</span>
@@ -254,12 +254,12 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                           activeMenu === key
                             ? 'text-white bg-blue-600 shadow-lg'
                             : isScrolled
-                              ? 'text-blue-800 hover:text-blue-600 hover:bg-blue-50'
-                              : 'text-blue-100 hover:text-white hover:bg-blue-700/50'
+                              ? 'text-blue-700 hover:text-blue-600 hover:bg-blue-50'
+                              : 'text-blue-100 hover:text-white hover:bg-blue-600/50'
                         }`}
                       >
                         <span className="relative z-10">{item.title}</span>
-                        <div className={`absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                        <div className={`absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
                           isScrolled ? '' : 'group-hover:opacity-100'
                         }`}></div>
                         <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-3/4 ${
@@ -367,7 +367,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`inline-flex items-center justify-center p-3 rounded-xl transition-all duration-300 hover:scale-110 ${
                   isScrolled
-                    ? 'text-blue-900 hover:bg-blue-100'
+                    ? 'text-blue-700 hover:bg-blue-100'
                     : 'text-white hover:bg-white/20'
                 } focus:outline-none backdrop-blur-sm`}
                 aria-expanded="false"
@@ -398,7 +398,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                   // Простая ссылка для главной страницы в мобильном меню
                   <a
                     href={item.link}
-                    className="block w-full text-left px-4 py-4 rounded-xl text-base font-semibold text-blue-900 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
+                    className="block w-full text-left px-4 py-4 rounded-xl text-base font-semibold text-blue-800 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.title}
@@ -411,7 +411,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                       className={`w-full text-left flex justify-between items-center px-4 py-4 rounded-xl text-base font-semibold transition-colors duration-200 ${
                         activeMenu === key
                           ? 'bg-blue-600 text-white shadow-lg'
-                          : 'text-blue-900 hover:bg-blue-50 hover:text-blue-700'
+                          : 'text-blue-800 hover:bg-blue-50 hover:text-blue-700'
                       }`}
                     >
                       {item.title}
