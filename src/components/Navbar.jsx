@@ -70,12 +70,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
           title: t('nav.leadership'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.rectorate'), link: '/academy/leadership/rectorate' },
-            { title: t('nav.board_of_trustees'), link: '/academy/leadership/trustees' },
-            { title: t('nav.audit_commission'), link: '/academy/leadership/audit' },
-            { title: t('nav.academic_council'), link: '/academy/leadership/academic-council' },
-            { title: t('nav.management_council'), link: '/academy/leadership/management-council' },
-            { title: t('nav.commissions'), link: '/academy/leadership/commissions' },
+            { title: t('nav.rectorate'), link: '/academy/leadership/rectorate' }
           ]
         },
         { 
@@ -83,14 +78,11 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
           hasNested: true,
           nestedItems: [
             { title: t('nav.academic_structure'), link: '/academy/structure/academic' },
-            { title: t('nav.departments_offices'), link: '/academy/structure/departments' },
-            { title: t('nav.administrative_units'), link: '/academy/structure/administrative' },
           ]
         },
         { title: t('nav.history'), link: '/academy/history' },
         { title: t('nav.mission_strategy'), link: '/academy/mission' },
         { title: t('nav.accreditation'), link: '/academy/accreditation' },
-        { title: t('nav.academy_in_numbers'), link: '/academy/numbers' },
         { title: t('nav.documents'), link: '/academy/documents' },
       ]
     },
