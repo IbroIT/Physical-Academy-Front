@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Academy Components</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .test-link {
+            display: block;
+            margin: 10px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .test-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .test-link h3 {
+            margin: 0 0 10px 0;
+            color: #2563eb;
+        }
+
+        .test-link p {
+            margin: 0;
+            color: #666;
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .fixed {
+            background-color: #10b981;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Academy Components Test</h1>
+    <p>Test the academy components to verify fixes are working:</p>
+
+    <a href="http://localhost:5174/academy/documents" class="test-link" target="_blank">
+        <h3>📄 Academy Documents <span class="status fixed">FIXED</span></h3>
+        <p>Test the documents page - React hooks error should be resolved and translations should work</p>
+    </a>
+
+    <a href="http://localhost:5174/academy/accreditation" class="test-link" target="_blank">
+        <h3>🏆 Academy Accreditation <span class="status fixed">FIXED</span></h3>
+        <p>Test the accreditation page - should now properly use API data with fallback to static data</p>
+    </a>
+
+    <a href="http://localhost:5174/academy/leadership/rectorate" class="test-link" target="_blank">
+        <h3>👥 Academy Leadership <span class="status fixed">VERIFIED</span></h3>
+        <p>Test the leadership page - should use proper hooks order</p>
+    </a>
+
+    <a href="http://localhost:5174/academy/structure/academic" class="test-link" target="_blank">
+        <h3>🏛️ Academy Structure <span class="status fixed">FIXED</span></h3>
+        <p>Test the structure page - hooks order issue resolved</p>
+    </a>
+
+    <h2>What was fixed:</h2>
+    <ul>
+        <li>✅ Fixed React Hooks order error in AcademyDocuments</li>
+        <li>✅ Fixed React Hooks order error in AcademyStructure</li>
+        <li>✅ Connected AcademyAccreditation to API data</li>
+        <li>✅ Improved translations usage across all components</li>
+        <li>✅ Added proper fallback text for all translation keys</li>
+        <li>✅ All early returns now happen AFTER hooks are called</li>
+    </ul>
+
+    <h2>Translation Integration:</h2>
+    <p>All components now properly use the translation system managed by Navbar and LanguageSwitcher. They include
+        fallback text to ensure content displays even if translation keys are missing.</p>
+</body>
+
+</html>
