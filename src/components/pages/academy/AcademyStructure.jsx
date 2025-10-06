@@ -6,13 +6,22 @@ import { PageLoading, ErrorDisplay, EmptyState, CardSkeleton } from '../../commo
 
 const AcademyStructure = () => {
   const { t } = useTranslation();
-  const [viewType, setViewType] = useState('hierarchical'); // 'hierarchical' or 'flat'
+  const [viewType, setViewType] = useState('hierarchical');
   const [selectedType, setSelectedType] = useState('all');
+  const [expandedDepartments, setExpandedDepartments] = useState(new Set());
 
-  // API integration - all hooks must be called before early returns
   const { structure, loading, error, refetch } = useOrganizationStructure(viewType === 'hierarchical');
 
-  // Filter data based on selected type
+  const toggleDepartment = (departmentId) => {
+    const newExpanded = new Set(expandedDepartments);
+    if (newExpanded.has(departmentId)) {
+      newExpanded.delete(departmentId);
+    } else {
+      newExpanded.add(departmentId);
+    }
+    setExpandedDepartments(newExpanded);
+  };
+
   const getFilteredData = () => {
     if (viewType === 'hierarchical') {
       return structure;
@@ -28,16 +37,20 @@ const AcademyStructure = () => {
   };
 
   const filteredData = getFilteredData();
-  const structureTypes = ['leadership', 'faculties', 'administrative', 'support'];
+  const structureTypes = [
+    { key: 'leadership', label: 'Руководство', icon: '👑', color: 'green' },
+    { key: 'faculties', label: 'Факультеты', icon: '🎓', color: 'blue' },
+    { key: 'administrative', label: 'Администрация', icon: '🏛️', color: 'purple' },
+    { key: 'support', label: 'Поддержка', icon: '🔧', color: 'orange' }
+  ];
 
-  // Early returns AFTER all hooks are called
   if (loading) {
     return <PageLoading message={t('structure.loading', 'Загрузка структуры...')} />;
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-8 px-4">
+      <div className="min-h-screen bg-white py-8 px-4">
         <div className="max-w-7xl mx-auto">
           <ErrorDisplay
             error={error}
@@ -49,226 +62,320 @@ const AcademyStructure = () => {
     );
   }
 
-  // Component to render a single department
-  const DepartmentCard = ({ department }) => (
-    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 hover:border-green-300">
-      <div className="p-6">
-        <div className="flex items-start space-x-4">
-          <div className="flex-shrink-0">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">{department.icon || '🏛️'}</span>
-            </div>
-          </div>
-          <div className="flex-1 min-w-0">
-            {/* Main Info */}
-            <h3 className="text-lg font-bold text-gray-800 mb-2">
-              {department.name}
-            </h3>
+  const getTypeColor = (type) => {
+    const typeConfig = structureTypes.find(t => t.key === type);
+    if (!typeConfig) return 'gray';
+    return typeConfig.color;
+  };
 
-            {/* Multilingual names */}
-            <div className="mb-3 space-y-1">
-              {department.name_ru && department.name_ru !== department.name && (
-                <p className="text-sm text-gray-600">
-                  🇷🇺 <strong>RU:</strong> {department.name_ru}
-                </p>
-              )}
-              {department.name_en && department.name_en !== department.name && (
-                <p className="text-sm text-gray-600">
-                  🇺🇸 <strong>EN:</strong> {department.name_en}
-                </p>
-              )}
-              {department.name_ky && department.name_ky !== department.name && (
-                <p className="text-sm text-gray-600">
-                  🇰🇬 <strong>KG:</strong> {department.name_ky}
-                </p>
-              )}
-            </div>
+  const getColorClasses = (color) => {
+    switch (color) {
+      case 'green':
+        return { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-800', active: 'bg-green-600' };
+      case 'blue':
+        return { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-800', active: 'bg-blue-600' };
+      case 'purple':
+        return { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-800', active: 'bg-purple-600' };
+      case 'orange':
+        return { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-800', active: 'bg-orange-600' };
+      default:
+        return { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-800', active: 'bg-gray-600' };
+    }
+  };
 
-            {/* Head Information */}
-            {department.head_name && (
-              <div className="mb-3 bg-blue-50 rounded-lg p-3">
-                <p className="text-sm font-semibold text-blue-800 mb-1">
-                  👤 Руководитель:
-                </p>
-                <p className="text-sm text-blue-700">{department.head_name}</p>
+  const DepartmentCard = ({ department, level = 0 }) => {
+    const colors = getColorClasses(getTypeColor(department.structure_type));
+    const hasChildren = department.children && department.children.length > 0;
+    const isExpanded = expandedDepartments.has(department.id);
+    
+    return (
+      <div className={`${level > 0 ? 'ml-6 mt-4' : ''}`}>
+        <div 
+          className={`bg-white rounded-xl border ${colors.border} hover:border-blue-300 transition-all duration-300 overflow-hidden group cursor-pointer`}
+          onClick={() => hasChildren && toggleDepartment(department.id)}
+        >
+          <div className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start space-x-4 flex-1">
+                <div className="flex-shrink-0">
+                  <div className={`w-12 h-12 ${colors.bg} rounded-lg flex items-center justify-center border ${colors.border}`}>
+                    <span className="text-xl">{department.icon || '🏛️'}</span>
+                  </div>
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">
+                        {department.name}
+                      </h3>
 
-                {/* Multilingual head names */}
-                {department.head_name_ru && department.head_name_ru !== department.head_name && (
-                  <p className="text-xs text-blue-600">🇷🇺 {department.head_name_ru}</p>
-                )}
-                {department.head_name_en && department.head_name_en !== department.head_name && (
-                  <p className="text-xs text-blue-600">🇺🇸 {department.head_name_en}</p>
-                )}
-                {department.head_name_ky && department.head_name_ky !== department.head_name && (
-                  <p className="text-xs text-blue-600">🇰🇬 {department.head_name_ky}</p>
-                )}
-              </div>
-            )}
-
-            {/* Structure Type */}
-            {department.structure_type && (
-              <div className="inline-block bg-purple-50 rounded-full px-3 py-1 mb-3">
-                <span className="text-xs text-purple-600 font-medium">
-                  🏗️ {department.title || department.structure_type}
-                </span>
-              </div>
-            )}
-
-            {/* Parent Department */}
-            {department.parent && (
-              <div className="mb-3">
-                <p className="text-xs text-gray-600">
-                  🔗 Родительское подразделение: #{department.parent}
-                </p>
-              </div>
-            )}
-
-            {/* Contact Information */}
-            <div className="space-y-2 text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
-              <p className="font-semibold text-gray-700 mb-2">📞 Контакты:</p>
-              {department.phone && (
-                <p className="flex items-center">
-                  <span className="mr-2">�</span>
-                  <a href={`tel:${department.phone}`} className="text-blue-600 hover:underline">
-                    {department.phone}
-                  </a>
-                </p>
-              )}
-              {department.email && (
-                <p className="flex items-center">
-                  <span className="mr-2">📧</span>
-                  <a href={`mailto:${department.email}`} className="text-blue-600 hover:underline">
-                    {department.email}
-                  </a>
-                </p>
-              )}
-              {!department.phone && !department.email && (
-                <p className="text-gray-500 text-xs">Контактная информация не указана</p>
-              )}
-            </div>
-
-            {/* Status and Order */}
-            <div className="flex flex-wrap gap-2 mt-3">
-              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${department.is_active
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
-                }`}>
-                <div className={`w-2 h-2 rounded-full mr-1 ${department.is_active ? 'bg-green-400' : 'bg-red-400'
-                  }`}></div>
-                {department.is_active ? '✅ Активное' : '❌ Неактивное'}
-              </span>
-
-              {department.order && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                  #️⃣ Порядок: {department.order}
-                </span>
-              )}
-            </div>
-
-            {/* Children departments */}
-            {department.children && department.children.length > 0 && (
-              <div className="mt-4 pl-4 border-l-2 border-green-200">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                  🏢 Подразделения ({department.children.length}):
-                </h4>
-                <div className="space-y-2">
-                  {department.children.map((child) => (
-                    <div key={child.id} className="bg-gray-50 rounded-lg p-3">
-                      <p className="font-medium text-gray-800">{child.name}</p>
-                      {child.head_name && (
-                        <p className="text-sm text-gray-600">
-                          👤 Руководитель: {child.head_name}
-                        </p>
+                      {/* Structure Type */}
+                      {department.structure_type && (
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${colors.bg} ${colors.text} border ${colors.border}`}>
+                          {structureTypes.find(t => t.key === department.structure_type)?.icon || '🏗️'} 
+                          {department.title || department.structure_type}
+                        </span>
                       )}
-                      {child.phone && (
-                        <p className="text-sm text-gray-600">
-                          📱 {child.phone}
-                        </p>
-                      )}
-                      {child.email && (
-                        <p className="text-sm text-gray-600">
-                          📧 {child.email}
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-500">ID: {child.id}</p>
                     </div>
-                  ))}
+
+                    {hasChildren && (
+                      <button className="flex-shrink-0 ml-4 w-8 h-8 rounded-lg bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                        <svg 
+                          className={`w-4 h-4 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Head Information */}
+                  {department.head_name && (
+                    <div className="mt-4 bg-blue-50 rounded-lg p-3 border border-blue-100">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-blue-600">👤</span>
+                        <span className="text-sm font-semibold text-blue-800">
+                          {t('structure.head', 'Руководитель')}:
+                        </span>
+                      </div>
+                      <p className="text-sm text-blue-700">{department.head_name}</p>
+                    </div>
+                  )}
+
+                  {/* Contact Information */}
+                  {(department.phone || department.email) && (
+                    <div className="mt-3 space-y-2 text-sm">
+                      {department.phone && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <span>📱</span>
+                          <a href={`tel:${department.phone}`} className="text-blue-600 hover:text-blue-700 hover:underline">
+                            {department.phone}
+                          </a>
+                        </div>
+                      )}
+                      {department.email && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <span>📧</span>
+                          <a href={`mailto:${department.email}`} className="text-blue-600 hover:text-blue-700 hover:underline">
+                            {department.email}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Status */}
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      department.is_active
+                        ? 'bg-green-100 text-green-800 border border-green-200'
+                        : 'bg-red-100 text-red-800 border border-red-200'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full mr-1 ${
+                        department.is_active ? 'bg-green-400' : 'bg-red-400'
+                      }`}></div>
+                      {department.is_active ? '✅ Активное' : '❌ Неактивное'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            )}
-
-            {/* API ID for developers */}
-            <div className="text-xs text-gray-400 mt-4 pt-3 border-t">
-              🔧 API ID: {department.id}
             </div>
+
+            {/* Expand Button for Mobile */}
+            {hasChildren && (
+              <div className="flex justify-center mt-4 lg:hidden">
+                <button className="flex items-center gap-1 text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors">
+                  <span>{isExpanded ? t('structure.showLess', 'Свернуть') : t('structure.showMore', 'Подробнее')}</span>
+                  <svg 
+                    className={`w-4 h-4 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
+
+          {/* Expanded Content */}
+          {isExpanded && hasChildren && (
+            <div className="border-t border-gray-100 bg-gray-50 p-6">
+              <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <span>🏢</span>
+                {t('structure.subdepartments', 'Подразделения')} ({department.children.length})
+              </h4>
+              <div className="space-y-3">
+                {department.children.map((child) => (
+                  <div key={child.id} className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h5 className="font-medium text-gray-900">{child.name}</h5>
+                        {child.head_name && (
+                          <p className="text-sm text-gray-600 mt-1">
+                            👤 {child.head_name}
+                          </p>
+                        )}
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {child.phone && (
+                            <span className="text-xs text-gray-500">📱 {child.phone}</span>
+                          )}
+                          {child.email && (
+                            <span className="text-xs text-gray-500">📧 {child.email}</span>
+                          )}
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        child.is_active
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {child.is_active ? 'Активно' : 'Неактивно'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Recursive children rendering for hierarchical view */}
+        {viewType === 'hierarchical' && isExpanded && hasChildren && (
+          <div className="space-y-4 mt-4">
+            {department.children.map((child) => (
+              <DepartmentCard 
+                key={child.id} 
+                department={child} 
+                level={level + 1}
+              />
+            ))}
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
+
+  const getStats = () => {
+    if (!Array.isArray(structure)) return null;
+    
+    return {
+      total: structure.length,
+      faculties: structure.filter(d => d.structure_type === 'faculties').length,
+      administrative: structure.filter(d => d.structure_type === 'administrative').length,
+      leadership: structure.filter(d => d.structure_type === 'leadership').length,
+      support: structure.filter(d => d.structure_type === 'support').length,
+      active: structure.filter(d => d.is_active).length
+    };
+  };
+
+  const stats = getStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-8 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Заголовок */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             {t('academicStructure.title', 'Организационная структура')}
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             {t('academicStructure.subtitle', 'Структура академии и её подразделений')}
           </p>
         </div>
 
+        {/* Statistics */}
+        {stats && (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
+            <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
+              <div className="text-2xl font-bold text-blue-600 mb-1">{stats.total}</div>
+              <div className="text-blue-800 text-sm font-medium">Всего</div>
+            </div>
+            <div className="bg-green-50 rounded-2xl p-4 text-center border border-green-100">
+              <div className="text-2xl font-bold text-green-600 mb-1">{stats.faculties}</div>
+              <div className="text-green-800 text-sm font-medium">Факультетов</div>
+            </div>
+            <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
+              <div className="text-2xl font-bold text-blue-600 mb-1">{stats.administrative}</div>
+              <div className="text-blue-800 text-sm font-medium">Административных</div>
+            </div>
+            <div className="bg-purple-50 rounded-2xl p-4 text-center border border-purple-100">
+              <div className="text-2xl font-bold text-purple-600 mb-1">{stats.leadership}</div>
+              <div className="text-purple-800 text-sm font-medium">Руководства</div>
+            </div>
+            <div className="bg-orange-50 rounded-2xl p-4 text-center border border-orange-100">
+              <div className="text-2xl font-bold text-orange-600 mb-1">{stats.support}</div>
+              <div className="text-orange-800 text-sm font-medium">Поддержки</div>
+            </div>
+            <div className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+              <div className="text-2xl font-bold text-gray-600 mb-1">{stats.active}</div>
+              <div className="text-gray-800 text-sm font-medium">Активных</div>
+            </div>
+          </div>
+        )}
+
         {/* Controls */}
-        <div className="flex flex-wrap justify-center gap-4 mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
           {/* View Type Toggle */}
-          <div className="bg-white rounded-full p-1 shadow-lg">
+          <div className="bg-gray-100 rounded-2xl p-2 flex">
             <button
-              onClick={() => setViewType('hierarchical')}
-              className={`px-6 py-2 rounded-full transition-all duration-300 ${viewType === 'hierarchical'
-                ? 'bg-green-600 text-white shadow-md'
-                : 'text-gray-600 hover:text-green-600'
-                }`}
+              onClick={() => {
+                setViewType('hierarchical');
+                setExpandedDepartments(new Set());
+              }}
+              className={`px-6 py-3 rounded-xl transition-all duration-300 font-medium ${
+                viewType === 'hierarchical'
+                  ? 'bg-white text-blue-600 shadow-sm border border-blue-200'
+                  : 'text-gray-600 hover:text-blue-600'
+              }`}
             >
-              Иерархический вид
+              {t('structure.hierarchicalView', 'Иерархический вид')}
             </button>
             <button
-              onClick={() => setViewType('flat')}
-              className={`px-6 py-2 rounded-full transition-all duration-300 ${viewType === 'flat'
-                ? 'bg-green-600 text-white shadow-md'
-                : 'text-gray-600 hover:text-green-600'
-                }`}
+              onClick={() => {
+                setViewType('flat');
+                setExpandedDepartments(new Set());
+              }}
+              className={`px-6 py-3 rounded-xl transition-all duration-300 font-medium ${
+                viewType === 'flat'
+                  ? 'bg-white text-blue-600 shadow-sm border border-blue-200'
+                  : 'text-gray-600 hover:text-blue-600'
+              }`}
             >
-              Плоский список
+              {t('structure.flatView', 'Плоский список')}
             </button>
           </div>
 
           {/* Type Filter (only for flat view) */}
           {viewType === 'flat' && (
-            <div className="bg-white rounded-full p-1 shadow-lg">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setSelectedType('all')}
-                className={`px-4 py-2 rounded-full transition-all duration-300 text-sm ${selectedType === 'all'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-blue-600'
-                  }`}
+                className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-medium border ${
+                  selectedType === 'all'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-600 border-gray-300 hover:border-blue-300'
+                }`}
               >
-                Все
+                {t('structure.all', 'Все')}
               </button>
               {structureTypes.map((type) => (
                 <button
-                  key={type}
-                  onClick={() => setSelectedType(type)}
-                  className={`px-4 py-2 rounded-full transition-all duration-300 text-sm ${selectedType === type
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:text-blue-600'
-                    }`}
+                  key={type.key}
+                  onClick={() => setSelectedType(type.key)}
+                  className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-medium border flex items-center gap-2 ${
+                    selectedType === type.key
+                      ? `${getColorClasses(type.color).bg} ${getColorClasses(type.color).text} ${getColorClasses(type.color).border}`
+                      : 'bg-white text-gray-600 border-gray-300 hover:border-blue-300'
+                  }`}
                 >
-                  {type === 'leadership' && 'Руководство'}
-                  {type === 'faculties' && 'Факультеты'}
-                  {type === 'administrative' && 'Администрация'}
-                  {type === 'support' && 'Поддержка'}
+                  <span>{type.icon}</span>
+                  <span>{type.label}</span>
                 </button>
               ))}
             </div>
@@ -278,21 +385,21 @@ const AcademyStructure = () => {
         {/* Content */}
         {viewType === 'hierarchical' ? (
           // Hierarchical view
-          <div className="space-y-8">
+          <div className="space-y-6">
             {Array.isArray(filteredData) && filteredData.length > 0 ? (
               filteredData.map((department) => (
                 <DepartmentCard key={department.id} department={department} />
               ))
             ) : (
               <EmptyState
-                message="Структура организации не найдена"
+                message={t('structure.noData', 'Структура организации не найдена')}
                 icon={<div className="text-6xl mb-4">🏛️</div>}
               />
             )}
           </div>
         ) : (
           // Flat grid view
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {Array.isArray(filteredData) && filteredData.length > 0 ? (
               filteredData.map((department) => (
                 <DepartmentCard key={department.id} department={department} />
@@ -300,7 +407,7 @@ const AcademyStructure = () => {
             ) : (
               <div className="col-span-full">
                 <EmptyState
-                  message="Подразделения не найдены"
+                  message={t('structure.noDepartments', 'Подразделения не найдены')}
                   icon={<div className="text-6xl mb-4">🏛️</div>}
                 />
               </div>
@@ -308,48 +415,18 @@ const AcademyStructure = () => {
           </div>
         )}
 
-        {/* Statistics */}
-        {Array.isArray(filteredData) && filteredData.length > 0 && (
-          <div className="mt-12 bg-white rounded-2xl p-8 shadow-lg">
-            <h3 className="text-2xl font-bold text-center text-gray-800 mb-8">
-              Статистика структуры
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">
-                  {viewType === 'hierarchical' ?
-                    (Array.isArray(filteredData) ? filteredData.length : 0) :
-                    filteredData.filter(d => d.structure_type === 'faculties').length
-                  }
-                </div>
-                <div className="text-gray-600">Факультетов</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">
-                  {viewType === 'hierarchical' ?
-                    (Array.isArray(filteredData) ?
-                      filteredData.reduce((acc, dept) => acc + (dept.children?.length || 0), 0) : 0
-                    ) :
-                    filteredData.filter(d => d.structure_type === 'administrative').length
-                  }
-                </div>
-                <div className="text-gray-600">Подразделений</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-2">
-                  {filteredData.filter(d => d.structure_type === 'leadership').length}
-                </div>
-                <div className="text-gray-600">Руководящих органов</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-orange-600 mb-2">
-                  {Array.isArray(filteredData) ? filteredData.length : 0}
-                </div>
-                <div className="text-gray-600">Всего единиц</div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Additional Information */}
+        <div className="mt-16 bg-blue-50 rounded-2xl p-8 text-center border border-blue-200">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            {t('structure.contactInfo.title', 'Нужна дополнительная информация?')}
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+            {t('structure.contactInfo.description', 'Свяжитесь с нашим отделом кадров для получения дополнительной информации об организационной структуре')}
+          </p>
+          <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors">
+            {t('structure.contactInfo.button', 'Связаться с отделом кадров')}
+          </button>
+        </div>
       </div>
     </div>
   );
