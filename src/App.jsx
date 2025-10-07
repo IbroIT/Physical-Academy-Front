@@ -56,6 +56,7 @@ import AddressMap from './components/pages/contacts/AddressMap';
 import ContactInfo from './components/pages/contacts/ContactInfo';
 import SocialNetworks from './components/pages/contacts/SocialNetworks';
 
+import Home from './components/pages/home/Home';
 import './App.css';
 
 function App() {
@@ -65,7 +66,7 @@ function App() {
         <Navbar />
         <main className="main-content">
           <Routes>
-            {/* <Route path="/" element={<Home />} /> */}
+            <Route path="/" element={<Home />} />
             
             {/* Academy routes */}
             <Route path="/academy/about" element={<AcademyAbout />} />

@@ -1,0 +1,32 @@
+
+{
+  "newsLabel": "Новость",
+  "consultation": "Консультация",
+  "loading": "Загрузка...",
+  "previous": "Предыдущая новость",
+  "next": "Следующая новость",
+  "goToNews": "Перейти к новости {{index}}",
+  "newsItems": [
+    {
+      "id": 1,
+      "title": "Откройте новые горизонты с нашими инвестиционными решениями",
+      "description": "Специальные предложения для долгосрочных вложений с повышенной доходностью",
+      "backgroundImage": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      "ctaText": "Узнать больше"
+    },
+    {
+      "id": 2,
+      "title": "Цифровой банкинг нового поколения",
+      "description": "Инновационные технологии для вашего удобства и безопасности",
+      "backgroundImage": "https://images.unsplash.com/photo-1553877522-43269d4ea984?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      "ctaText": "Подробнее"
+    },
+    {
+      "id": 3,
+      "title": "Премиальные условия для бизнеса",
+      "description": "Эксклюзивные программы поддержки предпринимателей",
+      "backgroundImage": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80",
+      "ctaText": "Начать сотрудничество"
+    }
+  ]
+}

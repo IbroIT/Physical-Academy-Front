@@ -56,5 +56,36 @@
     "address_map": "Address and Map",
     "phones_email": "Phones and Email",
     "social_networks": "Social Networks"
+  },
+    "news": {
+    "title": "Latest News",
+    "subtitle": "Stay updated with the latest developments...",
+    "readMore": "Read More",
+    "share": "Share",
+    "allNews": "All News",
+    "filters": {
+      "all": "All",
+      "latest": "Latest", 
+      "popular": "Popular"
+    },
+    "categories": {
+      "technology": "Technology",
+      "business": "Business",
+      "ecology": "Ecology",
+      "partnerships": "Partnerships"
+    },
+    "items": [
+      {
+        "title": "Product Launch",
+        "description": "Introducing innovative business solutions",
+        "date": "May 15, 2024"
+      }
+    ],
+    "newsletter": {
+      "title": "Stay Updated",
+      "description": "Subscribe to our newsletter...",
+      "placeholder": "Enter your email",
+      "subscribe": "Subscribe"
+    }
   }
 }
