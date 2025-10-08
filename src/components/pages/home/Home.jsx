@@ -4,8 +4,8 @@ import Facts from './Facts';
 import News from './News';
 import AdsPage from './AdsPage';
 import QuotesBanner from './QuotesBanner';
-import Contacts from './Contacts';
-import UniversityAnnouncementsPage from './AdsPage';
+// import Contacts from './Contacts';
+// import UniversityAnnouncementsPage from './AdsPage';
 import AboutAcademy from './AboutAcademy';
 import UniversityEventsPage from './UniversityEventsPage';
 const Home = () => {
@@ -18,7 +18,7 @@ const Home = () => {
         <AboutAcademy />
         <UniversityEventsPage />
         <Facts />
-        <Contacts />
+        {/* <Contacts /> */}
     </div>
   )
 }
