@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
-import DefaultLogo from "../assets/logo-salymbekov-university-site2.png";
-import ScrolledLogo from "../assets/Logo_white3.png";
+import DefaultLogo from "../assets/Logo.png";
+import ScrolledLogo from "../assets/Logo.png";
 
 const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
   const { t, i18n } = useTranslation();
@@ -59,37 +59,37 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
   // Данные меню для КГАФКиС
   const menuData = {
     academy: {
-  title: t('nav.academy'),
-  submenu: [
-    { 
-      title: t('nav.about_academy'),
-      hasNested: true,
-      nestedItems: [
-        { title: t('nav.about_academy'), link: '/academy/about' },
-        { title: t('nav.history'), link: '/academy/history' },
-        { title: t('nav.mission_strategy'), link: '/academy/mission' },
-        { title: t('nav.accreditation'), link: '/academy/accreditation' },
-        { title: t('nav.kgafkis_in_numbers'), link: '/academy/statistics' },
+      title: t('nav.academy'),
+      submenu: [
+        { 
+          title: t('nav.about_academy'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.about_academy'), link: '/academy/about' },
+            { title: t('nav.history'), link: '/academy/history' },
+            { title: t('nav.mission_strategy'), link: '/academy/mission' },
+            { title: t('nav.accreditation'), link: '/academy/accreditation' },
+            { title: t('nav.kgafkis_in_numbers'), link: '/academy/statistics' },
+          ]
+        },
+        { 
+          title: t('nav.leadership'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.board_of_trustees'), link: '/academy/leadership/board-of-trustees' },
+            { title: t('nav.audit_commission'), link: '/academy/leadership/audit-commission' },
+            { title: t('nav.academic_council'), link: '/academy/leadership/academic-council' },
+            { title: t('nav.rectorate'), link: '/academy/leadership/rectorate' },
+            { title: t('nav.trade_union'), link: '/academy/leadership/trade-union' },
+            { title: t('nav.commissions'), link: '/academy/leadership/commissions' },
+            { title: t('nav.academic_structure'), link: '/academy/structure/academic' },
+            { title: t('nav.administrative_structure'), link: '/academy/structure/administrative' },
+            { title: t('nav.administrative_units'), link: '/academy/structure/units' },
+            { title: t('nav.documents'), link: '/academy/documents' },
+          ]
+        }
       ]
     },
-    { 
-      title: t('nav.leadership'),
-      hasNested: true,
-      nestedItems: [
-        { title: t('nav.board_of_trustees'), link: '/academy/leadership/board-of-trustees' },
-        { title: t('nav.audit_commission'), link: '/academy/leadership/audit-commission' },
-        { title: t('nav.academic_council'), link: '/academy/leadership/academic-council' },
-        { title: t('nav.rectorate'), link: '/academy/leadership/rectorate' },
-        { title: t('nav.trade_union'), link: '/academy/leadership/trade-union' },
-        { title: t('nav.commissions'), link: '/academy/leadership/commissions' },
-        { title: t('nav.academic_structure'), link: '/academy/structure/academic' },
-        { title: t('nav.administrative_structure'), link: '/academy/structure/administrative' },
-        { title: t('nav.administrative_units'), link: '/academy/structure/units' },
-        { title: t('nav.documents'), link: '/academy/documents' },
-      ]
-    }
-  ]
-},
     admissions: {
       title: t('nav.admissions'),
       submenu: [
@@ -131,40 +131,39 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
       title: t('nav.education'),
       submenu: [
         {
-      title: t('nav.faculties'),
-      hasNested: true,
-      nestedItems: [
-        { 
-          title: t('nav.pedagogical_national_sports'),
-          link: '/education/faculties/pedagogical'
+          title: t('nav.faculties'),
+          hasNested: true,
+          nestedItems: [
+            { 
+              title: t('nav.pedagogical_national_sports'),
+              link: '/education/faculties/pedagogical'
+            },
+            { 
+              title: t('nav.coaching_faculty'),
+              link: '/education/faculties/coaching'
+            },
+            { 
+              title: t('nav.military_training_physical_culture'),
+              link: '/education/faculties/military-training'
+            },
+            { 
+              title: t('nav.correspondence_advanced_training'),
+              link: '/education/faculties/correspondence'
+            },
+            { 
+              title: t('nav.general_faculty_departments'),
+              link: '/education/departments'
+            },
+            { 
+              title: t('nav.master_program'),
+              link: '/education/faculties/master'
+            },
+            { 
+              title: t('nav.doctorate'),
+              link: '/education/faculties/doctorate'
+            }
+          ]
         },
-        { 
-          title: t('nav.coaching_faculty'),
-          link: '/education/faculties/coaching'
-        },
-        { 
-          title: t('nav.military_training_physical_culture'),
-          link: '/education/faculties/military-training'
-        },
-        { 
-          title: t('nav.correspondence_advanced_training'),
-          link: '/education/faculties/correspondence'
-        },
-        { 
-          title: t('nav.general_faculty_departments'),
-          link: '/education/departments'
-        },
-        { 
-          title: t('nav.master_program'),
-          link: '/education/faculties/master'
-        },
-        { 
-          title: t('nav.doctorate'),
-          link: '/education/faculties/doctorate'
-        }
-      ]
-    },
-
         { title: t('nav.master_program'), link: '/education/faculties/master' },
         { title: t('nav.doctorate'), link: '/education/faculties/doctorate' },
         { 
@@ -183,8 +182,6 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
         { title: t('nav.vestnik'), link: '/science/vestnik' },
         { title: t('nav.web_of_science'), link: '/science/web-of-science' },
         { title: t('nav.scopus'), link: '/science/scopus' },
-        // { title: t('nav.ipchain'), link: '/science/ipchain' },
-        // { title: t('nav.scientific_technical_council'), link: '/science/nts' },
         { title: t('nav.research_and_technical_council'), link: '/science/nts-committee' },
         { title: t('nav.student_scientific_society'), link: '/science/ssu' }
       ]
@@ -213,7 +210,6 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
         }
       ]
     },
-
     contacts: {
       title: t('nav.contacts'),
       submenu: [
@@ -228,8 +224,8 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
     <nav
       className={`sticky top-0 left-0 w-full z-50 transition-all duration-500 ${
         isScrolled
-          ? 'bg-white py-2 shadow-lg'
-          : 'bg-gradient-to-r from-blue-700 to-blue-600 py-1'
+          ? 'bg-white py-2 shadow-lg border-b border-blue-100'
+          : 'bg-gradient-to-r from-blue-600 via-teal-500 to-emerald-500 py-1'
       }`}
       ref={menuRef}
     >
@@ -277,12 +273,12 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                       href={item.link}
                       className={`relative px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 group ${
                         isScrolled
-                          ? 'text-blue-700 hover:text-blue-600 hover:bg-blue-50'
-                          : 'text-blue-100 hover:text-white hover:bg-blue-600/50'
+                          ? 'text-blue-800 hover:text-teal-600 hover:bg-blue-50'
+                          : 'text-white hover:text-white hover:bg-white/20'
                       }`}
                     >
                       <span className="relative z-10">{item.title}</span>
-                      <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-3/4`}></div>
+                      <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-teal-400 transition-all duration-300 group-hover:w-3/4`}></div>
                     </a>
                   ) : (
                     // Кнопка с выпадающим меню для остальных пунктов
@@ -290,17 +286,14 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                       <button
                         className={`relative px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 group ${
                           activeMenu === key
-                            ? 'text-white bg-blue-600 shadow-lg'
+                            ? 'text-white bg-gradient-to-r from-teal-500 to-emerald-500 shadow-lg'
                             : isScrolled
-                              ? 'text-blue-700 hover:text-blue-600 hover:bg-blue-50'
-                              : 'text-blue-100 hover:text-white hover:bg-blue-600/50'
+                              ? 'text-blue-800 hover:text-teal-600 hover:bg-blue-50'
+                              : 'text-white hover:text-white hover:bg-white/20'
                         }`}
                       >
                         <span className="relative z-10">{item.title}</span>
-                        <div className={`absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                          isScrolled ? '' : 'group-hover:opacity-100'
-                        }`}></div>
-                        <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-3/4 ${
+                        <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-teal-400 transition-all duration-300 group-hover:w-3/4 ${
                           activeMenu === key ? 'w-3/4' : ''
                         }`}></div>
                       </button>
@@ -308,7 +301,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                       {/* Выпадающее меню с анимацией */}
                       {activeMenu === key && (
                         <div
-                          className="absolute left-1/2 transform -translate-x-1/2 mt-2 min-w-[16rem] rounded-xl shadow-2xl bg-white/95 backdrop-blur-md ring-1 ring-black/5 overflow-visible z-50 transition-all duration-300"
+                          className="absolute left-1/2 transform -translate-x-1/2 mt-2 min-w-[16rem] rounded-xl shadow-2xl bg-white/95 backdrop-blur-md ring-1 ring-blue-100 overflow-visible z-50 transition-all duration-300"
                           style={{ transformOrigin: 'top center' }}
                           onMouseEnter={() => setActiveMenu(key)}
                           onMouseLeave={() => {
@@ -332,7 +325,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                                 {subItem.hasNested ? (
                                   <>
                                     <button
-                                      className="flex justify-between items-center w-full px-4 py-3 text-sm text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
+                                      className="flex justify-between items-center w-full px-4 py-3 text-sm text-gray-800 hover:bg-teal-50 hover:text-teal-700 transition-colors duration-200 border-l-4 border-transparent hover:border-teal-400"
                                     >
                                       <span>{subItem.title}</span>
                                       <svg
@@ -348,7 +341,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                                     {/* Вложенное меню */}
                                     {subItem.hasNested && nestedMenu === `${key}-${index}` && (
                                       <div
-                                        className="absolute left-full top-0 ml-[1px] w-56 rounded-xl shadow-2xl bg-white/95 backdrop-blur-md ring-1 ring-black/5 z-50 transition-all duration-200"
+                                        className="absolute left-full top-0 ml-[1px] w-56 rounded-xl shadow-2xl bg-white/95 backdrop-blur-md ring-1 ring-blue-100 z-50 transition-all duration-200"
                                         onMouseEnter={() => setNestedMenu(`${key}-${index}`)}
                                         onMouseLeave={() => setNestedMenu(null)}
                                       >
@@ -357,7 +350,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                                             <a
                                               key={nestedIndex}
                                               href={nestedItem.link}
-                                              className="block px-4 py-3 text-sm text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
+                                              className="block px-4 py-3 text-sm text-gray-800 hover:bg-teal-50 hover:text-teal-700 transition-colors duration-200 border-l-4 border-transparent hover:border-emerald-400"
                                             >
                                               {nestedItem.title}
                                             </a>
@@ -369,7 +362,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                                 ) : (
                                   <a
                                     href={subItem.link}
-                                    className="flex justify-between items-center px-4 py-3 text-sm text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
+                                    className="flex justify-between items-center px-4 py-3 text-sm text-gray-800 hover:bg-teal-50 hover:text-teal-700 transition-colors duration-200 border-l-4 border-transparent hover:border-teal-400"
                                   >
                                     <span>{subItem.title}</span>
                                   </a>
@@ -405,8 +398,8 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`inline-flex items-center justify-center p-3 rounded-xl transition-all duration-300 hover:scale-110 ${
                   isScrolled
-                    ? 'text-blue-700 hover:bg-blue-100'
-                    : 'text-white hover:bg-white/20'
+                    ? 'text-blue-700 hover:bg-teal-50 border border-blue-200'
+                    : 'text-white hover:bg-white/20 border border-white/30'
                 } focus:outline-none backdrop-blur-sm`}
                 aria-expanded="false"
               >
@@ -428,7 +421,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
 
       {/* Мобильное меню с анимацией */}
       {isMenuOpen && (
-        <div className="block min-[1475px]:hidden bg-white/95 backdrop-blur-md shadow-xl transform transition-all duration-300 ease-out animate-in slide-in-from-top-2 fade-in">
+        <div className="block min-[1475px]:hidden bg-gradient-to-b from-white to-blue-50/80 backdrop-blur-md shadow-xl border-t border-blue-100 transform transition-all duration-300 ease-out animate-in slide-in-from-top-2 fade-in">
           <div className="px-4 pt-2 pb-6 space-y-1">
             {Object.entries(menuData).map(([key, item]) => (
               <div key={key} className="relative">
@@ -436,7 +429,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                   // Простая ссылка для главной страницы в мобильном меню
                   <a
                     href={item.link}
-                    className="block w-full text-left px-4 py-4 rounded-xl text-base font-semibold text-blue-800 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
+                    className="block w-full text-left px-4 py-4 rounded-xl text-base font-semibold text-blue-800 hover:bg-teal-50 hover:text-teal-700 transition-colors duration-200 border-l-4 border-transparent hover:border-teal-400"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.title}
@@ -446,10 +439,10 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                   <>
                     <button
                       onClick={() => setActiveMenu(activeMenu === key ? null : key)}
-                      className={`w-full text-left flex justify-between items-center px-4 py-4 rounded-xl text-base font-semibold transition-colors duration-200 ${
+                      className={`w-full text-left flex justify-between items-center px-4 py-4 rounded-xl text-base font-semibold transition-colors duration-200 border-l-4 ${
                         activeMenu === key
-                          ? 'bg-blue-600 text-white shadow-lg'
-                          : 'text-blue-800 hover:bg-blue-50 hover:text-blue-700'
+                          ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg border-teal-400'
+                          : 'text-blue-800 hover:bg-teal-50 hover:text-teal-700 border-transparent hover:border-teal-400'
                       }`}
                     >
                       {item.title}
@@ -470,7 +463,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                               <div>
                                 <button
                                   onClick={() => setNestedMenu(nestedMenu === `${key}-${index}` ? null : `${key}-${index}`)}
-                                  className="w-full text-left flex justify-between items-center px-4 py-3 rounded-lg text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
+                                  className="w-full text-left flex justify-between items-center px-4 py-3 rounded-lg text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors duration-200 border-l-4 border-transparent hover:border-emerald-400"
                                 >
                                   {subItem.title}
                                   <svg
@@ -489,7 +482,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                                       <a
                                         key={nestedIndex}
                                         href={nestedItem.link}
-                                        className="block px-4 py-3 rounded-lg text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
+                                        className="block px-4 py-3 rounded-lg text-sm text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition-colors duration-200 border-l-4 border-transparent hover:border-emerald-400"
                                         onClick={() => setIsMenuOpen(false)}
                                       >
                                         {nestedItem.title}
@@ -501,7 +494,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                             ) : (
                               <a
                                 href={subItem.link}
-                                className="block px-4 py-3 rounded-lg text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
+                                className="block px-4 py-3 rounded-lg text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors duration-200 border-l-4 border-transparent hover:border-teal-400"
                                 onClick={() => setIsMenuOpen(false)}
                               >
                                 {subItem.title}
