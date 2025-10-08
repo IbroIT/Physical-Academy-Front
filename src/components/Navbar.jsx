@@ -58,34 +58,38 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
 
   // Данные меню для КГАФКиС
   const menuData = {
-    home: {
-      title: t('nav.home'),
-      link: '/'
-    },
     academy: {
-      title: t('nav.academy'),
-      submenu: [
+  title: t('nav.academy'),
+  submenu: [
+    { 
+      title: t('nav.about_academy'),
+      hasNested: true,
+      nestedItems: [
         { title: t('nav.about_academy'), link: '/academy/about' },
-        { 
-          title: t('nav.leadership'),
-          hasNested: true,
-          nestedItems: [
-            { title: t('nav.rectorate'), link: '/academy/leadership/rectorate' }
-          ]
-        },
-        { 
-          title: t('nav.structure'),
-          hasNested: true,
-          nestedItems: [
-            { title: t('nav.academic_structure'), link: '/academy/structure/academic' },
-          ]
-        },
         { title: t('nav.history'), link: '/academy/history' },
         { title: t('nav.mission_strategy'), link: '/academy/mission' },
         { title: t('nav.accreditation'), link: '/academy/accreditation' },
-        { title: t('nav.documents'), link: '/academy/documents' },
+        { title: t('nav.kgafkis_in_numbers'), link: '/academy/statistics' },
       ]
     },
+    { 
+      title: t('nav.leadership'),
+      hasNested: true,
+      nestedItems: [
+        { title: t('nav.board_of_trustees'), link: '/academy/leadership/board-of-trustees' },
+        { title: t('nav.audit_commission'), link: '/academy/leadership/audit-commission' },
+        { title: t('nav.academic_council'), link: '/academy/leadership/academic-council' },
+        { title: t('nav.rectorate'), link: '/academy/leadership/rectorate' },
+        { title: t('nav.trade_union'), link: '/academy/leadership/trade-union' },
+        { title: t('nav.commissions'), link: '/academy/leadership/commissions' },
+        { title: t('nav.academic_structure'), link: '/academy/structure/academic' },
+        { title: t('nav.administrative_structure'), link: '/academy/structure/administrative' },
+        { title: t('nav.administrative_units'), link: '/academy/structure/units' },
+        { title: t('nav.documents'), link: '/academy/documents' },
+      ]
+    }
+  ]
+},
     admissions: {
       title: t('nav.admissions'),
       submenu: [
@@ -107,6 +111,13 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
             { title: t('nav.general_info'), link: '/admissions/master/info' },
           ]
         },
+        {
+          title: t('nav.doctorate'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.general_info'), link: '/admissions/doctorate/info' },
+          ]
+        },
         { 
           title: t('nav.college'),
           hasNested: true,
@@ -119,29 +130,43 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
     education: {
       title: t('nav.education'),
       submenu: [
+        {
+      title: t('nav.faculties'),
+      hasNested: true,
+      nestedItems: [
         { 
-          title: t('nav.faculties'),
-          hasNested: true,
-          nestedItems: [
-            { 
-              title: t('nav.pedagogical_national_sports'),
-              link: '/education/faculties/pedagogical'
-            },
-            { 
-              title: t('nav.coaching_faculty'),
-              link: '/education/faculties/coaching'
-            },
-            { 
-              title: t('nav.military_training_physical_culture'),
-              link: '/education/faculties/military-training'
-            },
-            { 
-              title: t('nav.correspondence_advanced_training'),
-              link: '/education/faculties/correspondence'
-            },
-          ]
+          title: t('nav.pedagogical_national_sports'),
+          link: '/education/faculties/pedagogical'
         },
-        { title: t('nav.general_faculty_departments'), link: '/education/departments' },
+        { 
+          title: t('nav.coaching_faculty'),
+          link: '/education/faculties/coaching'
+        },
+        { 
+          title: t('nav.military_training_physical_culture'),
+          link: '/education/faculties/military-training'
+        },
+        { 
+          title: t('nav.correspondence_advanced_training'),
+          link: '/education/faculties/correspondence'
+        },
+        { 
+          title: t('nav.general_faculty_departments'),
+          link: '/education/departments'
+        },
+        { 
+          title: t('nav.master_program'),
+          link: '/education/faculties/master'
+        },
+        { 
+          title: t('nav.doctorate'),
+          link: '/education/faculties/doctorate'
+        }
+      ]
+    },
+
+        { title: t('nav.master_program'), link: '/education/faculties/master' },
+        { title: t('nav.doctorate'), link: '/education/faculties/doctorate' },
         { 
           title: t('nav.college'),
           hasNested: true,
@@ -158,24 +183,37 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
         { title: t('nav.vestnik'), link: '/science/vestnik' },
         { title: t('nav.web_of_science'), link: '/science/web-of-science' },
         { title: t('nav.scopus'), link: '/science/scopus' },
-        { title: t('nav.ipchain'), link: '/science/ipchain' },
-        { title: t('nav.scientific_technical_council'), link: '/science/nts' },
+        // { title: t('nav.ipchain'), link: '/science/ipchain' },
+        // { title: t('nav.scientific_technical_council'), link: '/science/nts' },
+        { title: t('nav.research_and_technical_council'), link: '/science/nts-committee' },
+        { title: t('nav.student_scientific_society'), link: '/science/ssu' }
       ]
     },
     students: {
       title: t('nav.students'),
       submenu: [
-        { title: t('nav.useful_information'), link: '/students/info' },
-        { title: t('nav.students_with_disabilities'), link: '/students/disabilities' },
-        { title: t('nav.student_council'), link: '/students/council' },
-        { title: t('nav.student_clubs'), link: '/students/clubs' },
-        { title: t('nav.exchange_programs'), link: '/students/exchange' },
-        { title: t('nav.instructions'), link: '/students/instructions' },
-        { title: t('nav.scholarship'), link: '/students/scholarship' },
-        { title: t('nav.useful_links'), link: '/students/links' },
-        { title: t('nav.ebilim_login'), link: '/students/ebilim' },
+        {
+          title: t('nav.useful_information'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.students_with_disabilities'), link: '/students/disabilities' },
+            { title: t('nav.student_council'), link: '/students/council' },
+            { title: t('nav.exchange_programs'), link: '/students/exchange' },
+            { title: t('nav.instructions'), link: '/students/instructions' },
+            { title: t('nav.scholarship'), link: '/students/scholarship' }
+          ]
+        },
+        {
+          title: t('nav.useful_links'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.ebilim_login'), link: '/students/ebilim' },
+            { title: t('nav.visa_support'), link: '/students/visa-support' }
+          ]
+        }
       ]
     },
+
     contacts: {
       title: t('nav.contacts'),
       submenu: [

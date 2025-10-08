@@ -59,6 +59,21 @@ import SocialNetworks from './components/pages/contacts/SocialNetworks';
 import Home from './components/pages/home/Home';
 import './App.css';
 
+// НОВЫЕ ИМПОРТЫ - добавьте эти импорты для недостающих страниц
+import BoardOfTrustees from './components/pages/academy/BoardOfTrustees';
+import AuditCommission from './components/pages/academy/AuditCommission';
+import AcademicCouncil from './components/pages/academy/AcademicCouncil';
+import TradeUnion from './components/pages/academy/TradeUnion';
+import Commissions from './components/pages/academy/Commissions';
+import AdministrativeStructure from './components/pages/academy/AdministrativeStructure';
+import AdministrativeUnits from './components/pages/academy/AdministrativeUnits';
+import DoctorateInfo from './components/pages/admissions/doctorate/DoctorateInfo';
+import MasterProgram from './components/pages/education/faculties/MasterProgram';
+import DoctorateProgram from './components/pages/education/faculties/DoctorateProgram';
+import NTSCommittee from './components/pages/science/NTSCommittee';
+import StudentScientificSociety from './components/pages/science/StudentScientificSociety';
+import VisaSupport from './components/pages/students/VisaSupport';
+
 function App() {
   return (
     <Router>
@@ -78,6 +93,15 @@ function App() {
             <Route path="/academy/numbers" element={<AcademyNumbers />} />
             <Route path="/academy/documents" element={<AcademyDocuments />} />
             
+            {/* НОВЫЕ ПУТИ ДЛЯ ACADEMY */}
+            <Route path="/academy/leadership/board-of-trustees" element={<BoardOfTrustees />} />
+            <Route path="/academy/leadership/audit-commission" element={<AuditCommission />} />
+            <Route path="/academy/leadership/academic-council" element={<AcademicCouncil />} />
+            <Route path="/academy/leadership/trade-union" element={<TradeUnion />} />
+            <Route path="/academy/leadership/commissions" element={<Commissions />} />
+            <Route path="/academy/structure/administrative" element={<AdministrativeStructure />} />
+            <Route path="/academy/structure/units" element={<AdministrativeUnits />} />
+            
             {/* Admissions routes */}
             <Route path="/admissions/bachelor/info" element={<BachelorInfo />} />
             <Route path="/admissions/bachelor/registration" element={<BachelorRegistration />} />
@@ -87,6 +111,9 @@ function App() {
             <Route path="/admissions/master/info" element={<MasterInfo />} />
             <Route path="/admissions/college/info" element={<CollegeInfo />} />
             
+            {/* НОВЫЕ ПУТИ ДЛЯ ADMISSIONS */}
+            <Route path="/admissions/doctorate/info" element={<DoctorateInfo />} />
+            
             {/* Education routes */}
             <Route path="/education/faculties/pedagogical" element={<PedagogicalSports />} />
             <Route path="/education/faculties/coaching" element={<CoachingFaculty />} />
@@ -95,6 +122,10 @@ function App() {
             <Route path="/education/departments" element={<GeneralDepartments />} />
             <Route path="/education/college/sports" element={<CollegeSports />} />
             
+            {/* НОВЫЕ ПУТИ ДЛЯ EDUCATION */}
+            <Route path="/education/faculties/master" element={<MasterProgram />} />
+            <Route path="/education/faculties/doctorate" element={<DoctorateProgram />} />
+            
             {/* Science routes */}
             <Route path="/science/publications" element={<ScientificPublications />} />
             <Route path="/science/vestnik" element={<Vestnik />} />
@@ -102,6 +133,10 @@ function App() {
             <Route path="/science/scopus" element={<Scopus />} />
             <Route path="/science/ipchain" element={<Ipchain />} />
             <Route path="/science/nts" element={<ScientificCouncil />} />
+            
+            {/* НОВЫЕ ПУТИ ДЛЯ SCIENCE */}
+            <Route path="/science/nts-committee" element={<NTSCommittee />} />
+            <Route path="/science/ssu" element={<StudentScientificSociety />} />
             
             {/* Students routes */}
             <Route path="/students/info" element={<UsefulInfo />} />
@@ -113,6 +148,9 @@ function App() {
             <Route path="/students/scholarship" element={<Scholarship />} />
             <Route path="/students/links" element={<UsefulLinks />} />
             <Route path="/students/ebilim" element={<EbilimLogin />} />
+            
+            {/* НОВЫЕ ПУТИ ДЛЯ STUDENTS */}
+            <Route path="/students/visa-support" element={<VisaSupport />} />
             
             {/* Contacts routes */}
             <Route path="/contacts/address" element={<AddressMap />} />
