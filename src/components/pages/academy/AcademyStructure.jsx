@@ -1,16 +1,33 @@
 // AcademicStructure.jsx
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useOrganizationStructure } from '../../../hooks/useApi';
 import { PageLoading, ErrorDisplay, EmptyState, CardSkeleton } from '../../common/Loading';
 
-const AcademyStructure = () => {
+const AcademicStructure = () => {
   const { t } = useTranslation();
   const [viewType, setViewType] = useState('hierarchical');
   const [selectedType, setSelectedType] = useState('all');
   const [expandedDepartments, setExpandedDepartments] = useState(new Set());
+  const [isVisible, setIsVisible] = useState(false);
+  const [activeDepartment, setActiveDepartment] = useState(null);
+  const sectionRef = useRef(null);
 
   const { structure, loading, error, refetch } = useOrganizationStructure(viewType === 'hierarchical');
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const toggleDepartment = (departmentId) => {
     const newExpanded = new Set(expandedDepartments);
@@ -37,20 +54,21 @@ const AcademyStructure = () => {
   };
 
   const filteredData = getFilteredData();
+  
   const structureTypes = [
-    { key: 'leadership', label: 'Руководство', icon: '👑', color: 'green' },
-    { key: 'faculties', label: 'Факультеты', icon: '🎓', color: 'blue' },
-    { key: 'administrative', label: 'Администрация', icon: '🏛️', color: 'purple' },
-    { key: 'support', label: 'Поддержка', icon: '🔧', color: 'orange' }
+    { key: 'leadership', label: t('structure.types.leadership'), icon: '👑', gradient: 'from-blue-500 to-emerald-500' },
+    { key: 'faculties', label: t('structure.types.faculties'), icon: '🎓', gradient: 'from-emerald-500 to-blue-600' },
+    { key: 'administrative', label: t('structure.types.administrative'), icon: '🏛️', gradient: 'from-blue-600 to-emerald-600' },
+    { key: 'support', label: t('structure.types.support'), icon: '🔧', gradient: 'from-emerald-400 to-blue-500' }
   ];
 
   if (loading) {
-    return <PageLoading message={t('structure.loading', 'Загрузка структуры...')} />;
+    return <PageLoading message={t('structure.loading')} />;
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-8 px-4">
         <div className="max-w-7xl mx-auto">
           <ErrorDisplay
             error={error}
@@ -62,202 +80,274 @@ const AcademyStructure = () => {
     );
   }
 
-  const getTypeColor = (type) => {
+  const getTypeGradient = (type) => {
     const typeConfig = structureTypes.find(t => t.key === type);
-    if (!typeConfig) return 'gray';
-    return typeConfig.color;
-  };
-
-  const getColorClasses = (color) => {
-    switch (color) {
-      case 'green':
-        return { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-800', active: 'bg-green-600' };
-      case 'blue':
-        return { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-800', active: 'bg-blue-600' };
-      case 'purple':
-        return { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-800', active: 'bg-purple-600' };
-      case 'orange':
-        return { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-800', active: 'bg-orange-600' };
-      default:
-        return { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-800', active: 'bg-gray-600' };
-    }
+    if (!typeConfig) return 'from-gray-500 to-gray-600';
+    return typeConfig.gradient;
   };
 
   const DepartmentCard = ({ department, level = 0 }) => {
-    const colors = getColorClasses(getTypeColor(department.structure_type));
+    const gradient = getTypeGradient(department.structure_type);
     const hasChildren = department.children && department.children.length > 0;
     const isExpanded = expandedDepartments.has(department.id);
     
     return (
-      <div className={`${level > 0 ? 'ml-6 mt-4' : ''}`}>
-        <div 
-          className={`bg-white rounded-xl border ${colors.border} hover:border-blue-300 transition-all duration-300 overflow-hidden group cursor-pointer`}
-          onClick={() => hasChildren && toggleDepartment(department.id)}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: level * 0.1 }}
+        className={`${level > 0 ? 'ml-4 lg:ml-8 mt-4' : ''}`}
+      >
+        <motion.div 
+          className={`bg-white/5 backdrop-blur-lg rounded-3xl border border-white/20 hover:border-emerald-400/50 transition-all duration-500 overflow-hidden group cursor-pointer ${
+            activeDepartment === department.id ? 'ring-2 ring-emerald-400 scale-105' : ''
+          }`}
+          onClick={() => {
+            if (hasChildren) toggleDepartment(department.id);
+            setActiveDepartment(department.id);
+          }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <div className="p-6">
+          <div className="p-6 lg:p-8">
             <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-4 flex-1">
-                <div className="flex-shrink-0">
-                  <div className={`w-12 h-12 ${colors.bg} rounded-lg flex items-center justify-center border ${colors.border}`}>
-                    <span className="text-xl">{department.icon || '🏛️'}</span>
+              <div className="flex items-start space-x-4 lg:space-x-6 flex-1">
+                {/* Иконка */}
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  className="flex-shrink-0"
+                >
+                  <div className={`w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-r ${gradient} rounded-2xl flex items-center justify-center text-white text-xl lg:text-2xl shadow-2xl`}>
+                    {department.icon || '🏛️'}
                   </div>
-                </div>
+                </motion.div>
                 
+                {/* Контент */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">
+                      <motion.h3 
+                        className="text-xl lg:text-2xl font-bold text-white mb-3"
+                        layout
+                      >
                         {department.name}
-                      </h3>
+                      </motion.h3>
 
                       {/* Structure Type */}
                       {department.structure_type && (
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${colors.bg} ${colors.text} border ${colors.border}`}>
-                          {structureTypes.find(t => t.key === department.structure_type)?.icon || '🏗️'} 
-                          {department.title || department.structure_type}
-                        </span>
+                        <motion.span 
+                          className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white/10 backdrop-blur-sm border border-white/20 text-white`}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          <span className="mr-2">{structureTypes.find(t => t.key === department.structure_type)?.icon || '🏗️'}</span>
+                          {structureTypes.find(t => t.key === department.structure_type)?.label}
+                        </motion.span>
                       )}
                     </div>
 
                     {hasChildren && (
-                      <button className="flex-shrink-0 ml-4 w-8 h-8 rounded-lg bg-gray-50 text-gray-600 flex items-center justify-center hover:bg-gray-100 transition-colors">
-                        <svg 
-                          className={`w-4 h-4 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                      <motion.button 
+                        className="flex-shrink-0 ml-4 w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <motion.svg 
+                          className="w-5 h-5"
                           fill="none" 
                           stroke="currentColor" 
                           viewBox="0 0 24 24"
+                          animate={{ rotate: isExpanded ? 180 : 0 }}
+                          transition={{ duration: 0.3 }}
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
+                        </motion.svg>
+                      </motion.button>
                     )}
                   </div>
 
                   {/* Head Information */}
                   {department.head_name && (
-                    <div className="mt-4 bg-blue-50 rounded-lg p-3 border border-blue-100">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-blue-600">👤</span>
-                        <span className="text-sm font-semibold text-blue-800">
-                          {t('structure.head', 'Руководитель')}:
+                    <motion.div 
+                      className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white text-sm">
+                          👤
+                        </div>
+                        <span className="text-sm font-semibold text-white">
+                          {t('structure.head')}
                         </span>
                       </div>
-                      <p className="text-sm text-blue-700">{department.head_name}</p>
-                    </div>
+                      <p className="text-blue-100 text-lg font-medium">{department.head_name}</p>
+                    </motion.div>
                   )}
 
                   {/* Contact Information */}
                   {(department.phone || department.email) && (
-                    <div className="mt-3 space-y-2 text-sm">
+                    <motion.div 
+                      className="mt-4 space-y-2 text-sm"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                    >
                       {department.phone && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <span>📱</span>
-                          <a href={`tel:${department.phone}`} className="text-blue-600 hover:text-blue-700 hover:underline">
+                        <div className="flex items-center gap-3 text-blue-100">
+                          <div className="w-6 h-6 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <span className="text-sm">📱</span>
+                          </div>
+                          <a href={`tel:${department.phone}`} className="hover:text-emerald-300 hover:underline transition-colors">
                             {department.phone}
                           </a>
                         </div>
                       )}
                       {department.email && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <span>📧</span>
-                          <a href={`mailto:${department.email}`} className="text-blue-600 hover:text-blue-700 hover:underline">
+                        <div className="flex items-center gap-3 text-blue-100">
+                          <div className="w-6 h-6 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                            <span className="text-sm">📧</span>
+                          </div>
+                          <a href={`mailto:${department.email}`} className="hover:text-emerald-300 hover:underline transition-colors">
                             {department.email}
                           </a>
                         </div>
                       )}
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Status */}
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  <motion.div 
+                    className="flex flex-wrap gap-2 mt-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${
                       department.is_active
-                        ? 'bg-green-100 text-green-800 border border-green-200'
-                        : 'bg-red-100 text-red-800 border border-red-200'
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+                        : 'bg-red-500/20 text-red-300 border-red-400/30'
                     }`}>
-                      <div className={`w-2 h-2 rounded-full mr-1 ${
-                        department.is_active ? 'bg-green-400' : 'bg-red-400'
+                      <div className={`w-2 h-2 rounded-full mr-2 ${
+                        department.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'
                       }`}></div>
-                      {department.is_active ? '✅ Активное' : '❌ Неактивное'}
+                      {department.is_active ? '✅ ' + t('structure.active') : '❌ ' + t('structure.inactive')}
                     </span>
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             </div>
 
             {/* Expand Button for Mobile */}
             {hasChildren && (
-              <div className="flex justify-center mt-4 lg:hidden">
-                <button className="flex items-center gap-1 text-blue-600 text-sm font-medium hover:text-blue-700 transition-colors">
-                  <span>{isExpanded ? t('structure.showLess', 'Свернуть') : t('structure.showMore', 'Подробнее')}</span>
-                  <svg 
-                    className={`w-4 h-4 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+              <div className="flex justify-center mt-6 lg:hidden">
+                <motion.button 
+                  className="flex items-center gap-2 text-emerald-300 text-sm font-medium hover:text-emerald-200 transition-colors bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span>{isExpanded ? t('structure.showLess') : t('structure.showMore')}</span>
+                  <motion.svg 
+                    className="w-4 h-4"
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
+                    animate={{ rotate: isExpanded ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+                  </motion.svg>
+                </motion.button>
               </div>
             )}
           </div>
 
           {/* Expanded Content */}
-          {isExpanded && hasChildren && (
-            <div className="border-t border-gray-100 bg-gray-50 p-6">
-              <h4 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                <span>🏢</span>
-                {t('structure.subdepartments', 'Подразделения')} ({department.children.length})
-              </h4>
-              <div className="space-y-3">
-                {department.children.map((child) => (
-                  <div key={child.id} className="bg-white rounded-lg p-4 border border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h5 className="font-medium text-gray-900">{child.name}</h5>
-                        {child.head_name && (
-                          <p className="text-sm text-gray-600 mt-1">
-                            👤 {child.head_name}
-                          </p>
-                        )}
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {child.phone && (
-                            <span className="text-xs text-gray-500">📱 {child.phone}</span>
-                          )}
-                          {child.email && (
-                            <span className="text-xs text-gray-500">📧 {child.email}</span>
-                          )}
-                        </div>
-                      </div>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        child.is_active
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {child.is_active ? 'Активно' : 'Неактивно'}
-                      </span>
-                    </div>
+          <AnimatePresence>
+            {isExpanded && hasChildren && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5 }}
+                className="border-t border-white/10 bg-white/5 p-6 lg:p-8"
+              >
+                <h4 className="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center text-white">
+                    🏢
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+                  {t('structure.subdepartments')} ({department.children.length})
+                </h4>
+                <div className="grid gap-4">
+                  {department.children.map((child, index) => (
+                    <motion.div
+                      key={child.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h5 className="font-bold text-white text-lg">{child.name}</h5>
+                          {child.head_name && (
+                            <p className="text-blue-100 text-sm mt-2 flex items-center gap-2">
+                              <span>👤</span>
+                              {child.head_name}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-3 mt-3">
+                            {child.phone && (
+                              <span className="text-xs text-blue-200 flex items-center gap-1">
+                                📱 {child.phone}
+                              </span>
+                            )}
+                            {child.email && (
+                              <span className="text-xs text-blue-200 flex items-center gap-1">
+                                📧 {child.email}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${
+                          child.is_active
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+                            : 'bg-red-500/20 text-red-300 border-red-400/30'
+                        }`}>
+                          {child.is_active ? t('structure.active') : t('structure.inactive')}
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Recursive children rendering for hierarchical view */}
-        {viewType === 'hierarchical' && isExpanded && hasChildren && (
-          <div className="space-y-4 mt-4">
-            {department.children.map((child) => (
-              <DepartmentCard 
-                key={child.id} 
-                department={child} 
-                level={level + 1}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+        <AnimatePresence>
+          {viewType === 'hierarchical' && isExpanded && hasChildren && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-4 mt-6"
+            >
+              {department.children.map((child) => (
+                <DepartmentCard 
+                  key={child.id} 
+                  department={child} 
+                  level={level + 1}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     );
   };
 
@@ -277,129 +367,190 @@ const AcademyStructure = () => {
   const stats = getStats();
 
   return (
-    <div className="min-h-screen bg-white py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            {t('academicStructure.title', 'Организационная структура')}
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            {t('academicStructure.subtitle', 'Структура академии и её подразделений')}
-          </p>
-        </div>
+    <motion.section
+      ref={sectionRef}
+      initial={{ opacity: 0 }}
+      animate={isVisible ? { opacity: 1 } : {}}
+      transition={{ duration: 0.8 }}
+      className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
+    >
+      {/* Анимированный фон */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        
+        {/* Академические символы */}
+        <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🏛️</div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">🎓</div>
+        <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">👑</div>
+      </div>
 
-        {/* Statistics */}
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        {/* Заголовок */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12 lg:mb-20"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={isVisible ? { scale: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
+          >
+            🏛️
+          </motion.div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
+            {t('academicStructure.title')}
+          </h1>
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
+          <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
+            {t('academicStructure.subtitle')}
+          </p>
+        </motion.div>
+
+        {/* Статистика */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
-            <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
-              <div className="text-2xl font-bold text-blue-600 mb-1">{stats.total}</div>
-              <div className="text-blue-800 text-sm font-medium">Всего</div>
-            </div>
-            <div className="bg-green-50 rounded-2xl p-4 text-center border border-green-100">
-              <div className="text-2xl font-bold text-green-600 mb-1">{stats.faculties}</div>
-              <div className="text-green-800 text-sm font-medium">Факультетов</div>
-            </div>
-            <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
-              <div className="text-2xl font-bold text-blue-600 mb-1">{stats.administrative}</div>
-              <div className="text-blue-800 text-sm font-medium">Административных</div>
-            </div>
-            <div className="bg-purple-50 rounded-2xl p-4 text-center border border-purple-100">
-              <div className="text-2xl font-bold text-purple-600 mb-1">{stats.leadership}</div>
-              <div className="text-purple-800 text-sm font-medium">Руководства</div>
-            </div>
-            <div className="bg-orange-50 rounded-2xl p-4 text-center border border-orange-100">
-              <div className="text-2xl font-bold text-orange-600 mb-1">{stats.support}</div>
-              <div className="text-orange-800 text-sm font-medium">Поддержки</div>
-            </div>
-            <div className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
-              <div className="text-2xl font-bold text-gray-600 mb-1">{stats.active}</div>
-              <div className="text-gray-800 text-sm font-medium">Активных</div>
-            </div>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-12 lg:mb-16"
+          >
+            {[
+              { value: stats.total, label: t('structure.stats.total'), gradient: 'from-blue-500 to-emerald-500' },
+              { value: stats.faculties, label: t('structure.stats.faculties'), gradient: 'from-emerald-500 to-blue-600' },
+              { value: stats.administrative, label: t('structure.stats.administrative'), gradient: 'from-blue-600 to-emerald-600' },
+              { value: stats.leadership, label: t('structure.stats.leadership'), gradient: 'from-emerald-400 to-blue-500' },
+              { value: stats.support, label: t('structure.stats.support'), gradient: 'from-blue-500 to-cyan-500' },
+              { value: stats.active, label: t('structure.stats.active'), gradient: 'from-emerald-500 to-green-500' }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 + index * 0.1 }}
+                className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+              >
+                <div className={`text-3xl lg:text-4xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}>
+                  {stat.value}
+                </div>
+                <div className="text-blue-200 text-sm lg:text-base">
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
         )}
 
         {/* Controls */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8"
+        >
           {/* View Type Toggle */}
-          <div className="bg-gray-100 rounded-2xl p-2 flex">
-            <button
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-2 flex border border-white/10">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => {
                 setViewType('hierarchical');
                 setExpandedDepartments(new Set());
+                setActiveDepartment(null);
               }}
-              className={`px-6 py-3 rounded-xl transition-all duration-300 font-medium ${
+              className={`px-6 py-3 rounded-xl transition-all duration-300 font-medium backdrop-blur-sm ${
                 viewType === 'hierarchical'
-                  ? 'bg-white text-blue-600 shadow-sm border border-blue-200'
-                  : 'text-gray-600 hover:text-blue-600'
+                  ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
+                  : 'text-blue-100 hover:text-white hover:bg-white/10'
               }`}
             >
-              {t('structure.hierarchicalView', 'Иерархический вид')}
-            </button>
-            <button
+              {t('structure.hierarchicalView')}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => {
                 setViewType('flat');
                 setExpandedDepartments(new Set());
+                setActiveDepartment(null);
               }}
-              className={`px-6 py-3 rounded-xl transition-all duration-300 font-medium ${
+              className={`px-6 py-3 rounded-xl transition-all duration-300 font-medium backdrop-blur-sm ${
                 viewType === 'flat'
-                  ? 'bg-white text-blue-600 shadow-sm border border-blue-200'
-                  : 'text-gray-600 hover:text-blue-600'
+                  ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
+                  : 'text-blue-100 hover:text-white hover:bg-white/10'
               }`}
             >
-              {t('structure.flatView', 'Плоский список')}
-            </button>
+              {t('structure.flatView')}
+            </motion.button>
           </div>
 
           {/* Type Filter (only for flat view) */}
           {viewType === 'flat' && (
             <div className="flex flex-wrap gap-2">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedType('all')}
-                className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-medium border ${
+                className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-medium border backdrop-blur-sm ${
                   selectedType === 'all'
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-600 border-gray-300 hover:border-blue-300'
+                    ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-transparent shadow-lg'
+                    : 'bg-white/5 text-blue-100 border-white/10 hover:bg-white/10'
                 }`}
               >
-                {t('structure.all', 'Все')}
-              </button>
+                {t('structure.all')}
+              </motion.button>
               {structureTypes.map((type) => (
-                <button
+                <motion.button
                   key={type.key}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setSelectedType(type.key)}
-                  className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-medium border flex items-center gap-2 ${
+                  className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-medium border backdrop-blur-sm flex items-center gap-2 ${
                     selectedType === type.key
-                      ? `${getColorClasses(type.color).bg} ${getColorClasses(type.color).text} ${getColorClasses(type.color).border}`
-                      : 'bg-white text-gray-600 border-gray-300 hover:border-blue-300'
+                      ? `bg-gradient-to-r ${type.gradient} text-white border-transparent shadow-lg`
+                      : 'bg-white/5 text-blue-100 border-white/10 hover:bg-white/10'
                   }`}
                 >
                   <span>{type.icon}</span>
                   <span>{type.label}</span>
-                </button>
+                </motion.button>
               ))}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Content */}
         {viewType === 'hierarchical' ? (
           // Hierarchical view
-          <div className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+            className="space-y-6"
+          >
             {Array.isArray(filteredData) && filteredData.length > 0 ? (
               filteredData.map((department) => (
                 <DepartmentCard key={department.id} department={department} />
               ))
             ) : (
               <EmptyState
-                message={t('structure.noData', 'Структура организации не найдена')}
+                message={t('structure.noData')}
                 icon={<div className="text-6xl mb-4">🏛️</div>}
               />
             )}
-          </div>
+          </motion.div>
         ) : (
           // Flat grid view
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+          >
             {Array.isArray(filteredData) && filteredData.length > 0 ? (
               filteredData.map((department) => (
                 <DepartmentCard key={department.id} department={department} />
@@ -407,29 +558,38 @@ const AcademyStructure = () => {
             ) : (
               <div className="col-span-full">
                 <EmptyState
-                  message={t('structure.noDepartments', 'Подразделения не найдены')}
+                  message={t('structure.noDepartments')}
                   icon={<div className="text-6xl mb-4">🏛️</div>}
                 />
               </div>
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Additional Information */}
-        <div className="mt-16 bg-blue-50 rounded-2xl p-8 text-center border border-blue-200">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            {t('structure.contactInfo.title', 'Нужна дополнительная информация?')}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.9 }}
+          className="mt-16 bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-8 lg:p-12 backdrop-blur-lg border border-white/20 text-center"
+        >
+          <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">
+            {t('structure.contactInfo.title')}
           </h3>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            {t('structure.contactInfo.description', 'Свяжитесь с нашим отделом кадров для получения дополнительной информации об организационной структуре')}
+          <p className="text-blue-100 mb-6 max-w-2xl mx-auto text-lg leading-relaxed">
+            {t('structure.contactInfo.description')}
           </p>
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors">
-            {t('structure.contactInfo.button', 'Связаться с отделом кадров')}
-          </button>
-        </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl"
+          >
+            {t('structure.contactInfo.button')}
+          </motion.button>
+        </motion.div>
       </div>
-    </div>
+    </motion.section>
   );
 };
 
-export default AcademyStructure;
+export default AcademicStructure;

@@ -1,357 +1,460 @@
-// components/ContactInfo.jsx
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ContactInfo = () => {
   const { t } = useTranslation();
   const [activeDepartment, setActiveDepartment] = useState(0);
   const [activeInfoTab, setActiveInfoTab] = useState('general');
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
 
-  // Получаем данные как объекты и преобразуем в массивы если нужно
   const contactInfo = t('contact.info', { returnObjects: true });
   const departmentsData = t('contact.departments.list', { returnObjects: true });
   
-  // Преобразуем departments в массив, если это объект
   const departments = Array.isArray(departmentsData) 
     ? departmentsData 
     : Object.values(departmentsData);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const contactCards = [
     {
       icon: '📍',
       title: t('contact.info.address.title', 'Адрес'),
-      content: contactInfo.address?.text || contactInfo.address || 'ул. Примерная, 123',
-      color: 'green',
-      description: t('contact.info.address.description', 'Наш главный кампус')
+      content: contactInfo.address?.text || contactInfo.address || 'ул. Спортивная, 123',
+      color: 'emerald',
+      description: t('contact.info.address.description', 'Главный кампус академии')
     },
     {
       icon: '📞',
       title: t('contact.info.phone.title', 'Телефоны'),
       content: contactInfo.phones?.numbers || contactInfo.phones || ['+7 (999) 123-45-67'],
       color: 'blue',
-      description: t('contact.info.phone.description', 'Свяжитесь с нами')
+      description: t('contact.info.phone.description', 'Круглосуточная поддержка')
     },
     {
       icon: '📧',
       title: t('contact.info.email.title', 'Email'),
-      content: contactInfo.emails?.addresses || contactInfo.emails || ['info@academy.edu'],
-      color: 'purple',
-      description: t('contact.info.email.description', 'Напишите нам')
+      content: contactInfo.emails?.addresses || contactInfo.emails || ['info@sports-academy.edu'],
+      color: 'cyan',
+      description: t('contact.info.email.description', 'Быстрый ответ в течение 2 часов')
     },
     {
       icon: '🕒',
       title: t('contact.info.hours.title', 'Часы работы'),
-      content: contactInfo.hours?.schedule || contactInfo.workingHours || ['Пн-Пт: 9:00-18:00'],
+      content: contactInfo.hours?.schedule || contactInfo.workingHours || ['Пн-Пт: 8:00-22:00', 'Сб-Вс: 9:00-20:00'],
       color: 'orange',
-      description: t('contact.info.hours.description', 'Время посещения')
+      description: t('contact.info.hours.description', 'Тренажерные залы 24/7')
     }
   ];
 
   const infoTabs = [
     { key: 'general', label: t('contact.info.tabs.general', 'Общая информация'), icon: '🏢' },
     { key: 'transport', label: t('contact.info.tabs.transport', 'Транспорт'), icon: '🚇' },
-    { key: 'facilities', label: t('contact.info.tabs.facilities', 'Удобства'), icon: '🅿️' }
+    { key: 'facilities', label: t('contact.info.tabs.facilities', 'Спорт объекты'), icon: '⚽' }
   ];
 
-  const getColorClasses = (color) => {
-    switch (color) {
-      case 'green':
-        return { 
-          bg: 'bg-green-50', 
-          border: 'border-green-200', 
-          text: 'text-green-800',
-          iconBg: 'bg-green-100',
-          iconText: 'text-green-600'
-        };
-      case 'blue':
-        return { 
-          bg: 'bg-blue-50', 
-          border: 'border-blue-200', 
-          text: 'text-blue-800',
-          iconBg: 'bg-blue-100',
-          iconText: 'text-blue-600'
-        };
-      case 'purple':
-        return { 
-          bg: 'bg-purple-50', 
-          border: 'border-purple-200', 
-          text: 'text-purple-800',
-          iconBg: 'bg-purple-100',
-          iconText: 'text-purple-600'
-        };
-      case 'orange':
-        return { 
-          bg: 'bg-orange-50', 
-          border: 'border-orange-200', 
-          text: 'text-orange-800',
-          iconBg: 'bg-orange-100',
-          iconText: 'text-orange-600'
-        };
-      default:
-        return { 
-          bg: 'bg-gray-50', 
-          border: 'border-gray-200', 
-          text: 'text-gray-800',
-          iconBg: 'bg-gray-100',
-          iconText: 'text-gray-600'
-        };
-    }
-  };
-
   const getContactItem = (item, color) => {
-    const colors = getColorClasses(color);
-    
     if (Array.isArray(item)) {
       return (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {item.map((subItem, idx) => (
-            <div key={idx} className="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0">
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="flex items-center justify-between py-2 border-b border-white/10 last:border-b-0"
+            >
               {typeof subItem === 'object' ? (
                 <>
-                  <span className="font-medium text-gray-700">{subItem.label}:</span>
+                  <span className="font-medium text-blue-100">{subItem.label}:</span>
                   <a 
                     href={subItem.number ? `tel:${subItem.number}` : `mailto:${subItem.address}`}
-                    className={`${colors.text} hover:underline font-medium`}
+                    className="text-emerald-300 hover:text-emerald-200 hover:underline font-medium transition-colors"
                   >
                     {subItem.number || subItem.address}
                   </a>
                 </>
               ) : (
-                <span className="text-gray-700">{subItem}</span>
+                <span className="text-blue-100">{subItem}</span>
               )}
-            </div>
+            </motion.div>
           ))}
         </div>
       );
     }
-    return <div className="text-gray-700">{item}</div>;
+    return <div className="text-blue-100">{item}</div>;
   };
 
   const additionalInfo = {
     general: [
-      { icon: '🏢', title: t('contact.info.general.campus', 'Главный кампус'), description: t('contact.info.general.campusDesc', 'Современное здание с оборудованными аудиториями') },
-      { icon: '👥', title: t('contact.info.general.capacity', 'Вместимость'), description: t('contact.info.general.capacityDesc', 'Более 2000 студентов') },
-      { icon: '🌐', title: t('contact.info.general.wifi', 'Wi-Fi'), description: t('contact.info.general.wifiDesc', 'Бесплатный Wi-Fi на всей территории') }
+      { 
+        icon: '🏢', 
+        title: t('contact.info.general.campus', 'Спортивный кампус'), 
+        description: t('contact.info.general.campusDesc', 'Современный комплекс с 20+ спортивными залами') 
+      },
+      { 
+        icon: '👥', 
+        title: t('contact.info.general.capacity', 'Вместимость'), 
+        description: t('contact.info.general.capacityDesc', 'Более 3000 студентов и спортсменов') 
+      },
+      { 
+        icon: '🌐', 
+        title: t('contact.info.general.wifi', 'Wi-Fi Pro'), 
+        description: t('contact.info.general.wifiDesc', 'Высокоскоростной Wi-Fi по всему кампусу') 
+      }
     ],
     transport: [
-      { icon: '🚇', title: t('contact.info.transport.metro', 'Метро'), description: t('contact.info.transport.metroDesc', 'Станция "Центральная", 5 минут пешком') },
-      { icon: '🚌', title: t('contact.info.transport.bus', 'Автобус'), description: t('contact.info.transport.busDesc', 'Остановка прямо у входа') },
-      { icon: '🚗', title: t('contact.info.transport.parking', 'Парковка'), description: t('contact.info.transport.parkingDesc', 'Бесплатная парковка для студентов') }
+      { 
+        icon: '🚇', 
+        title: t('contact.info.transport.metro', 'Метро'), 
+        description: t('contact.info.transport.metroDesc', 'Станция "Спортивная", 3 минуты пешком') 
+      },
+      { 
+        icon: '🚌', 
+        title: t('contact.info.transport.bus', 'Автобусы'), 
+        description: t('contact.info.transport.busDesc', '10 маршрутов до академии') 
+      },
+      { 
+        icon: '🚗', 
+        title: t('contact.info.transport.parking', 'Парковка'), 
+        description: t('contact.info.transport.parkingDesc', 'Бесплатная парковка на 500 мест') 
+      }
     ],
     facilities: [
-      { icon: '🍽️', title: t('contact.info.facilities.cafe', 'Кафе'), description: t('contact.info.facilities.cafeDesc', 'Студенческое кафе с горячим питанием') },
-      { icon: '📚', title: t('contact.info.facilities.library', 'Библиотека'), description: t('contact.info.facilities.libraryDesc', 'Библиотека открыта до 20:00') },
-      { icon: '💻', title: t('contact.info.facilities.computer', 'Компьютерные классы'), description: t('contact.info.facilities.computerDesc', '24/7 доступ к компьютерным классам') }
+      { 
+        icon: '🏊‍♂️', 
+        title: t('contact.info.facilities.pool', 'Бассейн'), 
+        description: t('contact.info.facilities.poolDesc', 'Олимпийский бассейн 50м') 
+      },
+      { 
+        icon: '🏃‍♂️', 
+        title: t('contact.info.facilities.track', 'Беговые дорожки'), 
+        description: t('contact.info.facilities.trackDesc', '8 профессиональных дорожек') 
+      },
+      { 
+        icon: '💪', 
+        title: t('contact.info.facilities.gym', 'Тренажерные залы'), 
+        description: t('contact.info.facilities.gymDesc', '5 залов с современным оборудованием') 
+      }
     ]
   };
 
+  const stats = [
+    { value: '24/7', label: 'Поддержка', icon: '🛡️' },
+    { value: '15+', label: 'Спорт отделов', icon: '🏃‍♂️' },
+    { value: '5min', label: 'Среднее время ответа', icon: '⚡' },
+    { value: '100%', label: 'Довольных спортсменов', icon: '🏆' }
+  ];
+
   return (
-    <div className="min-h-screen bg-white py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+    <section 
+      ref={sectionRef}
+      className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-8 lg:py-16 overflow-hidden"
+    >
+      {/* Анимированный фон */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        
+        {/* Спортивные символы */}
+        <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🏅</div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">⚽</div>
+        <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">🏃‍♀️</div>
+      </div>
+
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        {/* Заголовок */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12 lg:mb-16"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={isVisible ? { scale: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
+          >
+            📞
+          </motion.div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {t('contact.info.title', 'Контактная информация')}
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            {t('contact.info.subtitle', 'Свяжитесь с нами удобным для вас способом')}
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
+          <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+            {t('contact.info.subtitle', 'Свяжитесь с нами - мы всегда на связи для будущих чемпионов!')}
           </p>
-        </div>
+        </motion.div>
 
-        {/* Statistics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-          <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
-            <div className="text-2xl font-bold text-blue-600 mb-1">24/7</div>
-            <div className="text-blue-800 text-sm font-medium">Поддержка</div>
-          </div>
-          <div className="bg-green-50 rounded-2xl p-4 text-center border border-green-100">
-            <div className="text-2xl font-bold text-green-600 mb-1">15+</div>
-            <div className="text-green-800 text-sm font-medium">Отделов</div>
-          </div>
-          <div className="bg-blue-50 rounded-2xl p-4 text-center border border-blue-100">
-            <div className="text-2xl font-bold text-blue-600 mb-1">5min</div>
-            <div className="text-blue-800 text-sm font-medium">Среднее время ответа</div>
-          </div>
-          <div className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
-            <div className="text-2xl font-bold text-gray-600 mb-1">100%</div>
-            <div className="text-gray-800 text-sm font-medium">Довольных клиентов</div>
-          </div>
-        </div>
+        {/* Статистика */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 lg:mb-16"
+        >
+          {stats.map((stat, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 + index * 0.1 }}
+              className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+            >
+              <div className="text-2xl mb-3 text-emerald-400 group-hover:scale-110 transition-transform duration-300">
+                {stat.icon}
+              </div>
+              <div className="text-2xl lg:text-3xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                {stat.value}
+              </div>
+              <div className="text-blue-200 text-sm lg:text-base">
+                {stat.label}
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8 mb-16">
-          {/* Contact Cards */}
-          <div className="lg:col-span-2">
-            <div className="grid md:grid-cols-2 gap-6">
-              {contactCards.map((card, index) => {
-                const colors = getColorClasses(card.color);
-                
-                return (
-                  <div
-                    key={index}
-                    className={`bg-white rounded-2xl border ${colors.border} p-6 hover:shadow-lg transition-all duration-300`}
-                  >
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className={`w-12 h-12 ${colors.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                        <span className={`text-xl ${colors.iconText}`}>{card.icon}</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{card.title}</h3>
-                        <p className="text-sm text-gray-600">{card.description}</p>
-                      </div>
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+          {/* Левая колонка - Контактные карточки */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Контактные карточки */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="grid md:grid-cols-2 gap-6"
+            >
+              {contactCards.map((card, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 + index * 0.1 }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  className="bg-white/5 rounded-2xl p-6 backdrop-blur-lg border border-white/20 hover:border-emerald-400/50 shadow-2xl transition-all duration-300 group"
+                >
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      <span className="text-white text-xl">{card.icon}</span>
                     </div>
-                    <div className="text-sm">
-                      {getContactItem(card.content, card.color)}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-emerald-300 transition-colors">
+                        {card.title}
+                      </h3>
+                      <p className="text-blue-200 text-sm">{card.description}</p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="text-sm">
+                    {getContactItem(card.content, card.color)}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
 
-            {/* Additional Information Tabs */}
-            <div className="mt-8 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-              <div className="border-b border-gray-200">
+            {/* Дополнительная информация */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.7 }}
+              className="bg-white/5 rounded-2xl backdrop-blur-lg border border-white/20 shadow-2xl overflow-hidden"
+            >
+              {/* Табы */}
+              <div className="border-b border-white/10">
                 <div className="flex overflow-x-auto">
                   {infoTabs.map((tab) => (
-                    <button
+                    <motion.button
                       key={tab.key}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => setActiveInfoTab(tab.key)}
-                      className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors flex-shrink-0 ${
+                      className={`flex items-center gap-3 px-6 py-4 text-sm font-medium border-b-2 transition-all duration-300 flex-shrink-0 ${
                         activeInfoTab === tab.key
-                          ? 'border-blue-600 text-blue-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700'
+                          ? 'border-emerald-400 text-emerald-400 bg-emerald-400/10'
+                          : 'border-transparent text-blue-200 hover:text-white hover:bg-white/5'
                       }`}
                     >
-                      <span>{tab.icon}</span>
+                      <span className="text-lg">{tab.icon}</span>
                       <span>{tab.label}</span>
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
 
+              {/* Контент табов */}
               <div className="p-6">
-                <div className="grid gap-4">
-                  {additionalInfo[activeInfoTab]?.map((item, index) => (
-                    <div key={index} className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-blue-600 text-lg">{item.icon}</span>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-1">{item.title}</h4>
-                        <p className="text-gray-600 text-sm">{item.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeInfoTab}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="grid gap-4"
+                  >
+                    {additionalInfo[activeInfoTab]?.map((item, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-start gap-4 p-4 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+                      >
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                          <span className="text-white text-lg">{item.icon}</span>
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-white mb-2 group-hover:text-emerald-300 transition-colors">
+                            {item.title}
+                          </h4>
+                          <p className="text-blue-200 text-sm">{item.description}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                </AnimatePresence>
               </div>
-            </div>
+            </motion.div>
           </div>
 
-          {/* Departments */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 sticky top-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                  <span className="text-green-600 text-lg">🏢</span>
+          {/* Правая колонка - Отделы */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={isVisible ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="lg:col-span-1"
+          >
+            <div className="bg-white/5 rounded-2xl backdrop-blur-lg border border-white/20 shadow-2xl p-6 sticky top-6">
+              {/* Заголовок отделов */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-white text-xl">🏢</span>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    {t('contact.departments.title', 'Отделы и службы')}
+                  <h2 className="text-xl lg:text-2xl font-bold text-white">
+                    {t('contact.departments.title', 'Отделы академии')}
                   </h2>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-blue-200 text-sm">
                     {t('contact.departments.subtitle', 'Свяжитесь с нужным отделом')}
                   </p>
                 </div>
               </div>
 
-              {/* Department Navigation */}
-              <div className="flex flex-col gap-2 mb-6">
+              {/* Навигация по отделам */}
+              <div className="flex flex-col gap-3 mb-6">
                 {departments.map((dept, index) => (
-                  <button
+                  <motion.button
                     key={index}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => setActiveDepartment(index)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left ${
+                    className={`flex items-center gap-4 px-4 py-4 rounded-xl transition-all duration-300 text-left backdrop-blur-sm border ${
                       activeDepartment === index
-                        ? 'bg-blue-50 border border-blue-200'
-                        : 'bg-gray-50 hover:bg-gray-100 border border-transparent'
+                        ? 'bg-emerald-500/20 border-emerald-400/50 shadow-lg'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
                     }`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      activeDepartment === index ? 'bg-blue-100' : 'bg-gray-200'
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                      activeDepartment === index 
+                        ? 'bg-emerald-400 shadow-lg' 
+                        : 'bg-white/10'
                     }`}>
-                      <span className={activeDepartment === index ? 'text-blue-600' : 'text-gray-600'}>
-                        {dept.icon || '📞'}
+                      <span className={activeDepartment === index ? 'text-white' : 'text-blue-200'}>
+                        {dept.icon || '👥'}
                       </span>
                     </div>
-                    <span className="font-medium text-gray-900 flex-1">{dept.name}</span>
-                    <svg 
-                      className={`w-4 h-4 transform transition-transform ${
-                        activeDepartment === index ? 'rotate-90 text-blue-600' : 'text-gray-400'
-                      }`} 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
+                    <span className="font-medium text-white flex-1 text-sm lg:text-base">
+                      {dept.name}
+                    </span>
+                    <motion.div
+                      animate={{ rotate: activeDepartment === index ? 90 : 0 }}
+                      className="text-blue-200"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
+                      ▶
+                    </motion.div>
+                  </motion.button>
                 ))}
               </div>
 
-              {/* Department Details */}
-              {departments[activeDepartment] && (
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                  <h3 className="font-semibold text-gray-900 mb-3 text-lg">
-                    {departments[activeDepartment].name}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    {departments[activeDepartment].description}
-                  </p>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-blue-600 text-sm">👤</span>
+              {/* Детали отдела */}
+              <AnimatePresence mode="wait">
+                {departments[activeDepartment] && (
+                  <motion.div
+                    key={activeDepartment}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-xl p-5 backdrop-blur-sm border border-white/20"
+                  >
+                    <h3 className="font-bold text-white text-lg mb-3">
+                      {departments[activeDepartment].name}
+                    </h3>
+                    <p className="text-blue-100 text-sm mb-4 leading-relaxed">
+                      {departments[activeDepartment].description}
+                    </p>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+                          <span className="text-emerald-400 text-sm">👤</span>
+                        </div>
+                        <div>
+                          <div className="text-xs text-blue-300">{t('contact.departments.contactPerson', 'Контактное лицо')}</div>
+                          <div className="font-medium text-white">{departments[activeDepartment].contactPerson}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-xs text-gray-500">{t('contact.departments.contactPerson', 'Контактное лицо')}</div>
-                        <div className="font-medium text-gray-900">{departments[activeDepartment].contactPerson}</div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+                          <span className="text-emerald-400 text-sm">📞</span>
+                        </div>
+                        <div>
+                          <div className="text-xs text-blue-300">{t('contact.departments.phone', 'Телефон')}</div>
+                          <a 
+                            href={`tel:${departments[activeDepartment].phone}`}
+                            className="font-medium text-white hover:text-emerald-300 transition-colors"
+                          >
+                            {departments[activeDepartment].phone}
+                          </a>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+                          <span className="text-emerald-400 text-sm">📧</span>
+                        </div>
+                        <div>
+                          <div className="text-xs text-blue-300">{t('contact.departments.email', 'Email')}</div>
+                          <a 
+                            href={`mailto:${departments[activeDepartment].email}`}
+                            className="font-medium text-white hover:text-emerald-300 transition-colors break-all"
+                          >
+                            {departments[activeDepartment].email}
+                          </a>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-blue-600 text-sm">📞</span>
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-500">{t('contact.departments.phone', 'Телефон')}</div>
-                        <a 
-                          href={`tel:${departments[activeDepartment].phone}`}
-                          className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
-                        >
-                          {departments[activeDepartment].phone}
-                        </a>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-blue-600 text-sm">📧</span>
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-500">{t('contact.departments.email', 'Email')}</div>
-                        <a 
-                          href={`mailto:${departments[activeDepartment].email}`}
-                          className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
-                        >
-                          {departments[activeDepartment].email}
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

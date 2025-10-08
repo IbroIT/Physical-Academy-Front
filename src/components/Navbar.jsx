@@ -69,7 +69,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
             { title: t('nav.history'), link: '/academy/history' },
             { title: t('nav.mission_strategy'), link: '/academy/mission' },
             { title: t('nav.accreditation'), link: '/academy/accreditation' },
-            { title: t('nav.kgafkis_in_numbers'), link: '/academy/statistics' },
+            { title: t('nav.kgafkis_in_numbers'), link: '/academy/numbers' },
           ]
         },
         { 
@@ -153,14 +153,6 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
             { 
               title: t('nav.general_faculty_departments'),
               link: '/education/departments'
-            },
-            { 
-              title: t('nav.master_program'),
-              link: '/education/faculties/master'
-            },
-            { 
-              title: t('nav.doctorate'),
-              link: '/education/faculties/doctorate'
             }
           ]
         },

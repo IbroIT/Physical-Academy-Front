@@ -1,293 +1,281 @@
 // TradeUnion.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const TradeUnion = () => {
   const { t } = useTranslation();
   const [activeBenefit, setActiveBenefit] = useState(0);
+  const [activeEvent, setActiveEvent] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    position: ''
+  });
+  const sectionRef = useRef(null);
 
-  // Данные преимуществ профсоюза
-  const benefits = [
-    {
-      id: 1,
-      title: t('tradeUnion.benefits.legal.title'),
-      description: t('tradeUnion.benefits.legal.description'),
-      icon: '⚖️',
-      color: 'blue'
-    },
-    {
-      id: 2,
-      title: t('tradeUnion.benefits.financial.title'),
-      description: t('tradeUnion.benefits.financial.description'),
-      icon: '💰',
-      color: 'green'
-    },
-    {
-      id: 3,
-      title: t('tradeUnion.benefits.social.title'),
-      description: t('tradeUnion.benefits.social.description'),
-      icon: '👥',
-      color: 'blue'
-    },
-    {
-      id: 4,
-      title: t('tradeUnion.benefits.health.title'),
-      description: t('tradeUnion.benefits.health.description'),
-      icon: '🏥',
-      color: 'green'
-    }
-  ];
+  const benefits = t('tradeUnion.benefits.list', { returnObjects: true });
+  const events = t('tradeUnion.events.list', { returnObjects: true });
+  const stats = t('tradeUnion.stats', { returnObjects: true });
 
-  // Данные мероприятий
-  const events = [
-    {
-      id: 1,
-      title: t('tradeUnion.events.sportsFestival.title'),
-      date: t('tradeUnion.events.sportsFestival.date'),
-      description: t('tradeUnion.events.sportsFestival.description'),
-      participants: '150+'
-    },
-    {
-      id: 2,
-      title: t('tradeUnion.events.legalConsultation.title'),
-      date: t('tradeUnion.events.legalConsultation.date'),
-      description: t('tradeUnion.events.legalConsultation.description'),
-      participants: '89'
-    },
-    {
-      id: 3,
-      title: t('tradeUnion.events.healthDay.title'),
-      date: t('tradeUnion.events.healthDay.date'),
-      description: t('tradeUnion.events.healthDay.description'),
-      participants: '200+'
-    }
-  ];
-
-  // Анимация появления при скролле
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
+      ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.1 }
     );
 
-    const section = document.getElementById('trade-union');
-    if (section) {
-      observer.observe(section);
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
     }
 
-    return () => {
-      if (section) {
-        observer.unobserve(section);
-      }
-    };
+    return () => observer.disconnect();
   }, []);
 
-  // Автопереключение преимуществ
+  // Автопереключение преимуществ и событий
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveBenefit(prev => (prev + 1) % benefits.length);
-    }, 4000);
-    
+      setActiveBenefit((prev) => (prev + 1) % benefits.length);
+      setActiveEvent((prev) => (prev + 1) % events.length);
+    }, 5000);
     return () => clearInterval(interval);
-  }, [benefits.length]);
+  }, [benefits.length, events.length]);
 
-  const handleJoinClick = () => {
-    // В реальном приложении здесь будет логика отправки формы
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    // В реальном приложении здесь будет API запрос
     alert(t('tradeUnion.joinSuccess'));
+    setFormData({ name: '', email: '', position: '' });
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
   return (
-    <section id="trade-union" className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-16 px-4 overflow-hidden">
+    <section 
+      ref={sectionRef}
+      className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
+    >
       {/* Анимированный фон */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-        <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-2000"></div>
-        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        
+        {/* Символы сообщества */}
+        <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🤝</div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">⚖️</div>
+        <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">💪</div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto">
-        {/* Заголовок секции */}
-        <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-blue-900 mb-6">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        {/* Заголовок */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12 lg:mb-20"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={isVisible ? { scale: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
+          >
+            🤝
+          </motion.div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {t('tradeUnion.title')}
           </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-green-500 mx-auto mb-6"></div>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
+          <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
             {t('tradeUnion.subtitle')}
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Левая колонка - Основная информация */}
-          <div className={`space-y-8 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        {/* Статистика */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 lg:mb-16"
+        >
+          {stats.map((stat, index) => (
+            <motion.div
+              key={stat.id}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 + index * 0.1 }}
+              className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+            >
+              <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-2 group-hover:scale-110 transition-transform duration-300">
+                {stat.value}
+              </div>
+              <div className="text-blue-200 text-sm lg:text-base">
+                {stat.label}
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          {/* Левая колонка - Преимущества */}
+          <div className="space-y-8">
             {/* Приветственное сообщение */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 border-l-4 border-blue-500">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('tradeUnion.welcome.title')}</h2>
-              <p className="text-gray-600 mb-6">{t('tradeUnion.welcome.description')}</p>
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
+            >
+              <h2 className="text-2xl lg:text-3xl font-bold text-white mb-4">
+                {t('tradeUnion.welcome.title')}
+              </h2>
+              <p className="text-blue-100 text-lg leading-relaxed mb-6">
+                {t('tradeUnion.welcome.description')}
+              </p>
               <div className="flex flex-wrap gap-4">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                  <span className="text-gray-700">{t('tradeUnion.welcome.members')}</span>
+                <div className="flex items-center bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                  <span className="w-2 h-2 bg-emerald-400 rounded-full mr-3 animate-pulse"></span>
+                  <span className="text-blue-200 text-sm">{t('tradeUnion.welcome.members')}</span>
                 </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                  <span className="text-gray-700">{t('tradeUnion.welcome.activeSince')}</span>
+                <div className="flex items-center bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                  <span className="w-2 h-2 bg-blue-400 rounded-full mr-3 animate-pulse"></span>
+                  <span className="text-blue-200 text-sm">{t('tradeUnion.welcome.activeSince')}</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Преимущества профсоюза */}
-            <div className="bg-white rounded-2xl shadow-xl p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('tradeUnion.benefits.title')}</h2>
-              
-              {/* Десктопная версия - сетка */}
-              <div className="hidden md:grid grid-cols-2 gap-4">
+            {/* Преимущества */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.7 }}
+              className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
+            >
+              <h2 className="text-2xl lg:text-3xl font-bold text-white mb-6">
+                {t('tradeUnion.benefits.title')}
+              </h2>
+
+              {/* Активное преимущество */}
+              <motion.div
+                key={activeBenefit}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-2xl p-6 backdrop-blur-sm border border-white/20 mb-6"
+              >
+                <div className="flex flex-col lg:flex-row gap-6 items-center">
+                  <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg">
+                    {benefits[activeBenefit]?.icon}
+                  </div>
+                  <div className="flex-1 text-center lg:text-left">
+                    <h3 className="text-xl lg:text-2xl font-bold text-white mb-2">
+                      {benefits[activeBenefit]?.title}
+                    </h3>
+                    <p className="text-blue-200">
+                      {benefits[activeBenefit]?.description}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Все преимущества */}
+              <div className="grid md:grid-cols-2 gap-4">
                 {benefits.map((benefit, index) => (
-                  <div 
+                  <motion.div
                     key={benefit.id}
-                    className={`p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
-                      activeBenefit === index 
-                        ? `border-${benefit.color}-500 bg-${benefit.color}-50 transform scale-105 shadow-md` 
-                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/50'
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`p-4 rounded-2xl backdrop-blur-sm border cursor-pointer transition-all duration-300 ${
+                      activeBenefit === index
+                        ? 'bg-white/10 border-emerald-400/50 shadow-lg'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10'
                     }`}
                     onClick={() => setActiveBenefit(index)}
                   >
-                    <div className="flex items-start">
-                      <div className="text-2xl mr-3">{benefit.icon}</div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{benefit.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{benefit.description}</p>
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center text-white">
+                        {benefit.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-white truncate">
+                          {benefit.title}
+                        </h4>
+                        <p className="text-blue-200 text-sm truncate">
+                          {benefit.shortDescription}
+                        </p>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-              
-              {/* Мобильная версия - карусель */}
-              <div className="md:hidden relative overflow-hidden rounded-xl bg-blue-50 p-4">
-                <div 
-                  className="flex transition-transform duration-500 ease-in-out"
-                  style={{ transform: `translateX(-${activeBenefit * 100}%)` }}
-                >
-                  {benefits.map((benefit) => (
-                    <div key={benefit.id} className="w-full flex-shrink-0 p-4">
-                      <div className="flex items-start">
-                        <div className="text-2xl mr-3">{benefit.icon}</div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900">{benefit.title}</h3>
-                          <p className="text-sm text-gray-600 mt-1">{benefit.description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Индикаторы для мобильной версии */}
-                <div className="flex justify-center mt-4 space-x-2">
-                  {benefits.map((_, index) => (
-                    <button
-                      key={index}
-                      className={`w-2 h-2 rounded-full transition-all ${
-                        activeBenefit === index ? 'bg-blue-500' : 'bg-gray-300'
-                      }`}
-                      onClick={() => setActiveBenefit(index)}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Правая колонка - Мероприятия и форма */}
-          <div className={`space-y-8 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            {/* Предстоящие мероприятия */}
-            <div className="bg-white rounded-2xl shadow-xl p-6">
+          <div className="space-y-8">
+            {/* Мероприятия */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
+            >
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">{t('tradeUnion.events.title')}</h2>
-                <span className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                <h2 className="text-2xl lg:text-3xl font-bold text-white">
+                  {t('tradeUnion.events.title')}
+                </h2>
+                <span className="text-sm bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full backdrop-blur-sm">
                   {t('tradeUnion.events.upcoming')}
                 </span>
               </div>
-              
+
               <div className="space-y-4">
-                {events.map(event => (
-                  <div key={event.id} className="border-l-4 border-green-500 pl-4 py-2 hover:bg-green-50 transition-colors rounded-r">
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                      <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded-full whitespace-nowrap ml-2">
-                        {event.date}
-                      </span>
+                {events.map((event, index) => (
+                  <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="p-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-white group-hover:text-emerald-300 transition-colors">
+                          {event.title}
+                        </h3>
+                        <p className="text-blue-200 text-sm mt-1">
+                          {event.description}
+                        </p>
+                      </div>
+                      <div className="flex flex-col sm:items-end gap-2">
+                        <span className="text-emerald-300 font-semibold text-sm bg-emerald-500/20 px-3 py-1 rounded-full whitespace-nowrap">
+                          {event.date}
+                        </span>
+                        <div className="flex items-center text-blue-300 text-sm">
+                          <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+                          {event.participants} {t('tradeUnion.events.participants')}
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{event.description}</p>
-                    <div className="flex items-center mt-2 text-sm text-gray-500">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
-                      </svg>
-                      {event.participants} {t('tradeUnion.events.participants')}
-                    </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-              
-              <button className="w-full mt-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-green-600 transition-all transform hover:scale-105">
-                {t('tradeUnion.events.viewAll')}
-              </button>
-            </div>
 
-            {/* Форма вступления в профсоюз */}
-            <div className="bg-gradient-to-br from-blue-500 to-green-500 rounded-2xl shadow-xl p-6 text-white">
-              <h2 className="text-2xl font-bold mb-2">{t('tradeUnion.join.title')}</h2>
-              <p className="mb-6 opacity-90">{t('tradeUnion.join.subtitle')}</p>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1 opacity-90">
-                    {t('tradeUnion.join.form.name')}
-                  </label>
-                  <input 
-                    type="text" 
-                    className="w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
-                    placeholder={t('tradeUnion.join.form.namePlaceholder')}
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1 opacity-90">
-                    {t('tradeUnion.join.form.email')}
-                  </label>
-                  <input 
-                    type="email" 
-                    className="w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"
-                    placeholder={t('tradeUnion.join.form.emailPlaceholder')}
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1 opacity-90">
-                    {t('tradeUnion.join.form.position')}
-                  </label>
-                  <select className="w-full px-4 py-2 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-white">
-                    <option value="">{t('tradeUnion.join.form.selectPosition')}</option>
-                    <option value="teacher">{t('tradeUnion.join.form.positions.teacher')}</option>
-                    <option value="trainer">{t('tradeUnion.join.form.positions.trainer')}</option>
-                    <option value="staff">{t('tradeUnion.join.form.positions.staff')}</option>
-                    <option value="student">{t('tradeUnion.join.form.positions.student')}</option>
-                  </select>
-                </div>
-                
-                <button 
-                  onClick={handleJoinClick}
-                  className="w-full mt-2 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105"
-                >
-                  {t('tradeUnion.join.form.submit')}
-                </button>
-              </div>
-            </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full mt-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg"
+              >
+                {t('tradeUnion.events.viewAll')}
+              </motion.button>
+            </motion.div>
           </div>
         </div>
       </div>

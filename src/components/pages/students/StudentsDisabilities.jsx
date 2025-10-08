@@ -1,160 +1,340 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const StudentsDisabilities = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('support');
+  const [isVisible, setIsVisible] = useState(false);
+  const [activeService, setActiveService] = useState(0);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Автопереключение услуг
+  useEffect(() => {
+    const data = t('students.disabilities', { returnObjects: true });
+    const interval = setInterval(() => {
+      setActiveService((prev) => (prev + 1) % data.support.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [t]);
 
   const data = t('students.disabilities', { returnObjects: true });
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
-          {data.title}
-        </h2>
-        <p className="text-gray-600 mt-2 max-w-2xl mx-auto text-sm">
-          {data.subtitle}
-        </p>
+    <section 
+      ref={sectionRef}
+      className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
+    >
+      {/* Анимированный фон с символами инклюзивности */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        
+        {/* Символы инклюзивности */}
+        <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">♿</div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">🤝</div>
+        <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">❤️</div>
+        <div className="absolute top-1/3 left-1/3 text-5xl opacity-5">🌍</div>
       </div>
 
-      {/* Навигация */}
-      <div className="flex justify-center">
-        <div className="bg-white rounded-xl p-1 shadow-sm border border-gray-200">
-          {['support', 'contacts', 'resources'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                activeTab === tab
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              {data.tabs[tab]}
-            </button>
-          ))}
-        </div>
-      </div>
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12 lg:mb-20"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={isVisible ? { scale: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
+          >
+            ♿
+          </motion.div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
+            {data.title}
+          </h1>
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
+          <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
+            {data.subtitle}
+          </p>
+        </motion.div>
 
-      {/* Контент */}
-      {activeTab === 'support' && <SupportServices data={data.support} />}
-      {activeTab === 'contacts' && <Contacts data={data.contacts} />}
-      {activeTab === 'resources' && <Resources data={data.resources} />}
-    </div>
+        {/* Навигация */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="flex justify-center mb-12 lg:mb-16"
+        >
+          <div className="bg-white/5 rounded-2xl p-2 backdrop-blur-lg border border-white/20 shadow-2xl">
+            {['support', 'contacts', 'resources'].map((tab) => (
+              <motion.button
+                key={tab}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-500 ${
+                  activeTab === tab
+                    ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
+                    : 'text-blue-200 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                {data.tabs[tab]}
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Контент */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="bg-white/5 rounded-3xl backdrop-blur-lg border border-white/20 shadow-2xl overflow-hidden"
+        >
+          <div className="p-6 lg:p-8">
+            <AnimatePresence mode="wait">
+              {activeTab === 'support' && (
+                <SupportServices 
+                  key="support" 
+                  data={data.support} 
+                  activeService={activeService}
+                  onServiceChange={setActiveService}
+                />
+              )}
+              {activeTab === 'contacts' && (
+                <Contacts key="contacts" data={data.contacts} />
+              )}
+              {activeTab === 'resources' && (
+                <Resources key="resources" data={data.resources} />
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   );
 };
 
-const SupportServices = ({ data }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {data.map((service, index) => (
-      <div 
-        key={index}
-        className="bg-blue-50 rounded-xl p-4 border border-blue-200 hover:shadow-md transition-all duration-200"
+const SupportServices = ({ data, activeService, onServiceChange }) => (
+  <div className="space-y-8">
+    {/* Активная услуга */}
+    {data[activeService] && (
+      <motion.div
+        key={activeService}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-8 backdrop-blur-lg border border-white/20 shadow-2xl mb-8"
       >
-        <div className="flex items-start space-x-3 mb-3">
-          <div className="w-10 h-10 bg-blue-600 text-white p-2 rounded-lg flex items-center justify-center">
-            {service.icon}
+        <div className="flex flex-col lg:flex-row gap-8 items-center">
+          <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg">
+            {data[activeService].icon}
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-blue-700 mb-1">{service.title}</h3>
-            <p className="text-gray-700 text-sm leading-relaxed">{service.description}</p>
-          </div>
-        </div>
-        
-        {service.features && (
-          <div className="bg-white rounded-lg p-3 border border-blue-100">
-            <h4 className="font-semibold text-gray-800 text-sm mb-2">Включает:</h4>
-            <ul className="space-y-1">
-              {service.features.map((feature, i) => (
-                <li key={i} className="flex items-center text-gray-600 text-xs">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></div>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    ))}
-  </div>
-);
-
-const Contacts = ({ data }) => (
-  <div className="space-y-4">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {data.map((contact, index) => (
-        <div 
-          key={index}
-          className="bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all duration-200"
-        >
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
-              👤
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900 text-sm">{contact.name}</h3>
-              <p className="text-gray-600 text-xs">{contact.position}</p>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center text-gray-600 text-sm">
-              <span className="w-4 text-center mr-2">📞</span>
-              <a href={`tel:${contact.phone}`} className="hover:text-blue-600 transition-colors">
-                {contact.phone}
-              </a>
-            </div>
-            <div className="flex items-center text-gray-600 text-sm">
-              <span className="w-4 text-center mr-2">📧</span>
-              <a href={`mailto:${contact.email}`} className="hover:text-blue-600 transition-colors">
-                {contact.email}
-              </a>
-            </div>
-            {contact.hours && (
-              <div className="flex items-center text-gray-600 text-sm">
-                <span className="w-4 text-center mr-2">🕒</span>
-                <span>{contact.hours}</span>
+          <div className="flex-1 text-center lg:text-left">
+            <h3 className="text-2xl lg:text-3xl font-bold text-white mb-3">
+              {data[activeService].title}
+            </h3>
+            <p className="text-blue-100 text-lg leading-relaxed mb-4">
+              {data[activeService].description}
+            </p>
+            {data[activeService].features && (
+              <div className="grid md:grid-cols-2 gap-3">
+                {data[activeService].features.map((feature, i) => (
+                  <div key={i} className="flex items-center text-blue-200">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></div>
+                    {feature}
+                  </div>
+                ))}
               </div>
             )}
           </div>
         </div>
+      </motion.div>
+    )}
+
+    {/* Все услуги */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {data.map((service, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          className={`bg-white/5 rounded-2xl p-6 border backdrop-blur-sm transition-all duration-300 cursor-pointer ${
+            activeService === index
+              ? 'border-emerald-400/50 bg-white/10 shadow-lg'
+              : 'border-white/10 hover:border-emerald-400/30'
+          }`}
+          onClick={() => onServiceChange(index)}
+          whileHover={{ scale: 1.02 }}
+        >
+          <div className="flex items-start space-x-4 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center text-white text-lg flex-shrink-0">
+              {service.icon}
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-white mb-2">{service.title}</h3>
+              <p className="text-blue-200 text-sm leading-relaxed">{service.description}</p>
+            </div>
+          </div>
+          
+          {service.features && (
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <h4 className="font-semibold text-white text-sm mb-3">{service.featuresTitle || 'Включает:'}</h4>
+              <ul className="space-y-2">
+                {service.features.slice(0, 3).map((feature, i) => (
+                  <li key={i} className="flex items-center text-blue-200 text-sm">
+                    <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-3 flex-shrink-0"></div>
+                    {feature}
+                  </li>
+                ))}
+                {service.features.length > 3 && (
+                  <li className="text-blue-300 text-sm">
+                    + еще {service.features.length - 3} услуг
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
+        </motion.div>
       ))}
-    </div>
-    
-    <div className="bg-blue-600 rounded-xl p-4 text-white text-center">
-      <h3 className="text-lg font-bold mb-2">Экстренная поддержка</h3>
-      <p className="text-blue-100 text-sm mb-3">Круглосуточная психологическая помощь</p>
-      <a href="tel:+78002000112" className="text-xl font-bold hover:underline block">
-        📞 8-800-2000-112
-      </a>
     </div>
   </div>
 );
 
+const Contacts = ({ data }) => (
+  <div className="space-y-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {data.map((contact, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-emerald-400/30 transition-all duration-300 backdrop-blur-sm"
+          whileHover={{ scale: 1.02 }}
+        >
+          <div className="flex items-center space-x-4 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center text-white">
+              👤
+            </div>
+            <div>
+              <h3 className="font-bold text-white text-lg">{contact.name}</h3>
+              <p className="text-blue-200 text-sm">{contact.position}</p>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="flex items-center text-blue-200 text-sm">
+              <span className="w-8 text-center mr-3 text-lg">📞</span>
+              <a 
+                href={`tel:${contact.phone}`} 
+                className="hover:text-emerald-300 transition-colors duration-300"
+              >
+                {contact.phone}
+              </a>
+            </div>
+            <div className="flex items-center text-blue-200 text-sm">
+              <span className="w-8 text-center mr-3 text-lg">📧</span>
+              <a 
+                href={`mailto:${contact.email}`} 
+                className="hover:text-emerald-300 transition-colors duration-300"
+              >
+                {contact.email}
+              </a>
+            </div>
+            {contact.hours && (
+              <div className="flex items-center text-blue-200 text-sm">
+                <span className="w-8 text-center mr-3 text-lg">🕒</span>
+                <span>{contact.hours}</span>
+              </div>
+            )}
+            {contact.location && (
+              <div className="flex items-center text-blue-200 text-sm">
+                <span className="w-8 text-center mr-3 text-lg">📍</span>
+                <span>{contact.location}</span>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+    
+    {/* Экстренная поддержка */}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.5 }}
+      className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-8 text-center border border-white/20 backdrop-blur-lg shadow-2xl"
+    >
+      <h3 className="text-2xl font-bold text-white mb-3">
+        {data.emergency?.title || 'Экстренная поддержка'}
+      </h3>
+      <p className="text-blue-100 text-lg mb-4">
+        {data.emergency?.description || 'Круглосуточная психологическая помощь'}
+      </p>
+      <motion.a
+        href={data.emergency?.phoneLink || "tel:+78002000112"}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="inline-flex items-center space-x-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-8 py-4 rounded-2xl font-bold text-xl hover:from-emerald-600 hover:to-green-600 transition-all duration-300 shadow-lg"
+      >
+        <span className="text-2xl">📞</span>
+        <span>{data.emergency?.phone || '8-800-2000-112'}</span>
+      </motion.a>
+    </motion.div>
+  </div>
+);
+
 const Resources = ({ data }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {data.map((resource, index) => (
-      <a
+      <motion.a
         key={index}
         href={resource.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all duration-200 group"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: index * 0.1 }}
+        className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group backdrop-blur-sm block"
+        whileHover={{ scale: 1.05 }}
       >
-        <div className="text-center mb-3">
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-xl mx-auto mb-2 group-hover:scale-110 transition-transform duration-200">
+        <div className="text-center mb-4">
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
             {resource.icon}
           </div>
-          <h3 className="font-bold text-gray-900 text-sm mb-1">{resource.name}</h3>
-          <p className="text-gray-600 text-xs leading-relaxed">{resource.description}</p>
+          <h3 className="font-bold text-white text-lg mb-2">{resource.name}</h3>
+          <p className="text-blue-200 text-sm leading-relaxed">{resource.description}</p>
         </div>
         
-        <div className="flex justify-between items-center text-xs">
-          <span className="text-blue-600 font-medium">{resource.type}</span>
-          <span className="text-gray-500">{resource.format}</span>
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-emerald-400 font-medium bg-emerald-500/20 px-3 py-1 rounded-full">
+            {resource.type}
+          </span>
+          <span className="text-blue-300 bg-blue-500/20 px-3 py-1 rounded-full">
+            {resource.format}
+          </span>
         </div>
-      </a>
+      </motion.a>
     ))}
   </div>
 );

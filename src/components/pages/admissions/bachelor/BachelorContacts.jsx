@@ -1,5 +1,5 @@
 // components/BachelorContacts.jsx
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const BachelorContacts = () => {
@@ -10,6 +10,27 @@ const BachelorContacts = () => {
     email: '',
     message: ''
   });
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          setIsVisible(true);
+          hasAnimated.current = true;
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const departments = [
     {
@@ -19,13 +40,8 @@ const BachelorContacts = () => {
       phone: '+7 (999) 123-45-67',
       hours: t('bachelor.contacts.departments.admission.hours', 'Пн-Пт: 9:00-18:00'),
       description: t('bachelor.contacts.departments.admission.description', 'Вопросы поступления, документы, вступительные испытания'),
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14v6l9-5-9-5-9 5 9 5z" />
-        </svg>
-      )
+      icon: '📝',
+      color: 'from-blue-500 to-blue-600'
     },
     {
       id: 'international',
@@ -34,11 +50,8 @@ const BachelorContacts = () => {
       phone: '+7 (999) 123-45-68',
       hours: t('bachelor.contacts.departments.international.hours', 'Пн-Пт: 10:00-17:00'),
       description: t('bachelor.contacts.departments.international.description', 'Иностранным абитуриентам, визовая поддержка'),
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
+      icon: '🌍',
+      color: 'from-green-500 to-green-600'
     },
     {
       id: 'quotas',
@@ -47,11 +60,8 @@ const BachelorContacts = () => {
       phone: '+7 (999) 123-45-69',
       hours: t('bachelor.contacts.departments.quotas.hours', 'Пн-Чт: 9:00-17:00, Пт: 9:00-16:00'),
       description: t('bachelor.contacts.departments.quotas.description', 'Бюджетные места, стипендии, образовательные гранты'),
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
+      icon: '🎓',
+      color: 'from-blue-500 to-green-500'
     },
     {
       id: 'general',
@@ -60,11 +70,8 @@ const BachelorContacts = () => {
       phone: '+7 (999) 123-45-70',
       hours: t('bachelor.contacts.departments.general.hours', 'Пн-Пт: 8:00-19:00'),
       description: t('bachelor.contacts.departments.general.description', 'Общие вопросы, административные вопросы'),
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        </svg>
-      )
+      icon: '🏛️',
+      color: 'from-green-500 to-blue-500'
     }
   ];
 
@@ -100,91 +107,126 @@ const BachelorContacts = () => {
   };
 
   return (
-    <div className="min-h-screen bg-blue-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
+    <section 
+      ref={sectionRef}
+      className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 overflow-hidden"
+    >
+      {/* Анимированный фон */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-blue-600/10 via-transparent to-transparent"></div>
+        <div className="absolute top-20 left-10 w-32 h-32 bg-green-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {t('bachelor.contacts.title', 'Контакты для поступления')}
+        <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}>
+          <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300">
+            <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
+            <span className="text-green-300 font-medium text-sm md:text-base">
+              {t('bachelor.contacts.badge', 'Контакты')}
+            </span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
+            {t('bachelor.contacts.title', 'КОНТАКТЫ ДЛЯ ПОСТУПЛЕНИЯ')}
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-green-400 mx-auto mb-6 md:mb-8"></div>
+          <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto px-4 leading-relaxed">
             {t('bachelor.contacts.subtitle', 'Свяжитесь с нами для получения консультации по вопросам поступления')}
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 mb-12">
+        <div className={`grid lg:grid-cols-2 gap-6 md:gap-8 mb-12 transition-all duration-1000 delay-300 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}>
           {/* Contact Information */}
           <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl p-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center">
+                <span className="w-3 h-3 bg-blue-400 rounded-full mr-3"></span>
                 {t('bachelor.contacts.departmentsTitle', 'Отделы и контакты')}
               </h2>
               
               {/* Department Navigation */}
-              <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 mb-6">
-                {departments.map((dept) => (
-                  <button
-                    key={dept.id}
-                    onClick={() => setActiveDepartment(dept.id)}
-                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                      activeDepartment === dept.id
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    {dept.name.split(' ')[0]}
-                  </button>
-                ))}
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl p-1 mb-6 border border-white/20">
+                <div className="grid grid-cols-2 gap-1">
+                  {departments.map((dept) => (
+                    <button
+                      key={dept.id}
+                      onClick={() => setActiveDepartment(dept.id)}
+                      className={`flex items-center justify-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-300 group ${
+                        activeDepartment === dept.id
+                          ? `bg-gradient-to-r ${dept.color} text-white shadow-lg scale-105`
+                          : 'text-blue-100 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <span className="text-lg mr-2">{dept.icon}</span>
+                      <span className="hidden sm:block">{dept.name.split(' ')[0]}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Active Department Details */}
               {departments.map((dept) => (
                 <div
                   key={dept.id}
-                  className={`transition-all duration-300 ${
-                    activeDepartment === dept.id ? 'block' : 'hidden'
+                  className={`transition-all duration-500 ${
+                    activeDepartment === dept.id ? 'block animate-fadeIn' : 'hidden'
                   }`}
                 >
-                  <div className="flex items-start space-x-4 mb-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                  <div className="flex items-start space-x-4 mb-6">
+                    <div className={`flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-r ${dept.color} flex items-center justify-center text-white text-2xl shadow-lg`}>
                       {dept.icon}
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">{dept.name}</h3>
-                      <p className="text-gray-600 mb-4">{dept.description}</p>
+                      <h3 className="text-xl md:text-2xl font-bold text-white mb-2">{dept.name}</h3>
+                      <p className="text-blue-100 mb-4">{dept.description}</p>
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-gray-700 font-medium">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:border-green-400/30 transition-all duration-300 group">
+                      <span className="text-blue-100 font-medium flex items-center">
+                        <span className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3 text-blue-300">
+                          📧
+                        </span>
                         {t('bachelor.contacts.email', 'Email')}
                       </span>
                       <a 
                         href={`mailto:${dept.email}`}
-                        className="text-blue-600 hover:text-blue-700 font-medium"
+                        className="text-green-300 hover:text-green-400 font-medium transition-colors group-hover:scale-105"
                       >
                         {dept.email}
                       </a>
                     </div>
                     
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-gray-700 font-medium">
+                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:border-green-400/30 transition-all duration-300 group">
+                      <span className="text-blue-100 font-medium flex items-center">
+                        <span className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center mr-3 text-green-300">
+                          📞
+                        </span>
                         {t('bachelor.contacts.phone', 'Телефон')}
                       </span>
                       <a 
                         href={`tel:${dept.phone}`}
-                        className="text-blue-600 hover:text-blue-700 font-medium"
+                        className="text-green-300 hover:text-green-400 font-medium transition-colors group-hover:scale-105"
                       >
                         {dept.phone}
                       </a>
                     </div>
                     
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-gray-700 font-medium">
+                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:border-green-400/30 transition-all duration-300 group">
+                      <span className="text-blue-100 font-medium flex items-center">
+                        <span className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3 text-blue-300">
+                          ⏰
+                        </span>
                         {t('bachelor.contacts.hours', 'Часы работы')}
                       </span>
-                      <span className="text-gray-600">{dept.hours}</span>
+                      <span className="text-green-300">{dept.hours}</span>
                     </div>
                   </div>
                 </div>
@@ -195,28 +237,24 @@ const BachelorContacts = () => {
             <div className="grid grid-cols-2 gap-4">
               <a
                 href="tel:+79991234567"
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 text-center hover:shadow-md transition-shadow duration-200 group"
+                className="group bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 p-6 text-center hover:border-green-400/30 transition-all duration-500 hover:scale-105 hover:shadow-2xl"
               >
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white text-2xl">📞</span>
                 </div>
-                <span className="font-semibold text-gray-900">
+                <span className="font-bold text-white text-lg">
                   {t('bachelor.actions.call', 'Позвонить')}
                 </span>
               </a>
               
               <a
                 href="mailto:info@academy.ru"
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 text-center hover:shadow-md transition-shadow duration-200 group"
+                className="group bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 p-6 text-center hover:border-green-400/30 transition-all duration-500 hover:scale-105 hover:shadow-2xl"
               >
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white text-2xl">✉️</span>
                 </div>
-                <span className="font-semibold text-gray-900">
+                <span className="font-bold text-white text-lg">
                   {t('bachelor.actions.email', 'Написать')}
                 </span>
               </a>
@@ -226,39 +264,44 @@ const BachelorContacts = () => {
           {/* FAQ & Contact Form */}
           <div className="space-y-6">
             {/* FAQ Section */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl p-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 flex items-center">
+                <span className="w-3 h-3 bg-green-400 rounded-full mr-3"></span>
                 {t('bachelor.contacts.faqTitle', 'Частые вопросы')}
               </h2>
               
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {faqs.map((faq, index) => (
                   <div
                     key={index}
-                    className="border border-gray-200 rounded-lg hover:border-gray-300 transition-colors duration-200"
+                    className="bg-white/5 border border-white/10 rounded-xl hover:border-green-400/30 transition-all duration-300 group"
                   >
                     <button
                       onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                      className="w-full p-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors rounded-lg"
+                      className="w-full p-4 text-left flex items-center justify-between hover:bg-white/5 transition-colors rounded-xl"
                     >
-                      <span className="font-medium text-gray-900 pr-4 flex-1">
+                      <span className="font-bold text-white pr-4 flex-1 text-lg group-hover:text-green-300 transition-colors">
                         {faq.question}
                       </span>
-                      <svg 
-                        className={`w-5 h-5 text-gray-400 transform transition-transform duration-300 ${
-                          openFaq === index ? 'rotate-180' : ''
-                        }`}
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
+                      <div className={`w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:bg-green-500/20 ${
+                        openFaq === index ? 'bg-green-500/20 rotate-180' : ''
+                      }`}>
+                        <svg 
+                          className={`w-5 h-5 text-white transition-transform duration-300 ${
+                            openFaq === index ? 'rotate-180' : ''
+                          }`}
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
                     </button>
                     {openFaq === index && (
-                      <div className="px-4 pb-4">
-                        <div className="border-t border-gray-200 pt-4">
-                          <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                      <div className="px-4 pb-4 animate-fadeIn">
+                        <div className="border-t border-white/10 pt-4">
+                          <p className="text-blue-100 leading-relaxed text-lg">{faq.answer}</p>
                         </div>
                       </div>
                     )}
@@ -268,13 +311,14 @@ const BachelorContacts = () => {
             </div>
 
             {/* Quick Contact Form */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl p-6">
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center">
+                <span className="w-3 h-3 bg-blue-400 rounded-full mr-3"></span>
                 {t('bachelor.contacts.quickContact', 'Быстрая связь')}
               </h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-blue-100 mb-3">
                     {t('bachelor.contacts.form.email', 'Email для ответа')}
                   </label>
                   <input
@@ -284,12 +328,12 @@ const BachelorContacts = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="your@email.com"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-4 bg-white/5 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 text-white placeholder-blue-200"
                     required
                   />
                 </div>
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="message" className="block text-sm font-medium text-blue-100 mb-3">
                     {t('bachelor.contacts.form.message', 'Ваш вопрос')}
                   </label>
                   <textarea
@@ -299,13 +343,13 @@ const BachelorContacts = () => {
                     onChange={handleInputChange}
                     rows={4}
                     placeholder={t('bachelor.contacts.form.messagePlaceholder', 'Опишите ваш вопрос подробно...')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                    className="w-full px-4 py-4 bg-white/5 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 text-white placeholder-blue-200 resize-none"
                     required
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-6 rounded-xl font-bold hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                 >
                   {t('bachelor.contacts.form.send', 'Отправить вопрос')}
                 </button>
@@ -315,77 +359,73 @@ const BachelorContacts = () => {
         </div>
 
         {/* Location Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <div className={`bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl p-6 md:p-8 transition-all duration-1000 delay-500 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 flex items-center">
+            <span className="w-3 h-3 bg-green-400 rounded-full mr-3"></span>
             {t('bachelor.contacts.locationTitle', 'Мы находимся')}
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-4">
-              <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                  <svg className="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <p>{t('bachelor.contacts.mapPlaceholder', 'Интерактивная карта')}</p>
+              <div className="bg-white/5 rounded-2xl h-80 flex items-center justify-center border border-white/20 group hover:border-green-400/30 transition-all duration-500">
+                <div className="text-center text-blue-100 group-hover:text-white transition-colors">
+                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-white text-3xl">📍</span>
+                  </div>
+                  <p className="text-lg font-medium">{t('bachelor.contacts.mapPlaceholder', 'Интерактивная карта')}</p>
+                  <p className="text-blue-200 mt-2">{t('bachelor.contacts.mapDescription', 'Наш кампус в центре города')}</p>
                 </div>
               </div>
             </div>
             
             <div className="space-y-6">
-              <div className="flex items-start space-x-4 p-4 bg-blue-50 rounded-lg">
-                <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+              <div className="flex items-start space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-blue-400/30 transition-all duration-300 group">
+                <div className="flex-shrink-0 w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-300 group-hover:bg-blue-500/30 transition-colors">
+                  <span className="text-xl">🏛️</span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">
+                  <h4 className="font-bold text-white mb-3 text-lg">
                     {t('bachelor.contacts.address.title', 'Адрес академии')}
                   </h4>
-                  <p className="text-gray-600 mb-1">
+                  <p className="text-blue-100 mb-2 group-hover:text-white transition-colors">
                     {t('bachelor.contacts.address.street', 'ул. Примерная, 123')}
                   </p>
-                  <p className="text-gray-600">
+                  <p className="text-blue-100 group-hover:text-white transition-colors">
                     {t('bachelor.contacts.address.city', 'г. Москва, 123456')}
                   </p>
                 </div>
               </div>
               
-              <div className="flex items-start space-x-4 p-4 bg-green-50 rounded-lg">
-                <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+              <div className="flex items-start space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-green-400/30 transition-all duration-300 group">
+                <div className="flex-shrink-0 w-12 h-12 bg-green-500/20 rounded-2xl flex items-center justify-center text-green-300 group-hover:bg-green-500/30 transition-colors">
+                  <span className="text-xl">⏰</span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">
+                  <h4 className="font-bold text-white mb-3 text-lg">
                     {t('bachelor.contacts.hours.title', 'Часы работы')}
                   </h4>
-                  <p className="text-gray-600 mb-1">
+                  <p className="text-blue-100 mb-2 group-hover:text-white transition-colors">
                     {t('bachelor.contacts.hours.weekdays', 'Понедельник - Пятница: 9:00 - 18:00')}
                   </p>
-                  <p className="text-gray-600">
+                  <p className="text-blue-100 group-hover:text-white transition-colors">
                     {t('bachelor.contacts.hours.weekend', 'Суббота: 10:00 - 16:00')}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
-                <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+              <div className="flex items-start space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-blue-400/30 transition-all duration-300 group">
+                <div className="flex-shrink-0 w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center text-blue-300 group-hover:bg-blue-500/30 transition-colors">
+                  <span className="text-xl">🚇</span>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">
+                  <h4 className="font-bold text-white mb-3 text-lg">
                     {t('bachelor.contacts.transport.title', 'Как добраться')}
                   </h4>
-                  <p className="text-gray-600 mb-1">
+                  <p className="text-blue-100 mb-2 group-hover:text-white transition-colors">
                     {t('bachelor.contacts.transport.metro', 'Метро: Станция "Примерная"')}
                   </p>
-                  <p className="text-gray-600">
+                  <p className="text-blue-100 group-hover:text-white transition-colors">
                     {t('bachelor.contacts.transport.bus', 'Автобусы: 123, 456, 789')}
                   </p>
                 </div>
@@ -394,7 +434,11 @@ const BachelorContacts = () => {
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Плавающие элементы для десктопа */}
+      <div className="absolute bottom-20 left-5 w-6 h-6 bg-green-400/20 rounded-full animate-bounce hidden md:block"></div>
+      <div className="absolute top-20 right-5 w-4 h-4 bg-blue-400/20 rounded-full animate-ping hidden md:block"></div>
+    </section>
   );
 };
 
