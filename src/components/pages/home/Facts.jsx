@@ -115,15 +115,6 @@ const AnimatedFactsSection = () => {
             />
           ))}
         </div>
-
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center justify-center space-x-2 animate-bounce">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <div className="w-2 h-2 bg-green-500 rounded-full animation-delay-200"></div>
-            <div className="w-2 h-2 bg-blue-500 rounded-full animation-delay-400"></div>
-          </div>
-          <p className="text-gray-600 mt-2">{t("facts.scrollHint")}</p>
-        </div>
       </div>
     </section>
   );

@@ -73,6 +73,8 @@ import DoctorateProgram from './components/pages/education/faculties/DoctoratePr
 import NTSCommittee from './components/pages/science/NTSCommittee';
 import StudentScientificSociety from './components/pages/science/StudentScientificSociety';
 import VisaSupport from './components/pages/students/VisaSupport';
+import DetailPage from './components/Details';
+import AnnouncementDetailPage from './components/AnnouncementDetail';
 
 function App() {
   return (
@@ -82,6 +84,9 @@ function App() {
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
+
+            <Route path="/news/:id" element={<DetailPage />} />
+            <Route path="/announcements/:id" element={<AnnouncementDetailPage />} />
             
             {/* Academy routes */}
             <Route path="/academy/about" element={<AcademyAbout />} />

@@ -1,47 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const NewsHomePage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   // Данные новостей через i18n
-  const newsData = [
-    {
-      id: 1,
-      title: t('news.items.0.title', 'Product Launch'),
-      description: t('news.items.0.description', 'Introducing innovative business solutions'),
-      date: t('news.items.0.date', 'May 15, 2024'),
-      category: t('news.categories.technology', 'Technology'),
-      image: '/api/placeholder/600/400'
-    },
-    {
-      id: 2,
-      title: t('news.items.1.title', 'Company Achievements'),
-      description: t('news.items.1.description', 'Record performance this quarter'),
-      date: t('news.items.1.date', 'May 12, 2024'),
-      category: t('news.categories.business', 'Business'),
-      image: '/api/placeholder/600/400'
-    },
-    {
-      id: 3,
-      title: t('news.items.2.title', 'Eco Initiative'),
-      description: t('news.items.2.description', 'Launching sustainable development program'),
-      date: t('news.items.2.date', 'May 10, 2024'),
-      category: t('news.categories.ecology', 'Ecology'),
-      image: '/api/placeholder/600/400'
-    },
-    {
-      id: 4,
-      title: t('news.items.3.title', 'Industry Partnership'),
-      description: t('news.items.3.description', 'New strategic partnerships formed'),
-      date: t('news.items.3.date', 'May 8, 2024'),
-      category: t('news.categories.partnerships', 'Partnerships'),
-      image: '/api/placeholder/600/400'
-    }
-  ];
+  const newsData = t('news.items', { returnObjects: true });
 
   const navigateNews = useCallback((direction) => {
     setIsVisible(false);
@@ -70,27 +40,46 @@ const NewsHomePage = () => {
 
   const currentNews = newsData[currentNewsIndex];
 
+  const handleReadMore = (newsId) => {
+    navigate(`/news/${newsId}`);
+  };
+
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))]" />
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-600 to-emerald-600 bg-clip-text text-transparent mb-6">
-              {t('news.title', 'Latest News')}
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              {t('news.subtitle', 'Stay updated with the latest developments and innovations shaping our future')}
-            </p>
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-600 to-emerald-600 bg-clip-text text-transparent mb-6"
+            >
+              {t('news.title')}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+            >
+              {t('news.subtitle')}
+            </motion.p>
           </div>
         </div>
       </div>
 
       {/* Featured News Slider */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
+        >
           {/* Navigation Arrows */}
           <button
             onClick={() => navigateNews('prev')}
@@ -131,44 +120,57 @@ const NewsHomePage = () => {
             {/* Image Section */}
             <div className="relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 z-10" />
-              <div 
+              <motion.div 
                 className={`absolute inset-0 bg-cover bg-center transition-transform duration-700 ${isVisible ? 'scale-110' : 'scale-100'}`}
                 style={{ backgroundImage: `url(${currentNews.image})` }}
+                key={currentNews.id}
               />
             </div>
 
             {/* Content Section */}
             <div className="relative p-8 lg:p-12 flex flex-col justify-center">
-              <div className={`transition-all duration-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                {/* Category and Date */}
-                <div className="flex items-center gap-4 mb-6">
-                  <span className="px-4 py-2 bg-gradient-to-r from-cyan-100 to-cyan-50 text-cyan-700 rounded-full text-sm font-semibold border border-cyan-200">
-                    {currentNews.category}
-                  </span>
-                  <span className="text-gray-500 font-medium">{currentNews.date}</span>
-                </div>
-                
-                {/* Title */}
-                <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-6 leading-tight">
-                  {currentNews.title}
-                </h2>
-                
-                {/* Description */}
-                <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                  {currentNews.description}
-                </p>
-                
-                {/* CTA Button */}
-                <div className="flex items-center gap-4">
-                  <button className="px-8 py-4 bg-gradient-to-r from-cyan-600 to-emerald-600 text-white rounded-xl hover:from-cyan-700 hover:to-emerald-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                    {t('news.readMore', 'Read More')}
-                  </button>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentNews.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-6"
+                >
+                  {/* Category and Date */}
+                  <div className="flex items-center gap-4">
+                    <span className="px-4 py-2 bg-gradient-to-r from-cyan-100 to-cyan-50 text-cyan-700 rounded-full text-sm font-semibold border border-cyan-200">
+                      {currentNews.category}
+                    </span>
+                    <span className="text-gray-500 font-medium">{currentNews.date}</span>
+                  </div>
                   
-                  <button className="px-6 py-4 border border-gray-300 text-gray-600 rounded-xl hover:border-cyan-400 hover:text-cyan-600 transition-all duration-300 font-semibold">
-                    {t('news.share', 'Share')}
-                  </button>
-                </div>
-              </div>
+                  {/* Title */}
+                  <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 leading-tight">
+                    {currentNews.title}
+                  </h2>
+                  
+                  {/* Description */}
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    {currentNews.description}
+                  </p>
+                  
+                  {/* CTA Button */}
+                  <div className="flex items-center gap-4 pt-4">
+                    <button 
+                      onClick={() => handleReadMore(currentNews.id)}
+                      className="px-8 py-4 bg-gradient-to-r from-cyan-600 to-emerald-600 text-white rounded-xl hover:from-cyan-700 hover:to-emerald-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    >
+                      {t('news.readMore')}
+                    </button>
+                    
+                    <button className="px-6 py-4 border border-gray-300 text-gray-600 rounded-xl hover:border-cyan-400 hover:text-cyan-600 transition-all duration-300 font-semibold">
+                      {t('news.share')}
+                    </button>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
 
@@ -192,30 +194,31 @@ const NewsHomePage = () => {
               />
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* News Grid */}
-        <div className="mt-20">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="mt-20"
+        >
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-gray-800">
-              {t('news.allNews', 'All News')}
+              {t('news.allNews')}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {newsData.map((news, index) => (
-              <div
+              <motion.div
                 key={news.id}
-                className={`group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-500 cursor-pointer ${
-                  index === currentNewsIndex ? 'ring-2 ring-cyan-500 scale-105' : 'hover:scale-105'
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className={`group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-500 ${
+                  index === currentNewsIndex ? 'ring-2 ring-cyan-500' : ''
                 }`}
-                onClick={() => {
-                  setIsVisible(false);
-                  setTimeout(() => {
-                    setCurrentNewsIndex(index);
-                    setIsVisible(true);
-                  }, 300);
-                }}
               >
                 <div className="relative overflow-hidden h-48">
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 z-10 group-hover:scale-110 transition-transform duration-700" />
@@ -241,17 +244,20 @@ const NewsHomePage = () => {
                     {news.description}
                   </p>
                   
-                  <div className="flex items-center text-cyan-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300">
-                    {t('news.readMore', 'Read More')}
+                  <button 
+                    onClick={() => handleReadMore(news.id)}
+                    className="flex items-center text-cyan-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300"
+                  >
+                    {t('news.readMore')}
                     <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                  </div>
+                  </button>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
