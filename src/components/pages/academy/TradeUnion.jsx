@@ -1,10 +1,11 @@
-// TradeUnion.jsx
+// TradeUnion.jsx - Integrated with API
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import apiService from '../../../services/api';
 
 const TradeUnion = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeBenefit, setActiveBenefit] = useState(0);
   const [activeEvent, setActiveEvent] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -13,11 +14,50 @@ const TradeUnion = () => {
     email: '',
     position: ''
   });
+  const [benefits, setBenefits] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [stats, setStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sectionRef = useRef(null);
 
-  const benefits = t('tradeUnion.benefits.list', { returnObjects: true });
-  const events = t('tradeUnion.events.list', { returnObjects: true });
-  const stats = t('tradeUnion.stats', { returnObjects: true });
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const lang = i18n.language;
+
+        console.log('🔍 Fetching TradeUnion data with lang:', lang);
+
+        const [benefitsData, eventsData, statsData] = await Promise.all([
+          apiService.getTradeUnionBenefits(lang),
+          apiService.getTradeUnionEvents(lang),
+          apiService.getTradeUnionStats(lang)
+        ]);
+
+        console.log('📊 TradeUnion data received:', {
+          benefits: benefitsData?.length,
+          events: eventsData?.length,
+          stats: statsData?.length
+        });
+
+        setBenefits(benefitsData);
+        setEvents(eventsData);
+        setStats(statsData);
+        setError(null);
+        // Set visible immediately after data loads
+        setIsVisible(true);
+      } catch (err) {
+        console.error('❌ Error fetching Trade Union data:', err);
+        setError(t('error.loadingData', 'Ошибка загрузки данных'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [i18n.language, t]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -34,6 +74,8 @@ const TradeUnion = () => {
 
   // Автопереключение преимуществ и событий
   useEffect(() => {
+    if (benefits.length === 0 || events.length === 0) return;
+
     const interval = setInterval(() => {
       setActiveBenefit((prev) => (prev + 1) % benefits.length);
       setActiveEvent((prev) => (prev + 1) % events.length);
@@ -44,7 +86,7 @@ const TradeUnion = () => {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     // В реальном приложении здесь будет API запрос
-    alert(t('tradeUnion.joinSuccess'));
+    alert(t('tradeUnion.joinSuccess', 'Спасибо за подачу заявки!'));
     setFormData({ name: '', email: '', position: '' });
   };
 
@@ -55,17 +97,49 @@ const TradeUnion = () => {
     });
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">{t('loading', 'Загрузка...')}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
+        <div className="bg-red-500/20 border border-red-500 rounded-lg p-6 max-w-md">
+          <p className="text-white text-center">{error}</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
     >
+      {/* DEBUG: Проверка состояния */}
+      {console.log('🔍 TradeUnion render state:', {
+        benefits: benefits?.length || 0,
+        events: events?.length || 0,
+        stats: stats?.length || 0,
+        loading,
+        error
+      })}
+
       {/* Анимированный фон */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
         <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-        
+
         {/* Символы сообщества */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🤝</div>
         <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">⚖️</div>
@@ -192,11 +266,10 @@ const TradeUnion = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`p-4 rounded-2xl backdrop-blur-sm border cursor-pointer transition-all duration-300 ${
-                      activeBenefit === index
-                        ? 'bg-white/10 border-emerald-400/50 shadow-lg'
-                        : 'bg-white/5 border-white/10 hover:bg-white/10'
-                    }`}
+                    className={`p-4 rounded-2xl backdrop-blur-sm border cursor-pointer transition-all duration-300 ${activeBenefit === index
+                      ? 'bg-white/10 border-emerald-400/50 shadow-lg'
+                      : 'bg-white/5 border-white/10 hover:bg-white/10'
+                      }`}
                     onClick={() => setActiveBenefit(index)}
                   >
                     <div className="flex items-center space-x-3">

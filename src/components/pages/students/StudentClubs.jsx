@@ -5,7 +5,7 @@ const StudentClubs = () => {
   const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   const data = t('students.clubs', { returnObjects: true });
 
   const categories = ['all', ...new Set(data.list.map(club => club.category))];
@@ -13,7 +13,7 @@ const StudentClubs = () => {
   const filteredClubs = data.list.filter(club => {
     const matchesCategory = selectedCategory === 'all' || club.category === selectedCategory;
     const matchesSearch = club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         club.description.toLowerCase().includes(searchTerm.toLowerCase());
+      club.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -41,7 +41,7 @@ const StudentClubs = () => {
             />
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
           </div>
-          
+
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -60,7 +60,7 @@ const StudentClubs = () => {
       {/* Статистика */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {data.stats.map((stat, index) => (
-          <div 
+          <div
             key={index}
             className="bg-white rounded-lg p-4 text-center border border-gray-200 hover:shadow-md transition-all duration-200"
           >
@@ -107,7 +107,7 @@ const ClubCard = ({ club, index }) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 hover:border-blue-300 overflow-hidden hover:shadow-md transition-all duration-200 group cursor-pointer">
       {/* Заголовок */}
-      <div 
+      <div
         className="bg-blue-600 p-4 text-white"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -124,7 +124,7 @@ const ClubCard = ({ club, index }) => {
       {/* Контент */}
       <div className="p-4">
         <p className="text-gray-600 text-sm mb-3 leading-relaxed">{club.description}</p>
-        
+
         <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
           <div className="flex items-center space-x-3">
             <span className="flex items-center">
@@ -134,19 +134,17 @@ const ClubCard = ({ club, index }) => {
               🏷️ {club.category}
             </span>
           </div>
-          <span className={`px-2 py-1 rounded text-xs font-medium ${
-            club.status === 'active' 
+          <span className={`px-2 py-1 rounded text-xs font-medium ${club.status === 'active'
               ? 'bg-green-100 text-green-700'
               : 'bg-yellow-100 text-yellow-700'
-          }`}>
+            }`}>
             {club.status === 'active' ? 'Активен' : 'Набор'}
           </span>
         </div>
 
         {/* Дополнительная информация */}
-        <div className={`space-y-3 transition-all duration-200 overflow-hidden ${
-          isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}>
+        <div className={`space-y-3 transition-all duration-200 overflow-hidden ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}>
           {club.leaders && (
             <div>
               <h4 className="font-semibold text-gray-800 text-sm mb-1">👥 Руководители:</h4>
@@ -188,11 +186,10 @@ const ClubCard = ({ club, index }) => {
           <button
             onClick={handleJoin}
             disabled={isJoining || club.status !== 'active'}
-            className={`flex-1 py-2 px-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center text-sm ${
-              club.status === 'active' && !isJoining
+            className={`flex-1 py-2 px-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center text-sm ${club.status === 'active' && !isJoining
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
+              }`}
           >
             {isJoining ? (
               <>
@@ -206,15 +203,15 @@ const ClubCard = ({ club, index }) => {
               </>
             )}
           </button>
-          
+
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="w-10 h-10 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center"
           >
-            <svg 
+            <svg
               className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-              fill="none" 
-              stroke="currentColor" 
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

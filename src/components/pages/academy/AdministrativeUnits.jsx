@@ -1,134 +1,50 @@
-// AdministrativeUnits.jsx
+// AdministrativeUnits.jsx - Integrated with API
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import apiService from '../../../services/api';
 
 const AdministrativeUnits = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeUnit, setActiveUnit] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+  const [units, setUnits] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sectionRef = useRef(null);
   const hasAnimated = useRef(false);
 
-  // Данные административных подразделений
-  const units = [
-    {
-      id: 1,
-      name: t('administrativeUnits.units.rectorate.name'),
-      description: t('administrativeUnits.units.rectorate.description'),
-      head: t('administrativeUnits.units.rectorate.head'),
-      email: 'rector@academy.ru',
-      phone: '+7 (495) 111-11-11',
-      location: t('administrativeUnits.units.rectorate.location'),
-      staff: t('administrativeUnits.units.rectorate.staff'),
-      icon: '🏛️',
-      color: 'blue',
-      colorClass: 'from-blue-500 to-blue-600',
-      responsibilities: [
-        t('administrativeUnits.units.rectorate.responsibilities.0'),
-        t('administrativeUnits.units.rectorate.responsibilities.1'),
-        t('administrativeUnits.units.rectorate.responsibilities.2')
-      ]
-    },
-    {
-      id: 2,
-      name: t('administrativeUnits.units.educationalDepartment.name'),
-      description: t('administrativeUnits.units.educationalDepartment.description'),
-      head: t('administrativeUnits.units.educationalDepartment.head'),
-      email: 'education@academy.ru',
-      phone: '+7 (495) 111-22-22',
-      location: t('administrativeUnits.units.educationalDepartment.location'),
-      staff: t('administrativeUnits.units.educationalDepartment.staff'),
-      icon: '📚',
-      color: 'green',
-      colorClass: 'from-green-500 to-green-600',
-      responsibilities: [
-        t('administrativeUnits.units.educationalDepartment.responsibilities.0'),
-        t('administrativeUnits.units.educationalDepartment.responsibilities.1'),
-        t('administrativeUnits.units.educationalDepartment.responsibilities.2')
-      ]
-    },
-    {
-      id: 3,
-      name: t('administrativeUnits.units.internationalDepartment.name'),
-      description: t('administrativeUnits.units.internationalDepartment.description'),
-      head: t('administrativeUnits.units.internationalDepartment.head'),
-      email: 'international@academy.ru',
-      phone: '+7 (495) 111-33-33',
-      location: t('administrativeUnits.units.internationalDepartment.location'),
-      staff: t('administrativeUnits.units.internationalDepartment.staff'),
-      icon: '🌍',
-      color: 'blue',
-      colorClass: 'from-blue-500 to-blue-600',
-      responsibilities: [
-        t('administrativeUnits.units.internationalDepartment.responsibilities.0'),
-        t('administrativeUnits.units.internationalDepartment.responsibilities.1'),
-        t('administrativeUnits.units.internationalDepartment.responsibilities.2')
-      ]
-    },
-    {
-      id: 4,
-      name: t('administrativeUnits.units.financeDepartment.name'),
-      description: t('administrativeUnits.units.financeDepartment.description'),
-      head: t('administrativeUnits.units.financeDepartment.head'),
-      email: 'finance@academy.ru',
-      phone: '+7 (495) 111-44-44',
-      location: t('administrativeUnits.units.financeDepartment.location'),
-      staff: t('administrativeUnits.units.financeDepartment.staff'),
-      icon: '💰',
-      color: 'green',
-      colorClass: 'from-green-500 to-green-600',
-      responsibilities: [
-        t('administrativeUnits.units.financeDepartment.responsibilities.0'),
-        t('administrativeUnits.units.financeDepartment.responsibilities.1'),
-        t('administrativeUnits.units.financeDepartment.responsibilities.2')
-      ]
-    },
-    {
-      id: 5,
-      name: t('administrativeUnits.units.hrDepartment.name'),
-      description: t('administrativeUnits.units.hrDepartment.description'),
-      head: t('administrativeUnits.units.hrDepartment.head'),
-      email: 'hr@academy.ru',
-      phone: '+7 (495) 111-55-55',
-      location: t('administrativeUnits.units.hrDepartment.location'),
-      staff: t('administrativeUnits.units.hrDepartment.staff'),
-      icon: '👥',
-      color: 'blue',
-      colorClass: 'from-blue-500 to-blue-600',
-      responsibilities: [
-        t('administrativeUnits.units.hrDepartment.responsibilities.0'),
-        t('administrativeUnits.units.hrDepartment.responsibilities.1'),
-        t('administrativeUnits.units.hrDepartment.responsibilities.2')
-      ]
-    },
-    {
-      id: 6,
-      name: t('administrativeUnits.units.researchDepartment.name'),
-      description: t('administrativeUnits.units.researchDepartment.description'),
-      head: t('administrativeUnits.units.researchDepartment.head'),
-      email: 'research@academy.ru',
-      phone: '+7 (495) 111-66-66',
-      location: t('administrativeUnits.units.researchDepartment.location'),
-      staff: t('administrativeUnits.units.researchDepartment.staff'),
-      icon: '🔬',
-      color: 'green',
-      colorClass: 'from-green-500 to-green-600',
-      responsibilities: [
-        t('administrativeUnits.units.researchDepartment.responsibilities.0'),
-        t('administrativeUnits.units.researchDepartment.responsibilities.1'),
-        t('administrativeUnits.units.researchDepartment.responsibilities.2')
-      ]
-    }
-  ];
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const lang = i18n.language;
+
+        const unitsData = await apiService.getAdministrativeUnits(lang, searchTerm);
+        setUnits(unitsData);
+        setError(null);
+        // Set visible immediately after data loads
+        setIsVisible(true);
+      } catch (err) {
+        console.error('Error fetching Administrative Units data:', err);
+        setError(t('error.loadingData', 'Ошибка загрузки данных'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Debounce search
+    const timeoutId = setTimeout(() => {
+      fetchData();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [i18n.language, searchTerm, t]);
 
   // Фильтрация подразделений по поисковому запросу
-  const filteredUnits = units.filter(unit =>
-    unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    unit.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    unit.head.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUnits = units;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -148,7 +64,7 @@ const AdministrativeUnits = () => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
@@ -164,11 +80,34 @@ const AdministrativeUnits = () => {
 
   const handleContactClick = (email, phone) => {
     // В реальном приложении здесь будет логика открытия контактов
-    alert(`${t('administrativeUnits.contactEmail')}: ${email}\n${t('administrativeUnits.contactPhone')}: ${phone}`);
+    alert(`${t('administrativeUnits.contactEmail', 'Email')}: ${email}\n${t('administrativeUnits.contactPhone', 'Телефон')}: ${phone}`);
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">{t('loading', 'Загрузка...')}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 flex items-center justify-center">
+        <div className="bg-red-500/20 border border-red-500 rounded-lg p-6 max-w-md">
+          <p className="text-white text-center">{error}</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 overflow-hidden"
     >
@@ -182,9 +121,8 @@ const AdministrativeUnits = () => {
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Заголовок секции */}
-        <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}>
+        <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}>
           <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300">
             <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
             <span className="text-green-300 font-medium text-sm md:text-base">
@@ -198,7 +136,7 @@ const AdministrativeUnits = () => {
           <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto px-4 leading-relaxed">
             {t('administrativeUnits.subtitle')}
           </p>
-          
+
           {/* Поисковая строка */}
           <div className="max-w-2xl mx-auto mt-8">
             <div className="relative">
@@ -218,38 +156,33 @@ const AdministrativeUnits = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
           {/* Левая колонка - Список подразделений */}
-          <div className={`lg:col-span-1 transition-all duration-1000 delay-300 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
+          <div className={`lg:col-span-1 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}>
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl sticky top-6 max-h-screen overflow-y-auto">
               <h2 className="text-2xl font-bold text-white mb-6">{t('administrativeUnits.allUnits')}</h2>
-              
+
               <div className="space-y-4">
                 {filteredUnits.map((unit, index) => (
-                  <div 
+                  <div
                     key={unit.id}
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 group ${
-                      activeUnit === index 
-                        ? `bg-gradient-to-br ${unit.colorClass} text-white border-white/30 transform scale-105 shadow-2xl` 
-                        : 'bg-white/5 border-white/20 hover:border-green-400/50 hover:bg-white/10 hover:shadow-xl'
-                    }`}
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 group ${activeUnit === index
+                      ? `bg-gradient-to-br ${unit.colorClass} text-white border-white/30 transform scale-105 shadow-2xl`
+                      : 'bg-white/5 border-white/20 hover:border-green-400/50 hover:bg-white/10 hover:shadow-xl'
+                      }`}
                     onClick={() => handleUnitClick(index)}
                   >
                     <div className="flex items-start">
-                      <div className={`text-2xl mr-4 p-2 rounded-lg ${
-                        activeUnit === index ? 'bg-white/20' : 'bg-white/10 group-hover:bg-white/20'
-                      } transition-all duration-300`}>
+                      <div className={`text-2xl mr-4 p-2 rounded-lg ${activeUnit === index ? 'bg-white/20' : 'bg-white/10 group-hover:bg-white/20'
+                        } transition-all duration-300`}>
                         {unit.icon}
                       </div>
                       <div className="flex-1">
-                        <h3 className={`font-semibold ${
-                          activeUnit === index ? 'text-white' : 'text-white group-hover:text-green-300'
-                        } transition-colors duration-300`}>
+                        <h3 className={`font-semibold ${activeUnit === index ? 'text-white' : 'text-white group-hover:text-green-300'
+                          } transition-colors duration-300`}>
                           {unit.name}
                         </h3>
-                        <p className={`text-sm mt-1 line-clamp-2 ${
-                          activeUnit === index ? 'text-white/90' : 'text-blue-100 group-hover:text-white'
-                        } transition-colors duration-300`}>
+                        <p className={`text-sm mt-1 line-clamp-2 ${activeUnit === index ? 'text-white/90' : 'text-blue-100 group-hover:text-white'
+                          } transition-colors duration-300`}>
                           {unit.description}
                         </p>
                         <div className="flex items-center mt-2 text-xs text-blue-200">
@@ -262,7 +195,7 @@ const AdministrativeUnits = () => {
                     </div>
                   </div>
                 ))}
-                
+
                 {filteredUnits.length === 0 && (
                   <div className="text-center py-8 text-blue-200">
                     {t('administrativeUnits.noResults')}
@@ -273,9 +206,8 @@ const AdministrativeUnits = () => {
           </div>
 
           {/* Правая колонка - Детальная информация о выбранном подразделении */}
-          <div className={`lg:col-span-2 transition-all duration-1000 delay-500 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
+          <div className={`lg:col-span-2 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}>
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
               {/* Заголовок карточки */}
               <div className={`bg-gradient-to-r ${filteredUnits[activeUnit]?.colorClass} p-6 md:p-8 text-white`}>
@@ -315,7 +247,7 @@ const AdministrativeUnits = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Контактная информация */}
                     <div className="mt-6">
                       <h3 className="text-xl md:text-2xl font-bold text-white mb-4">{t('administrativeUnits.contactInfo')}</h3>
@@ -340,8 +272,8 @@ const AdministrativeUnits = () => {
                           <span className="text-blue-100">{filteredUnits[activeUnit]?.phone}</span>
                         </div>
                       </div>
-                      
-                      <button 
+
+                      <button
                         onClick={() => handleContactClick(filteredUnits[activeUnit]?.email, filteredUnits[activeUnit]?.phone)}
                         className="w-full mt-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-green-600 transition-all transform hover:scale-105 shadow-2xl border border-white/20"
                       >
@@ -363,12 +295,12 @@ const AdministrativeUnits = () => {
                         </li>
                       ))}
                     </ul>
-                    
+
                     {/* Дополнительная информация */}
                     <div className="mt-8 bg-blue-500/20 backdrop-blur-lg rounded-xl p-6 border border-blue-400/30">
                       <h4 className="font-semibold text-blue-300 mb-2">{t('administrativeUnits.workingHours')}</h4>
                       <p className="text-blue-100">09:00 - 18:00, {t('administrativeUnits.weekdays')}</p>
-                      
+
                       <h4 className="font-semibold text-green-300 mt-4 mb-2">{t('administrativeUnits.receptionHours')}</h4>
                       <p className="text-blue-100">10:00 - 16:00, {t('administrativeUnits.weekdays')}</p>
                     </div>
@@ -378,26 +310,23 @@ const AdministrativeUnits = () => {
             </div>
 
             {/* Быстрая навигация */}
-            <div className={`mt-8 transition-all duration-1000 delay-700 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}>
+            <div className={`mt-8 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}>
               <h3 className="text-2xl font-bold text-white mb-6 text-center">{t('administrativeUnits.quickNavigation')}</h3>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {units.map((unit, index) => (
                   <button
                     key={unit.id}
-                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-center group ${
-                      activeUnit === index 
-                        ? `bg-gradient-to-br ${unit.colorClass} text-white border-white/30 shadow-lg scale-105` 
-                        : 'bg-white/5 border-white/20 hover:border-green-400/50 hover:bg-white/10 hover:shadow-md'
-                    }`}
+                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-center group ${activeUnit === index
+                      ? `bg-gradient-to-br ${unit.colorClass} text-white border-white/30 shadow-lg scale-105`
+                      : 'bg-white/5 border-white/20 hover:border-green-400/50 hover:bg-white/10 hover:shadow-md'
+                      }`}
                     onClick={() => handleUnitClick(index)}
                   >
                     <div className="text-2xl mb-2 group-hover:scale-110 transition-transform duration-300">{unit.icon}</div>
-                    <div className={`text-sm font-medium line-clamp-2 ${
-                      activeUnit === index ? 'text-white' : 'text-blue-100 group-hover:text-white'
-                    } transition-colors duration-300`}>
+                    <div className={`text-sm font-medium line-clamp-2 ${activeUnit === index ? 'text-white' : 'text-blue-100 group-hover:text-white'
+                      } transition-colors duration-300`}>
                       {unit.name}
                     </div>
                   </button>
