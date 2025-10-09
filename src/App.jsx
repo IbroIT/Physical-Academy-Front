@@ -90,15 +90,14 @@ function App() {
             
             {/* Academy routes */}
             <Route path="/academy/about" element={<AcademyAbout />} />
-            <Route path="/academy/leadership/rectorate" element={<AcademyLeadership />} />
-            <Route path="/academy/structure/academic" element={<AcademyStructure />} />
             <Route path="/academy/history" element={<AcademyHistory />} />
             <Route path="/academy/mission" element={<AcademyMission />} />
             <Route path="/academy/accreditation" element={<AcademyAccreditation />} />
             <Route path="/academy/numbers" element={<AcademyNumbers />} />
-            <Route path="/academy/documents" element={<AcademyDocuments />} />
             
             {/* НОВЫЕ ПУТИ ДЛЯ ACADEMY */}
+            <Route path="/academy/leadership/rectorate" element={<AcademyLeadership />} />
+            <Route path="/academy/structure/academic" element={<AcademyStructure />} />
             <Route path="/academy/leadership/board-of-trustees" element={<BoardOfTrustees />} />
             <Route path="/academy/leadership/audit-commission" element={<AuditCommission />} />
             <Route path="/academy/leadership/academic-council" element={<AcademicCouncil />} />
@@ -106,7 +105,9 @@ function App() {
             <Route path="/academy/leadership/commissions" element={<Commissions />} />
             <Route path="/academy/structure/administrative" element={<AdministrativeStructure />} />
             <Route path="/academy/structure/units" element={<AdministrativeUnits />} />
-            
+            <Route path="/academy/documents" element={<AcademyDocuments />} />
+
+
             {/* Admissions routes */}
             <Route path="/admissions/bachelor/info" element={<BachelorInfo />} />
             <Route path="/admissions/bachelor/registration" element={<BachelorRegistration />} />

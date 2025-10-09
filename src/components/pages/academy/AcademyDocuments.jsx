@@ -33,6 +33,13 @@ const AcademyDocuments = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Set visible when data is loaded
+  useEffect(() => {
+    if (!loading && apiDocuments.length > 0) {
+      setIsVisible(true);
+    }
+  }, [loading, apiDocuments]);
+
   // Use search results if searching, otherwise use API documents
   const documents = searchTerm ? searchResults : (apiDocuments || []);
 
@@ -54,12 +61,14 @@ const AcademyDocuments = () => {
     if (!documents || !Array.isArray(documents)) return [];
 
     let filtered = documents.filter(doc => {
-      const matchesFilter = activeFilter === 'all' || doc.is_active;
+      const matchesFilter = activeFilter === 'all' ||
+        (activeFilter === 'active' && doc.is_active) ||
+        (activeFilter === 'featured' && doc.is_featured) ||
+        (activeFilter === doc.document_type);
       const matchesSearch = searchTerm === '' ||
         (doc.title && doc.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (doc.title_ru && doc.title_ru.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (doc.title_en && doc.title_en.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (doc.title_ky && doc.title_ky.toLowerCase().includes(searchTerm.toLowerCase()));
+        (doc.description && doc.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (doc.document_number && doc.document_number.toLowerCase().includes(searchTerm.toLowerCase()));
       return matchesFilter && matchesSearch;
     });
 
@@ -67,9 +76,9 @@ const AcademyDocuments = () => {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'newest':
-          return new Date(b.upload_date || b.created_at) - new Date(a.upload_date || a.created_at);
+          return new Date(b.document_date || b.created_at) - new Date(a.document_date || a.created_at);
         case 'oldest':
-          return new Date(a.upload_date || a.created_at) - new Date(b.upload_date || b.created_at);
+          return new Date(a.document_date || a.created_at) - new Date(b.document_date || b.created_at);
         case 'name_asc':
           return (a.title || '').localeCompare(b.title || '');
         case 'name_desc':
@@ -82,30 +91,18 @@ const AcademyDocuments = () => {
     return filtered;
   }, [documents, activeFilter, searchTerm, sortBy]);
 
-  // Get localized title
+  // Get localized title - API already returns translated fields
   const getLocalizedTitle = useCallback((doc) => {
-    const currentLang = i18n.language;
-    switch (currentLang) {
-      case 'ru': return doc.title_ru || doc.title;
-      case 'en': return doc.title_en || doc.title;
-      case 'ky': return doc.title_ky || doc.title;
-      default: return doc.title;
-    }
-  }, [i18n.language]);
+    return doc.title || '';
+  }, []);
 
-  // Get localized description
+  // Get localized description - API already returns translated fields
   const getLocalizedDescription = useCallback((doc) => {
-    const currentLang = i18n.language;
-    switch (currentLang) {
-      case 'ru': return doc.description_ru;
-      case 'en': return doc.description_en;
-      case 'ky': return doc.description_ky;
-      default: return doc.description_ru;
-    }
-  }, [i18n.language]);
+    return doc.description || '';
+  }, []);
 
   // File type icons and gradients
-  const getFileConfig = useCallback((fileType) => {
+  const getFileConfig = useCallback((doc) => {
     const configMap = {
       pdf: { icon: '📕', gradient: 'from-red-500 to-pink-500' },
       doc: { icon: '📘', gradient: 'from-blue-500 to-cyan-500' },
@@ -116,30 +113,30 @@ const AcademyDocuments = () => {
       pptx: { icon: '📙', gradient: 'from-orange-500 to-red-500' },
       zip: { icon: '📦', gradient: 'from-purple-500 to-pink-500' },
       txt: { icon: '📄', gradient: 'from-gray-500 to-blue-500' },
-      default: { icon: '📄', gradient: 'from-blue-500 to-emerald-500' }
+      default: { icon: doc.icon || '📄', gradient: 'from-blue-500 to-emerald-500' }
     };
 
-    if (!fileType) return configMap.default;
+    const fileFormat = doc.file_format ? doc.file_format.toLowerCase() : '';
 
-    const extension = fileType.includes('.') ?
-      fileType.split('.').pop().toLowerCase() :
-      fileType.toLowerCase();
-
-    return configMap[extension] || configMap.default;
+    return configMap[fileFormat] || configMap.default;
   }, []);
 
-  // Format file size
-  const formatFileSize = useCallback((bytes) => {
-    if (!bytes || bytes === 0) return t('documents.unknownSize');
+  // Format file size - use file_size_formatted from API
+  const formatFileSize = useCallback((doc) => {
+    if (doc.file_size_formatted) {
+      return doc.file_size_formatted;
+    }
+    if (!doc.file_size || doc.file_size === 0) return t('documents.unknownSize', 'N/A');
     const sizes = ['Б', 'КБ', 'МБ', 'ГБ'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+    const i = Math.floor(Math.log(doc.file_size) / Math.log(1024));
+    return Math.round(doc.file_size / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
   }, [t]);
 
   // Get file extension
-  const getFileExtension = useCallback((url) => {
-    if (!url) return '';
-    return url.split('.').pop().toUpperCase();
+  const getFileExtension = useCallback((doc) => {
+    if (doc.file_format) return doc.file_format.toUpperCase();
+    if (!doc.file_url) return '';
+    return doc.file_url.split('.').pop().toUpperCase();
   }, []);
 
   // Document statistics
@@ -169,17 +166,16 @@ const AcademyDocuments = () => {
   }
 
   const DocumentCard = ({ doc, index }) => {
-    const fileConfig = getFileConfig(doc.file_url);
+    const fileConfig = getFileConfig(doc);
     const isExpanded = expandedDocId === doc.id;
-    
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: index * 0.1 }}
-        className={`bg-white/5 backdrop-blur-lg rounded-3xl border border-white/20 hover:border-emerald-400/50 transition-all duration-500 overflow-hidden group cursor-pointer ${
-          activeDocument === doc.id ? 'ring-2 ring-emerald-400 scale-105' : ''
-        } ${!doc.is_active ? 'opacity-60' : ''}`}
+        className={`bg-white/5 backdrop-blur-lg rounded-3xl border border-white/20 hover:border-emerald-400/50 transition-all duration-500 overflow-hidden group cursor-pointer ${activeDocument === doc.id ? 'ring-2 ring-emerald-400 scale-105' : ''
+          } ${!doc.is_active ? 'opacity-60' : ''}`}
         onClick={() => setActiveDocument(doc.id)}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -195,31 +191,29 @@ const AcademyDocuments = () => {
                 {fileConfig.icon}
               </div>
             </motion.div>
-            
+
             <div className="flex-1 min-w-0">
-              <motion.h3 
+              <motion.h3
                 className="text-xl lg:text-2xl font-bold text-white mb-3 line-clamp-2"
                 layout
               >
                 {getLocalizedTitle(doc)}
               </motion.h3>
-              
+
               {/* Status Badge */}
-              <motion.div 
+              <motion.div
                 className="mb-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border ${
-                  doc.is_active
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
-                    : 'bg-gray-500/20 text-gray-300 border-gray-400/30'
-                }`}>
-                  <div className={`w-2 h-2 rounded-full mr-2 ${
-                    doc.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-gray-400'
-                  }`}></div>
-                  {doc.is_active 
+                <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm border ${doc.is_active
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+                  : 'bg-gray-500/20 text-gray-300 border-gray-400/30'
+                  }`}>
+                  <div className={`w-2 h-2 rounded-full mr-2 ${doc.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-gray-400'
+                    }`}></div>
+                  {doc.is_active
                     ? t('documents.status.active')
                     : t('documents.status.inactive')
                   }
@@ -230,7 +224,7 @@ const AcademyDocuments = () => {
 
           {/* Localized Description */}
           {getLocalizedDescription(doc) && (
-            <motion.div 
+            <motion.div
               className="mb-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -243,36 +237,64 @@ const AcademyDocuments = () => {
           )}
 
           {/* Document Metadata */}
-          <motion.div 
+          <motion.div
             className="space-y-3 text-blue-100 mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            {doc.upload_date && (
+            {doc.document_date && (
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
                     <span className="text-sm">📅</span>
                   </div>
-                  {t('documents.uploaded')}
+                  {t('documents.date', 'Дата документа')}
                 </span>
                 <span className="font-semibold text-white">
-                  {new Date(doc.upload_date).toLocaleDateString('ru-RU')}
+                  {new Date(doc.document_date).toLocaleDateString('ru-RU')}
                 </span>
               </div>
             )}
 
-            {doc.file_url && (
+            {doc.document_number && (
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <span className="text-sm">🔢</span>
+                  </div>
+                  {t('documents.number', 'Номер')}
+                </span>
+                <span className="font-semibold text-white">
+                  {doc.document_number}
+                </span>
+              </div>
+            )}
+
+            {doc.file_format && (
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
                     <span className="text-sm">📄</span>
                   </div>
-                  {t('documents.type')}
+                  {t('documents.type', 'Тип')}
                 </span>
                 <span className="font-semibold text-white">
-                  {getFileExtension(doc.file_url)}
+                  {getFileExtension(doc)}
+                </span>
+              </div>
+            )}
+
+            {doc.file_size && (
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                    <span className="text-sm">💾</span>
+                  </div>
+                  {t('documents.size', 'Размер')}
+                </span>
+                <span className="font-semibold text-white">
+                  {formatFileSize(doc)}
                 </span>
               </div>
             )}
@@ -291,7 +313,7 @@ const AcademyDocuments = () => {
                 <h4 className="font-bold text-white mb-4 text-lg">
                   {t('documents.details')}
                 </h4>
-                
+
                 {/* Multilingual Titles */}
                 <div className="space-y-3 text-sm mb-4">
                   {doc.title_ru && (
@@ -325,7 +347,7 @@ const AcademyDocuments = () => {
           </AnimatePresence>
 
           {/* Actions */}
-          <motion.div 
+          <motion.div
             className="flex gap-3 mt-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -337,12 +359,12 @@ const AcademyDocuments = () => {
               onClick={() => toggleDocumentDetails(doc.id)}
               className="flex-1 py-3 px-4 border border-white/20 text-blue-100 rounded-xl font-medium hover:bg-white/10 transition-all duration-300 backdrop-blur-sm text-sm lg:text-base"
             >
-              {isExpanded 
+              {isExpanded
                 ? t('documents.actions.hide')
                 : t('documents.actions.details')
               }
             </motion.button>
-            
+
             {doc.file_url && doc.is_active && (
               <>
                 <motion.a
@@ -387,7 +409,7 @@ const AcademyDocuments = () => {
         <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
         <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-        
+
         {/* Документальные символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">📚</div>
         <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">📄</div>
@@ -472,11 +494,10 @@ const AcademyDocuments = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveFilter('all')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 backdrop-blur-sm ${
-                    activeFilter === 'all'
-                      ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
-                      : 'text-blue-100 hover:text-white hover:bg-white/10'
-                  }`}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 backdrop-blur-sm ${activeFilter === 'all'
+                    ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
+                    : 'text-blue-100 hover:text-white hover:bg-white/10'
+                    }`}
                 >
                   {t('documents.filters.all')}
                 </motion.button>
@@ -484,11 +505,10 @@ const AcademyDocuments = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveFilter('active')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 backdrop-blur-sm ${
-                    activeFilter === 'active'
-                      ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
-                      : 'text-blue-100 hover:text-white hover:bg-white/10'
-                  }`}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 backdrop-blur-sm ${activeFilter === 'active'
+                    ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
+                    : 'text-blue-100 hover:text-white hover:bg-white/10'
+                    }`}
                 >
                   {t('documents.filters.active')}
                 </motion.button>

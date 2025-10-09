@@ -20,11 +20,11 @@ const AcademyLeadership = () => {
 
   const categories = [
     { key: 'all', icon: '👥', apiFilter: '', color: 'from-blue-500 to-blue-600' },
-    { key: 'directors', icon: '👑', apiFilter: 'director', color: 'from-green-500 to-green-600' },
-    { key: 'deputy_directors', icon: '🌟', apiFilter: 'deputy_director', color: 'from-blue-500 to-green-500' },
-    { key: 'department_heads', icon: '🏛️', apiFilter: 'department_head', color: 'from-green-500 to-blue-500' },
-    { key: 'deans', icon: '📚', apiFilter: 'dean', color: 'from-blue-500 to-blue-600' },
-    { key: 'vice_deans', icon: '🎓', apiFilter: 'vice_dean', color: 'from-green-500 to-green-600' },
+    { key: 'rector', icon: '👑', apiFilter: 'rector', color: 'from-green-500 to-green-600' },
+    { key: 'vice_rector', icon: '🌟', apiFilter: 'vice_rector', color: 'from-blue-500 to-green-500' },
+    { key: 'director', icon: '🏛️', apiFilter: 'director', color: 'from-green-500 to-blue-500' },
+    { key: 'dean', icon: '📚', apiFilter: 'dean', color: 'from-blue-500 to-blue-600' },
+    { key: 'department_head', icon: '🎓', apiFilter: 'department_head', color: 'from-green-500 to-green-600' },
   ];
 
   useEffect(() => {
@@ -46,32 +46,39 @@ const AcademyLeadership = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Set visible when data is loaded
+  useEffect(() => {
+    if (!loading && leadership.length > 0) {
+      setIsVisible(true);
+    }
+  }, [loading, leadership]);
+
   const startCounters = () => {
     const currentData = getCurrentData();
     const targetValues = [
       currentData.length,
-      currentData.filter(p => p.is_director).length,
+      currentData.filter(p => p.leadership_type === 'rector' || p.leadership_type === 'director').length,
       currentData.filter(p => p.department).length,
       categories.length
     ];
-    
+
     const duration = 2000;
-    
+
     targetValues.forEach((target, index) => {
       const startTime = performance.now();
       const updateCounter = (currentTime) => {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         const currentValue = Math.floor(easeOutQuart * target);
-        
+
         setCounterValues(prev => {
           const newValues = [...prev];
           newValues[index] = currentValue;
           return newValues;
         });
-        
+
         if (progress < 1) {
           requestAnimationFrame(updateCounter);
         }
@@ -101,14 +108,11 @@ const AcademyLeadership = () => {
 
   // Получаем данные для отображения
   const getCurrentData = () => {
-    if (activeCategory === 'directors') {
-      return directorsLoading ? [] : (directors?.data || directors || []);
-    }
     return leadership || [];
   };
 
   const currentData = getCurrentData();
-  const isLoading = loading || (activeCategory === 'directors' && directorsLoading);
+  const isLoading = loading;
 
   if (isLoading && currentData.length === 0) {
     return (
@@ -160,7 +164,7 @@ const AcademyLeadership = () => {
   ];
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 overflow-hidden"
     >
@@ -174,9 +178,8 @@ const AcademyLeadership = () => {
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Заголовок */}
-        <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}>
+        <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}>
           <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300">
             <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
             <span className="text-green-300 font-medium text-sm md:text-base">
@@ -193,11 +196,10 @@ const AcademyLeadership = () => {
         </div>
 
         {/* Статистика */}
-        <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 transition-all duration-1000 delay-300 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}>
+        <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}>
           {stats.map((stat, index) => (
-            <div 
+            <div
               key={index}
               className="group relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl transition-all duration-500 hover:scale-105 hover:border-green-400/30 text-center"
             >
@@ -221,23 +223,21 @@ const AcademyLeadership = () => {
         </div>
 
         {/* Навигация по категориям */}
-        <div className={`flex flex-wrap justify-center gap-3 mb-12 transition-all duration-1000 delay-500 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}>
+        <div className={`flex flex-wrap justify-center gap-3 mb-12 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}>
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-2 border border-white/20 shadow-lg">
             <div className="flex flex-wrap justify-center gap-2">
               {categories.map((category) => {
                 const isActive = activeCategory === category.key;
-                
+
                 return (
                   <button
                     key={category.key}
                     onClick={() => handleCategoryChange(category)}
-                    className={`flex items-center px-5 py-3 rounded-xl transition-all duration-300 font-medium ${
-                      isActive
-                        ? `bg-gradient-to-r ${category.color} text-white shadow-lg transform scale-105`
-                        : `text-blue-100 hover:text-white hover:bg-white/10`
-                    }`}
+                    className={`flex items-center px-5 py-3 rounded-xl transition-all duration-300 font-medium ${isActive
+                      ? `bg-gradient-to-r ${category.color} text-white shadow-lg transform scale-105`
+                      : `text-blue-100 hover:text-white hover:bg-white/10`
+                      }`}
                   >
                     <span className="text-lg mr-2">{category.icon}</span>
                     <span>
@@ -251,9 +251,8 @@ const AcademyLeadership = () => {
         </div>
 
         {/* Содержимое категории */}
-        <div className={`mb-16 transition-all duration-1000 delay-700 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}>
+        <div className={`mb-16 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20">
             <div className="flex items-center mb-4 sm:mb-0">
               <span className="text-4xl mr-4">
@@ -319,7 +318,7 @@ const AcademyLeadership = () => {
                               {generateInitials(person.name)}
                             </span>
                           </div>
-                          
+
                           {/* Декоративный элемент */}
                           <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </div>
@@ -340,11 +339,11 @@ const AcademyLeadership = () => {
 
                     {/* Краткая информация */}
                     <div className="space-y-2">
-                      {/* Degree */}
-                      {person.degree && (
+                      {/* Education */}
+                      {person.education && (
                         <div className="flex items-center gap-2 text-sm text-blue-100 group-hover:text-white transition-colors">
                           <span className="text-green-300">🎓</span>
-                          <span>{person.degree}</span>
+                          <span>{person.education}</span>
                         </div>
                       )}
 
@@ -356,25 +355,25 @@ const AcademyLeadership = () => {
                         </div>
                       )}
 
-                      {/* Experience */}
-                      {person.experience && (
+                      {/* Experience Years */}
+                      {person.experience_years && (
                         <div className="flex items-center gap-2 text-sm text-blue-100 group-hover:text-white transition-colors">
                           <span className="text-green-300">⏱️</span>
-                          <span>{t('leadership.experience', 'Опыт')}: {person.experience}</span>
+                          <span>{t('leadership.experience', 'Опыт')}: {person.experience_years} {t('leadership.years', 'лет')}</span>
                         </div>
                       )}
                     </div>
 
                     {/* Статус и теги */}
                     <div className="flex flex-wrap gap-2 mt-4">
-                      {person.leadership_type_display && (
+                      {person.leadership_type && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                          📊 {person.leadership_type_display}
+                          {person.icon || '📊'} {t(`leadership.types.${person.leadership_type}`, person.leadership_type)}
                         </span>
                       )}
-                      {person.is_director && (
+                      {(person.leadership_type === 'rector' || person.leadership_type === 'director') && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-400/30">
-                          👑 {t('leadership.director', 'Директор')}
+                          👑 {t('leadership.director', 'Руководитель')}
                         </span>
                       )}
                     </div>
@@ -383,12 +382,11 @@ const AcademyLeadership = () => {
                     <div className="flex justify-center mt-4">
                       <button className="flex items-center gap-1 text-green-300 text-sm font-medium hover:text-green-400 transition-colors group">
                         <span>{expandedCard === (person.id || index) ? t('leadership.showLess', 'Свернуть') : t('leadership.showMore', 'Подробнее')}</span>
-                        <svg 
-                          className={`w-4 h-4 transform transition-transform group-hover:scale-110 ${
-                            expandedCard === (person.id || index) ? 'rotate-180' : ''
-                          }`} 
-                          fill="none" 
-                          stroke="currentColor" 
+                        <svg
+                          className={`w-4 h-4 transform transition-transform group-hover:scale-110 ${expandedCard === (person.id || index) ? 'rotate-180' : ''
+                            }`}
+                          fill="none"
+                          stroke="currentColor"
                           viewBox="0 0 24 24"
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -400,17 +398,17 @@ const AcademyLeadership = () => {
                   {/* Раскрытая информация */}
                   {expandedCard === (person.id || index) && (
                     <div className="border-t border-white/10 bg-white/5 p-6 space-y-4 animate-fadeIn">
-                      {/* Specialization */}
-                      {person.specialization && (
+                      {/* Education */}
+                      {person.education && (
                         <div className="flex items-start gap-3 group">
                           <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-purple-500/30 transition-colors">
-                            <span className="text-purple-300">🔬</span>
+                            <span className="text-purple-300">🎓</span>
                           </div>
                           <div>
                             <div className="text-sm font-medium text-white">
-                              {t('leadership.specialization', 'Специализация')}
+                              {t('leadership.education', 'Образование')}
                             </div>
-                            <div className="text-sm text-blue-100 group-hover:text-white transition-colors">{person.specialization}</div>
+                            <div className="text-sm text-blue-100 group-hover:text-white transition-colors">{person.education}</div>
                           </div>
                         </div>
                       )}
@@ -466,8 +464,8 @@ const AcademyLeadership = () => {
                               {person.email && (
                                 <div className="flex items-center gap-2 text-sm group/item">
                                   <span className="text-blue-300">📧</span>
-                                  <a 
-                                    href={`mailto:${person.email}`} 
+                                  <a
+                                    href={`mailto:${person.email}`}
                                     className="text-green-300 hover:text-green-400 hover:underline transition-colors"
                                   >
                                     {person.email}
@@ -477,8 +475,8 @@ const AcademyLeadership = () => {
                               {person.phone && (
                                 <div className="flex items-center gap-2 text-sm group/item">
                                   <span className="text-blue-300">📱</span>
-                                  <a 
-                                    href={`tel:${person.phone}`} 
+                                  <a
+                                    href={`tel:${person.phone}`}
                                     className="text-green-300 hover:text-green-400 hover:underline transition-colors"
                                   >
                                     {person.phone}
@@ -499,7 +497,7 @@ const AcademyLeadership = () => {
               message={t('leadership.noData', 'Данные не найдены')}
               icon={<div className="text-6xl mb-4">👥</div>}
               action={
-                <button 
+                <button
                   onClick={() => setActiveCategory('all')}
                   className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105"
                 >
@@ -511,9 +509,8 @@ const AcademyLeadership = () => {
         </div>
 
         {/* CTA Section */}
-        <div className={`text-center transition-all duration-1000 delay-900 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}>
+        <div className={`text-center transition-all duration-1000 delay-900 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}>
           <div className="bg-gradient-to-r from-blue-600/20 to-green-600/20 backdrop-blur-lg rounded-2xl md:rounded-3xl p-8 md:p-12 border border-white/20 shadow-2xl">
             <h3 className="text-2xl md:text-4xl font-bold text-white mb-4">
               {t('leadership.contactInfo.title', 'Нужна дополнительная информация?')}
