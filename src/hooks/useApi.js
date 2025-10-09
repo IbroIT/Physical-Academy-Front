@@ -321,7 +321,7 @@ export const useStudentClub = (clubId) => {
 
     const fetchClub = async () => {
         if (!clubId) return;
-        
+
         try {
             setLoading(true);
             setError(null);

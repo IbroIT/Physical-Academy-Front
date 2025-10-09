@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStudentClubsPageData, useJoinStudentClub } from '../../../hooks/useApi';
-import {LoadingSkeleton} from '../../common/Loading';
+import { LoadingSkeleton } from '../../common/Loading';
 
 const StudentClubs = () => {
   const { t, i18n } = useTranslation();
@@ -142,13 +142,13 @@ const ClubCard = ({ club }) => {
       // In a real app, you'd have a proper form/modal
       const email = prompt(t('students.clubs.enterEmail', 'Введите ваш email:'));
       const name = prompt(t('students.clubs.enterName', 'Введите ваше имя:'));
-      
+
       if (!email || !name) {
         return;
       }
 
       const result = await joinClub(club.id, { email, name });
-      
+
       if (result.join_link) {
         alert(
           `${result.message}\n\n${t('students.clubs.joinLink', 'Ссылка для вступления')}: ${result.join_link}`
@@ -158,7 +158,7 @@ const ClubCard = ({ club }) => {
       } else {
         alert(result.message);
       }
-      
+
       reset();
     } catch (error) {
       alert(t('students.clubs.joinError', 'Ошибка при отправке заявки. Попробуйте позже.'));
@@ -215,9 +215,8 @@ const ClubCard = ({ club }) => {
         </div>
 
         {/* Дополнительная информация */}
-        <div className={`space-y-3 transition-all duration-200 overflow-hidden ${
-          isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}>
+        <div className={`space-y-3 transition-all duration-200 overflow-hidden ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}>
           {club.leaders && club.leaders.length > 0 && (
             <div>
               <h4 className="font-semibold text-gray-800 text-sm mb-1">
@@ -267,11 +266,10 @@ const ClubCard = ({ club }) => {
           <button
             onClick={handleJoin}
             disabled={isJoining || club.status === 'inactive'}
-            className={`flex-1 py-2 px-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center text-sm ${
-              club.status !== 'inactive' && !isJoining
+            className={`flex-1 py-2 px-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center text-sm ${club.status !== 'inactive' && !isJoining
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
+              }`}
           >
             {isJoining ? (
               <>
