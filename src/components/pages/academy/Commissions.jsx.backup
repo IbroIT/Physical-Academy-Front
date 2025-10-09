@@ -18,9 +18,10 @@ const Commissions = () => {
   const filters = [
     { id: 'all', label: t('filters.all', 'Все комиссии') },
     { id: 'methodical', label: t('filters.methodical', 'Методические') },
-    { id: 'academic', label: t('filters.academic', 'Академические') },
+    { id: 'scientific', label: t('filters.scientific', 'Научные') },
     { id: 'quality', label: t('filters.quality', 'Качество') },
-    { id: 'student', label: t('filters.student', 'Студенческие') }
+    { id: 'ethics', label: t('filters.ethics', 'Этические') },
+    { id: 'scholarship', label: t('filters.scholarship', 'Стипендиальные') }
   ];
 
   // Fetch data from API
@@ -144,11 +145,11 @@ const Commissions = () => {
               key={filterItem.id}
               onClick={() => setFilter(filterItem.id)}
               className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${filter === filterItem.id
-                ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-2xl shadow-blue-500/30'
-                : 'bg-white/10 text-blue-100 backdrop-blur-sm border border-white/20 hover:bg-white/20'
+                  ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-2xl shadow-blue-500/30'
+                  : 'bg-white/10 text-blue-100 backdrop-blur-sm border border-white/20 hover:bg-white/20'
                 }`}
             >
-              {filterItem.label}
+              {filterItem.name}
             </button>
           ))}
         </motion.div>
@@ -166,16 +167,16 @@ const Commissions = () => {
                   exit={{ opacity: 0, x: 50, scale: 0.9 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className={`p-6 rounded-2xl backdrop-blur-lg border-2 transition-all duration-500 cursor-pointer group ${activeCommission === index
-                    ? 'bg-white/20 border-emerald-400 shadow-2xl scale-105'
-                    : 'bg-white/10 border-white/20 hover:bg-white/15 hover:border-blue-300'
+                      ? 'bg-white/20 border-emerald-400 shadow-2xl scale-105'
+                      : 'bg-white/10 border-white/20 hover:bg-white/15 hover:border-blue-300'
                     }`}
                   onMouseEnter={() => setActiveCommission(index)}
                   onClick={() => setActiveCommission(index)}
                 >
                   <div className="flex items-start space-x-4">
                     <div className={`flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold transition-all duration-300 group-hover:scale-110 ${activeCommission === index
-                      ? 'bg-gradient-to-r from-emerald-500 to-blue-500 shadow-lg'
-                      : 'bg-gradient-to-r from-blue-600 to-emerald-600'
+                        ? 'bg-gradient-to-r from-emerald-500 to-blue-500 shadow-lg'
+                        : 'bg-gradient-to-r from-blue-600 to-emerald-600'
                       }`}>
                       {commission.icon}
                     </div>
@@ -185,7 +186,7 @@ const Commissions = () => {
                           {commission.name}
                         </h3>
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-blue-100 backdrop-blur-sm">
-                          {commission.category_display || commission.category}
+                          {commission.category}
                         </span>
                       </div>
                       <p className="text-blue-200 mt-2 line-clamp-2">
@@ -259,54 +260,81 @@ const Commissions = () => {
                   </div>
 
                   {/* Обязанности комиссии */}
-                  {filteredCommissions[activeCommission].responsibilities &&
-                    filteredCommissions[activeCommission].responsibilities.length > 0 && (
-                      <div className="space-y-4 mb-8">
-                        <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-                          <span className="w-2 h-2 bg-blue-400 rounded-full mr-3"></span>
-                          {t('commissions.responsibilities', 'Обязанности')}
-                        </h4>
-                        <div className="grid gap-3">
-                          {filteredCommissions[activeCommission].responsibilities.map((responsibility, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-start bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10"
-                            >
-                              <span className="text-emerald-400 mr-3 text-lg">✓</span>
-                              <span className="text-blue-100">{responsibility}</span>
-                            </motion.div>
-                          ))}
-                        </div>
+                  {filteredCommissions[activeCommission].responsibilities && 
+                   filteredCommissions[activeCommission].responsibilities.length > 0 && (
+                    <div className="space-y-4 mb-8">
+                      <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+                        <span className="w-2 h-2 bg-blue-400 rounded-full mr-3"></span>
+                        {t('commissions.responsibilities', 'Обязанности')}
+                      </h4>
+                      <div className="grid gap-3">
+                        {filteredCommissions[activeCommission].responsibilities.map((responsibility, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-start bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10"
+                          >
+                            <span className="text-emerald-400 mr-3 text-lg">✓</span>
+                            <span className="text-blue-100">{responsibility}</span>
+                          </motion.div>
+                        ))}
                       </div>
-                    )}
+                    </div>
+                  )}
 
                   {/* Контактная информация */}
+                                    )}
+
+                                    )}
 
                   {/* Контактная информация */}
-                  {(filteredCommissions[activeCommission].email ||
-                    filteredCommissions[activeCommission].phone ||
+                  {(filteredCommissions[activeCommission].email || 
+                    filteredCommissions[activeCommission].phone || 
                     filteredCommissions[activeCommission].chairman) && (
-                      <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                        <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-                          <span className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
-                          {t('commissions.contact', 'Контактная информация')}
-                        </h4>
-                        <div className="space-y-3 text-blue-200">
-                          {filteredCommissions[activeCommission].chairman && (
-                            <p>👥 {t('commissions.chairman', 'Председатель')}: {filteredCommissions[activeCommission].chairman}</p>
-                          )}
-                          {filteredCommissions[activeCommission].email && (
-                            <p>📧 {filteredCommissions[activeCommission].email}</p>
-                          )}
-                          {filteredCommissions[activeCommission].phone && (
-                            <p>📞 {filteredCommissions[activeCommission].phone}</p>
-                          )}
-                        </div>
+                    <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                      <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+                        <span className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
+                        {t('commissions.contact', 'Контактная информация')}
+                      </h4>
+                      <div className="space-y-3 text-blue-200">
+                        {filteredCommissions[activeCommission].chairman && (
+                          <p>👥 {t('commissions.chairman', 'Председатель')}: {filteredCommissions[activeCommission].chairman}</p>
+                        )}
+                        {filteredCommissions[activeCommission].email && (
+                          <p>📧 {filteredCommissions[activeCommission].email}</p>
+                        )}
+                        {filteredCommissions[activeCommission].phone && (
+                          <p>📞 {filteredCommissions[activeCommission].phone}</p>
+                        )}
                       </div>
-                    )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Commissions;
+
+                </>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Commissions;
+
                 </>
               )}
             </div>

@@ -1,15 +1,16 @@
 // API service for Academy Management System
 class ApiService {
     constructor() {
-        this.baseURL = 'http://localhost:8000/api/v1';
+        this.baseURL = 'http://localhost:8000/api';
     }
 
     // Helper method to get language parameter
     getLanguageParam(language) {
         const langMap = {
             'ru': 'ru',
-            'kg': 'ky', // API uses 'ky' for Kyrgyz
-            'en': 'en'
+            'kg': 'kg', // API uses 'kg' for Kyrgyz
+            'en': 'en',
+            'ky': 'kg' // Map ky to kg for i18n compatibility
         };
         return langMap[language] || 'ru';
     }
@@ -47,25 +48,25 @@ class ApiService {
             ...filters
         });
 
-        const data = await this.request(`/leadership/?${queryParams}`);
+        const data = await this.request(`/leadership-structure/leadership/?${queryParams}`);
         return data.results || [];
     }
 
     async getDirectors(language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        const data = await this.request(`/leadership/directors/?lang=${langParam}`);
+        const data = await this.request(`/leadership-structure/leadership/?lang=${langParam}&leadership_type=director`);
         return data.results || [];
     }
 
     async getDepartmentHeads(language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        const data = await this.request(`/leadership/department-heads/?lang=${langParam}`);
+        const data = await this.request(`/leadership-structure/leadership/?lang=${langParam}&leadership_type=department_head`);
         return data.results || [];
     }
 
     async getLeadershipById(id, language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        return await this.request(`/leadership/${id}/?lang=${langParam}`);
+        return await this.request(`/leadership-structure/leadership/${id}/?lang=${langParam}`);
     }
 
     // Accreditation API methods
@@ -94,13 +95,14 @@ class ApiService {
             ...filters
         });
 
-        const data = await this.request(`/organization-structure/?${queryParams}`);
+        const data = await this.request(`/leadership-structure/organization-structure/?${queryParams}`);
         return data.results || [];
     }
 
     async getOrganizationHierarchy(language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        return await this.request(`/organization-structure/hierarchy/?lang=${langParam}`);
+        const data = await this.request(`/leadership-structure/organization-structure/root/?lang=${langParam}`);
+        return data || [];
     }
 
     // Documents API methods
@@ -111,7 +113,7 @@ class ApiService {
             ...filters
         });
 
-        const data = await this.request(`/documents/?${queryParams}`);
+        const data = await this.request(`/leadership-structure/documents/?${queryParams}`);
         return data.results || [];
     }
 

@@ -29,6 +29,13 @@ const AcademicStructure = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Set visible when data is loaded
+  useEffect(() => {
+    if (!loading && structure.length > 0) {
+      setIsVisible(true);
+    }
+  }, [loading, structure]);
+
   const toggleDepartment = (departmentId) => {
     const newExpanded = new Set(expandedDepartments);
     if (newExpanded.has(departmentId)) {
@@ -41,7 +48,11 @@ const AcademicStructure = () => {
 
   const getFilteredData = () => {
     if (viewType === 'hierarchical') {
-      return structure;
+      // Возвращаем только корневые элементы для иерархического представления
+      if (Array.isArray(structure)) {
+        return structure.filter(item => !item.parent);
+      }
+      return [];
     }
 
     if (!structure || !Array.isArray(structure)) return [];
@@ -54,12 +65,14 @@ const AcademicStructure = () => {
   };
 
   const filteredData = getFilteredData();
-  
+
   const structureTypes = [
-    { key: 'leadership', label: t('structure.types.leadership'), icon: '👑', gradient: 'from-blue-500 to-emerald-500' },
-    { key: 'faculties', label: t('structure.types.faculties'), icon: '🎓', gradient: 'from-emerald-500 to-blue-600' },
-    { key: 'administrative', label: t('structure.types.administrative'), icon: '🏛️', gradient: 'from-blue-600 to-emerald-600' },
-    { key: 'support', label: t('structure.types.support'), icon: '🔧', gradient: 'from-emerald-400 to-blue-500' }
+    { key: 'all', label: t('structure.types.all', 'Все'), icon: '🏛️', gradient: 'from-blue-500 to-emerald-500' },
+    { key: 'faculty', label: t('structure.types.faculty', 'Факультеты'), icon: '🎓', gradient: 'from-emerald-500 to-blue-600' },
+    { key: 'department', label: t('structure.types.department', 'Кафедры'), icon: '📚', gradient: 'from-blue-600 to-emerald-600' },
+    { key: 'unit', label: t('structure.types.unit', 'Подразделения'), icon: '🏢', gradient: 'from-emerald-400 to-blue-500' },
+    { key: 'service', label: t('structure.types.service', 'Службы'), icon: '🔧', gradient: 'from-blue-500 to-emerald-400' },
+    { key: 'center', label: t('structure.types.center', 'Центры'), icon: '�', gradient: 'from-emerald-600 to-blue-500' }
   ];
 
   if (loading) {
@@ -90,7 +103,7 @@ const AcademicStructure = () => {
     const gradient = getTypeGradient(department.structure_type);
     const hasChildren = department.children && department.children.length > 0;
     const isExpanded = expandedDepartments.has(department.id);
-    
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -98,10 +111,9 @@ const AcademicStructure = () => {
         transition={{ duration: 0.5, delay: level * 0.1 }}
         className={`${level > 0 ? 'ml-4 lg:ml-8 mt-4' : ''}`}
       >
-        <motion.div 
-          className={`bg-white/5 backdrop-blur-lg rounded-3xl border border-white/20 hover:border-emerald-400/50 transition-all duration-500 overflow-hidden group cursor-pointer ${
-            activeDepartment === department.id ? 'ring-2 ring-emerald-400 scale-105' : ''
-          }`}
+        <motion.div
+          className={`bg-white/5 backdrop-blur-lg rounded-3xl border border-white/20 hover:border-emerald-400/50 transition-all duration-500 overflow-hidden group cursor-pointer ${activeDepartment === department.id ? 'ring-2 ring-emerald-400 scale-105' : ''
+            }`}
           onClick={() => {
             if (hasChildren) toggleDepartment(department.id);
             setActiveDepartment(department.id);
@@ -121,12 +133,12 @@ const AcademicStructure = () => {
                     {department.icon || '🏛️'}
                   </div>
                 </motion.div>
-                
+
                 {/* Контент */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <motion.h3 
+                      <motion.h3
                         className="text-xl lg:text-2xl font-bold text-white mb-3"
                         layout
                       >
@@ -135,7 +147,7 @@ const AcademicStructure = () => {
 
                       {/* Structure Type */}
                       {department.structure_type && (
-                        <motion.span 
+                        <motion.span
                           className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white/10 backdrop-blur-sm border border-white/20 text-white`}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -148,15 +160,15 @@ const AcademicStructure = () => {
                     </div>
 
                     {hasChildren && (
-                      <motion.button 
+                      <motion.button
                         className="flex-shrink-0 ml-4 w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/20 transition-colors"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
-                        <motion.svg 
+                        <motion.svg
                           className="w-5 h-5"
-                          fill="none" 
-                          stroke="currentColor" 
+                          fill="none"
+                          stroke="currentColor"
                           viewBox="0 0 24 24"
                           animate={{ rotate: isExpanded ? 180 : 0 }}
                           transition={{ duration: 0.3 }}
@@ -168,8 +180,8 @@ const AcademicStructure = () => {
                   </div>
 
                   {/* Head Information */}
-                  {department.head_name && (
-                    <motion.div 
+                  {department.head && (
+                    <motion.div
                       className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -180,16 +192,16 @@ const AcademicStructure = () => {
                           👤
                         </div>
                         <span className="text-sm font-semibold text-white">
-                          {t('structure.head')}
+                          {t('structure.head', 'Руководитель')}
                         </span>
                       </div>
-                      <p className="text-blue-100 text-lg font-medium">{department.head_name}</p>
+                      <p className="text-blue-100 text-lg font-medium">{department.head}</p>
                     </motion.div>
                   )}
 
                   {/* Contact Information */}
                   {(department.phone || department.email) && (
-                    <motion.div 
+                    <motion.div
                       className="mt-4 space-y-2 text-sm"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -219,20 +231,18 @@ const AcademicStructure = () => {
                   )}
 
                   {/* Status */}
-                  <motion.div 
+                  <motion.div
                     className="flex flex-wrap gap-2 mt-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
                   >
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${
-                      department.is_active
-                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
-                        : 'bg-red-500/20 text-red-300 border-red-400/30'
-                    }`}>
-                      <div className={`w-2 h-2 rounded-full mr-2 ${
-                        department.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'
-                      }`}></div>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${department.is_active
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+                      : 'bg-red-500/20 text-red-300 border-red-400/30'
+                      }`}>
+                      <div className={`w-2 h-2 rounded-full mr-2 ${department.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'
+                        }`}></div>
                       {department.is_active ? '✅ ' + t('structure.active') : '❌ ' + t('structure.inactive')}
                     </span>
                   </motion.div>
@@ -243,16 +253,16 @@ const AcademicStructure = () => {
             {/* Expand Button for Mobile */}
             {hasChildren && (
               <div className="flex justify-center mt-6 lg:hidden">
-                <motion.button 
+                <motion.button
                   className="flex items-center gap-2 text-emerald-300 text-sm font-medium hover:text-emerald-200 transition-colors bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <span>{isExpanded ? t('structure.showLess') : t('structure.showMore')}</span>
-                  <motion.svg 
+                  <motion.svg
                     className="w-4 h-4"
-                    fill="none" 
-                    stroke="currentColor" 
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                     animate={{ rotate: isExpanded ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
@@ -311,11 +321,10 @@ const AcademicStructure = () => {
                             )}
                           </div>
                         </div>
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${
-                          child.is_active
-                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
-                            : 'bg-red-500/20 text-red-300 border-red-400/30'
-                        }`}>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${child.is_active
+                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+                          : 'bg-red-500/20 text-red-300 border-red-400/30'
+                          }`}>
                           {child.is_active ? t('structure.active') : t('structure.inactive')}
                         </span>
                       </div>
@@ -338,9 +347,9 @@ const AcademicStructure = () => {
               className="space-y-4 mt-6"
             >
               {department.children.map((child) => (
-                <DepartmentCard 
-                  key={child.id} 
-                  department={child} 
+                <DepartmentCard
+                  key={child.id}
+                  department={child}
                   level={level + 1}
                 />
               ))}
@@ -353,7 +362,7 @@ const AcademicStructure = () => {
 
   const getStats = () => {
     if (!Array.isArray(structure)) return null;
-    
+
     return {
       total: structure.length,
       faculties: structure.filter(d => d.structure_type === 'faculties').length,
@@ -379,7 +388,7 @@ const AcademicStructure = () => {
         <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
         <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-        
+
         {/* Академические символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🏛️</div>
         <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">🎓</div>
@@ -462,11 +471,10 @@ const AcademicStructure = () => {
                 setExpandedDepartments(new Set());
                 setActiveDepartment(null);
               }}
-              className={`px-6 py-3 rounded-xl transition-all duration-300 font-medium backdrop-blur-sm ${
-                viewType === 'hierarchical'
-                  ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
-                  : 'text-blue-100 hover:text-white hover:bg-white/10'
-              }`}
+              className={`px-6 py-3 rounded-xl transition-all duration-300 font-medium backdrop-blur-sm ${viewType === 'hierarchical'
+                ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
+                : 'text-blue-100 hover:text-white hover:bg-white/10'
+                }`}
             >
               {t('structure.hierarchicalView')}
             </motion.button>
@@ -478,11 +486,10 @@ const AcademicStructure = () => {
                 setExpandedDepartments(new Set());
                 setActiveDepartment(null);
               }}
-              className={`px-6 py-3 rounded-xl transition-all duration-300 font-medium backdrop-blur-sm ${
-                viewType === 'flat'
-                  ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
-                  : 'text-blue-100 hover:text-white hover:bg-white/10'
-              }`}
+              className={`px-6 py-3 rounded-xl transition-all duration-300 font-medium backdrop-blur-sm ${viewType === 'flat'
+                ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
+                : 'text-blue-100 hover:text-white hover:bg-white/10'
+                }`}
             >
               {t('structure.flatView')}
             </motion.button>
@@ -495,11 +502,10 @@ const AcademicStructure = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedType('all')}
-                className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-medium border backdrop-blur-sm ${
-                  selectedType === 'all'
-                    ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-transparent shadow-lg'
-                    : 'bg-white/5 text-blue-100 border-white/10 hover:bg-white/10'
-                }`}
+                className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-medium border backdrop-blur-sm ${selectedType === 'all'
+                  ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-transparent shadow-lg'
+                  : 'bg-white/5 text-blue-100 border-white/10 hover:bg-white/10'
+                  }`}
               >
                 {t('structure.all')}
               </motion.button>
@@ -509,11 +515,10 @@ const AcademicStructure = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setSelectedType(type.key)}
-                  className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-medium border backdrop-blur-sm flex items-center gap-2 ${
-                    selectedType === type.key
-                      ? `bg-gradient-to-r ${type.gradient} text-white border-transparent shadow-lg`
-                      : 'bg-white/5 text-blue-100 border-white/10 hover:bg-white/10'
-                  }`}
+                  className={`px-4 py-2 rounded-xl transition-all duration-300 text-sm font-medium border backdrop-blur-sm flex items-center gap-2 ${selectedType === type.key
+                    ? `bg-gradient-to-r ${type.gradient} text-white border-transparent shadow-lg`
+                    : 'bg-white/5 text-blue-100 border-white/10 hover:bg-white/10'
+                    }`}
                 >
                   <span>{type.icon}</span>
                   <span>{type.label}</span>

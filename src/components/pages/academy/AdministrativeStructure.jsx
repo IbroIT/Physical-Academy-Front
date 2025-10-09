@@ -1,101 +1,87 @@
-// AdministrativeStructure.jsx
+// AdministrativeStructure.jsx - Integrated with API
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import apiService from '../../../services/api';
 
 const AdministrativeStructure = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeDepartment, setActiveDepartment] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const departments = [
-    {
-      id: 1,
-      name: t('admin.departments.0.name'),
-      head: t('admin.departments.0.head'),
-      responsibilities: [
-        t('admin.departments.0.responsibilities.0'),
-        t('admin.departments.0.responsibilities.1'),
-        t('admin.departments.0.responsibilities.2'),
-        t('admin.departments.0.responsibilities.3')
-      ],
-      email: 'rectorat@sport-academy.ru',
-      phone: '+7 (495) 123-45-67',
-      icon: '🏛️'
-    },
-    {
-      id: 2,
-      name: t('admin.departments.1.name'),
-      head: t('admin.departments.1.head'),
-      responsibilities: [
-        t('admin.departments.1.responsibilities.0'),
-        t('admin.departments.1.responsibilities.1'),
-        t('admin.departments.1.responsibilities.2'),
-        t('admin.departments.1.responsibilities.3')
-      ],
-      email: 'academic@sport-academy.ru',
-      phone: '+7 (495) 123-45-68',
-      icon: '📚'
-    },
-    {
-      id: 3,
-      name: t('admin.departments.2.name'),
-      head: t('admin.departments.2.head'),
-      responsibilities: [
-        t('admin.departments.2.responsibilities.0'),
-        t('admin.departments.2.responsibilities.1'),
-        t('admin.departments.2.responsibilities.2'),
-        t('admin.departments.2.responsibilities.3')
-      ],
-      email: 'science@sport-academy.ru',
-      phone: '+7 (495) 123-45-69',
-      icon: '🔬'
-    },
-    {
-      id: 4,
-      name: t('admin.departments.3.name'),
-      head: t('admin.departments.3.head'),
-      responsibilities: [
-        t('admin.departments.3.responsibilities.0'),
-        t('admin.departments.3.responsibilities.1'),
-        t('admin.departments.3.responsibilities.2'),
-        t('admin.departments.3.responsibilities.3')
-      ],
-      email: 'sports@sport-academy.ru',
-      phone: '+7 (495) 123-45-70',
-      icon: '⚽'
-    },
-    {
-      id: 5,
-      name: t('admin.departments.4.name'),
-      head: t('admin.departments.4.head'),
-      responsibilities: [
-        t('admin.departments.4.responsibilities.0'),
-        t('admin.departments.4.responsibilities.1'),
-        t('admin.departments.4.responsibilities.2'),
-        t('admin.departments.4.responsibilities.3')
-      ],
-      email: 'international@sport-academy.ru',
-      phone: '+7 (495) 123-45-71',
-      icon: '🌍'
-    }
-  ];
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const lang = i18n.language;
+
+        const departmentsData = await apiService.getAdministrativeDepartments(lang);
+        setDepartments(departmentsData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching Administrative Structure data:', err);
+        setError(t('error.loadingData', 'Ошибка загрузки данных'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [i18n.language, t]);
 
   useEffect(() => {
     setIsVisible(true);
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const handleDepartmentClick = (index) => {
     setActiveDepartment(index);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">{t('loading', 'Загрузка...')}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 flex items-center justify-center">
+        <div className="bg-red-500/20 border border-red-500 rounded-lg p-6 max-w-md">
+          <p className="text-white text-center">{error}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // No data state
+  if (departments.length === 0) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl">{t('noData', 'Нет данных')}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 overflow-hidden">
@@ -126,31 +112,28 @@ const AdministrativeStructure = () => {
               <h3 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6 text-center">
                 {t('admin.departmentsTitle')}
               </h3>
-              
+
               <div className="space-y-3">
                 {departments.map((department, index) => (
                   <button
                     key={department.id}
                     onClick={() => handleDepartmentClick(index)}
-                    className={`w-full text-left p-4 rounded-xl transition-all duration-300 group ${
-                      index === activeDepartment
+                    className={`w-full text-left p-4 rounded-xl transition-all duration-300 group ${index === activeDepartment
                         ? 'bg-gradient-to-r from-blue-500 to-green-500 shadow-lg transform scale-105'
                         : 'bg-white/5 hover:bg-white/10 hover:transform hover:scale-102'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center">
                       <span className="text-2xl mr-3 group-hover:scale-110 transition-transform duration-300">
                         {department.icon}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <h4 className={`font-semibold truncate ${
-                          index === activeDepartment ? 'text-white' : 'text-white group-hover:text-green-300'
-                        }`}>
+                        <h4 className={`font-semibold truncate ${index === activeDepartment ? 'text-white' : 'text-white group-hover:text-green-300'
+                          }`}>
                           {department.name}
                         </h4>
-                        <p className={`text-sm truncate ${
-                          index === activeDepartment ? 'text-blue-100' : 'text-blue-200'
-                        }`}>
+                        <p className={`text-sm truncate ${index === activeDepartment ? 'text-blue-100' : 'text-blue-200'
+                          }`}>
                           {department.head}
                         </p>
                       </div>
@@ -245,7 +228,7 @@ const AdministrativeStructure = () => {
               <h4 className="text-white font-bold text-lg md:text-xl mb-2">{t('admin.stats.employees')}</h4>
               <p className="text-green-300 text-2xl md:text-3xl font-bold">150+</p>
             </div>
-            
+
             <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-4 md:p-6 border border-white/10 text-center group hover:border-blue-400/30 transition-all duration-300">
               <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-green-500/30 transition-colors">
                 <span className="text-2xl">🏢</span>
@@ -253,7 +236,7 @@ const AdministrativeStructure = () => {
               <h4 className="text-white font-bold text-lg md:text-xl mb-2">{t('admin.stats.departments')}</h4>
               <p className="text-blue-300 text-2xl md:text-3xl font-bold">12+</p>
             </div>
-            
+
             <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-4 md:p-6 border border-white/10 text-center group hover:border-green-400/30 transition-all duration-300">
               <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-500/30 transition-colors">
                 <span className="text-2xl">📈</span>

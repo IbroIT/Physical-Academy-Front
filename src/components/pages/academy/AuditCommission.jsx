@@ -1,17 +1,53 @@
-// AuditCommission.jsx
+// AuditCommission.jsx - Integrated with API
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import apiService from '../../../services/api';
 
 const AuditCommission = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeMember, setActiveMember] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [members, setMembers] = useState([]);
+  const [statistics, setStatistics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sectionRef = useRef(null);
 
-  // Получаем данные членов комиссии из i18n
-  const members = t('auditCommission.members', { returnObjects: true });
-  const statistics = t('auditCommission.statistics', { returnObjects: true });
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const lang = i18n.language;
+
+        console.log('🔍 Fetching AuditCommission data with lang:', lang);
+
+        const [membersData, statisticsData] = await Promise.all([
+          apiService.getAuditCommission(lang),
+          apiService.getAuditCommissionStatistics(lang)
+        ]);
+
+        console.log('📊 AuditCommission data received:', {
+          members: membersData?.length,
+          statistics: statisticsData?.length
+        });
+
+        setMembers(membersData);
+        setStatistics(statisticsData);
+        setError(null);
+        // Set visible immediately after data loads
+        setIsVisible(true);
+      } catch (err) {
+        console.error('❌ Error fetching Audit Commission data:', err);
+        setError(t('error.loadingData', 'Ошибка загрузки данных'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [i18n.language, t]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -27,14 +63,50 @@ const AuditCommission = () => {
   }, []);
 
   useEffect(() => {
+    if (members.length === 0) return;
+
     const interval = setInterval(() => {
       setActiveMember((prev) => (prev + 1) % members.length);
     }, 5000);
     return () => clearInterval(interval);
   }, [members.length]);
 
+  // Loading state
+  if (loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-800 py-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">{t('loading', 'Загрузка...')}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-800 py-20 flex items-center justify-center">
+        <div className="bg-red-500/20 border border-red-500 rounded-lg p-6 max-w-md">
+          <p className="text-white text-center">{error}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // No data state
+  if (members.length === 0) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-800 py-20 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl">{t('noData', 'Нет данных')}</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-800 py-20 overflow-hidden"
     >
@@ -52,11 +124,11 @@ const AuditCommission = () => {
           className="text-center mb-16"
         >
           <h2 className="text-5xl font-bold text-white mb-6 tracking-tight">
-            {t('auditCommission.title')}
+            {t('auditCommission.title', 'Ревизионная комиссия')}
           </h2>
           <div className="w-24 h-1 bg-emerald-400 mx-auto mb-6"></div>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            {t('auditCommission.subtitle')}
+            {t('auditCommission.subtitle', 'Контроль финансовой деятельности и обеспечение прозрачности')}
           </p>
         </motion.div>
 
@@ -69,11 +141,10 @@ const AuditCommission = () => {
                 initial={{ opacity: 0, x: -50 }}
                 animate={isVisible ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
-                className={`p-6 rounded-2xl backdrop-blur-lg border-2 transition-all duration-500 cursor-pointer ${
-                  activeMember === index
-                    ? 'bg-white/20 border-emerald-400 shadow-2xl scale-105'
-                    : 'bg-white/10 border-white/20 hover:bg-white/15'
-                }`}
+                className={`p-6 rounded-2xl backdrop-blur-lg border-2 transition-all duration-500 cursor-pointer ${activeMember === index
+                  ? 'bg-white/20 border-emerald-400 shadow-2xl scale-105'
+                  : 'bg-white/10 border-white/20 hover:bg-white/15'
+                  }`}
                 onMouseEnter={() => setActiveMember(index)}
               >
                 <div className="flex items-center space-x-4">
@@ -86,9 +157,9 @@ const AuditCommission = () => {
                     <p className="text-blue-200 text-sm">{member.department}</p>
                   </div>
                 </div>
-                
+
                 <AnimatePresence>
-                  {activeMember === index && (
+                  {activeMember === index && member.achievements && member.achievements.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
@@ -131,7 +202,7 @@ const AuditCommission = () => {
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-4 border-white/30 rounded-full animate-ping"></div>
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-4 border-white/20 rounded-full animate-pulse"></div>
                 </div>
-                
+
                 <motion.div
                   key={activeMember}
                   initial={{ opacity: 0, scale: 0.5 }}
@@ -149,7 +220,7 @@ const AuditCommission = () => {
 
               {/* Статистика */}
               <div className="grid grid-cols-3 gap-4 mt-6">
-                {Object.values(statistics).map((stat, index) => (
+                {statistics.map((stat, index) => (
                   <div key={index} className="text-center p-4 bg-white/5 rounded-xl">
                     <div className="text-2xl font-bold text-emerald-400">{stat.value}</div>
                     <div className="text-blue-200 text-sm">{stat.label}</div>
@@ -168,10 +239,10 @@ const AuditCommission = () => {
           className="text-center mt-16"
         >
           <button className="bg-gradient-to-r from-emerald-400 to-blue-500 hover:from-emerald-500 hover:to-blue-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-            {t('auditCommission.contactButton')}
+            {t('auditCommission.contactButton', 'Связаться с комиссией')}
           </button>
           <p className="text-blue-200 mt-4 text-sm">
-            {t('auditCommission.contactDescription')}
+            {t('auditCommission.contactDescription', 'Для вопросов по финансовой отчетности')}
           </p>
         </motion.div>
       </div>

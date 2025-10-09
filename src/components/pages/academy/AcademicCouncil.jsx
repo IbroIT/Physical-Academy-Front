@@ -1,63 +1,86 @@
-// AcademicCouncil.jsx
+// AcademicCouncil.jsx - Integrated with API
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import apiService from '../../../services/api';
 
 const AcademicCouncil = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeMember, setActiveMember] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [councilMembers, setCouncilMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const councilMembers = [
-    {
-      id: 1,
-      name: t('council.members.0.name'),
-      position: t('council.members.0.position'),
-      department: t('council.members.0.department'),
-      achievements: [
-        t('council.members.0.achievements.0'),
-        t('council.members.0.achievements.1'),
-        t('council.members.0.achievements.2')
-      ],
-      image: '/images/council/member1.jpg'
-    },
-    {
-      id: 2,
-      name: t('council.members.1.name'),
-      position: t('council.members.1.position'),
-      department: t('council.members.1.department'),
-      achievements: [
-        t('council.members.1.achievements.0'),
-        t('council.members.1.achievements.1'),
-        t('council.members.1.achievements.2')
-      ],
-      image: '/images/council/member2.jpg'
-    },
-    {
-      id: 3,
-      name: t('council.members.2.name'),
-      position: t('council.members.2.position'),
-      department: t('council.members.2.department'),
-      achievements: [
-        t('council.members.2.achievements.0'),
-        t('council.members.2.achievements.1'),
-        t('council.members.2.achievements.2')
-      ],
-      image: '/images/council/member3.jpg'
-    }
-  ];
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const lang = i18n.language;
+
+        const membersData = await apiService.getAcademicCouncil(lang);
+        setCouncilMembers(membersData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching Academic Council data:', err);
+        setError(t('error.loadingData', 'Ошибка загрузки данных'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [i18n.language, t]);
 
   useEffect(() => {
     setIsVisible(true);
+
+    if (councilMembers.length === 0) return;
+
     const interval = setInterval(() => {
       setActiveMember(prev => (prev + 1) % councilMembers.length);
     }, 5000);
-    
+
     return () => clearInterval(interval);
-  }, []);
+  }, [councilMembers.length]);
 
   const handleDotClick = (index) => {
     setActiveMember(index);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-green-800 py-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">{t('loading', 'Загрузка...')}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-green-800 py-20 flex items-center justify-center">
+        <div className="bg-red-500/20 border border-red-500 rounded-lg p-6 max-w-md">
+          <p className="text-white text-center">{error}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // No data state
+  if (councilMembers.length === 0) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-green-800 py-20 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl">{t('noData', 'Нет данных')}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-green-800 py-20 overflow-hidden">
@@ -72,11 +95,11 @@ const AcademicCouncil = () => {
         {/* Заголовок */}
         <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-            {t('council.title')}
+            {t('council.title', 'Ученый совет')}
           </h1>
           <div className="w-24 h-1 bg-green-400 mx-auto mb-4"></div>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            {t('council.subtitle')}
+            {t('council.subtitle', 'Академическое управление и научная деятельность')}
           </p>
         </div>
 
@@ -87,11 +110,17 @@ const AcademicCouncil = () => {
             <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl">
               <div className="flex items-center mb-6">
                 <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-400 to-green-400 p-1">
-                  <img
-                    src={councilMembers[activeMember].image}
-                    alt={councilMembers[activeMember].name}
-                    className="w-full h-full rounded-full object-cover border-4 border-white"
-                  />
+                  {councilMembers[activeMember].image_url ? (
+                    <img
+                      src={councilMembers[activeMember].image_url}
+                      alt={councilMembers[activeMember].name}
+                      className="w-full h-full rounded-full object-cover border-4 border-white"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-full bg-gradient-to-r from-blue-500 to-green-500 flex items-center justify-center border-4 border-white">
+                      <span className="text-white text-2xl">👤</span>
+                    </div>
+                  )}
                 </div>
                 <div className="ml-6">
                   <h3 className="text-2xl font-bold text-white">
@@ -100,28 +129,32 @@ const AcademicCouncil = () => {
                   <p className="text-green-300 font-semibold">
                     {councilMembers[activeMember].position}
                   </p>
-                  <p className="text-blue-200">
-                    {councilMembers[activeMember].department}
-                  </p>
+                  {councilMembers[activeMember].department && (
+                    <p className="text-blue-200">
+                      {councilMembers[activeMember].department}
+                    </p>
+                  )}
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <h4 className="text-lg font-semibold text-white mb-3">
-                  {t('council.achievements')}:
-                </h4>
-                {councilMembers[activeMember].achievements.map((achievement, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start group hover:transform hover:translate-x-2 transition-transform duration-300"
-                  >
-                    <div className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                    <p className="text-blue-100 group-hover:text-white transition-colors">
-                      {achievement}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              {councilMembers[activeMember].achievements && councilMembers[activeMember].achievements.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-lg font-semibold text-white mb-3">
+                    {t('council.achievements', 'Достижения')}:
+                  </h4>
+                  {councilMembers[activeMember].achievements.map((achievement, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start group hover:transform hover:translate-x-2 transition-transform duration-300"
+                    >
+                      <div className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                      <p className="text-blue-100 group-hover:text-white transition-colors">
+                        {achievement}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Декоративные элементы */}
@@ -164,11 +197,10 @@ const AcademicCouncil = () => {
             <button
               key={index}
               onClick={() => handleDotClick(index)}
-              className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                index === activeMember
+              className={`w-4 h-4 rounded-full transition-all duration-300 ${index === activeMember
                   ? 'bg-green-400 scale-125'
                   : 'bg-white/30 hover:bg-white/50'
-              }`}
+                }`}
             />
           ))}
         </div>

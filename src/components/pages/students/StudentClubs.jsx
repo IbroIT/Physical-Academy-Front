@@ -75,6 +75,7 @@ const StudentClubs = () => {
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
           </div>
 
+
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -181,6 +182,7 @@ const ClubCard = ({ club }) => {
     <div className="bg-white rounded-lg border border-gray-200 hover:border-blue-300 overflow-hidden hover:shadow-md transition-all duration-200 group cursor-pointer">
       {/* Заголовок */}
       <div
+      <div
         className="bg-blue-600 p-4 text-white"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -197,6 +199,7 @@ const ClubCard = ({ club }) => {
       {/* Контент */}
       <div className="p-4">
         <p className="text-gray-600 text-sm mb-3 leading-relaxed">{club.description}</p>
+
 
         <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
           <div className="flex items-center space-x-3">
@@ -270,6 +273,7 @@ const ClubCard = ({ club }) => {
                 ? 'bg-blue-600 text-white hover:bg-blue-700'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
+              }`}
           >
             {isJoining ? (
               <>
@@ -284,12 +288,16 @@ const ClubCard = ({ club }) => {
             )}
           </button>
 
+
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="w-10 h-10 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center"
           >
             <svg
+            <svg
               className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
