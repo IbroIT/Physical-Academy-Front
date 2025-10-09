@@ -255,3 +255,149 @@ export const useSearch = (searchType = 'leadership') => {
         search
     };
 };
+
+// Hook for Student Clubs page data (all-in-one)
+export const useStudentClubsPageData = (filters = {}) => {
+    const { i18n } = useTranslation();
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const result = await apiService.getStudentClubsPageData(i18n.language, filters);
+            setData(result);
+        } catch (err) {
+            setError(err.message || 'Failed to fetch student clubs page data');
+            console.error('Student clubs page data fetch error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [i18n.language, JSON.stringify(filters)]);
+
+    return { data, loading, error, refetch: fetchData };
+};
+
+// Hook for Student Clubs list
+export const useStudentClubs = (filters = {}) => {
+    const { i18n } = useTranslation();
+    const [clubs, setClubs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchClubs = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const result = await apiService.getStudentClubs(i18n.language, filters);
+            setClubs(result);
+        } catch (err) {
+            setError(err.message || 'Failed to fetch student clubs');
+            console.error('Student clubs fetch error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchClubs();
+    }, [i18n.language, JSON.stringify(filters)]);
+
+    return { clubs, loading, error, refetch: fetchClubs };
+};
+
+// Hook for Student Club details
+export const useStudentClub = (clubId) => {
+    const { i18n } = useTranslation();
+    const [club, setClub] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchClub = async () => {
+        if (!clubId) return;
+        
+        try {
+            setLoading(true);
+            setError(null);
+            const result = await apiService.getStudentClubById(clubId, i18n.language);
+            setClub(result);
+        } catch (err) {
+            setError(err.message || 'Failed to fetch club details');
+            console.error('Club details fetch error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchClub();
+    }, [clubId, i18n.language]);
+
+    return { club, loading, error, refetch: fetchClub };
+};
+
+// Hook for Student Club categories
+export const useStudentClubCategories = () => {
+    const { i18n } = useTranslation();
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchCategories = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const result = await apiService.getStudentClubCategories(i18n.language);
+            setCategories(result);
+        } catch (err) {
+            setError(err.message || 'Failed to fetch categories');
+            console.error('Categories fetch error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, [i18n.language]);
+
+    return { categories, loading, error, refetch: fetchCategories };
+};
+
+// Hook for joining a club
+export const useJoinStudentClub = () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(false);
+
+    const joinClub = async (clubId, userData) => {
+        try {
+            setLoading(true);
+            setError(null);
+            setSuccess(false);
+            const result = await apiService.joinStudentClub(clubId, userData);
+            setSuccess(true);
+            return result;
+        } catch (err) {
+            setError(err.message || 'Failed to join club');
+            console.error('Join club error:', err);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const reset = () => {
+        setLoading(false);
+        setError(null);
+        setSuccess(false);
+    };
+
+    return { joinClub, loading, error, success, reset };
+};

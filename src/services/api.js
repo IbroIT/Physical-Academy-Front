@@ -127,6 +127,79 @@ class ApiService {
     async searchOrganizationStructure(query, language = 'ru') {
         return await this.getOrganizationStructure(language, { search: query });
     }
+
+    // Student Clubs API methods
+    async getStudentClubsPageData(language = 'ru', filters = {}) {
+        const langParam = this.getLanguageParam(language);
+        const queryParams = new URLSearchParams({
+            lang: langParam,
+            ...filters
+        });
+
+        return await this.request(`/student-clubs/clubs/page_data/?${queryParams}`);
+    }
+
+    async getStudentClubs(language = 'ru', filters = {}) {
+        const langParam = this.getLanguageParam(language);
+        const queryParams = new URLSearchParams({
+            lang: langParam,
+            ...filters
+        });
+
+        const data = await this.request(`/student-clubs/clubs/?${queryParams}`);
+        return data.results || data;
+    }
+
+    async getStudentClubById(id, language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/student-clubs/clubs/${id}/?lang=${langParam}`);
+    }
+
+    async getStudentClubsByCategory(categorySlug, language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        const data = await this.request(
+            `/student-clubs/clubs/by_category/?category=${categorySlug}&lang=${langParam}`
+        );
+        return data.results || data;
+    }
+
+    async getStudentClubCategories(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        const data = await this.request(`/student-clubs/categories/?lang=${langParam}`);
+        return data.results || data;
+    }
+
+    async getStudentClubStats(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        const data = await this.request(`/student-clubs/stats/?lang=${langParam}`);
+        return data.results || data;
+    }
+
+    async getStudentClubLeaders(language = 'ru', clubId = null) {
+        const langParam = this.getLanguageParam(language);
+        const queryParams = new URLSearchParams({ lang: langParam });
+        if (clubId) {
+            queryParams.append('club', clubId);
+        }
+
+        const data = await this.request(`/student-clubs/leaders/?${queryParams}`);
+        return data.results || data;
+    }
+
+    async joinStudentClub(clubId, userData) {
+        return await this.request(`/student-clubs/clubs/${clubId}/join/`, {
+            method: 'POST',
+            body: JSON.stringify(userData),
+        });
+    }
+
+    async searchStudentClubs(query, language = 'ru', category = null) {
+        const filters = { search: query };
+        if (category && category !== 'all') {
+            filters.category = category;
+        }
+        return await this.getStudentClubs(language, filters);
+    }
 }
 
 // Create and export a singleton instance
@@ -146,5 +219,14 @@ export const {
     getDocuments,
     searchLeadership,
     searchDocuments,
-    searchOrganizationStructure
+    searchOrganizationStructure,
+    getStudentClubsPageData,
+    getStudentClubs,
+    getStudentClubById,
+    getStudentClubsByCategory,
+    getStudentClubCategories,
+    getStudentClubStats,
+    getStudentClubLeaders,
+    joinStudentClub,
+    searchStudentClubs
 } = apiService;
