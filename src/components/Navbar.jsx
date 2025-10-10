@@ -59,155 +59,155 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
   // Данные меню для КГАФКиС
   const menuData = {
     academy: {
-      title: t('nav.academy'),
+      title: t('nav.academy', 'Академия'),
       submenu: [
         { 
-          title: t('nav.about_academy'),
+          title: t('nav.about_academy', 'Об академии'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.about_academy'), link: '/academy/about' },
-            { title: t('nav.history'), link: '/academy/history' },
-            { title: t('nav.mission_strategy'), link: '/academy/mission' },
-            { title: t('nav.accreditation'), link: '/academy/accreditation' },
-            { title: t('nav.kgafkis_in_numbers'), link: '/academy/numbers' },
+            { title: t('nav.about_academy', 'Об академии'), link: '/academy/about' },
+            { title: t('nav.history', 'История'), link: '/academy/history' },
+            { title: t('nav.mission_strategy', 'Миссия и стратегия'), link: '/academy/mission' },
+            { title: t('nav.accreditation', 'Аккредитация'), link: '/academy/accreditation' },
+            { title: t('nav.kgafkis_in_numbers', 'КГАФКиС в цифрах'), link: '/academy/numbers' },
           ]
         },
         { 
-          title: t('nav.leadership'),
+          title: t('nav.leadership', 'Руководство'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.board_of_trustees'), link: '/academy/leadership/board-of-trustees' },
-            { title: t('nav.audit_commission'), link: '/academy/leadership/audit-commission' },
-            { title: t('nav.academic_council'), link: '/academy/leadership/academic-council' },
-            { title: t('nav.rectorate'), link: '/academy/leadership/rectorate' },
-            { title: t('nav.trade_union'), link: '/academy/leadership/trade-union' },
-            { title: t('nav.commissions'), link: '/academy/leadership/commissions' },
-            { title: t('nav.academic_structure'), link: '/academy/structure/academic' },
-            { title: t('nav.administrative_structure'), link: '/academy/structure/administrative' },
-            { title: t('nav.administrative_units'), link: '/academy/structure/units' },
-            { title: t('nav.documents'), link: '/academy/documents' },
+            { title: t('nav.board_of_trustees', 'Попечительский совет'), link: '/academy/leadership/board-of-trustees' },
+            { title: t('nav.audit_commission', 'Ревизионная комиссия'), link: '/academy/leadership/audit-commission' },
+            { title: t('nav.academic_council', 'Ученый совет'), link: '/academy/leadership/academic-council' },
+            { title: t('nav.rectorate', 'Ректорат'), link: '/academy/leadership/rectorate' },
+            { title: t('nav.trade_union', 'Профсоюз'), link: '/academy/leadership/trade-union' },
+            { title: t('nav.commissions', 'Комиссии'), link: '/academy/leadership/commissions' },
+            { title: t('nav.academic_structure', 'Учебная структура'), link: '/academy/structure/academic' },
+            { title: t('nav.administrative_structure', 'Административная структура'), link: '/academy/structure/administrative' },
+            { title: t('nav.administrative_units', 'Административные подразделения'), link: '/academy/structure/units' },
+            { title: t('nav.documents', 'Документы'), link: '/academy/documents' },
           ]
         }
       ]
     },
     admissions: {
-      title: t('nav.admissions'),
+      title: t('nav.admissions', 'Поступление'),
       submenu: [
         { 
-          title: t('nav.bachelor'),
+          title: t('nav.bachelor', 'Бакалавриат'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.general_info'), link: '/admissions/bachelor/info' },
-            { title: t('nav.registration'), link: '/admissions/bachelor/registration' },
-            { title: t('nav.international_applicants'), link: '/admissions/bachelor/international' },
-            { title: t('nav.quotas'), link: '/admissions/bachelor/quotas' },
-            { title: t('nav.contacts'), link: '/admissions/bachelor/contacts' },
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/bachelor/info' },
+            { title: t('nav.registration', 'Регистрация'), link: '/admissions/bachelor/registration' },
+            { title: t('nav.international_applicants', 'Иностранные абитуриенты'), link: '/admissions/bachelor/international' },
+            { title: t('nav.quotas', 'Квоты'), link: '/admissions/bachelor/quotas' },
+            { title: t('nav.contacts', 'Контакты'), link: '/admissions/bachelor/contacts' },
           ]
         },
         { 
-          title: t('nav.master_phd'),
+          title: t('nav.master_phd', 'Магистратура'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.general_info'), link: '/admissions/master/info' },
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/master/info' },
           ]
         },
         {
-          title: t('nav.doctorate'),
+          title: t('nav.doctorate', 'Докторантура'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.general_info'), link: '/admissions/doctorate/info' },
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/doctorate/info' },
           ]
         },
         { 
-          title: t('nav.college'),
+          title: t('nav.college', 'Колледж'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.general_info'), link: '/admissions/college/info' },
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/college/info' },
           ]
         },
       ]
     },
     education: {
-      title: t('nav.education'),
+      title: t('nav.education', 'Образование'),
       submenu: [
         {
-          title: t('nav.faculties'),
+          title: t('nav.faculties', 'Факультеты'),
           hasNested: true,
           nestedItems: [
             { 
-              title: t('nav.pedagogical_national_sports'),
+              title: t('nav.pedagogical_national_sports', 'Педагогический и национальные виды спорта'),
               link: '/education/faculties/pedagogical'
             },
             { 
-              title: t('nav.coaching_faculty'),
+              title: t('nav.coaching_faculty', 'Тренерский факультет'),
               link: '/education/faculties/coaching'
             },
             { 
-              title: t('nav.military_training_physical_culture'),
+              title: t('nav.military_training_physical_culture', 'Военная подготовка и физическая культура'),
               link: '/education/faculties/military-training'
             },
             { 
-              title: t('nav.correspondence_advanced_training'),
+              title: t('nav.correspondence_advanced_training', 'Заочное обучение и повышение квалификации'),
               link: '/education/faculties/correspondence'
             },
             { 
-              title: t('nav.general_faculty_departments'),
+              title: t('nav.general_faculty_departments', 'Общефакультетские кафедры'),
               link: '/education/departments'
             }
           ]
         },
-        { title: t('nav.master_program'), link: '/education/faculties/master' },
-        { title: t('nav.doctorate'), link: '/education/faculties/doctorate' },
+        { title: t('nav.master_program', 'Магистратура'), link: '/education/faculties/master' },
+        { title: t('nav.doctorate', 'Докторантура'), link: '/education/faculties/doctorate' },
         { 
-          title: t('nav.college'),
+          title: t('nav.college', 'Колледж'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.college_physical_culture_sports'), link: '/education/college/sports' },
+            { title: t('nav.college_physical_culture_sports', 'Колледж физической культуры и спорта'), link: '/education/college/sports' },
           ]
         },
       ]
     },
     science: {
-      title: t('nav.science'),
+      title: t('nav.science', 'Наука'),
       submenu: [
-        { title: t('nav.scientific_publications'), link: '/science/publications' },
-        { title: t('nav.vestnik'), link: '/science/vestnik' },
-        { title: t('nav.web_of_science'), link: '/science/web-of-science' },
-        { title: t('nav.scopus'), link: '/science/scopus' },
-        { title: t('nav.research_and_technical_council'), link: '/science/nts-committee' },
-        { title: t('nav.student_scientific_society'), link: '/science/ssu' }
+        { title: t('nav.scientific_publications', 'Научные публикации'), link: '/science/publications' },
+        { title: t('nav.vestnik', 'Вестник'), link: '/science/vestnik' },
+        { title: t('nav.web_of_science', 'Web of Science'), link: '/science/web-of-science' },
+        { title: t('nav.scopus', 'Scopus'), link: '/science/scopus' },
+        { title: t('nav.research_and_technical_council', 'Научно-технический совет'), link: '/science/nts-committee' },
+        { title: t('nav.student_scientific_society', 'Студенческое научное общество'), link: '/science/ssu' }
       ]
     },
     students: {
-      title: t('nav.students'),
+      title: t('nav.students', 'Студентам'),
       submenu: [
         {
-          title: t('nav.useful_information'),
+          title: t('nav.useful_information', 'Полезная информация'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.students_with_disabilities'), link: '/students/disabilities' },
-            { title: t('nav.student_council'), link: '/students/council' },
-            { title: t('nav.exchange_programs'), link: '/students/exchange' },
-            { title: t('nav.instructions'), link: '/students/instructions' },
-            { title: t('nav.scholarship'), link: '/students/scholarship' }
+            { title: t('nav.students_with_disabilities', 'Студенты с ограниченными возможностями'), link: '/students/disabilities' },
+            { title: t('nav.student_council', 'Студенческий совет'), link: '/students/council' },
+            { title: t('nav.exchange_programs', 'Программы обмена'), link: '/students/exchange' },
+            { title: t('nav.instructions', 'Инструкции'), link: '/students/instructions' },
+            { title: t('nav.scholarship', 'Стипендия'), link: '/students/scholarship' }
           ]
         },
         {
-          title: t('nav.useful_links'),
+          title: t('nav.useful_links', 'Полезные ссылки'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.ebilim_login'), link: '/students/ebilim' },
-            { title: t('nav.visa_support'), link: '/students/visa-support' }
+            { title: t('nav.ebilim_login', 'Вход в eBilim'), link: '/students/ebilim' },
+            { title: t('nav.visa_support', 'Визовая поддержка'), link: '/students/visa-support' }
           ]
         }
       ]
     },
     contacts: {
-      title: t('nav.contacts'),
+      title: t('nav.contacts', 'Контакты'),
       submenu: [
-        { title: t('nav.address_map'), link: '/contacts/address' },
-        { title: t('nav.phones_email'), link: '/contacts/contact-info' },
-        { title: t('nav.social_networks'), link: '/contacts/social' },
+        { title: t('nav.address_map', 'Адрес и карта'), link: '/contacts/address' },
+        { title: t('nav.phones_email', 'Телефоны и email'), link: '/contacts/contact-info' },
+        { title: t('nav.social_networks', 'Социальные сети'), link: '/contacts/social' },
       ]
     }
   };
@@ -231,7 +231,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
               >
                 <img
                   src={isScrolled ? DefaultLogo : ScrolledLogo}
-                  alt="Logo"
+                  alt={t('nav.logo_alt', 'Логотип КГАФКиС')}
                   className="h-10 w-auto object-contain transition-opacity duration-300"
                 />
               </div>
@@ -393,9 +393,14 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                     ? 'text-blue-700 hover:bg-teal-50 border border-blue-200'
                     : 'text-white hover:bg-white/20 border border-white/30'
                 } focus:outline-none backdrop-blur-sm`}
-                aria-expanded="false"
+                aria-expanded={isMenuOpen}
               >
-                <span className="sr-only">Open main menu</span>
+                <span className="sr-only">
+                  {isMenuOpen 
+                    ? t('nav.close_menu', 'Закрыть меню') 
+                    : t('nav.open_menu', 'Открыть меню')
+                  }
+                </span>
                 {!isMenuOpen ? (
                   <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />

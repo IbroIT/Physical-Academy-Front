@@ -59,51 +59,48 @@ const Contacts = () => {
     <path d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l.002.001-.314 4.692c.46 0 .663-.211.921-.46l2.211-2.15 4.599 3.397c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.434z"/>
   </svg>
 );
-  const socialLinks = [
-    {
-      name: 'WhatsApp',
-      url: '#',
-      icon: <WhatsAppIcon />,
-      color: 'hover:bg-green-500'
-    },
-    {
-      name: 'Facebook',
-      url: '#',
-      icon: <FacebookIcon />,
-      color: 'hover:bg-blue-600'
-    },
-    {
-      name: 'Instagram',
-      url: '#',
-      icon: <InstagramIcon />,
-      color: 'hover:bg-pink-600'
-    },
-    {
-      name: 'Telegram',
-      url: '#',
-      icon: <TelegramIcon />,
-      color: 'hover:bg-blue-400'
-    }
-  ];
+
+  const contacts = t('contacts', { returnObjects: true });
+
+  const socialLinks = Array.isArray(contacts?.socialLinks)
+  ? contacts.socialLinks.map((social) => ({
+      ...social,
+      icon: (() => {
+        switch (social.name) {
+          case 'WhatsApp':
+            return <WhatsAppIcon />;
+          case 'Facebook':
+            return <FacebookIcon />;
+          case 'Instagram':
+            return <InstagramIcon />;
+          case 'Telegram':
+            return <TelegramIcon />;
+          default:
+            return null;
+        }
+      })(),
+    }))
+  : [];
+
 
   const contactInfo = [
     {
       icon: <PhoneIcon />,
-      title: t('contacts.phone.title'),
-      value: '+7 (999) 123-45-67',
-      link: 'tel:+79991234567'
+      title: contacts.contactInfo.phone.title,
+      value: contacts.contactInfo.phone.value,
+      link: `tel:${contacts.contactInfo.phone.value}`
     },
     {
       icon: <MailIcon />,
-      title: t('contacts.email.title'),
-      value: 'info@example.com',
-      link: 'mailto:info@example.com'
+      title: contacts.contactInfo.email.title,
+      value: contacts.contactInfo.email.value,
+      link: `mailto:${contacts.contactInfo.email.value}`
     },
     {
       icon: <LocationIcon />,
-      title: t('contacts.location.title'),
-      value: t('contacts.location.address'),
-      link: '#'
+      title: contacts.contactInfo.location.title,
+      value: contacts.contactInfo.location.value,
+      link: contacts.contactInfo.location.link
     }
   ];
 
@@ -128,10 +125,10 @@ const Contacts = () => {
               className="lg:col-span-1"
             >
               <h3 className="text-2xl font-bold text-white mb-4">
-                {t('contacts.title')}
+                {contacts.title}
               </h3>
               <p className="text-white/90 text-sm leading-relaxed mb-6">
-                {t('contacts.subtitle')}
+                {contacts.subtitle}
               </p>
               
               {/* Социальные сети */}
@@ -158,7 +155,7 @@ const Contacts = () => {
               className="lg:col-span-1"
             >
               <h4 className="text-lg font-semibold text-white mb-6">
-                {t('contacts.quickContact.title')}
+                {contacts.quickContact.title}
               </h4>
               <div className="space-y-4">
                 {contactInfo.map((contact, index) => (
@@ -188,15 +185,10 @@ const Contacts = () => {
               className="lg:col-span-1"
             >
               <h4 className="text-lg font-semibold text-white mb-6">
-                {t('contacts.links.title', 'Быстрые ссылки')}
+                {contacts.links.title}
               </h4>
               <div className="space-y-3">
-                {[
-                  { name: t('contacts.links.about', 'О нас'), url: '#' },
-                  { name: t('contacts.links.services', 'Услуги'), url: '#' },
-                  { name: t('contacts.links.news', 'Новости'), url: '#' },
-                  { name: t('contacts.links.contact', 'Контакты'), url: '#' }
-                ].map((link, index) => (
+                {contacts.links.items.map((link, index) => (
                   <motion.a
                     key={index}
                     href={link.url}
@@ -217,21 +209,21 @@ const Contacts = () => {
               className="lg:col-span-1"
             >
               <h4 className="text-lg font-semibold text-white mb-6">
-                {t('contacts.hours.title')}
+                {contacts.hours.title}
               </h4>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-white/90">{t('contacts.hours.weekdays', 'Пн-Пт')}</span>
-                    <span className="text-white font-medium">9:00 - 18:00</span>
+                    <span className="text-white/90">{contacts.hours.weekdays}</span>
+                    <span className="text-white font-medium">{contacts.hours.weekdaysTime}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/90">{t('contacts.hours.saturday', 'Суббота')}</span>
-                    <span className="text-white font-medium">10:00 - 16:00</span>
+                    <span className="text-white/90">{contacts.hours.saturday}</span>
+                    <span className="text-white font-medium">{contacts.hours.saturdayTime}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/90">{t('contacts.hours.sunday', 'Воскресенье')}</span>
-                    <span className="text-red-200 font-medium">{t('contacts.hours.closed', 'Выходной')}</span>
+                    <span className="text-white/90">{contacts.hours.sunday}</span>
+                    <span className="text-red-200 font-medium">{contacts.hours.closed}</span>
                   </div>
                 </div>
               </div>
@@ -246,14 +238,14 @@ const Contacts = () => {
             className="border-t border-white/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center"
           >
             <p className="text-white/80 text-sm text-center md:text-left mb-4 md:mb-0">
-              © 2025 {t('contacts.company', 'КГАФКиС')}. {t('contacts.rights', 'Все права защищены.')}
+              {contacts.footer.copyright}
             </p>
             <div className="flex space-x-6 text-sm">
-              <a href="#" className="text-white/80 hover:text-white transition-colors duration-300">
-                {t('contacts.privacy', 'Политика конфиденциальности')}
+              <a href={contacts.footer.privacy.url} className="text-white/80 hover:text-white transition-colors duration-300">
+                {contacts.footer.privacy.name}
               </a>
-              <a href="#" className="text-white/80 hover:text-white transition-colors duration-300">
-                {t('contacts.terms', 'Условия использования')}
+              <a href={contacts.footer.terms.url} className="text-white/80 hover:text-white transition-colors duration-300">
+                {contacts.footer.terms.name}
               </a>
             </div>
           </motion.div>

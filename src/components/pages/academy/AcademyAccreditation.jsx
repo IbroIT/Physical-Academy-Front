@@ -5,7 +5,7 @@ import { useAccreditations } from '../../../hooks/useApi';
 import { PageLoading, ErrorDisplay, EmptyState } from '../../common/Loading';
 
 const AcademyAccreditation = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showActiveOnly, setShowActiveOnly] = useState(true);
   const [expandedAccreditation, setExpandedAccreditation] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -201,34 +201,40 @@ const AcademyAccreditation = () => {
 
   const standards = [
     {
-      area: t('academy.accreditation.standards.education.area', 'Качество образования'),
+      area: t('accreditation.standards.education.area', 'Качество образования'),
       compliance: '100%',
-      status: t('academy.accreditation.standards.education.status', 'Полное соответствие'),
+      status: t('accreditation.standards.education.status', 'Полное соответствие'),
       icon: '🎓',
       color: 'from-blue-500 to-blue-600'
     },
     {
-      area: t('academy.accreditation.standards.faculty.area', 'Квалификация преподавателей'),
+      area: t('accreditation.standards.faculty.area', 'Квалификация преподавателей'),
       compliance: '98%',
-      status: t('academy.accreditation.standards.faculty.status', 'Высокий уровень'),
+      status: t('accreditation.standards.faculty.status', 'Высокий уровень'),
       icon: '👨‍🏫',
       color: 'from-green-500 to-green-600'
     },
     {
-      area: t('academy.accreditation.standards.infrastructure.area', 'Инфраструктура'),
+      area: t('accreditation.standards.infrastructure.area', 'Инфраструктура'),
       compliance: '95%',
-      status: t('academy.accreditation.standards.infrastructure.status', 'Современное оснащение'),
+      status: t('accreditation.standards.infrastructure.status', 'Современное оснащение'),
       icon: '🏛️',
       color: 'from-blue-500 to-green-500'
     },
     {
-      area: t('academy.accreditation.standards.research.area', 'Научная деятельность'),
+      area: t('accreditation.standards.research.area', 'Научная деятельность'),
       compliance: '92%',
-      status: t('academy.accreditation.standards.research.status', 'Активные исследования'),
+      status: t('accreditation.standards.research.status', 'Активные исследования'),
       icon: '🔬',
       color: 'from-green-500 to-blue-500'
     }
   ];
+
+  // Helper function to format dates according to current language
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(i18n.language);
+  };
 
   return (
     <section 
@@ -251,15 +257,15 @@ const AcademyAccreditation = () => {
           <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300">
             <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
             <span className="text-green-300 font-medium text-sm md:text-base">
-              {t('academy.accreditation.badge', 'Аккредитация')}
+              {t('accreditation.badge', 'Аккредитация')}
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-            {t('academy.accreditation.title', 'АККРЕДИТАЦИЯ АКАДЕМИИ')}
+            {t('accreditation.title', 'АККРЕДИТАЦИЯ АКАДЕМИИ')}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-green-400 mx-auto mb-6 md:mb-8"></div>
           <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto px-4 leading-relaxed">
-            {t('academy.accreditation.subtitle', 'Официальные аккредитации и сертификаты, подтверждающие высокое качество образования и соответствие международным стандартам')}
+            {t('accreditation.subtitle', 'Официальные аккредитации и сертификаты, подтверждающие высокое качество образования и соответствие международным стандартам')}
           </p>
         </div>
 
@@ -361,10 +367,12 @@ const AcademyAccreditation = () => {
                           </h3>
                           <div className="flex flex-wrap gap-2 mb-3">
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(accreditation.accreditation_type)}`}>
-                              {getTypeIcon(accreditation.accreditation_type)} {accreditation.accreditation_type_display || accreditation.accreditation_type}
+                              {getTypeIcon(accreditation.accreditation_type)} {t(`accreditation.type.${accreditation.accreditation_type}`, accreditation.accreditation_type)}
                             </span>
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(accreditation)}`}>
-                              {accreditation.is_valid ? '✅ Действующая' : '❌ Недействующая'}
+                              {accreditation.is_valid ? 
+                                t('accreditation.status.active', '✅ Действующая') : 
+                                t('accreditation.status.inactive', '❌ Недействующая')}
                             </span>
                           </div>
                           {accreditation.description && (
@@ -381,12 +389,12 @@ const AcademyAccreditation = () => {
                         <div className="text-right">
                           {accreditation.issue_date && (
                             <div className="text-sm text-blue-200">
-                              Выдан: {new Date(accreditation.issue_date).toLocaleDateString('ru-RU')}
+                              {t('accreditation.issued', 'Выдан')}: {formatDate(accreditation.issue_date)}
                             </div>
                           )}
                           {accreditation.expiry_date && (
                             <div className="text-sm font-medium text-green-300">
-                              Действует до: {new Date(accreditation.expiry_date).toLocaleDateString('ru-RU')}
+                              {t('accreditation.validUntil', 'Действует до')}: {formatDate(accreditation.expiry_date)}
                             </div>
                           )}
                         </div>
@@ -416,7 +424,7 @@ const AcademyAccreditation = () => {
                         <div className="space-y-6">
                           <h4 className="font-bold text-white text-xl flex items-center">
                             <span className="w-3 h-3 bg-green-400 rounded-full mr-3"></span>
-                            Детали аккредитации
+                            {t('accreditation.details.title', 'Детали аккредитации')}
                           </h4>
                           
                           {accreditation.certificate_number && (
@@ -425,7 +433,9 @@ const AcademyAccreditation = () => {
                                 <span className="text-blue-300 text-xl">🆔</span>
                               </div>
                               <div>
-                                <div className="text-blue-300 font-medium">Номер сертификата</div>
+                                <div className="text-blue-300 font-medium">
+                                  {t('accreditation.certificateNumber', 'Номер сертификата')}
+                                </div>
                                 <div className="text-white text-lg">{accreditation.certificate_number}</div>
                               </div>
                             </div>
@@ -436,7 +446,7 @@ const AcademyAccreditation = () => {
                             <div className="p-6 bg-white/5 rounded-2xl border border-white/10">
                               <h5 className="font-semibold text-white mb-4 flex items-center">
                                 <span className="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
-                                Преимущества
+                                {t('accreditation.benefits.title', 'Преимущества')}
                               </h5>
                               <ul className="space-y-3">
                                 {accreditation.benefits ? (
@@ -458,7 +468,7 @@ const AcademyAccreditation = () => {
                         <div className="space-y-6">
                           <h4 className="font-bold text-white text-xl flex items-center">
                             <span className="w-3 h-3 bg-blue-400 rounded-full mr-3"></span>
-                            Документы
+                            {t('accreditation.documents.title', 'Документы')}
                           </h4>
                           
                           {accreditation.certificate_image_url && (
@@ -472,8 +482,12 @@ const AcademyAccreditation = () => {
                                 <span className="text-green-300 text-2xl">📄</span>
                               </div>
                               <div className="flex-1">
-                                <div className="font-medium text-white">Сертификат аккредитации</div>
-                                <div className="text-blue-200 text-sm">PDF документ</div>
+                                <div className="font-medium text-white">
+                                  {t('accreditation.certificate.title', 'Сертификат аккредитации')}
+                                </div>
+                                <div className="text-blue-200 text-sm">
+                                  {t('accreditation.certificate.format', 'PDF документ')}
+                                </div>
                               </div>
                               <div className="text-green-300 group-hover:text-green-400 transition-colors">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -487,7 +501,7 @@ const AcademyAccreditation = () => {
                           <div className="p-6 bg-blue-500/10 rounded-2xl border border-blue-400/30">
                             <p className="text-blue-100 text-center">
                               <span className="text-green-300 mr-2">💡</span>
-                              Аккредитация подтверждает соответствие образовательных программ международным стандартам качества
+                              {t('accreditation.info', 'Аккредитация подтверждает соответствие образовательных программ международным стандартам качества')}
                             </p>
                           </div>
                         </div>

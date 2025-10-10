@@ -13,6 +13,9 @@ const DoctorateInfo = () => {
   const doctorateData = t('doctorate', { returnObjects: true });
   const tabs = t('doctorate.tabs', { returnObjects: true });
   const steps = t('doctorate.admission.steps', { returnObjects: true });
+  const stats = t('doctorate.stats.items', { returnObjects: true });
+  const contacts = t('doctorate.contacts.details', { returnObjects: true });
+  const deadlines = t('doctorate.deadlines', { returnObjects: true });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -88,19 +91,19 @@ const DoctorateInfo = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="flex overflow-x-auto scrollbar-hide mb-8 bg-white/5 rounded-2xl p-2 backdrop-blur-sm border border-white/10"
             >
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 min-w-max px-6 py-3 rounded-xl font-semibold transition-all duration-300 whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
-                      : 'text-blue-100 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {tab.name}
-                </button>
-              ))}
+{Array.isArray(tabs) && tabs.map((tab) => (
+  <button
+    key={tab.id}
+    onClick={() => setActiveTab(tab.id)}
+    className={`flex-1 min-w-max px-6 py-3 rounded-xl font-semibold transition-all duration-300 whitespace-nowrap ${
+      activeTab === tab.id
+        ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
+        : 'text-blue-100 hover:text-white hover:bg-white/10'
+    }`}
+  >
+    {tab.name}
+  </button>
+))}
             </motion.div>
 
             {/* Контент табов */}
@@ -198,7 +201,7 @@ const DoctorateInfo = () => {
                                 {program.duration}
                               </div>
                               <button className="px-6 py-2 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white rounded-lg transition-all duration-300 transform hover:scale-105">
-                                Подробнее
+                                {t('doctorate.buttons.moreDetails')}
                               </button>
                             </div>
                           </div>
@@ -321,7 +324,7 @@ const DoctorateInfo = () => {
               </h3>
               
               <div className="space-y-6">
-                {doctorateData.stats.items.map((stat, index) => (
+                {stats.map((stat, index) => (
                   <motion.div
                     key={stat.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -352,7 +355,7 @@ const DoctorateInfo = () => {
               </h3>
               
               <div className="space-y-4">
-                {doctorateData.contacts.details.map((contact, index) => (
+                {contacts.map((contact, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: 20 }}
@@ -380,11 +383,11 @@ const DoctorateInfo = () => {
               className="bg-gradient-to-br from-blue-500/20 to-emerald-500/20 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-blue-400/30 shadow-2xl"
             >
               <h3 className="text-xl font-bold text-white mb-4 text-center">
-                📅 Ближайшие сроки
+                {t('doctorate.deadlinesTitle')}
               </h3>
               
               <div className="space-y-3">
-                {doctorateData.deadlines.map((deadline, index) => (
+                {deadlines.map((deadline, index) => (
                   <div key={index} className="flex justify-between items-center p-3 bg-white/10 rounded-lg backdrop-blur-sm">
                     <span className="text-white text-sm">{deadline.event}</span>
                     <span className="text-emerald-300 text-sm font-semibold">{deadline.date}</span>

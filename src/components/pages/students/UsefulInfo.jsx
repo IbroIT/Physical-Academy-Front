@@ -10,6 +10,8 @@ const UsefulInfo = () => {
   const sectionRef = useRef(null);
   
   const infoItems = t('students.info.items', { returnObjects: true });
+  const common = t('students.info.common', { returnObjects: true });
+  const stats = t('students.info.stats', { returnObjects: true });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -57,12 +59,12 @@ const UsefulInfo = () => {
           
           <div className="relative w-full lg:w-80">
             <label className="block text-lg font-medium text-gray-700 mb-3">
-              Поиск полезной информации
+              {common.search.label}
             </label>
             <div className="relative">
               <input
                 type="text"
-                placeholder="Название, описание, ссылки..."
+                placeholder={common.search.placeholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg"
@@ -75,14 +77,14 @@ const UsefulInfo = () => {
         {/* Results count */}
         <div className="flex justify-between items-center mb-4">
           <p className="text-gray-600 text-lg">
-            Найдено материалов: <span className="font-semibold text-gray-900">{filteredItems.length}</span>
+            {common.results.count} <span className="font-semibold text-gray-900">{filteredItems.length}</span>
           </p>
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
               className="text-blue-600 hover:text-blue-700 font-medium text-lg"
             >
-              Очистить поиск
+              {common.results.clear}
             </button>
           )}
         </div>
@@ -112,13 +114,13 @@ const UsefulInfo = () => {
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
           <div className="text-6xl mb-4 opacity-50">🔍</div>
-          <h3 className="text-2xl font-semibold text-gray-600 mb-2">Информация не найдена</h3>
-          <p className="text-gray-500 text-lg mb-6">Попробуйте изменить поисковый запрос</p>
+          <h3 className="text-2xl font-semibold text-gray-600 mb-2">{common.noResults.title}</h3>
+          <p className="text-gray-500 text-lg mb-6">{common.noResults.description}</p>
           <button
             onClick={() => setSearchTerm('')}
             className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-300 font-medium"
           >
-            Сбросить поиск
+            {common.noResults.reset}
           </button>
         </div>
       )}
@@ -127,12 +129,7 @@ const UsefulInfo = () => {
       <div className={`grid grid-cols-2 lg:grid-cols-4 gap-6 transition-all duration-1000 delay-700 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}>
-        {[
-          { icon: '📚', value: infoItems.length, label: 'Всего материалов' },
-          { icon: '🔗', value: infoItems.reduce((acc, item) => acc + item.links.length, 0), label: 'Полезных ссылок' },
-          { icon: '📋', value: Math.ceil(infoItems.reduce((acc, item) => acc + item.description.length, 0) / 1000), label: 'Тысяч символов' },
-          { icon: '⭐', value: '100%', label: 'Проверенная информация' }
-        ].map((stat, index) => (
+        {stats.map((stat, index) => (
           <div 
             key={index}
             className="bg-white rounded-2xl p-6 text-center border border-gray-200 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
@@ -152,17 +149,17 @@ const UsefulInfo = () => {
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}>
         <h3 className="text-2xl font-bold text-gray-900 mb-4">
-          Не нашли нужную информацию?
+          {common.cta.title}
         </h3>
         <p className="text-gray-600 mb-6 text-lg">
-          Задайте вопрос нашему консультанту и получите персональную помощь
+          {common.cta.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-            Задать вопрос
+            {common.cta.ask}
           </button>
           <button className="border-2 border-green-600 text-green-600 px-8 py-3 rounded-xl font-semibold hover:bg-green-600 hover:text-white transition-all duration-300 transform hover:-translate-y-1">
-            Предложить материал
+            {common.cta.suggest}
           </button>
         </div>
       </div>
@@ -171,6 +168,9 @@ const UsefulInfo = () => {
 };
 
 const InfoCard = ({ item, index, isExpanded, isHovered, onToggle, onMouseEnter, onMouseLeave }) => {
+  const { t } = useTranslation();
+  const common = t('students.info.common', { returnObjects: true });
+
   const handleLinkClick = (e, url) => {
     e.stopPropagation();
     window.open(url, '_blank');
@@ -228,7 +228,7 @@ const InfoCard = ({ item, index, isExpanded, isHovered, onToggle, onMouseEnter, 
                 onToggle();
               }}
             >
-              {isExpanded ? 'Свернуть' : 'Подробнее'}
+              {isExpanded ? common.card.collapse : common.card.more}
               <svg 
                 className={`w-5 h-5 ml-2 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
                 fill="none" 
@@ -246,7 +246,7 @@ const InfoCard = ({ item, index, isExpanded, isHovered, onToggle, onMouseEnter, 
           <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-200 transition-all duration-500">
             <h4 className="font-semibold text-gray-900 text-lg mb-3 flex items-center">
               <span className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">💡</span>
-              Дополнительная информация
+              {common.card.additional}
             </h4>
             <p className="text-gray-700 leading-relaxed">{item.additionalInfo}</p>
           </div>

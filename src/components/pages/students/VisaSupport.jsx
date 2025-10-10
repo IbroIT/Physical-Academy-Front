@@ -12,11 +12,11 @@ const VisaSupport = () => {
   const sectionRef = useRef(null);
 
   const visaData = t('visaSupport', { returnObjects: true });
-  const tabs = t('visaSupport.tabs', { returnObjects: true });
-  const steps = t('visaSupport.process.steps', { returnObjects: true });
-  const visaTypes = t('visaSupport.types.list', { returnObjects: true });
-  const documents = t('visaSupport.documents.list', { returnObjects: true });
-  const faqs = t('visaSupport.faq.list', { returnObjects: true });
+  const tabs = visaData.tabs;
+  const steps = visaData.process.steps;
+  const visaTypes = visaData.types.list;
+  const documents = visaData.documents.list;
+  const faqs = visaData.faq.list;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -77,7 +77,7 @@ const VisaSupport = () => {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
           >
-            🌍
+            {visaData.headerIcon}
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {visaData.title}
@@ -199,7 +199,7 @@ const VisaSupport = () => {
                               </p>
                               <div className="flex items-center justify-between">
                                 <span className="text-sm text-blue-300">
-                                  📍 {step.location}
+                                  {visaData.ui.locationIcon} {step.location}
                                 </span>
                                 <span className="text-sm text-emerald-300 font-medium">
                                   {step.cost}
@@ -272,15 +272,15 @@ const VisaSupport = () => {
                         </div>
                         <div className="space-y-4">
                           <div className="bg-white/10 rounded-xl p-4">
-                            <h4 className="text-white font-semibold mb-2">Срок действия</h4>
+                            <h4 className="text-white font-semibold mb-2">{visaData.ui.validity}</h4>
                             <p className="text-emerald-300">{selectedVisa.validity}</p>
                           </div>
                           <div className="bg-white/10 rounded-xl p-4">
-                            <h4 className="text-white font-semibold mb-2">Стоимость</h4>
+                            <h4 className="text-white font-semibold mb-2">{visaData.ui.cost}</h4>
                             <p className="text-emerald-300">{selectedVisa.cost}</p>
                           </div>
                           <div className="bg-white/10 rounded-xl p-4">
-                            <h4 className="text-white font-semibold mb-2">Время обработки</h4>
+                            <h4 className="text-white font-semibold mb-2">{visaData.ui.processingTime}</h4>
                             <p className="text-emerald-300">{selectedVisa.processingTime}</p>
                           </div>
                         </div>
@@ -331,7 +331,7 @@ const VisaSupport = () => {
                                     ? 'bg-emerald-500/20 text-emerald-300' 
                                     : 'bg-blue-500/20 text-blue-300'
                                 }`}>
-                                  {doc.required ? 'Обязательно' : 'Рекомендуется'}
+                                  {doc.required ? visaData.ui.required : visaData.ui.recommended}
                                 </span>
                               </div>
                             </div>
@@ -343,14 +343,13 @@ const VisaSupport = () => {
                     {/* Важное примечание */}
                     <div className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-2xl p-6 mt-8 backdrop-blur-sm border border-blue-400/30">
                       <h4 className="text-white font-semibold mb-3 flex items-center">
-                        <span className="text-xl mr-2">💡</span>
-                        Важные примечания
+                        <span className="text-xl mr-2">{visaData.documents.notes.icon}</span>
+                        {visaData.documents.notes.title}
                       </h4>
                       <ul className="text-blue-200 space-y-2 text-sm">
-                        <li>• Все документы должны быть переведены на русский язык и нотариально заверены</li>
-                        <li>• Срок действия паспорта должен быть не менее 1.5 лет на момент подачи</li>
-                        <li>• Медицинская страховка должна покрывать весь период пребывания</li>
-                        <li>• Приглашение от академии оформляется в течение 10 рабочих дней</li>
+                        {visaData.documents.notes.items.map((note, index) => (
+                          <li key={index}>{note}</li>
+                        ))}
                       </ul>
                     </div>
                   </motion.div>
@@ -379,7 +378,7 @@ const VisaSupport = () => {
                           className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300"
                         >
                           <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
-                            <span className="text-emerald-400 mr-3">❓</span>
+                            <span className="text-emerald-400 mr-3">{visaData.faq.icon}</span>
                             {faq.question}
                           </h3>
                           <p className="text-blue-200 pl-8">
@@ -448,11 +447,11 @@ const VisaSupport = () => {
               className="bg-gradient-to-br from-blue-500/20 to-emerald-500/20 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-blue-400/30 shadow-2xl"
             >
               <h3 className="text-xl font-bold text-white mb-4 text-center">
-                🗓️ Ближайшие сроки
+                {visaData.deadlines.title}
               </h3>
               
               <div className="space-y-3">
-                {visaData.deadlines.map((deadline, index) => (
+                {visaData.deadlines.items.map((deadline, index) => (
                   <div key={index} className="flex justify-between items-center p-3 bg-white/10 rounded-lg backdrop-blur-sm">
                     <span className="text-white text-sm">{deadline.event}</span>
                     <span className="text-emerald-300 text-sm font-semibold">{deadline.date}</span>
@@ -469,11 +468,11 @@ const VisaSupport = () => {
               className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
             >
               <h3 className="text-xl font-bold text-white mb-6 text-center">
-                📊 Статус процессов
+                {visaData.status.title}
               </h3>
               
               <div className="space-y-4">
-                {visaData.status.map((item, index) => (
+                {visaData.status.items.map((item, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex justify-between text-sm text-blue-200">
                       <span>{item.label}</span>

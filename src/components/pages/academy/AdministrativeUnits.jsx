@@ -29,7 +29,7 @@ const AdministrativeUnits = () => {
         setIsVisible(true);
       } catch (err) {
         console.error('Error fetching Administrative Units data:', err);
-        setError(t('error.loadingData', 'Ошибка загрузки данных'));
+        setError(t('error.loadingData'));
       } finally {
         setLoading(false);
       }
@@ -80,7 +80,7 @@ const AdministrativeUnits = () => {
 
   const handleContactClick = (email, phone) => {
     // В реальном приложении здесь будет логика открытия контактов
-    alert(`${t('administrativeUnits.contactEmail', 'Email')}: ${email}\n${t('administrativeUnits.contactPhone', 'Телефон')}: ${phone}`);
+    alert(`${t('administrativeUnits.contactEmail')}: ${email}\n${t('administrativeUnits.contactPhone')}: ${phone}`);
   };
 
   // Loading state
@@ -89,7 +89,7 @@ const AdministrativeUnits = () => {
       <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-xl">{t('loading', 'Загрузка...')}</p>
+          <p className="text-white text-xl">{t('loading')}</p>
         </div>
       </section>
     );
@@ -189,7 +189,7 @@ const AdministrativeUnits = () => {
                           <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
                           </svg>
-                          {unit.staff}
+                          {t('administrativeUnits.staffCount', { count: unit.staff })}
                         </div>
                       </div>
                     </div>
@@ -224,7 +224,7 @@ const AdministrativeUnits = () => {
                       <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
                       </svg>
-                      {filteredUnits[activeUnit]?.staff}
+                      {t('administrativeUnits.staffCount', { count: filteredUnits[activeUnit]?.staff })}
                     </div>
                   </div>
                 </div>
@@ -299,10 +299,10 @@ const AdministrativeUnits = () => {
                     {/* Дополнительная информация */}
                     <div className="mt-8 bg-blue-500/20 backdrop-blur-lg rounded-xl p-6 border border-blue-400/30">
                       <h4 className="font-semibold text-blue-300 mb-2">{t('administrativeUnits.workingHours')}</h4>
-                      <p className="text-blue-100">09:00 - 18:00, {t('administrativeUnits.weekdays')}</p>
+                      <p className="text-blue-100">{t('administrativeUnits.workingHoursTime')}</p>
 
                       <h4 className="font-semibold text-green-300 mt-4 mb-2">{t('administrativeUnits.receptionHours')}</h4>
-                      <p className="text-blue-100">10:00 - 16:00, {t('administrativeUnits.weekdays')}</p>
+                      <p className="text-blue-100">{t('administrativeUnits.receptionHoursTime')}</p>
                     </div>
                   </div>
                 </div>

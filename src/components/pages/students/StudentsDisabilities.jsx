@@ -9,6 +9,8 @@ const StudentsDisabilities = () => {
   const [activeService, setActiveService] = useState(0);
   const sectionRef = useRef(null);
 
+  const data = t('students.disabilities', { returnObjects: true });
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
@@ -24,14 +26,11 @@ const StudentsDisabilities = () => {
 
   // Автопереключение услуг
   useEffect(() => {
-    const data = t('students.disabilities', { returnObjects: true });
     const interval = setInterval(() => {
       setActiveService((prev) => (prev + 1) % data.support.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [t]);
-
-  const data = t('students.disabilities', { returnObjects: true });
+  }, [data.support.length]);
 
   return (
     <section 
@@ -65,7 +64,7 @@ const StudentsDisabilities = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
           >
-            ♿
+            {data.headerIcon}
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {data.title}
@@ -84,7 +83,7 @@ const StudentsDisabilities = () => {
           className="flex justify-center mb-12 lg:mb-16"
         >
           <div className="bg-white/5 rounded-2xl p-2 backdrop-blur-lg border border-white/20 shadow-2xl">
-            {['support', 'contacts', 'resources'].map((tab) => (
+            {Object.keys(data.tabs).map((tab) => (
               <motion.button
                 key={tab}
                 whileHover={{ scale: 1.05 }}
@@ -117,13 +116,14 @@ const StudentsDisabilities = () => {
                   data={data.support} 
                   activeService={activeService}
                   onServiceChange={setActiveService}
+                  uiTexts={data.uiTexts}
                 />
               )}
               {activeTab === 'contacts' && (
-                <Contacts key="contacts" data={data.contacts} />
+                <Contacts key="contacts" data={data.contacts} uiTexts={data.uiTexts} />
               )}
               {activeTab === 'resources' && (
-                <Resources key="resources" data={data.resources} />
+                <Resources key="resources" data={data.resources} uiTexts={data.uiTexts} />
               )}
             </AnimatePresence>
           </div>
@@ -133,7 +133,7 @@ const StudentsDisabilities = () => {
   );
 };
 
-const SupportServices = ({ data, activeService, onServiceChange }) => (
+const SupportServices = ({ data, activeService, onServiceChange, uiTexts }) => (
   <div className="space-y-8">
     {/* Активная услуга */}
     {data[activeService] && (
@@ -198,7 +198,7 @@ const SupportServices = ({ data, activeService, onServiceChange }) => (
           
           {service.features && (
             <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-              <h4 className="font-semibold text-white text-sm mb-3">{service.featuresTitle || 'Включает:'}</h4>
+              <h4 className="font-semibold text-white text-sm mb-3">{service.featuresTitle || uiTexts.includes}</h4>
               <ul className="space-y-2">
                 {service.features.slice(0, 3).map((feature, i) => (
                   <li key={i} className="flex items-center text-blue-200 text-sm">
@@ -208,7 +208,7 @@ const SupportServices = ({ data, activeService, onServiceChange }) => (
                 ))}
                 {service.features.length > 3 && (
                   <li className="text-blue-300 text-sm">
-                    + еще {service.features.length - 3} услуг
+                    {uiTexts.moreServices.replace('{count}', service.features.length - 3)}
                   </li>
                 )}
               </ul>
@@ -220,10 +220,10 @@ const SupportServices = ({ data, activeService, onServiceChange }) => (
   </div>
 );
 
-const Contacts = ({ data }) => (
+const Contacts = ({ data, uiTexts }) => (
   <div className="space-y-8">
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {data.map((contact, index) => (
+      {data.contacts.map((contact, index) => (
         <motion.div
           key={index}
           initial={{ opacity: 0, y: 20 }}
@@ -234,7 +234,7 @@ const Contacts = ({ data }) => (
         >
           <div className="flex items-center space-x-4 mb-4">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center text-white">
-              👤
+              {contact.icon}
             </div>
             <div>
               <h3 className="font-bold text-white text-lg">{contact.name}</h3>
@@ -244,7 +244,7 @@ const Contacts = ({ data }) => (
           
           <div className="space-y-3">
             <div className="flex items-center text-blue-200 text-sm">
-              <span className="w-8 text-center mr-3 text-lg">📞</span>
+              <span className="w-8 text-center mr-3 text-lg">{uiTexts.phoneIcon}</span>
               <a 
                 href={`tel:${contact.phone}`} 
                 className="hover:text-emerald-300 transition-colors duration-300"
@@ -253,7 +253,7 @@ const Contacts = ({ data }) => (
               </a>
             </div>
             <div className="flex items-center text-blue-200 text-sm">
-              <span className="w-8 text-center mr-3 text-lg">📧</span>
+              <span className="w-8 text-center mr-3 text-lg">{uiTexts.emailIcon}</span>
               <a 
                 href={`mailto:${contact.email}`} 
                 className="hover:text-emerald-300 transition-colors duration-300"
@@ -263,13 +263,13 @@ const Contacts = ({ data }) => (
             </div>
             {contact.hours && (
               <div className="flex items-center text-blue-200 text-sm">
-                <span className="w-8 text-center mr-3 text-lg">🕒</span>
+                <span className="w-8 text-center mr-3 text-lg">{uiTexts.hoursIcon}</span>
                 <span>{contact.hours}</span>
               </div>
             )}
             {contact.location && (
               <div className="flex items-center text-blue-200 text-sm">
-                <span className="w-8 text-center mr-3 text-lg">📍</span>
+                <span className="w-8 text-center mr-3 text-lg">{uiTexts.locationIcon}</span>
                 <span>{contact.location}</span>
               </div>
             )}
@@ -286,25 +286,25 @@ const Contacts = ({ data }) => (
       className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-8 text-center border border-white/20 backdrop-blur-lg shadow-2xl"
     >
       <h3 className="text-2xl font-bold text-white mb-3">
-        {data.emergency?.title || 'Экстренная поддержка'}
+        {data.emergency.title}
       </h3>
       <p className="text-blue-100 text-lg mb-4">
-        {data.emergency?.description || 'Круглосуточная психологическая помощь'}
+        {data.emergency.description}
       </p>
       <motion.a
-        href={data.emergency?.phoneLink || "tel:+78002000112"}
+        href={data.emergency.phoneLink}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className="inline-flex items-center space-x-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-8 py-4 rounded-2xl font-bold text-xl hover:from-emerald-600 hover:to-green-600 transition-all duration-300 shadow-lg"
       >
-        <span className="text-2xl">📞</span>
-        <span>{data.emergency?.phone || '8-800-2000-112'}</span>
+        <span className="text-2xl">{uiTexts.emergencyIcon}</span>
+        <span>{data.emergency.phone}</span>
       </motion.a>
     </motion.div>
   </div>
 );
 
-const Resources = ({ data }) => (
+const Resources = ({ data, uiTexts }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {data.map((resource, index) => (
       <motion.a

@@ -37,7 +37,9 @@ const ScientificCouncil = () => {
           </div>
           
           <div className="bg-green-50 rounded-2xl p-6 border border-green-200">
-            <h4 className="font-bold text-gray-900 mb-4 text-lg">Основные функции</h4>
+            <h4 className="font-bold text-gray-900 mb-4 text-lg">
+              {t('science.sections.council.functions.title', 'Основные функции')}
+            </h4>
             <ul className="space-y-3">
               {data.info.functions.map((func, index) => (
                 <li key={index} className="flex items-start gap-3">
@@ -63,7 +65,7 @@ const ScientificCouncil = () => {
                 : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300'
             }`}
           >
-            Все направления
+            {t('science.sections.council.filters.all', 'Все направления')}
           </button>
           {fields.map((field) => (
             <button
@@ -84,9 +86,13 @@ const ScientificCouncil = () => {
       {/* Члены совета */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-gray-900">Члены научно-технического совета</h3>
+          <h3 className="text-2xl font-bold text-gray-900">
+            {t('science.sections.council.members.title', 'Члены научно-технического совета')}
+          </h3>
           <div className="text-sm text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">
-            {members.length} {members.length === 1 ? 'член' : 'членов'}
+            {members.length} {members.length === 1 
+              ? t('science.sections.council.members.single', 'член') 
+              : t('science.sections.council.members.plural', 'членов')}
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -106,6 +112,8 @@ const ScientificCouncil = () => {
 };
 
 const MemberCard = ({ member, index, isExpanded, onToggle }) => {
+  const { t } = useTranslation();
+
   return (
     <div 
       className="bg-white border border-gray-300 rounded-2xl p-6 hover:border-blue-300 transition-all duration-300 cursor-pointer"
@@ -126,15 +134,21 @@ const MemberCard = ({ member, index, isExpanded, onToggle }) => {
       
       <div className="space-y-3 text-sm mb-4">
         <div className="flex justify-between items-center">
-          <span className="text-gray-600">Направление:</span>
+          <span className="text-gray-600">
+            {t('science.sections.council.member.field', 'Направление')}:
+          </span>
           <span className="font-medium text-gray-900">{member.field}</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-gray-600">Стаж:</span>
+          <span className="text-gray-600">
+            {t('science.sections.council.member.experience', 'Стаж')}:
+          </span>
           <span className="font-medium text-gray-900">{member.experience}</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-gray-600">Ученая степень:</span>
+          <span className="text-gray-600">
+            {t('science.sections.council.member.degree', 'Ученая степень')}:
+          </span>
           <span className="font-medium text-gray-900">{member.degree}</span>
         </div>
       </div>
@@ -145,7 +159,9 @@ const MemberCard = ({ member, index, isExpanded, onToggle }) => {
       }`}>
         <div className="border-t border-gray-200 pt-4 space-y-4">
           <div>
-            <div className="text-gray-600 text-sm mb-2 font-medium">Области экспертизы:</div>
+            <div className="text-gray-600 text-sm mb-2 font-medium">
+              {t('science.sections.council.member.expertise', 'Области экспертизы')}:
+            </div>
             <div className="flex flex-wrap gap-2">
               {member.expertise.map((exp, i) => (
                 <span key={i} className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
@@ -163,7 +179,7 @@ const MemberCard = ({ member, index, isExpanded, onToggle }) => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <span>📧</span>
-                <span>Email</span>
+                <span>{t('science.sections.council.member.email', 'Email')}</span>
               </a>
             )}
             {member.phone && (
@@ -180,7 +196,9 @@ const MemberCard = ({ member, index, isExpanded, onToggle }) => {
 
           {member.achievements && (
             <div>
-              <div className="text-gray-600 text-sm mb-2 font-medium">Достижения:</div>
+              <div className="text-gray-600 text-sm mb-2 font-medium">
+                {t('science.sections.council.member.achievements', 'Достижения')}:
+              </div>
               <ul className="space-y-1 text-sm text-gray-700">
                 {member.achievements.map((achievement, i) => (
                   <li key={i} className="flex items-start gap-2">
@@ -203,7 +221,12 @@ const MemberCard = ({ member, index, isExpanded, onToggle }) => {
             onToggle();
           }}
         >
-          <span>{isExpanded ? 'Свернуть' : 'Подробнее'}</span>
+          <span>
+            {isExpanded 
+              ? t('science.sections.council.member.collapse', 'Свернуть') 
+              : t('science.sections.council.member.expand', 'Подробнее')
+            }
+          </span>
           <svg 
             className={`w-4 h-4 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
             fill="none" 

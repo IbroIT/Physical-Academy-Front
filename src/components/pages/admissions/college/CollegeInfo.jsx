@@ -105,7 +105,7 @@ const CollegeInfo = () => {
                 {stat.label}
               </div>
             </motion.div>
-    ))}
+          ))}
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
@@ -131,7 +131,6 @@ const CollegeInfo = () => {
                   {tab.name}
                 </button>
               ))}
-
             </motion.div>
 
             {/* Контент табов */}
@@ -263,7 +262,7 @@ const CollegeInfo = () => {
                                 {department.students}
                               </div>
                               <div className="text-blue-300 text-xs">
-                                студентов
+                                {t('collegeInfo.departments.studentsLabel')}
                               </div>
                             </div>
                           </div>
@@ -332,7 +331,7 @@ const CollegeInfo = () => {
                                 {program.format}
                               </div>
                               <button className="px-6 py-2 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white rounded-lg transition-all duration-300 transform hover:scale-105">
-                                Подробнее
+                                {t('collegeInfo.programs.detailsButton')}
                               </button>
                             </div>
                           </div>
@@ -382,7 +381,7 @@ const CollegeInfo = () => {
 
                     <div className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-2xl p-6 mt-8 backdrop-blur-sm border border-blue-400/30">
                       <h3 className="text-xl font-bold text-white mb-4 text-center">
-                        📝 Требования к поступающим
+                        {t('collegeInfo.admission.requirementsTitle')}
                       </h3>
                       <div className="grid md:grid-cols-2 gap-4">
                         {collegeData.admission.requirements.map((req, index) => (
@@ -444,21 +443,25 @@ const CollegeInfo = () => {
               className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
             >
               <h3 className="text-xl font-bold text-white mb-6 text-center">
-                🗓️ Ближайшие события
+                {t('collegeInfo.events.title')}
               </h3>
               
               <div className="space-y-4">
-                {collegeData.events.map((event, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors duration-300">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-white text-sm font-medium truncate">{event.name}</div>
-                      <div className="text-blue-200 text-xs">{event.date}</div>
-                    </div>
-                    <div className="flex-shrink-0 w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-300 text-xs font-bold">
-                      {event.daysLeft}
-                    </div>
-                  </div>
-                ))}
+{Array.isArray(collegeData?.events) && collegeData.events.map((event, index) => (
+  <div
+    key={index}
+    className="flex items-center justify-between p-3 bg-white/5 rounded-xl backdrop-blur-sm hover:bg-white/10 transition-colors duration-300"
+  >
+    <div className="flex-1 min-w-0">
+      <div className="text-white text-sm font-medium truncate">{event.name}</div>
+      <div className="text-blue-200 text-xs">{event.date}</div>
+    </div>
+    <div className="flex-shrink-0 w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-300 text-xs font-bold">
+      {event.daysLeft}
+    </div>
+  </div>
+))}
+
               </div>
             </motion.div>
 

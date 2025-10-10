@@ -95,7 +95,7 @@ const Instructions = () => {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder={t('students.instructions.searchPlaceholder')}
+                  placeholder={t('students.instructions.searchPlaceholder', 'Поиск документов...')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all text-white placeholder-blue-200 backdrop-blur-sm"
@@ -109,7 +109,9 @@ const Instructions = () => {
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all text-white backdrop-blur-sm"
             >
-              <option value="all" className="bg-slate-800">{t('students.instructions.categories.all')}</option>
+              <option value="all" className="bg-slate-800">
+                {t('students.instructions.categories.all', 'Все категории')}
+              </option>
               {categories.filter(cat => cat !== 'all').map(category => (
                 <option key={category} value={category} className="bg-slate-800">
                   {data.categories[category]}
@@ -152,10 +154,10 @@ const Instructions = () => {
               🔍
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
-              {t('students.instructions.noDocuments')}
+              {t('students.instructions.noDocuments', 'Документы не найдены')}
             </h3>
             <p className="text-blue-200">
-              {t('students.instructions.tryChangingSearch')}
+              {t('students.instructions.tryChangingSearch', 'Попробуйте изменить параметры поиска')}
             </p>
           </motion.div>
         )}
@@ -171,7 +173,7 @@ const Instructions = () => {
             <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-white mr-3 shadow-lg">
               🚨
             </div>
-            {t('students.instructions.importantUpdatess')}
+            {t('students.instructions.importantUpdatesTitle', 'Важные обновления')}
           </h3>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -230,6 +232,7 @@ const Instructions = () => {
 };
 
 const DocumentCard = ({ document, index }) => {
+  const { t } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -308,19 +311,19 @@ const DocumentCard = ({ document, index }) => {
         <div className="space-y-2 text-xs text-blue-200 mb-4">
           {document.lastUpdated && (
             <div className="flex justify-between">
-              <span>Обновлено:</span>
+              <span>{t('students.instructions.document.updated', 'Обновлено')}:</span>
               <span className="font-medium text-emerald-300">{document.lastUpdated}</span>
             </div>
           )}
           {document.pages && (
             <div className="flex justify-between">
-              <span>Страниц:</span>
+              <span>{t('students.instructions.document.pages', 'Страниц')}:</span>
               <span className="font-medium text-emerald-300">{document.pages}</span>
             </div>
           )}
           {document.downloads && (
             <div className="flex justify-between">
-              <span>Скачиваний:</span>
+              <span>{t('students.instructions.document.downloads', 'Скачиваний')}:</span>
               <span className="font-medium text-emerald-300">{document.downloads}</span>
             </div>
           )}
@@ -338,12 +341,12 @@ const DocumentCard = ({ document, index }) => {
             {isDownloading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                Загрузка...
+                {t('students.instructions.document.downloading', 'Загрузка...')}
               </>
             ) : (
               <>
                 <span className="mr-2">📥</span>
-                Скачать
+                {t('students.instructions.document.download', 'Скачать')}
               </>
             )}
           </motion.button>

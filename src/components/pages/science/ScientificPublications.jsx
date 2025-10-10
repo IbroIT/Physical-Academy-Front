@@ -13,6 +13,8 @@ const ScientificPublications = () => {
   const [activeStat, setActiveStat] = useState(0);
   const sectionRef = useRef(null);
 
+  const publicationsData = t('science.sections.publications', { returnObjects: true });
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -34,13 +36,13 @@ const ScientificPublications = () => {
   // Автопереключение статистики
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveStat((prev) => (prev + 1) % stats.length);
+      setActiveStat((prev) => (prev + 1) % publicationsData.stats.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [publicationsData.stats.length]);
 
   const startCounters = () => {
-    const stats = t('science.sections.publications.stats', { returnObjects: true });
+    const stats = publicationsData.stats;
     const targetValues = stats.map(stat => parseInt(stat.value.replace(/\D/g, '')));
     const duration = 2000;
     const steps = 60;
@@ -64,8 +66,8 @@ const ScientificPublications = () => {
     }, duration / steps);
   };
 
-  const publications = t('science.sections.publications.publications', { returnObjects: true });
-  const stats = t('science.sections.publications.stats', { returnObjects: true });
+  const publications = publicationsData.publications;
+  const stats = publicationsData.stats;
 
   const filteredPublications = useMemo(() => {
     let filtered = publications.filter(pub => 
@@ -128,11 +130,11 @@ const ScientificPublications = () => {
             📚
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-            {t('science.sections.publications.title')}
+            {publicationsData.title}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {t('science.sections.publications.subtitle')}
+            {publicationsData.subtitle}
           </p>
         </motion.div>
 
@@ -207,12 +209,12 @@ const ScientificPublications = () => {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-end">
             <div className="relative">
               <label className="block text-sm font-medium text-blue-200 mb-2">
-                Поиск публикаций
+                {publicationsData.filters.searchLabel}
               </label>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Название, автор, ключевые слова..."
+                  placeholder={publicationsData.filters.searchPlaceholder}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-4 py-3 pl-12 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all text-lg text-white placeholder-blue-300 backdrop-blur-sm"
@@ -223,14 +225,14 @@ const ScientificPublications = () => {
             
             <div>
               <label className="block text-sm font-medium text-blue-200 mb-2">
-                Год публикации
+                {publicationsData.filters.yearLabel}
               </label>
               <select
                 value={filterYear}
                 onChange={(e) => setFilterYear(e.target.value)}
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all text-lg text-white backdrop-blur-sm"
               >
-                <option value="all" className="bg-slate-800">Все годы</option>
+                <option value="all" className="bg-slate-800">{publicationsData.filters.allYears}</option>
                 {years.map(year => (
                   <option key={year} value={year} className="bg-slate-800">{year}</option>
                 ))}
@@ -239,15 +241,15 @@ const ScientificPublications = () => {
 
             <div>
               <label className="block text-sm font-medium text-blue-200 mb-2">
-                Сортировка
+                {publicationsData.filters.sortLabel}
               </label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all text-lg text-white backdrop-blur-sm"
               >
-                <option value="date" className="bg-slate-800">По дате публикации</option>
-                <option value="citations" className="bg-slate-800">По количеству цитирований</option>
+                <option value="date" className="bg-slate-800">{publicationsData.filters.sortByDate}</option>
+                <option value="citations" className="bg-slate-800">{publicationsData.filters.sortByCitations}</option>
               </select>
             </div>
 
@@ -258,7 +260,7 @@ const ScientificPublications = () => {
                 onClick={resetFilters}
                 className="w-full px-4 py-3 border-2 border-white/20 text-blue-200 rounded-2xl hover:bg-white/10 hover:border-white/30 transition-all duration-300 font-medium text-lg backdrop-blur-sm"
               >
-                Сбросить фильтры
+                {publicationsData.filters.resetButton}
               </motion.button>
             </div>
           </div>
@@ -279,7 +281,7 @@ const ScientificPublications = () => {
                     animate={{ scale: 1 }}
                     className="inline-flex items-center px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm backdrop-blur-sm"
                   >
-                    Поиск: "{searchTerm}"
+                    {publicationsData.filters.searchFilter}: "{searchTerm}"
                     <button 
                       onClick={() => setSearchTerm('')}
                       className="ml-2 hover:text-white transition-colors"
@@ -294,7 +296,7 @@ const ScientificPublications = () => {
                     animate={{ scale: 1 }}
                     className="inline-flex items-center px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm backdrop-blur-sm"
                   >
-                    Год: {filterYear}
+                    {publicationsData.filters.yearFilter}: {filterYear}
                     <button 
                       onClick={() => setFilterYear('all')}
                       className="ml-2 hover:text-white transition-colors"
@@ -317,11 +319,11 @@ const ScientificPublications = () => {
         >
           <div className="flex justify-between items-center mb-4">
             <p className="text-blue-200 text-lg">
-              Найдено публикаций: <span className="font-semibold text-white">{filteredPublications.length}</span>
+              {publicationsData.results.found}: <span className="font-semibold text-white">{filteredPublications.length}</span>
             </p>
             {filteredPublications.length > 0 && (
               <p className="text-blue-300 text-sm">
-                Сортировка: {sortBy === 'date' ? 'по дате' : 'по цитированиям'}
+                {publicationsData.results.sorting}: {sortBy === 'date' ? publicationsData.results.sortByDate : publicationsData.results.sortByCitations}
               </p>
             )}
           </div>
@@ -347,15 +349,15 @@ const ScientificPublications = () => {
               className="text-center py-16 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm"
             >
               <div className="text-6xl mb-4 text-blue-300 opacity-60">🔍</div>
-              <h3 className="text-2xl font-semibold text-white mb-2">Публикации не найдены</h3>
-              <p className="text-blue-200 text-lg mb-6">Попробуйте изменить параметры поиска</p>
+              <h3 className="text-2xl font-semibold text-white mb-2">{publicationsData.noResults.title}</h3>
+              <p className="text-blue-200 text-lg mb-6">{publicationsData.noResults.description}</p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={resetFilters}
                 className="px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 text-white rounded-2xl hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 font-medium shadow-lg"
               >
-                Сбросить фильтры
+                {publicationsData.noResults.resetButton}
               </motion.button>
             </motion.div>
           )}
@@ -376,6 +378,8 @@ const ScientificPublications = () => {
 };
 
 const PublicationCard = ({ publication, index, onSelect }) => {
+  const { t } = useTranslation();
+  const publicationsData = t('science.sections.publications', { returnObjects: true });
   const [isHovered, setIsHovered] = useState(false);
 
   const handleCardClick = () => {
@@ -388,7 +392,6 @@ const PublicationCard = ({ publication, index, onSelect }) => {
       window.open(publication.pdfLink, '_blank');
     } else if (action === 'cite') {
       navigator.clipboard.writeText(publication.citation);
-      // You could add a toast notification here
     }
   };
 
@@ -439,7 +442,7 @@ const PublicationCard = ({ publication, index, onSelect }) => {
             {publication.year}
           </span>
           <span className="px-3 py-2 bg-purple-500/20 text-purple-300 rounded-xl text-sm font-medium backdrop-blur-sm">
-            {publication.citations} цитирований
+            {publication.citations} {publicationsData.card.citations}
           </span>
           <span className="px-3 py-2 bg-orange-500/20 text-orange-300 rounded-xl text-sm font-medium backdrop-blur-sm">
             {publication.type}
@@ -475,7 +478,7 @@ const PublicationCard = ({ publication, index, onSelect }) => {
               className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 font-medium text-sm shadow-lg"
             >
               <span>📥</span>
-              <span>PDF</span>
+              <span>{publicationsData.card.pdfButton}</span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -484,7 +487,7 @@ const PublicationCard = ({ publication, index, onSelect }) => {
               className="flex items-center space-x-2 px-4 py-2 bg-white/10 text-blue-200 rounded-xl hover:bg-white/20 transition-all duration-300 font-medium text-sm backdrop-blur-sm"
             >
               <span>📋</span>
-              <span>Цитировать</span>
+              <span>{publicationsData.card.citeButton}</span>
             </motion.button>
           </div>
         </div>
@@ -494,6 +497,8 @@ const PublicationCard = ({ publication, index, onSelect }) => {
 };
 
 const PublicationModal = ({ publication, onClose }) => {
+  const { t } = useTranslation();
+  const publicationsData = t('science.sections.publications', { returnObjects: true });
   const [copied, setCopied] = useState(false);
 
   const handleCopyCitation = () => {
@@ -526,7 +531,7 @@ const PublicationModal = ({ publication, onClose }) => {
       >
         <div className="p-6 border-b border-white/10 bg-white/5">
           <div className="flex justify-between items-start">
-            <h2 className="text-2xl font-bold text-white">Детали публикации</h2>
+            <h2 className="text-2xl font-bold text-white">{publicationsData.modal.title}</h2>
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -556,41 +561,41 @@ const PublicationModal = ({ publication, onClose }) => {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <h4 className="font-semibold text-white mb-2">Журнал</h4>
+                <h4 className="font-semibold text-white mb-2">{publicationsData.modal.journal}</h4>
                 <p className="text-blue-200">{publication.journal}</p>
               </div>
               <div>
-                <h4 className="font-semibold text-white mb-2">Год публикации</h4>
+                <h4 className="font-semibold text-white mb-2">{publicationsData.modal.year}</h4>
                 <p className="text-blue-200">{publication.year}</p>
               </div>
               <div>
-                <h4 className="font-semibold text-white mb-2">Тип публикации</h4>
+                <h4 className="font-semibold text-white mb-2">{publicationsData.modal.type}</h4>
                 <p className="text-blue-200">{publication.type}</p>
               </div>
             </div>
             <div className="space-y-4">
               <div>
-                <h4 className="font-semibold text-white mb-2">Цитирования</h4>
+                <h4 className="font-semibold text-white mb-2">{publicationsData.modal.citations}</h4>
                 <p className="text-emerald-400 font-semibold">{publication.citations}</p>
               </div>
               <div>
-                <h4 className="font-semibold text-white mb-2">DOI</h4>
+                <h4 className="font-semibold text-white mb-2">{publicationsData.modal.doi}</h4>
                 <p className="text-blue-200 font-mono">{publication.doi}</p>
               </div>
               <div>
-                <h4 className="font-semibold text-white mb-2">Дата публикации</h4>
+                <h4 className="font-semibold text-white mb-2">{publicationsData.modal.date}</h4>
                 <p className="text-blue-200">{publication.date}</p>
               </div>
             </div>
           </div>
 
           <div>
-            <h4 className="font-semibold text-white mb-2">Аннотация</h4>
+            <h4 className="font-semibold text-white mb-2">{publicationsData.modal.abstract}</h4>
             <p className="text-blue-200 leading-relaxed">{publication.abstract}</p>
           </div>
 
           <div>
-            <h4 className="font-semibold text-white mb-2">Ключевые слова</h4>
+            <h4 className="font-semibold text-white mb-2">{publicationsData.modal.keywords}</h4>
             <div className="flex flex-wrap gap-2">
               {publication.keywords.map((keyword, i) => (
                 <span 
@@ -604,7 +609,7 @@ const PublicationModal = ({ publication, onClose }) => {
           </div>
 
           <div>
-            <h4 className="font-semibold text-white mb-2">Цитирование</h4>
+            <h4 className="font-semibold text-white mb-2">{publicationsData.modal.citation}</h4>
             <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
               <p className="text-blue-200 font-mono text-sm">{publication.citation}</p>
             </div>
@@ -618,7 +623,7 @@ const PublicationModal = ({ publication, onClose }) => {
               className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 text-white rounded-2xl hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 font-medium shadow-lg"
             >
               <span>📥</span>
-              <span>Открыть PDF</span>
+              <span>{publicationsData.modal.pdfButton}</span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -627,7 +632,7 @@ const PublicationModal = ({ publication, onClose }) => {
               className="flex items-center space-x-2 px-6 py-3 bg-white/10 text-blue-200 rounded-2xl hover:bg-white/20 transition-all duration-300 font-medium backdrop-blur-sm"
             >
               <span>📋</span>
-              <span>{copied ? 'Скопировано!' : 'Копировать цитирование'}</span>
+              <span>{copied ? publicationsData.modal.copied : publicationsData.modal.copyButton}</span>
             </motion.button>
           </div>
         </div>

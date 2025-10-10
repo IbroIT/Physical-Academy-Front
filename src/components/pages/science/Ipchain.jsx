@@ -16,8 +16,8 @@ const Ipchain = () => {
             <span className="text-2xl">⛓️</span>
           </div>
           <div className="text-left">
-            <h2 className="text-2xl font-bold">IPChain</h2>
-            <p className="text-blue-100 text-sm">Блокчейн для интеллектуальной собственности</p>
+            <h2 className="text-2xl font-bold">{data.title}</h2>
+            <p className="text-blue-100 text-sm">{data.subtitle}</p>
           </div>
         </div>
       </div>
@@ -25,7 +25,7 @@ const Ipchain = () => {
       {/* Навигация */}
       <div className="flex justify-center">
         <div className="bg-white rounded-xl p-1 shadow-sm border border-gray-200">
-          {['overview', 'patents', 'blockchain', 'benefits'].map((tab) => (
+          {Object.keys(data.tabs).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -69,16 +69,16 @@ const Overview = ({ data }) => (
         </div>
         
         <button className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm">
-          Подробнее на IPChain
+          {data.buttonText}
         </button>
       </div>
       
       <div className="bg-blue-50 rounded-xl p-6 text-center border border-blue-200">
         <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center text-white text-2xl mx-auto mb-4">
-          🔗
+          {data.blockchainCard.icon}
         </div>
-        <h4 className="text-lg font-bold text-gray-900 mb-2">Технология блокчейн</h4>
-        <p className="text-gray-600 text-sm">Надежная защита интеллектуальной собственности</p>
+        <h4 className="text-lg font-bold text-gray-900 mb-2">{data.blockchainCard.title}</h4>
+        <p className="text-gray-600 text-sm">{data.blockchainCard.description}</p>
       </div>
     </div>
   </div>
@@ -86,7 +86,7 @@ const Overview = ({ data }) => (
 
 const Patents = ({ data }) => (
   <div className="p-6">
-    <h3 className="text-xl font-bold text-gray-900 mb-6">Зарегистрированные патенты</h3>
+    <h3 className="text-xl font-bold text-gray-900 mb-6">{data.title}</h3>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {data.items.map((patent, index) => (
         <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 group">
@@ -98,7 +98,7 @@ const Patents = ({ data }) => (
               <p className="text-gray-500 text-xs mt-1">{patent.number}</p>
             </div>
             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 text-sm">
-              📜
+              {patent.icon}
             </div>
           </div>
           
@@ -114,9 +114,9 @@ const Patents = ({ data }) => (
           </div>
           
           <div className="flex justify-between items-center text-xs">
-            <span className="text-gray-500">📅 {patent.date}</span>
+            <span className="text-gray-500">{patent.dateLabel} {patent.date}</span>
             <button className="text-blue-600 hover:text-blue-700 font-medium">
-              Подробнее
+              {data.buttonText}
             </button>
           </div>
         </div>
@@ -127,10 +127,10 @@ const Patents = ({ data }) => (
 
 const Blockchain = ({ data }) => (
   <div className="p-6">
-    <h3 className="text-xl font-bold text-gray-900 mb-6">Блокчейн-технологии</h3>
+    <h3 className="text-xl font-bold text-gray-900 mb-6">{data.title}</h3>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <h4 className="font-bold text-gray-900 mb-4 text-sm">Преимущества технологии</h4>
+        <h4 className="font-bold text-gray-900 mb-4 text-sm">{data.featuresTitle}</h4>
         <div className="space-y-3">
           {data.features.map((feature, index) => (
             <div key={index} className="flex items-start space-x-3">
@@ -147,7 +147,7 @@ const Blockchain = ({ data }) => (
       </div>
       
       <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-        <h4 className="font-bold text-gray-900 mb-3 text-sm">Хеш-идентификаторы</h4>
+        <h4 className="font-bold text-gray-900 mb-3 text-sm">{data.hashesTitle}</h4>
         <div className="space-y-2 font-mono text-xs">
           {data.hashes.map((hash, index) => (
             <div key={index} className="bg-white rounded px-3 py-2 border border-blue-100">
@@ -163,9 +163,9 @@ const Blockchain = ({ data }) => (
 
 const Benefits = ({ data }) => (
   <div className="p-6">
-    <h3 className="text-xl font-bold text-gray-900 mb-6">Преимущества IPChain</h3>
+    <h3 className="text-xl font-bold text-gray-900 mb-6">{data.title}</h3>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {data.map((benefit, index) => (
+      {data.items.map((benefit, index) => (
         <div key={index} className="text-center p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200 group">
           <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-xl mx-auto mb-3 group-hover:scale-110 transition-transform duration-200">
             {benefit.icon}
