@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useBachelorQuotas } from '../../../../hooks/useApi';
 
 const BachelorQuotas = () => {
   const { t } = useTranslation();
@@ -10,91 +11,20 @@ const BachelorQuotas = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
-  const quotas = [
-    {
-      type: 'sports',
-      title: t('bachelor.quotas.types.sports.title', 'Спортивная квота'),
-      description: t('bachelor.quotas.types.sports.description', 'Для спортсменов с выдающимися достижениями'),
-      icon: '🏆',
-      requirements: [
-        t('bachelor.quotas.types.sports.requirements.0', 'Документы, подтверждающие спортивные достижения'),
-        t('bachelor.quotas.types.sports.requirements.1', 'Рекомендация от спортивной федерации'),
-        t('bachelor.quotas.types.sports.requirements.2', 'Медицинская справка о допуске к занятиям'),
-        t('bachelor.quotas.types.sports.requirements.3', 'Аттестат о среднем образовании')
-      ],
-      benefits: [
-        t('bachelor.quotas.types.sports.benefits.0', 'Индивидуальный учебный план'),
-        t('bachelor.quotas.types.sports.benefits.1', 'Совмещение тренировок и учебы'),
-        t('bachelor.quotas.types.sports.benefits.2', 'Спортивная стипендия'),
-        t('bachelor.quotas.types.sports.benefits.3', 'Проживание в спортивном общежитии')
-      ],
-      spots: 15,
-      deadline: '20 августа',
-      color: 'blue'
-    },
-    {
-      type: 'health',
-      title: t('bachelor.quotas.types.health.title', 'Квота по состоянию здоровья'),
-      description: t('bachelor.quotas.types.health.description', 'Для лиц с ограниченными возможностями здоровья'),
-      icon: '❤️',
-      requirements: [
-        t('bachelor.quotas.types.health.requirements.0', 'Медико-социальная экспертиза'),
-        t('bachelor.quotas.types.health.requirements.1', 'Индивидуальная программа реабилитации'),
-        t('bachelor.quotas.types.health.requirements.2', 'Заключение врачебной комиссии академии')
-      ],
-      benefits: [
-        t('bachelor.quotas.types.health.benefits.0', 'Адаптированная программа обучения'),
-        t('bachelor.quotas.types.health.benefits.1', 'Доступная среда'),
-        t('bachelor.quotas.types.health.benefits.2', 'Персональный тьютор'),
-        t('bachelor.quotas.types.health.benefits.3', 'Социальная поддержка')
-      ],
-      spots: 10,
-      deadline: '25 августа',
-      color: 'green'
-    },
-    {
-      type: 'target',
-      title: t('bachelor.quotas.types.target.title', 'Целевая квота'),
-      description: t('bachelor.quotas.types.target.description', 'Для будущих сотрудников спортивных организаций'),
-      icon: '🎯',
-      requirements: [
-        t('bachelor.quotas.types.target.requirements.0', 'Направление от спортивной организации'),
-        t('bachelor.quotas.types.target.requirements.1', 'Трехсторонний договор'),
-        t('bachelor.quotas.types.target.requirements.2', 'Обязательство отработать 3 года')
-      ],
-      benefits: [
-        t('bachelor.quotas.types.target.benefits.0', 'Гарантированное трудоустройство'),
-        t('bachelor.quotas.types.target.benefits.1', 'Стажировка в профильных организациях'),
-        t('bachelor.quotas.types.target.benefits.2', 'Дополнительная стипендия')
-      ],
-      spots: 20,
-      deadline: '15 августа',
-      color: 'cyan'
-    }
-  ];
+  // Получаем данные из API
+  const { quotasData, loading, error } = useBachelorQuotas();
 
-  const quotaStats = [
-    { 
-      number: '45', 
-      label: t('bachelor.quotas.stats.totalSpots', 'всего мест по квотам'),
-      description: t('bachelor.quotas.stats.totalSpotsDesc', 'Ежегодно выделяется')
-    },
-    { 
-      number: '98%', 
-      label: t('bachelor.quotas.stats.successRate', 'успешного зачисления'),
-      description: t('bachelor.quotas.stats.successRateDesc', 'Проходят конкурсный отбор')
-    },
-    { 
-      number: '25+', 
-      label: t('bachelor.quotas.stats.sportsOrganizations', 'спортивных организаций'),
-      description: t('bachelor.quotas.stats.sportsOrganizationsDesc', 'Участвуют в программе')
-    },
-    { 
-      number: '3', 
-      label: t('bachelor.quotas.stats.quotaTypes', 'вида квот'),
-      description: t('bachelor.quotas.stats.quotaTypesDesc', 'Для разных категорий абитуриентов')
-    }
-  ];
+  // Извлекаем данные из API response
+  const quotas = quotasData?.quotas || [];
+  const quotaStats = quotasData?.quota_stats || [];
+  const additionalSupport = quotasData?.additional_support || [];
+  const processSteps = quotasData?.process_steps || [];
+
+  // Базовая отладочная информация
+  console.log('BachelorQuotas - Data loaded:', !!quotasData, 'Loading:', loading, 'Error:', error);
+  if (quotasData) {
+    console.log('BachelorQuotas - Quotas count:', quotas.length, 'Stats count:', quotaStats.length, 'Support count:', additionalSupport.length, 'Steps count:', processSteps.length);
+  }
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -111,11 +41,72 @@ const BachelorQuotas = () => {
 
   // Автопереключение квот
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSelectedQuota((prev) => (prev + 1) % quotas.length);
-    }, 6000);
-    return () => clearInterval(interval);
+    if (quotas.length > 0) {
+      const interval = setInterval(() => {
+        setSelectedQuota((prev) => (prev + 1) % quotas.length);
+      }, 6000);
+      return () => clearInterval(interval);
+    }
   }, [quotas.length]);
+
+  // Обработка loading состояния - показываем только если действительно нет данных
+  if (loading && !quotasData) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl animate-pulse">
+                🎓
+              </div>
+              <div className="text-white text-xl">Загрузка данных о квотах...</div>
+              <div className="mt-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Обработка error состояния
+  if (error) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center text-white text-2xl shadow-2xl">
+                ⚠️
+              </div>
+              <div className="text-white text-xl mb-4">Ошибка загрузки данных</div>
+              <div className="text-blue-200">{error}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Если нет данных после загрузки, показываем соответствующее сообщение
+  if (!quotas.length && !loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-gray-500 to-gray-600 flex items-center justify-center text-white text-2xl shadow-2xl">
+                📋
+              </div>
+              <div className="text-white text-xl mb-4">Нет данных о квотах</div>
+              <div className="text-blue-200">Данные временно недоступны. Попробуйте обновить страницу.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   const getColorClasses = (color) => {
     const colors = {
@@ -145,7 +136,7 @@ const BachelorQuotas = () => {
   };
 
   const currentQuota = quotas[selectedQuota];
-  const colorClasses = getColorClasses(currentQuota.color);
+  const colorClasses = currentQuota ? getColorClasses(currentQuota.color) : getColorClasses('blue');
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -169,7 +160,7 @@ const BachelorQuotas = () => {
   };
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
     >
@@ -178,7 +169,7 @@ const BachelorQuotas = () => {
         <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
         <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-        
+
         {/* Спортивные символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🏃‍♂️</div>
         <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">⚽</div>
@@ -203,6 +194,12 @@ const BachelorQuotas = () => {
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {t('bachelor.quotas.title', 'Образовательные квоты')}
+            {/* Индикатор источника данных */}
+            {quotasData ? (
+              <span className="text-green-400 text-sm ml-2">🟢 API</span>
+            ) : (
+              <span className="text-yellow-400 text-sm ml-2">🟡 Demo</span>
+            )}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
@@ -253,24 +250,21 @@ const BachelorQuotas = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedQuota(index)}
-                      className={`w-full p-4 rounded-2xl border transition-all duration-300 text-left group ${
-                        selectedQuota === index
+                      className={`w-full p-4 rounded-2xl border transition-all duration-300 text-left group ${selectedQuota === index
                           ? `${quotaColor.border} ${quotaColor.light} shadow-lg`
                           : 'border-white/10 bg-white/5 hover:bg-white/10'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center space-x-3">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${
-                          selectedQuota === index 
-                            ? 'bg-white text-gray-900' 
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${selectedQuota === index
+                            ? 'bg-white text-gray-900'
                             : 'bg-white/10 text-white'
-                        } transition-all duration-300`}>
+                          } transition-all duration-300`}>
                           {quota.icon}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className={`font-semibold text-sm ${
-                            selectedQuota === index ? 'text-white' : 'text-blue-100'
-                          }`}>
+                          <h3 className={`font-semibold text-sm ${selectedQuota === index ? 'text-white' : 'text-blue-100'
+                            }`}>
                             {quota.title}
                           </h3>
                           <p className="text-xs text-blue-200/80 mt-1 line-clamp-2">
@@ -300,18 +294,18 @@ const BachelorQuotas = () => {
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                     <div className="flex items-start space-x-4">
                       <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl bg-white/20 backdrop-blur-sm text-white`}>
-                        {currentQuota.icon}
+                        {currentQuota?.icon || '🎓'}
                       </div>
                       <div>
-                        <h2 className="text-2xl lg:text-3xl font-bold text-white">{currentQuota.title}</h2>
-                        <p className="text-blue-100 mt-2 text-lg">{currentQuota.description}</p>
+                        <h2 className="text-2xl lg:text-3xl font-bold text-white">{currentQuota?.title || 'Загрузка...'}</h2>
+                        <p className="text-blue-100 mt-2 text-lg">{currentQuota?.description || 'Загрузка описания...'}</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-blue-200">{t('bachelor.quotas.availableSpots', 'Доступно мест')}</div>
-                      <div className="text-3xl lg:text-4xl font-bold text-white">{currentQuota.spots}</div>
+                      <div className="text-3xl lg:text-4xl font-bold text-white">{currentQuota?.spots || '0'}</div>
                       <div className="text-blue-200 text-sm mt-2">
-                        {t('bachelor.quotas.deadline', 'До')} {currentQuota.deadline}
+                        {t('bachelor.quotas.deadline', 'До')} {currentQuota?.deadline || 'Уточняется'}
                       </div>
                     </div>
                   </div>
@@ -327,11 +321,10 @@ const BachelorQuotas = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setExpandedSection(section)}
-                      className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 ${
-                        expandedSection === section
+                      className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 ${expandedSection === section
                           ? `${colorClasses.light} text-white shadow-lg`
                           : 'text-blue-200 hover:text-white'
-                      }`}
+                        }`}
                     >
                       {t(`bachelor.quotas.${section}`, {
                         requirements: 'Требования',
@@ -360,7 +353,7 @@ const BachelorQuotas = () => {
                             {t('bachelor.quotas.requiredDocuments', 'Необходимые документы')}
                           </h3>
                           <div className="space-y-4">
-                            {currentQuota.requirements.map((req, idx) => (
+                            {(currentQuota?.requirements || []).map((req, idx) => (
                               <motion.div
                                 key={idx}
                                 initial={{ opacity: 0, x: -20 }}
@@ -369,7 +362,7 @@ const BachelorQuotas = () => {
                                 className="flex items-start p-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 group"
                               >
                                 <div className="w-2 h-2 bg-red-400 rounded-full mt-2 mr-4 flex-shrink-0 group-hover:scale-150 transition-transform duration-300"></div>
-                                <span className="text-blue-100 group-hover:text-white transition-colors">{req}</span>
+                                <span className="text-blue-100 group-hover:text-white transition-colors">{req.requirement || req}</span>
                               </motion.div>
                             ))}
                           </div>
@@ -382,7 +375,7 @@ const BachelorQuotas = () => {
                           <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
                             <div className="flex items-center justify-between mb-4">
                               <span className="text-blue-100">{t('bachelor.quotas.applicationDeadline', 'Крайний срок подачи')}:</span>
-                              <span className="font-bold text-white text-xl">{currentQuota.deadline}</span>
+                              <span className="font-bold text-white text-xl">{currentQuota?.deadline || 'Уточняется'}</span>
                             </div>
                             <div className="text-blue-200/80 text-sm">
                               {t('bachelor.quotas.recommendEarly', 'Рекомендуем подать документы заранее для прохождения дополнительных испытаний')}
@@ -410,7 +403,7 @@ const BachelorQuotas = () => {
                             {t('bachelor.quotas.mainBenefits', 'Основные преимущества')}
                           </h3>
                           <div className="space-y-4">
-                            {currentQuota.benefits.map((benefit, idx) => (
+                            {(currentQuota?.benefits || []).map((benefit, idx) => (
                               <motion.div
                                 key={idx}
                                 initial={{ opacity: 0, x: -20 }}
@@ -419,7 +412,7 @@ const BachelorQuotas = () => {
                                 className="flex items-start p-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 group"
                               >
                                 <div className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-4 flex-shrink-0 group-hover:scale-150 transition-transform duration-300"></div>
-                                <span className="text-blue-100 group-hover:text-white transition-colors">{benefit}</span>
+                                <span className="text-blue-100 group-hover:text-white transition-colors">{benefit.benefit || benefit}</span>
                               </motion.div>
                             ))}
                           </div>
@@ -430,12 +423,7 @@ const BachelorQuotas = () => {
                             {t('bachelor.quotas.additionalSupport', 'Дополнительная поддержка')}
                           </h3>
                           <div className="space-y-4">
-                            {[
-                              t('bachelor.quotas.support.mentoring', 'Персональный спортивный наставник'),
-                              t('bachelor.quotas.support.equipment', 'Спортивная экипировка и инвентарь'),
-                              t('bachelor.quotas.support.nutrition', 'Специализированное питание'),
-                              t('bachelor.quotas.support.recovery', 'Медицинское сопровождение и восстановление')
-                            ].map((support, idx) => (
+                            {additionalSupport.map((support, idx) => (
                               <motion.div
                                 key={idx}
                                 initial={{ opacity: 0, x: 20 }}
@@ -444,7 +432,7 @@ const BachelorQuotas = () => {
                                 className="flex items-center p-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 group"
                               >
                                 <div className="w-2 h-2 bg-blue-400 rounded-full mr-4 group-hover:scale-150 transition-transform duration-300"></div>
-                                <span className="text-blue-100 group-hover:text-white transition-colors">{support}</span>
+                                <span className="text-blue-100 group-hover:text-white transition-colors">{support.support || support}</span>
                               </motion.div>
                             ))}
                           </div>
@@ -464,35 +452,16 @@ const BachelorQuotas = () => {
                       className="space-y-8"
                     >
                       <div className="grid md:grid-cols-3 gap-6">
-                        {[
-                          {
-                            step: 1,
-                            title: t('bachelor.quotas.steps.consultation', 'Консультация'),
-                            description: t('bachelor.quotas.steps.consultationDesc', 'Получите консультацию в приемной комиссии и определите подходящую квоту'),
-                            color: 'from-blue-500 to-cyan-500'
-                          },
-                          {
-                            step: 2,
-                            title: t('bachelor.quotas.steps.documents', 'Документы'),
-                            description: t('bachelor.quotas.steps.documentsDesc', 'Подготовьте необходимый пакет документов и спортивные достижения'),
-                            color: 'from-green-500 to-emerald-500'
-                          },
-                          {
-                            step: 3,
-                            title: t('bachelor.quotas.steps.submission', 'Подача'),
-                            description: t('bachelor.quotas.steps.submissionDesc', 'Подайте заявление и пройдите дополнительные испытания'),
-                            color: 'from-purple-500 to-pink-500'
-                          }
-                        ].map((step, idx) => (
+                        {processSteps.map((step, idx) => (
                           <motion.div
-                            key={step.step}
+                            key={step.step_number || idx}
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: idx * 0.2 }}
                             className="text-center p-6 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 group"
                           >
-                            <div className={`w-12 h-12 bg-gradient-to-r ${step.color} text-white rounded-full flex items-center justify-center mx-auto mb-4 text-lg font-bold group-hover:scale-110 transition-transform duration-300`}>
-                              {step.step}
+                            <div className={`w-12 h-12 bg-gradient-to-r ${step.color_scheme || 'from-blue-500 to-cyan-500'} text-white rounded-full flex items-center justify-center mx-auto mb-4 text-lg font-bold group-hover:scale-110 transition-transform duration-300`}>
+                              {step.step_number || idx + 1}
                             </div>
                             <h4 className="font-semibold text-white mb-3 text-lg">{step.title}</h4>
                             <p className="text-blue-200/80 text-sm leading-relaxed">{step.description}</p>

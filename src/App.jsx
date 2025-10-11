@@ -19,7 +19,7 @@ import AcademyDocuments from './components/pages/academy/AcademyDocuments';
 import BachelorInfo from './components/pages/admissions/bachelor/BachelorInfo';
 import BachelorRegistration from './components/pages/admissions/bachelor/BachelorRegistration';
 import BachelorInternational from './components/pages/admissions/bachelor/BachelorInternational';
-import BachelorQuotas from './components/pages/admissions/bachelor/BachelorQuotas';
+import BachelorQuotasFull from './components/pages/admissions/bachelor/BachelorQuotasFull';
 import BachelorContacts from './components/pages/admissions/bachelor/BachelorContacts';
 import MasterInfo from './components/pages/admissions/master/MasterInfo';
 import CollegeInfo from './components/pages/admissions/college/CollegeInfo';
@@ -85,16 +85,13 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
 
-            <Route path="/news/:id" element={<DetailPage />} />
-            <Route path="/announcements/:id" element={<AnnouncementDetailPage />} />
-            
             {/* Academy routes */}
             <Route path="/academy/about" element={<AcademyAbout />} />
             <Route path="/academy/history" element={<AcademyHistory />} />
             <Route path="/academy/mission" element={<AcademyMission />} />
             <Route path="/academy/accreditation" element={<AcademyAccreditation />} />
             <Route path="/academy/numbers" element={<AcademyNumbers />} />
-            
+
             {/* НОВЫЕ ПУТИ ДЛЯ ACADEMY */}
             <Route path="/academy/leadership/rectorate" element={<AcademyLeadership />} />
             <Route path="/academy/structure/academic" element={<AcademyStructure />} />
@@ -112,14 +109,14 @@ function App() {
             <Route path="/admissions/bachelor/info" element={<BachelorInfo />} />
             <Route path="/admissions/bachelor/registration" element={<BachelorRegistration />} />
             <Route path="/admissions/bachelor/international" element={<BachelorInternational />} />
-            <Route path="/admissions/bachelor/quotas" element={<BachelorQuotas />} />
+            <Route path="/admissions/bachelor/quotas" element={<BachelorQuotasFull />} />
             <Route path="/admissions/bachelor/contacts" element={<BachelorContacts />} />
             <Route path="/admissions/master/info" element={<MasterInfo />} />
             <Route path="/admissions/college/info" element={<CollegeInfo />} />
-            
+
             {/* НОВЫЕ ПУТИ ДЛЯ ADMISSIONS */}
             <Route path="/admissions/doctorate/info" element={<DoctorateInfo />} />
-            
+
             {/* Education routes */}
             <Route path="/education/faculties/pedagogical" element={<PedagogicalSports />} />
             <Route path="/education/faculties/coaching" element={<CoachingFaculty />} />
@@ -127,11 +124,11 @@ function App() {
             <Route path="/education/faculties/correspondence" element={<CorrespondenceTraining />} />
             <Route path="/education/departments" element={<GeneralDepartments />} />
             <Route path="/education/college/sports" element={<CollegeSports />} />
-            
+
             {/* НОВЫЕ ПУТИ ДЛЯ EDUCATION */}
             <Route path="/education/faculties/master" element={<MasterProgram />} />
             <Route path="/education/faculties/doctorate" element={<DoctorateProgram />} />
-            
+
             {/* Science routes */}
             <Route path="/science/publications" element={<ScientificPublications />} />
             <Route path="/science/vestnik" element={<Vestnik />} />
@@ -139,11 +136,11 @@ function App() {
             <Route path="/science/scopus" element={<Scopus />} />
             <Route path="/science/ipchain" element={<Ipchain />} />
             <Route path="/science/nts" element={<ScientificCouncil />} />
-            
+
             {/* НОВЫЕ ПУТИ ДЛЯ SCIENCE */}
             <Route path="/science/nts-committee" element={<NTSCommittee />} />
             <Route path="/science/ssu" element={<StudentScientificSociety />} />
-            
+
             {/* Students routes */}
             <Route path="/students/info" element={<UsefulInfo />} />
             <Route path="/students/disabilities" element={<StudentsDisabilities />} />
@@ -154,10 +151,10 @@ function App() {
             <Route path="/students/scholarship" element={<Scholarship />} />
             <Route path="/students/links" element={<UsefulLinks />} />
             <Route path="/students/ebilim" element={<EbilimLogin />} />
-            
+
             {/* НОВЫЕ ПУТИ ДЛЯ STUDENTS */}
             <Route path="/students/visa-support" element={<VisaSupport />} />
-            
+
             {/* Contacts routes */}
             <Route path="/contacts/address" element={<AddressMap />} />
             <Route path="/contacts/contact-info" element={<ContactInfo />} />

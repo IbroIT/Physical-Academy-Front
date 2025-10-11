@@ -8,11 +8,11 @@ class ApiService {
     getLanguageParam(language) {
         const langMap = {
             'ru': 'ru',
-            'kg': 'kg', // API uses 'kg' for Kyrgyz
+            'kg': 'ky', // Map kg to ky for backend compatibility  
             'en': 'en',
-            'ky': 'kg' // Map ky to kg for i18n compatibility
+            'ky': 'ky' // Keep ky as ky for backend
         };
-        return langMap[language] || 'ru';
+        return langMap[language] || 'en';
     }
 
     // Generic API request method
@@ -130,77 +130,197 @@ class ApiService {
         return await this.getOrganizationStructure(language, { search: query });
     }
 
-    // Student Clubs API methods
-    async getStudentClubsPageData(language = 'ru', filters = {}) {
+    // ===== LEADERSHIP STRUCTURE MODULE =====
+
+    // Board of Trustees
+    async getBoardOfTrustees(language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        const queryParams = new URLSearchParams({
-            lang: langParam,
-            ...filters
-        });
-
-        return await this.request(`/student-clubs/clubs/page_data/?${queryParams}`);
+        const data = await this.request(`/leadership-structure/board-of-trustees/?lang=${langParam}`);
+        return data.results || [];
     }
 
-    async getStudentClubs(language = 'ru', filters = {}) {
+    async getBoardOfTrusteesStats(language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        const queryParams = new URLSearchParams({
-            lang: langParam,
-            ...filters
-        });
-
-        const data = await this.request(`/student-clubs/clubs/?${queryParams}`);
-        return data.results || data;
+        const data = await this.request(`/leadership-structure/board-of-trustees-stats/?lang=${langParam}`);
+        return data.results || [];
     }
 
-    async getStudentClubById(id, language = 'ru') {
+    // Audit Commission
+    async getAuditCommission(language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        return await this.request(`/student-clubs/clubs/${id}/?lang=${langParam}`);
+        const data = await this.request(`/leadership-structure/audit-commission/?lang=${langParam}`);
+        return data.results || [];
     }
 
-    async getStudentClubsByCategory(categorySlug, language = 'ru') {
+    async getAuditCommissionStatistics(language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        const data = await this.request(
-            `/student-clubs/clubs/by_category/?category=${categorySlug}&lang=${langParam}`
-        );
-        return data.results || data;
+        const data = await this.request(`/leadership-structure/audit-commission-statistics/?lang=${langParam}`);
+        return data.results || [];
     }
 
-    async getStudentClubCategories(language = 'ru') {
+    // Academic Council
+    async getAcademicCouncil(language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        const data = await this.request(`/student-clubs/categories/?lang=${langParam}`);
-        return data.results || data;
+        const data = await this.request(`/leadership-structure/academic-council/?lang=${langParam}`);
+        return data.results || [];
     }
 
-    async getStudentClubStats(language = 'ru') {
+    // Trade Union
+    async getTradeUnionBenefits(language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        const data = await this.request(`/student-clubs/stats/?lang=${langParam}`);
-        return data.results || data;
+        const data = await this.request(`/leadership-structure/trade-union/benefits/?lang=${langParam}`);
+        return data.results || [];
     }
 
-    async getStudentClubLeaders(language = 'ru', clubId = null) {
+    async getTradeUnionEvents(language = 'ru') {
         const langParam = this.getLanguageParam(language);
-        const queryParams = new URLSearchParams({ lang: langParam });
-        if (clubId) {
-            queryParams.append('club', clubId);
-        }
-
-        const data = await this.request(`/student-clubs/leaders/?${queryParams}`);
-        return data.results || data;
+        const data = await this.request(`/leadership-structure/trade-union/events/?lang=${langParam}`);
+        return data.results || [];
     }
 
-    async joinStudentClub(clubId, userData) {
-        return await this.request(`/student-clubs/clubs/${clubId}/join/`, {
-            method: 'POST',
-            body: JSON.stringify(userData),
-        });
+    async getTradeUnionStats(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        const data = await this.request(`/leadership-structure/trade-union/stats/?lang=${langParam}`);
+        return data.results || [];
     }
 
-    async searchStudentClubs(query, language = 'ru', category = null) {
-        const filters = { search: query };
+    // Commissions
+    async getCommissions(language = 'ru', category = null) {
+        const langParam = this.getLanguageParam(language);
+        const params = new URLSearchParams({ lang: langParam });
         if (category && category !== 'all') {
-            filters.category = category;
+            params.append('category', category);
         }
-        return await this.getStudentClubs(language, filters);
+        const data = await this.request(`/leadership-structure/commissions/?${params}`);
+        return data.results || [];
+    }
+
+    // Administrative Structure
+    async getAdministrativeDepartments(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        const data = await this.request(`/leadership-structure/administrative/departments/?lang=${langParam}`);
+        return data.results || [];
+    }
+
+    async getAdministrativeUnits(language = 'ru', searchTerm = '') {
+        const langParam = this.getLanguageParam(language);
+        const params = new URLSearchParams({ lang: langParam });
+        if (searchTerm) {
+            params.append('search', searchTerm);
+        }
+        const data = await this.request(`/leadership-structure/administrative/units/?${params}`);
+        return data.results || [];
+    }
+
+    // Admission API methods
+    async getBachelorInfo(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/admission/api/bachelor/?lang=${langParam}`, {
+            headers: {
+                'Accept-Language': langParam
+            }
+        });
+    }
+
+    async getMasterInfo(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/admission/api/master/?lang=${langParam}`, {
+            headers: {
+                'Accept-Language': langParam
+            }
+        });
+    }
+
+    async getDoctorateInfo(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/admission/api/doctorate/?lang=${langParam}`, {
+            headers: {
+                'Accept-Language': langParam
+            }
+        });
+    }
+
+    async getCollegeInfo(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/admission/api/college/?lang=${langParam}`, {
+            headers: {
+                'Accept-Language': langParam
+            }
+        });
+    }
+
+    async getBachelorQuotas(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/admission/api/bachelor-quotas/data/?lang=${langParam}`, {
+            headers: {
+                'Accept-Language': langParam
+            }
+        });
+    }
+
+    async getQuotasByLevel(level, language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/admission/api/quotas/${level}/?lang=${langParam}`);
+    }
+
+    async getAdmissionLevels(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        const data = await this.request(`/admission/api/levels/?lang=${langParam}`);
+        return data.results || [];
+    }
+
+    async getPrograms(language = 'ru', filters = {}) {
+        const langParam = this.getLanguageParam(language);
+        const queryParams = new URLSearchParams({
+            lang: langParam,
+            ...filters
+        });
+        const data = await this.request(`/admission/api/programs/?${queryParams}`);
+        return data.results || [];
+    }
+
+    async getAdmissionStatistics(language = 'ru', filters = {}) {
+        const langParam = this.getLanguageParam(language);
+        const queryParams = new URLSearchParams({
+            lang: langParam,
+            ...filters
+        });
+        const data = await this.request(`/admission/api/statistics/?${queryParams}`);
+        return data.results || [];
+    }
+
+    async getAdmissionFeatures(language = 'ru', filters = {}) {
+        const langParam = this.getLanguageParam(language);
+        const queryParams = new URLSearchParams({
+            lang: langParam,
+            ...filters
+        });
+        const data = await this.request(`/admission/api/features/?${queryParams}`);
+        return data.results || [];
+    }
+
+    // Get quota types only
+    async getQuotaTypes(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/admission/api/quota-types/?lang=${langParam}`);
+    }
+
+    // Get quota stats only
+    async getQuotaStats(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/admission/api/quota-stats/?lang=${langParam}`);
+    }
+
+    // Get additional support only
+    async getAdditionalSupport(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/admission/api/additional-support/?lang=${langParam}`);
+    }
+
+    // Get process steps only
+    async getProcessSteps(language = 'ru') {
+        const langParam = this.getLanguageParam(language);
+        return await this.request(`/admission/api/process-steps/?lang=${langParam}`);
     }
 }
 
@@ -222,13 +342,31 @@ export const {
     searchLeadership,
     searchDocuments,
     searchOrganizationStructure,
-    getStudentClubsPageData,
-    getStudentClubs,
-    getStudentClubById,
-    getStudentClubsByCategory,
-    getStudentClubCategories,
-    getStudentClubStats,
-    getStudentClubLeaders,
-    joinStudentClub,
-    searchStudentClubs
+    // Leadership Structure exports
+    getBoardOfTrustees,
+    getBoardOfTrusteesStats,
+    getAuditCommission,
+    getAuditCommissionStatistics,
+    getAcademicCouncil,
+    getTradeUnionBenefits,
+    getTradeUnionEvents,
+    getTradeUnionStats,
+    getCommissions,
+    getAdministrativeDepartments,
+    getAdministrativeUnits,
+    // Admission API exports
+    getBachelorInfo,
+    getMasterInfo,
+    getDoctorateInfo,
+    getCollegeInfo,
+    getBachelorQuotas,
+    getQuotasByLevel,
+    getAdmissionLevels,
+    getPrograms,
+    getAdmissionStatistics,
+    getAdmissionFeatures,
+    getQuotaTypes,
+    getQuotaStats,
+    getAdditionalSupport,
+    getProcessSteps
 } = apiService;
