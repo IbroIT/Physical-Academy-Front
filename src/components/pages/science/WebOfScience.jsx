@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WebOfScience = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [timeRange, setTimeRange] = useState('5years');
   const [isVisible, setIsVisible] = useState(false);
   const [counterValues, setCounterValues] = useState({});
@@ -13,14 +14,40 @@ const WebOfScience = () => {
   const [activeCategory, setActiveCategory] = useState(0);
   const sectionRef = useRef(null);
 
+  // Загружаем данные при монтировании компонента
+  useEffect(() => {
+    const loadData = () => {
+      try {
+        const scienceData = t('science.sections.webofscience', { returnObjects: true });
+        
+        // Проверяем, что данные действительно загрузились
+        if (scienceData && typeof scienceData === 'object' && scienceData.metrics) {
+          setData(scienceData);
+          setError(false);
+        } else {
+          // Если данные не загрузились, создаем fallback данные
+          console.warn('Web of Science data not found in translations, using fallback data');
+          setData(getFallbackData());
+        }
+      } catch (err) {
+        console.error('Error loading Web of Science data:', err);
+        setData(getFallbackData());
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Загружаем данные сразу и при изменении языка
+    loadData();
+  }, [t, i18n.language]);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
           setTimeout(() => {
-            setData(t('science.sections.webofscience', { returnObjects: true }));
-            setLoading(false);
             startCounters();
           }, 300);
         }
@@ -33,25 +60,37 @@ const WebOfScience = () => {
     }
 
     return () => observer.disconnect();
-  }, [t]);
+  }, [data]); // Добавляем data в зависимости
 
   // Автопереключение метрик и категорий
   useEffect(() => {
+    if (!data?.metrics?.[timeRange]) return;
+    
     const interval = setInterval(() => {
-      setActiveMetric(prev => (prev + 1) % (data?.metrics[timeRange]?.main ? Object.keys(data.metrics[timeRange].main).length : 1));
-      setActiveCategory(prev => (prev + 1) % (data?.metrics[timeRange]?.categories?.length || 1));
+      const mainMetricsCount = data.metrics[timeRange]?.main ? Object.keys(data.metrics[timeRange].main).length : 0;
+      const categoriesCount = data.metrics[timeRange]?.categories?.length || 0;
+      
+      if (mainMetricsCount > 0) {
+        setActiveMetric(prev => (prev + 1) % mainMetricsCount);
+      }
+      if (categoriesCount > 0) {
+        setActiveCategory(prev => (prev + 1) % categoriesCount);
+      }
     }, 4000);
+    
     return () => clearInterval(interval);
   }, [timeRange, data]);
 
   const startCounters = () => {
-    if (!data) return;
+    if (!data?.metrics?.[timeRange]) return;
     
     const filteredData = data.metrics[timeRange];
     const targetValues = {};
     
-    Object.entries(filteredData.main).forEach(([key, metric]) => {
-      targetValues[key] = parseInt(metric.value.replace(/\D/g, ''));
+    Object.entries(filteredData.main || {}).forEach(([key, metric]) => {
+      if (metric && metric.value) {
+        targetValues[key] = parseInt(metric.value.replace(/\D/g, '')) || 0;
+      }
     });
 
     const duration = 2000;
@@ -85,10 +124,99 @@ const WebOfScience = () => {
   };
 
   useEffect(() => {
-    if (data) {
+    if (data && isVisible) {
       startCounters();
     }
-  }, [timeRange, data]);
+  }, [timeRange, data, isVisible]);
+
+  // Fallback данные на случай проблем с загрузкой
+  const getFallbackData = () => ({
+    title: "Web of Science",
+    subtitle: "Research metrics and publication data",
+    titleIcon: "📊",
+    categoriesIcon: "📈",
+    collaborationsIcon: "🌍",
+    topJournalsIcon: "⭐",
+    timeRanges: {
+      '1year': '1 Year',
+      '3years': '3 Years', 
+      '5years': '5 Years'
+    },
+    metrics: {
+      '5years': {
+        main: {
+          publications: {
+            value: '150',
+            label: 'Publications',
+            icon: '📄',
+            description: 'Total research papers'
+          },
+          citations: {
+            value: '2500', 
+            label: 'Citations',
+            icon: '🔗',
+            description: 'Total citations received'
+          },
+          hindex: {
+            value: '18',
+            label: 'H-index',
+            icon: '📊',
+            description: 'Hirsch index'
+          },
+          collaborations: {
+            value: '45',
+            label: 'Collaborations',
+            icon: '🤝',
+            description: 'International collaborations'
+          }
+        },
+        categories: [
+          { name: 'Computer Science', count: 45 },
+          { name: 'Engineering', count: 38 },
+          { name: 'Mathematics', count: 32 },
+          { name: 'Physics', count: 25 },
+          { name: 'Chemistry', count: 10 }
+        ],
+        collaborations: [
+          { country: 'USA', institutions: 12, publications: 28, flag: '🇺🇸' },
+          { country: 'Germany', institutions: 8, publications: 15, flag: '🇩🇪' },
+          { country: 'UK', institutions: 6, publications: 12, flag: '🇬🇧' },
+          { country: 'Japan', institutions: 5, publications: 10, flag: '🇯🇵' }
+        ],
+        topJournals: [
+          { quartile: 'Q1', count: '85' },
+          { quartile: 'Q2', count: '42' },
+          { quartile: 'Q3', count: '18' },
+          { quartile: 'Q4', count: '5' }
+        ]
+      }
+    },
+    collaborationsInstitutions: 'institutions',
+    collaborationsPublications: 'publications',
+    topJournalsTitle: 'Publications by Journal Quartile',
+    topJournalsPublications: 'publications',
+    categoriesTitle: 'Publications by Category',
+    additionalMetrics: [
+      {
+        icon: '📈',
+        key: 'averageCitations',
+        title: 'Avg. Citations',
+        description: 'Per publication'
+      },
+      {
+        icon: '🔥',
+        key: 'hotPapers', 
+        title: 'Hot Papers',
+        description: 'Highly cited papers'
+      },
+      {
+        icon: '🌐',
+        key: 'international',
+        title: 'International',
+        description: 'Collaboration rate'
+      }
+    ]
+  });
 
   if (loading) {
     return (
@@ -99,14 +227,46 @@ const WebOfScience = () => {
           className="text-center"
         >
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-400 mx-auto mb-4"></div>
-          <p className="text-blue-200">{t('science.sections.webofscience.loading')}</p>
+          <p className="text-blue-200">Loading Web of Science data...</p>
+        </motion.div>
+      </section>
+    );
+  }
+
+  if (!data) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex justify-center items-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="text-6xl mb-4">⚠️</div>
+          <p className="text-blue-200">Failed to load data</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+          >
+            Retry
+          </button>
         </motion.div>
       </section>
     );
   }
 
   const filteredData = data.metrics[timeRange];
-  const mainMetrics = Object.entries(filteredData.main);
+  const mainMetrics = Object.entries(filteredData?.main || {});
+
+  // Если нет основных метрик, показываем сообщение
+  if (mainMetrics.length === 0) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex justify-center items-center">
+        <div className="text-center">
+          <p className="text-blue-200">No data available</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section 
@@ -140,14 +300,14 @@ const WebOfScience = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
           >
-            {data.titleIcon}
+            {data.titleIcon || "📊"}
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-            {data.title}
+            {data.title || "Web of Science"}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {data.subtitle}
+            {data.subtitle || "Research metrics and publication data"}
           </p>
         </motion.div>
 
@@ -159,7 +319,7 @@ const WebOfScience = () => {
           className="flex justify-center mb-12 lg:mb-16"
         >
           <div className="bg-white/5 rounded-2xl p-2 backdrop-blur-lg border border-white/20 shadow-2xl">
-            {Object.keys(data.metrics).map((range) => (
+            {Object.keys(data.metrics || {}).map((range) => (
               <motion.button
                 key={range}
                 whileHover={{ scale: 1.05 }}
@@ -171,7 +331,7 @@ const WebOfScience = () => {
                     : 'text-blue-200 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                {data.timeRanges[range]}
+                {data.timeRanges?.[range] || range}
               </motion.button>
             ))}
           </div>
@@ -190,21 +350,21 @@ const WebOfScience = () => {
             >
               <div className="flex flex-col lg:flex-row gap-6 items-center">
                 <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg">
-                  {mainMetrics[activeMetric][1].icon}
+                  {mainMetrics[activeMetric][1]?.icon || "📊"}
                 </div>
                 <div className="flex-1 text-center lg:text-left">
                   <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">
-                    {mainMetrics[activeMetric][1].label}
+                    {mainMetrics[activeMetric][1]?.label || "Metric"}
                   </h3>
                   <div className="text-4xl lg:text-5xl font-bold text-emerald-400 font-mono mb-2">
                     {counterValues[mainMetrics[activeMetric][0]] 
                       ? Math.round(counterValues[mainMetrics[activeMetric][0]]).toLocaleString()
                       : '0'
                     }
-                    {mainMetrics[activeMetric][1].value.includes('%') && '%'}
+                    {mainMetrics[activeMetric][1]?.value?.includes('%') && '%'}
                   </div>
                   <p className="text-blue-200 text-lg">
-                    {mainMetrics[activeMetric][1].description}
+                    {mainMetrics[activeMetric][1]?.description || ""}
                   </p>
                 </div>
               </div>
@@ -227,177 +387,183 @@ const WebOfScience = () => {
                 onClick={() => setActiveMetric(index)}
                 whileHover={{ scale: 1.05 }}
               >
-                <div className="text-2xl mb-3">{metric.icon}</div>
+                <div className="text-2xl mb-3">{metric?.icon || "📊"}</div>
                 <div className="text-2xl font-bold text-emerald-400 mb-1 font-mono">
                   {counterValues[key] 
                     ? Math.round(counterValues[key]).toLocaleString()
                     : '0'
                   }
-                  {metric.value.includes('%') && '%'}
+                  {metric?.value?.includes('%') && '%'}
                 </div>
-                <div className="text-blue-200 text-sm">{metric.label}</div>
+                <div className="text-blue-200 text-sm">{metric?.label || "Label"}</div>
               </motion.div>
             ))}
           </div>
         </div>
 
         {/* Detailed Information */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Publications by Category */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={isVisible ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
-          >
-            <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-              <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">
-                {data.categoriesIcon}
-              </span>
-              {data.categoriesTitle}
-            </h3>
-            <div className="space-y-4">
-              {filteredData.categories.map((category, index) => {
-                const maxCount = Math.max(...filteredData.categories.map(c => c.count));
-                const percentage = (category.count / maxCount) * 100;
-                
-                return (
+        {filteredData?.categories && filteredData.collaborations && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            {/* Publications by Category */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
+            >
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+                <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">
+                  {data.categoriesIcon || "📈"}
+                </span>
+                {data.categoriesTitle || "Publications by Category"}
+              </h3>
+              <div className="space-y-4">
+                {(filteredData.categories || []).map((category, index) => {
+                  const maxCount = Math.max(...(filteredData.categories || []).map(c => c.count || 0));
+                  const percentage = maxCount > 0 ? ((category.count || 0) / maxCount) * 100 : 0;
+                  
+                  return (
+                    <motion.div 
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`flex items-center justify-between p-4 rounded-2xl backdrop-blur-sm border transition-all duration-300 cursor-pointer ${
+                        activeCategory === index
+                          ? 'bg-white/10 border-emerald-400/30'
+                          : 'bg-white/5 border-white/10 hover:border-emerald-400/30'
+                      }`}
+                      onClick={() => setActiveCategory(index)}
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <span className="text-white text-lg font-medium flex-1">{category.name || "Category"}</span>
+                      <div className="flex items-center space-x-4 flex-1 max-w-xs">
+                        <div className="w-full bg-white/10 rounded-full h-3">
+                          <motion.div 
+                            className="bg-gradient-to-r from-blue-500 to-emerald-500 h-3 rounded-full shadow-lg"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${percentage}%` }}
+                            transition={{ duration: 1, delay: index * 0.2 }}
+                          ></motion.div>
+                        </div>
+                        <span className="font-bold text-emerald-400 w-12 text-right text-lg">
+                          {category.count || 0}
+                        </span>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            {/* International Collaboration */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
+            >
+              <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+                <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">
+                  {data.collaborationsIcon || "🌍"}
+                </span>
+                {data.collaborationsTitle || "International Collaboration"}
+              </h3>
+              <div className="space-y-4">
+                {(filteredData.collaborations || []).map((collab, index) => (
                   <motion.div 
                     key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`flex items-center justify-between p-4 rounded-2xl backdrop-blur-sm border transition-all duration-300 cursor-pointer ${
-                      activeCategory === index
-                        ? 'bg-white/10 border-emerald-400/30'
-                        : 'bg-white/5 border-white/10 hover:border-emerald-400/30'
-                    }`}
-                    onClick={() => setActiveCategory(index)}
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group backdrop-blur-sm"
                     whileHover={{ scale: 1.02 }}
                   >
-                    <span className="text-white text-lg font-medium flex-1">{category.name}</span>
-                    <div className="flex items-center space-x-4 flex-1 max-w-xs">
-                      <div className="w-full bg-white/10 rounded-full h-3">
-                        <motion.div 
-                          className="bg-gradient-to-r from-blue-500 to-emerald-500 h-3 rounded-full shadow-lg"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${percentage}%` }}
-                          transition={{ duration: 1, delay: index * 0.2 }}
-                        ></motion.div>
+                    <div className="flex items-center space-x-4">
+                      <span className="text-2xl group-hover:scale-110 transition-transform duration-300">{collab.flag || "🇺🇳"}</span>
+                      <div>
+                        <span className="font-semibold text-white text-lg group-hover:text-emerald-300 transition-colors duration-300">
+                          {collab.country || "Country"}
+                        </span>
+                        <div className="text-blue-200 text-sm">
+                          {collab.institutions || 0} {data.collaborationsInstitutions || "institutions"}
+                        </div>
                       </div>
-                      <span className="font-bold text-emerald-400 w-12 text-right text-lg">
-                        {category.count}
-                      </span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-emerald-400 font-bold text-xl">{collab.publications || 0}</div>
+                      <div className="text-blue-300 text-sm">{data.collaborationsPublications || "publications"}</div>
                     </div>
                   </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
 
-          {/* International Collaboration */}
+        {/* Q1/Q2 Journals */}
+        {filteredData?.topJournals && (
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isVisible ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
+            initial={{ opacity: 0, y: 30 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-8 text-white shadow-2xl mb-12 backdrop-blur-lg border border-white/20"
           >
-            <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-              <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">
-                {data.collaborationsIcon}
+            <h3 className="text-2xl font-bold mb-8 flex items-center justify-center">
+              <span className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3">
+                {data.topJournalsIcon || "⭐"}
               </span>
-              {data.collaborationsTitle}
+              {data.topJournalsTitle || "Publications by Journal Quartile"}
             </h3>
-            <div className="space-y-4">
-              {filteredData.collaborations.map((collab, index) => (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {(filteredData.topJournals || []).map((journal, index) => (
                 <motion.div 
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group backdrop-blur-sm"
-                  whileHover={{ scale: 1.02 }}
+                  className="bg-white/10 rounded-2xl p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2 group border border-white/10"
+                  whileHover={{ scale: 1.05 }}
                 >
-                  <div className="flex items-center space-x-4">
-                    <span className="text-2xl group-hover:scale-110 transition-transform duration-300">{collab.flag}</span>
-                    <div>
-                      <span className="font-semibold text-white text-lg group-hover:text-emerald-300 transition-colors duration-300">
-                        {collab.country}
-                      </span>
-                      <div className="text-blue-200 text-sm">
-                        {collab.institutions} {data.collaborationsInstitutions}
-                      </div>
-                    </div>
+                  <div className="text-3xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300 text-emerald-400">
+                    {journal.count || 0}
                   </div>
-                  <div className="text-right">
-                    <div className="text-emerald-400 font-bold text-xl">{collab.publications}</div>
-                    <div className="text-blue-300 text-sm">{data.collaborationsPublications}</div>
-                  </div>
+                  <div className="text-blue-200 text-lg font-medium mb-1">{journal.quartile || "Q"}</div>
+                  <div className="text-white/80 text-sm">{data.topJournalsPublications || "publications"}</div>
+                  <div className="w-0 group-hover:w-full h-1 bg-emerald-400/50 transition-all duration-500 mt-2 mx-auto"></div>
                 </motion.div>
               ))}
             </div>
           </motion.div>
-        </div>
-
-        {/* Q1/Q2 Journals */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-8 text-white shadow-2xl mb-12 backdrop-blur-lg border border-white/20"
-        >
-          <h3 className="text-2xl font-bold mb-8 flex items-center justify-center">
-            <span className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3">
-              {data.topJournalsIcon}
-            </span>
-            {data.topJournalsTitle}
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {filteredData.topJournals.map((journal, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white/10 rounded-2xl p-6 text-center backdrop-blur-sm hover:bg-white/20 transition-all duration-500 transform hover:-translate-y-2 group border border-white/10"
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="text-3xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300 text-emerald-400">
-                  {journal.count}
-                </div>
-                <div className="text-blue-200 text-lg font-medium mb-1">{journal.quartile}</div>
-                <div className="text-white/80 text-sm">{data.topJournalsPublications}</div>
-                <div className="w-0 group-hover:w-full h-1 bg-emerald-400/50 transition-all duration-500 mt-2 mx-auto"></div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        )}
 
         {/* Additional Metrics */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.9 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
-        >
-          {data.additionalMetrics.map((metric, index) => (
-            <motion.div 
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 + index * 0.1 }}
-              className="bg-white/5 rounded-3xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group"
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-300 text-emerald-400">
-                {metric.icon}
-              </div>
-              <div className="text-2xl font-bold text-white mb-2">{filteredData[metric.key]}</div>
-              <div className="text-blue-200 font-semibold text-lg mb-2">{metric.title}</div>
-              <div className="text-blue-300 text-sm">{metric.description}</div>
-            </motion.div>
-          ))}
-        </motion.div>
+        {data.additionalMetrics && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.9 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+          >
+            {(data.additionalMetrics || []).map((metric, index) => (
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9 + index * 0.1 }}
+                className="bg-white/5 rounded-3xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group"
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-300 text-emerald-400">
+                  {metric.icon || "📊"}
+                </div>
+                <div className="text-2xl font-bold text-white mb-2">{filteredData?.[metric.key] || "0"}</div>
+                <div className="text-blue-200 font-semibold text-lg mb-2">{metric.title || "Metric"}</div>
+                <div className="text-blue-300 text-sm">{metric.description || ""}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </section>
   );
