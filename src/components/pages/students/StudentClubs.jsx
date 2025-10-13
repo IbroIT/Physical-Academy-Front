@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useStudentClubsPageData, useJoinStudentClub } from '../../../hooks/useApi';
 import { LoadingSkeleton } from '../../common/Loading';
 
 const StudentClubs = () => {
