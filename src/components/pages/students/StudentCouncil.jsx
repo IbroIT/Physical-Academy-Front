@@ -1,22 +1,78 @@
-import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
+import { getCouncilPageData } from "../../../services/api";
+import Loading from "../../common/Loading";
 
 const StudentCouncil = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedMember, setSelectedMember] = useState(null);
-  const [activeTab, setActiveTab] = useState('members');
+  const [activeTab, setActiveTab] = useState("members");
   const [isVisible, setIsVisible] = useState(false);
   const [activeMemberIndex, setActiveMemberIndex] = useState(0);
+  const [apiData, setApiData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sectionRef = useRef(null);
 
-  const data = t('students.council', { returnObjects: true });
-  const labels = t('students.council.labels', { returnObjects: true });
+  // UI translations - not data
+  const uiTranslations = t("students.council", { returnObjects: true });
+
+  // Add default values and fallbacks for labels
+  const defaultLabels = {
+    tabs: {
+      members: "Members",
+      initiatives: "Initiatives",
+      events: "Events",
+    },
+    contacts: {
+      title: "Contacts",
+      email: "Email",
+      office: "Office",
+      hours: "Hours",
+    },
+    goals: {
+      title: "Goals",
+    },
+    events: {
+      participants: "Participants",
+      signUp: "Sign Up",
+      viewAll: "View All",
+    },
+    modal: {
+      information: "Information",
+      faculty: "Faculty",
+      course: "Course",
+      role: "Role",
+      contacts: "Contacts",
+      telegram: "Telegram",
+      responsibilities: "Responsibilities",
+      achievements: "Achievements",
+      close: "Close",
+    },
+  };
+
+  // Get labels with fallback to default values
+  const fetchedLabels =
+    t("students.council.labels", { returnObjects: true }) || {};
+
+  // Create a safe merged labels object with all required keys
+  const labels = {
+    ...defaultLabels,
+    tabs: { ...defaultLabels.tabs, ...(fetchedLabels?.tabs || {}) },
+    contacts: { ...defaultLabels.contacts, ...(fetchedLabels?.contacts || {}) },
+    goals: { ...defaultLabels.goals, ...(fetchedLabels?.goals || {}) },
+    events: { ...defaultLabels.events, ...(fetchedLabels?.events || {}) },
+    modal: { ...defaultLabels.modal, ...(fetchedLabels?.modal || {}) },
+  };
+
+  // Get current language
+  const currentLanguage = i18n.language || "ru";
 
   const tabs = [
-    { id: 'members', label: labels.tabs.members, icon: '👥' },
-    { id: 'initiatives', label: labels.tabs.initiatives, icon: '🚀' },
-    { id: 'events', label: labels.tabs.events, icon: '📅' }
+    { id: "members", label: labels.tabs.members, icon: "👥" },
+    { id: "initiatives", label: labels.tabs.initiatives, icon: "🚀" },
+    { id: "events", label: labels.tabs.events, icon: "📅" },
   ];
 
   useEffect(() => {
@@ -32,17 +88,80 @@ const StudentCouncil = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Fetch data from API
   useEffect(() => {
-    if (activeTab === 'members' && data?.members) {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await getCouncilPageData(currentLanguage);
+        // Ensure we have a valid response object
+        if (response && typeof response === "object") {
+          setApiData(response);
+          setError(null);
+        } else {
+          // If response is not a valid object, create a default structure
+          setApiData({
+            title: "",
+            subtitle: "",
+            members: [],
+            initiatives: [],
+            events: [],
+            stats: {},
+          });
+          setError(t("common.errors.invalidData"));
+        }
+      } catch (err) {
+        console.error("Failed to fetch student council data:", err);
+        setError(t("common.errors.apiError"));
+        // Set empty data structure on error
+        setApiData({
+          title: "",
+          subtitle: "",
+          members: [],
+          initiatives: [],
+          events: [],
+          stats: {},
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [currentLanguage, t]);
+
+  // Reset active member when data changes
+  useEffect(() => {
+    setActiveMemberIndex(0);
+  }, [apiData, currentLanguage]);
+
+  useEffect(() => {
+    if (
+      activeTab === "members" &&
+      apiData?.members &&
+      apiData.members.length > 0
+    ) {
       const interval = setInterval(() => {
-        setActiveMemberIndex((prev) => (prev + 1) % data.members.length);
+        setActiveMemberIndex((prev) => (prev + 1) % apiData.members.length);
       }, 4000);
       return () => clearInterval(interval);
     }
-  }, [activeTab, data?.members]);
+  }, [activeTab, apiData?.members]);
+
+  // Render proper loading state when initial data is loading
+  if (loading && !apiData) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
+        <div className="text-center">
+          <Loading />
+          <p className="text-blue-100 mt-4">Loading council information...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
     >
@@ -51,10 +170,12 @@ const StudentCouncil = () => {
         <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
         <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-        
+
         {/* Спортивные символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🏆</div>
-        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">💪</div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">
+          💪
+        </div>
         <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">⚽</div>
       </div>
 
@@ -72,41 +193,56 @@ const StudentCouncil = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
           >
-            🏅
+            {uiTranslations.headerIcon || "🏅"}
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-            {data.title}
+            {apiData?.title || uiTranslations?.title || "Student Council"}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {data.subtitle}
+            {apiData?.subtitle ||
+              uiTranslations?.subtitle ||
+              "Welcome to our student council page"}
           </p>
+          {error && (
+            <div className="bg-red-500/20 text-red-100 p-3 rounded-lg mt-4 inline-block">
+              {error}
+            </div>
+          )}
         </motion.div>
 
         {/* Статистика */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 lg:mb-16"
-        >
-          {data.stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4 + index * 0.1 }}
-              className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
-            >
-              <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-2 group-hover:scale-110 transition-transform duration-300">
-                {stat.value}
-              </div>
-              <div className="text-blue-200 text-sm lg:text-base">
-                {stat.label}
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <Loading />
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 lg:mb-16"
+          >
+            {(Array.isArray(apiData?.stats) ? apiData.stats : []).map(
+              (stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 + index * 0.1 }}
+                  className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+                >
+                  <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-2 group-hover:scale-110 transition-transform duration-300">
+                    {stat?.value || "0"}
+                  </div>
+                  <div className="text-blue-200 text-sm lg:text-base">
+                    {stat?.label || ""}
+                  </div>
+                </motion.div>
+              )
+            )}
+          </motion.div>
+        )}
 
         {/* Tabs */}
         <motion.div
@@ -124,8 +260,8 @@ const StudentCouncil = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-3 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
-                    : 'text-blue-100 hover:bg-white/10'
+                    ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg"
+                    : "text-blue-100 hover:bg-white/10"
                 }`}
               >
                 <span className="text-lg">{tab.icon}</span>
@@ -138,116 +274,147 @@ const StudentCouncil = () => {
         <div className="grid lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Основной контент */}
           <div className="lg:col-span-3">
-            <AnimatePresence mode="wait">
-              {activeTab === 'members' && (
-                <motion.div
-                  key="members"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6"
-                >
-                  {/* Выделенный член */}
-                  {data.members[activeMemberIndex] && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-6 backdrop-blur-lg border border-white/20 shadow-2xl mb-8"
-                    >
-                      <div className="flex flex-col lg:flex-row items-center gap-6">
-                        <div className="flex-shrink-0">
-                          {data.members[activeMemberIndex].avatar ? (
-                            <img 
-                              src={data.members[activeMemberIndex].avatar} 
-                              alt={data.members[activeMemberIndex].name}
-                              className="w-24 h-24 rounded-2xl border-4 border-white/20 shadow-lg"
-                            />
-                          ) : (
-                            <div className="w-24 h-24 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-2xl border-4 border-white/20 shadow-lg">
-                              {data.members[activeMemberIndex].name.split(' ').map(w => w[0]).join('')}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 text-center lg:text-left">
-                          <div className="flex items-center justify-center lg:justify-start gap-3 mb-2">
-                            <h3 className="text-2xl font-bold text-white">
-                              {data.members[activeMemberIndex].name}
-                            </h3>
-                            {data.members[activeMemberIndex].role === 'president' && (
-                              <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                                👑 {labels.roles.president}
-                              </span>
+            {loading ? (
+              <div className="flex justify-center items-center py-20">
+                <Loading />
+              </div>
+            ) : (
+              <AnimatePresence mode="wait">
+                {activeTab === "members" && (
+                  <motion.div
+                    key="members"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {/* Featured member */}
+                    {(apiData?.members || [])[activeMemberIndex] && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-6 backdrop-blur-lg border border-white/20 shadow-2xl mb-8"
+                      >
+                        <div className="flex flex-col lg:flex-row items-center gap-6">
+                          <div className="flex-shrink-0">
+                            {(apiData?.members || [])[activeMemberIndex]
+                              .avatar ? (
+                              <img
+                                src={
+                                  (apiData?.members || [])[activeMemberIndex]
+                                    .avatar
+                                }
+                                alt={
+                                  (apiData?.members || fallbackData.members)[
+                                    activeMemberIndex
+                                  ].name
+                                }
+                                className="w-24 h-24 rounded-2xl border-4 border-white/20 shadow-lg"
+                              />
+                            ) : (
+                              <div className="w-24 h-24 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-2xl border-4 border-white/20 shadow-lg">
+                                {(apiData?.members || fallbackData.members)[
+                                  activeMemberIndex
+                                ].name
+                                  .split(" ")
+                                  .map((w) => w[0])
+                                  .join("")}
+                              </div>
                             )}
                           </div>
-                          <p className="text-emerald-300 font-semibold text-lg mb-2">
-                            {data.members[activeMemberIndex].position}
-                          </p>
-                          <p className="text-blue-200">
-                            {data.members[activeMemberIndex].department}
-                          </p>
+                          <div className="flex-1 text-center lg:text-left">
+                            <div className="flex items-center justify-center lg:justify-start gap-3 mb-2">
+                              <h3 className="text-2xl font-bold text-white">
+                                {
+                                  (apiData?.members || fallbackData.members)[
+                                    activeMemberIndex
+                                  ].name
+                                }
+                              </h3>
+                              {(apiData?.members || fallbackData.members)[
+                                activeMemberIndex
+                              ].role === "president" && (
+                                <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                                  👑 {labels.roles.president}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-emerald-300 font-semibold text-lg mb-2">
+                              {
+                                (apiData?.members || [])[activeMemberIndex]
+                                  .position
+                              }
+                            </p>
+                            <p className="text-blue-200">
+                              {
+                                (apiData?.members || [])[activeMemberIndex]
+                                  .department
+                              }
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
+                      </motion.div>
+                    )}
 
-                  {/* Сетка членов */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {data.members.map((member, index) => (
-                      <MemberCard 
-                        key={member.id} 
-                        member={member} 
+                    {/* Сетка членов */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {(apiData?.members || []).map((member, index) => (
+                        <MemberCard
+                          key={member.id || index}
+                          member={member}
+                          index={index}
+                          onSelect={setSelectedMember}
+                          isSelected={selectedMember?.id === member.id}
+                          isActive={activeMemberIndex === index}
+                          labels={labels}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === "initiatives" && (
+                  <motion.div
+                    key="initiatives"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {(apiData?.initiatives || []).map((initiative, index) => (
+                      <InitiativeCard
+                        key={initiative.id || index}
+                        initiative={initiative}
                         index={index}
-                        onSelect={setSelectedMember}
-                        isSelected={selectedMember?.id === member.id}
-                        isActive={activeMemberIndex === index}
                         labels={labels}
                       />
                     ))}
-                  </div>
-                </motion.div>
-              )}
+                  </motion.div>
+                )}
 
-              {activeTab === 'initiatives' && (
-                <motion.div
-                  key="initiatives"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6"
-                >
-                  {data.initiatives.map((initiative, index) => (
-                    <InitiativeCard 
-                      key={initiative.id} 
-                      initiative={initiative} 
-                      index={index}
-                      labels={labels}
-                    />
-                  ))}
-                </motion.div>
-              )}
-
-              {activeTab === 'events' && (
-                <motion.div
-                  key="events"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6"
-                >
-                  {data.events.map((event, index) => (
-                    <EventCard 
-                      key={event.id} 
-                      event={event} 
-                      index={index}
-                      labels={labels}
-                    />
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                {activeTab === "events" && (
+                  <motion.div
+                    key="events"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {(apiData?.events || []).map((event, index) => (
+                      <EventCard
+                        key={event.id || index}
+                        event={event}
+                        index={index}
+                        labels={labels}
+                      />
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )}
           </div>
 
           {/* Боковая панель */}
@@ -261,23 +428,25 @@ const StudentCouncil = () => {
             >
               <h3 className="font-bold text-white mb-4 text-lg flex items-center gap-3">
                 <span className="text-2xl">🎯</span>
-                <span>{labels.goals.title}</span>
+                <span>{labels?.goals?.title || "Goals"}</span>
               </h3>
               <ul className="space-y-3">
-                {data.goals.map((goal, index) => (
-                  <motion.li 
-                    key={index}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 + index * 0.1 }}
-                    className="flex items-start text-blue-100"
-                  >
-                    <div className="w-5 h-5 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">
-                      <span className="text-emerald-400 text-xs">✓</span>
-                    </div>
-                    {goal}
-                  </motion.li>
-                ))}
+                {(Array.isArray(apiData?.goals) ? apiData.goals : []).map(
+                  (goal, index) => (
+                    <motion.li
+                      key={index}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.8 + index * 0.1 }}
+                      className="flex items-start text-blue-100"
+                    >
+                      <div className="w-5 h-5 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 mr-3">
+                        <span className="text-emerald-400 text-xs">✓</span>
+                      </div>
+                      {goal}
+                    </motion.li>
+                  )
+                )}
               </ul>
             </motion.div>
 
@@ -290,20 +459,20 @@ const StudentCouncil = () => {
             >
               <h3 className="font-bold text-white mb-4 text-lg flex items-center gap-3">
                 <span className="text-2xl">📞</span>
-                <span>{labels.contacts.title}</span>
+                <span>{labels?.contacts?.title || "Contacts"}</span>
               </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-3 text-blue-100">
                   <span className="text-lg">📧</span>
-                  <span>{labels.contacts.email}</span>
+                  <span>{labels?.contacts?.email || "Email"}</span>
                 </div>
                 <div className="flex items-center gap-3 text-blue-100">
                   <span className="text-lg">🏢</span>
-                  <span>{labels.contacts.office}</span>
+                  <span>{labels?.contacts?.office || "Office"}</span>
                 </div>
                 <div className="flex items-center gap-3 text-blue-100">
                   <span className="text-lg">🕒</span>
-                  <span>{labels.contacts.hours}</span>
+                  <span>{labels?.contacts?.hours || "Hours"}</span>
                 </div>
               </div>
             </motion.div>
@@ -314,8 +483,8 @@ const StudentCouncil = () => {
       {/* Модальное окно с деталями члена совета */}
       <AnimatePresence>
         {selectedMember && (
-          <MemberModal 
-            member={selectedMember} 
+          <MemberModal
+            member={selectedMember}
             onClose={() => setSelectedMember(null)}
             labels={labels}
           />
@@ -325,12 +494,29 @@ const StudentCouncil = () => {
   );
 };
 
-const MemberCard = ({ member, index, onSelect, isSelected, isActive, labels }) => {
+const MemberCard = ({
+  member,
+  index,
+  onSelect,
+  isSelected,
+  isActive,
+  labels,
+}) => {
+  // Ensure member is not null/undefined with default values
+  const safeMember = member || {
+    name: "",
+    position: "",
+    department: "",
+    role: "",
+    tags: [],
+  };
+
   const generateInitials = (name) => {
+    if (!name) return "";
     return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
+      .split(" ")
+      .map((word) => word?.[0] || "")
+      .join("")
       .toUpperCase();
   };
 
@@ -341,45 +527,59 @@ const MemberCard = ({ member, index, onSelect, isSelected, isActive, labels }) =
       transition={{ delay: index * 0.1 }}
       whileHover={{ scale: 1.05 }}
       className={`bg-white/5 rounded-2xl p-6 border backdrop-blur-sm cursor-pointer transition-all duration-300 ${
-        isSelected 
-          ? 'border-emerald-400 shadow-2xl bg-emerald-500/20' 
+        isSelected
+          ? "border-emerald-400 shadow-2xl bg-emerald-500/20"
           : isActive
-          ? 'border-blue-400 shadow-lg bg-blue-500/10'
-          : 'border-white/10 hover:border-emerald-400/50 hover:shadow-xl'
+          ? "border-blue-400 shadow-lg bg-blue-500/10"
+          : "border-white/10 hover:border-emerald-400/50 hover:shadow-xl"
       }`}
       onClick={() => onSelect(member)}
     >
       <div className="text-center">
         <div className="relative inline-block mb-4">
-          {member.avatar ? (
-            <img 
-              src={member.avatar} 
-              alt={member.name}
+          {safeMember.avatar ? (
+            <img
+              src={safeMember.avatar}
+              alt={safeMember.name || "Member"}
               className="w-20 h-20 rounded-full mx-auto border-2 border-white/20 shadow-lg"
             />
           ) : (
             <div className="w-20 h-20 rounded-full mx-auto border-2 border-white/20 bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">
-              {generateInitials(member.name)}
+              {generateInitials(safeMember.name || "")}
             </div>
           )}
-          <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 border-white/20 shadow-lg ${
-            member.role === 'president' ? 'bg-yellow-500 text-white' : 'bg-emerald-500 text-white'
-          }`}>
-            {member.role === 'president' ? '👑' : '⭐'}
+          <div
+            className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 border-white/20 shadow-lg ${
+              safeMember.role === "president"
+                ? "bg-yellow-500 text-white"
+                : "bg-emerald-500 text-white"
+            }`}
+          >
+            {safeMember.role === "president" ? "👑" : "⭐"}
           </div>
         </div>
-        
-        <h3 className="font-bold text-white text-lg mb-1">{member.name}</h3>
-        <p className="text-emerald-300 font-semibold mb-1">{member.position}</p>
-        <p className="text-blue-200 text-sm mb-3">{member.department}</p>
-        
+
+        <h3 className="font-bold text-white text-lg mb-1">
+          {safeMember.name || "Unknown"}
+        </h3>
+        <p className="text-emerald-300 font-semibold mb-1">
+          {safeMember.position || "Position"}
+        </p>
+        <p className="text-blue-200 text-sm mb-3">
+          {safeMember.department || "Department"}
+        </p>
+
         <div className="flex flex-wrap gap-1 justify-center">
-          {member.tags.slice(0, 2).map((tag, i) => (
-            <span key={i} className="px-2 py-1 bg-white/10 text-blue-100 rounded-full text-xs backdrop-blur-sm">
-              {tag}
-            </span>
-          ))}
-          {member.tags.length > 2 && (
+          {Array.isArray(safeMember.tags) &&
+            safeMember.tags.slice(0, 2).map((tag, i) => (
+              <span
+                key={i}
+                className="px-2 py-1 bg-white/10 text-blue-100 rounded-full text-xs backdrop-blur-sm"
+              >
+                {tag}
+              </span>
+            ))}
+          {member.tags && member.tags.length > 2 && (
             <span className="px-2 py-1 bg-white/10 text-blue-100 rounded-full text-xs backdrop-blur-sm">
               +{member.tags.length - 2}
             </span>
@@ -410,19 +610,26 @@ const InitiativeCard = ({ initiative, index, labels }) => {
             <p className="text-blue-200">{initiative.description}</p>
           </div>
         </div>
-        <motion.button 
+        <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsExpanded(!isExpanded)}
           className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/10 text-blue-200 flex items-center justify-center hover:bg-white/20 transition-colors backdrop-blur-sm"
         >
-          <svg 
-            className={`w-4 h-4 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className={`w-4 h-4 transform transition-transform ${
+              isExpanded ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </motion.button>
       </div>
@@ -430,11 +637,15 @@ const InitiativeCard = ({ initiative, index, labels }) => {
       {/* Progress Bar */}
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-blue-200">{initiative.progressText}</span>
-          <span className="text-sm font-medium text-emerald-400">{initiative.progress}%</span>
+          <span className="text-sm text-blue-200">
+            {initiative.progressText}
+          </span>
+          <span className="text-sm font-medium text-emerald-400">
+            {initiative.progress}%
+          </span>
         </div>
         <div className="w-full bg-white/10 rounded-full h-2 backdrop-blur-sm">
-          <motion.div 
+          <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${initiative.progress}%` }}
             transition={{ duration: 1, delay: 0.5 }}
@@ -447,34 +658,44 @@ const InitiativeCard = ({ initiative, index, labels }) => {
         {isExpanded && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="mt-4 pt-4 border-t border-white/10 space-y-4"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h4 className="font-semibold text-white mb-2">{labels.initiatives.tasks}</h4>
+                <h4 className="font-semibold text-white mb-2">
+                  {labels.initiatives.tasks}
+                </h4>
                 <ul className="space-y-1 text-sm text-blue-200">
-                  {initiative.tasks.map((task, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <span className="text-emerald-400">•</span>
-                      {task}
-                    </li>
-                  ))}
+                  {initiative.tasks &&
+                    initiative.tasks.map((task, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <span className="text-emerald-400">•</span>
+                        {task}
+                      </li>
+                    ))}
                 </ul>
               </div>
-              <div>
-                <h4 className="font-semibold text-white mb-2">{labels.initiatives.participants}</h4>
-                <div className="flex flex-wrap gap-2">
-                  {initiative.participants.map((participant, i) => (
-                    <span key={i} className="px-2 py-1 bg-white/10 text-blue-200 rounded text-xs backdrop-blur-sm">
-                      {participant}
-                    </span>
-                  ))}
+              {initiative.participants && (
+                <div>
+                  <h4 className="font-semibold text-white mb-2">
+                    {labels.initiatives.participants}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {initiative.participants.map((participant, i) => (
+                      <span
+                        key={i}
+                        className="px-2 py-1 bg-white/10 text-blue-200 rounded text-xs backdrop-blur-sm"
+                      >
+                        {participant}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 text-sm font-semibold"
@@ -519,12 +740,14 @@ const EventCard = ({ event, index, labels }) => {
               </span>
               <span className="flex items-center gap-2">
                 <span>👥</span>
-                <span>{event.participantsCount} {labels.events.participants}</span>
+                <span>
+                  {event.participantsCount} {labels.events.participants}
+                </span>
               </span>
             </div>
           </div>
         </div>
-        <motion.button 
+        <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 text-sm font-semibold whitespace-nowrap flex-shrink-0"
@@ -537,6 +760,35 @@ const EventCard = ({ event, index, labels }) => {
 };
 
 const MemberModal = ({ member, onClose, labels }) => {
+  // Add default values to prevent undefined access
+  const safeLabels = labels || {
+    modal: {
+      information: "Information",
+      faculty: "Faculty",
+      course: "Course",
+      role: "Role",
+      contacts: "Contacts",
+      telegram: "Telegram",
+      responsibilities: "Responsibilities",
+      achievements: "Achievements",
+      close: "Close",
+    },
+  };
+
+  // Create safe member object with default values to prevent undefined access
+  const safeMember = member || {
+    name: "Unknown",
+    position: "Position",
+    department: "Department",
+    course: "",
+    roleLabel: "",
+    email: "",
+    phone: "",
+    telegram: "",
+    responsibilities: [],
+    achievements: [],
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -557,30 +809,45 @@ const MemberModal = ({ member, onClose, labels }) => {
           <div className="bg-gradient-to-r from-blue-500 to-emerald-500 p-6 text-white rounded-t-3xl">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-4">
-                {member.avatar ? (
-                  <img 
-                    src={member.avatar} 
-                    alt={member.name}
+                {safeMember.avatar ? (
+                  <img
+                    src={safeMember.avatar}
+                    alt={safeMember.name}
                     className="w-16 h-16 rounded-2xl border-2 border-white/20 shadow-lg"
                   />
                 ) : (
                   <div className="w-16 h-16 rounded-2xl border-2 border-white/20 bg-gradient-to-r from-blue-600 to-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                    {member.name.split(' ').map(w => w[0]).join('')}
+                    {safeMember.name
+                      ? safeMember.name
+                          .split(" ")
+                          .map((w) => w?.[0] || "")
+                          .join("")
+                      : "?"}
                   </div>
                 )}
                 <div>
-                  <h3 className="text-2xl font-bold">{member.name}</h3>
-                  <p className="text-blue-100">{member.position}</p>
+                  <h3 className="text-2xl font-bold">{safeMember.name}</h3>
+                  <p className="text-blue-100">{safeMember.position}</p>
                 </div>
               </div>
-              <motion.button 
+              <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={onClose}
                 className="text-white hover:text-gray-200 text-2xl bg-white/20 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </motion.button>
             </div>
@@ -592,20 +859,32 @@ const MemberModal = ({ member, onClose, labels }) => {
               <div>
                 <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
                   <span>📋</span>
-                  <span>{labels.modal.information}</span>
+                  <span>{safeLabels.modal.information}</span>
                 </h4>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-blue-200">{labels.modal.faculty}:</span>
-                    <span className="font-medium text-white">{member.department}</span>
+                    <span className="text-blue-200">
+                      {safeLabels.modal.faculty}:
+                    </span>
+                    <span className="font-medium text-white">
+                      {safeMember.department}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-blue-200">{labels.modal.course}:</span>
-                    <span className="font-medium text-white">{member.course}</span>
+                    <span className="text-blue-200">
+                      {safeLabels.modal.course}:
+                    </span>
+                    <span className="font-medium text-white">
+                      {safeMember.course}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-blue-200">{labels.modal.role}:</span>
-                    <span className="font-medium text-emerald-400">{member.roleLabel}</span>
+                    <span className="text-blue-200">
+                      {safeLabels.modal.role}:
+                    </span>
+                    <span className="font-medium text-emerald-400">
+                      {safeMember.roleLabel}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -613,26 +892,37 @@ const MemberModal = ({ member, onClose, labels }) => {
               <div>
                 <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
                   <span>📞</span>
-                  <span>{labels.modal.contacts}</span>
+                  <span>{safeLabels.modal.contacts}</span>
                 </h4>
                 <div className="space-y-3">
                   <div className="flex items-center text-blue-200">
                     <span className="w-6">📧</span>
-                    <a href={`mailto:${member.email}`} className="hover:text-emerald-400 transition-colors">
-                      {member.email}
+                    <a
+                      href={`mailto:${safeMember.email}`}
+                      className="hover:text-emerald-400 transition-colors"
+                    >
+                      {safeMember.email}
                     </a>
                   </div>
                   <div className="flex items-center text-blue-200">
                     <span className="w-6">📱</span>
-                    <a href={`tel:${member.phone}`} className="hover:text-emerald-400 transition-colors">
-                      {member.phone}
+                    <a
+                      href={`tel:${safeMember.phone}`}
+                      className="hover:text-emerald-400 transition-colors"
+                    >
+                      {safeMember.phone}
                     </a>
                   </div>
-                  {member.telegram && (
+                  {safeMember.telegram && (
                     <div className="flex items-center text-blue-200">
                       <span className="w-6">📢</span>
-                      <a href={member.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">
-                        {labels.modal.telegram}
+                      <a
+                        href={safeMember.telegram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-emerald-400 transition-colors"
+                      >
+                        {safeLabels.modal.telegram}
                       </a>
                     </div>
                   )}
@@ -643,30 +933,48 @@ const MemberModal = ({ member, onClose, labels }) => {
             <div>
               <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
                 <span>🎯</span>
-                <span>{labels.modal.responsibilities}</span>
+                <span>{safeLabels.modal.responsibilities}</span>
               </h4>
               <ul className="space-y-2">
-                {member.responsibilities.map((resp, index) => (
-                  <li key={index} className="flex items-start text-blue-200">
-                    <span className="text-emerald-400 mr-2 mt-1">•</span>
-                    {resp}
-                  </li>
-                ))}
+                {Array.isArray(safeMember.responsibilities) &&
+                  safeMember.responsibilities.map((resp, index) => (
+                    <li key={index} className="flex items-start text-blue-200">
+                      <span className="text-emerald-400 mr-2 mt-1">•</span>
+                      {resp}
+                    </li>
+                  ))}
               </ul>
             </div>
 
-            <div>
-              <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
-                <span>🏆</span>
-                <span>{labels.modal.achievements}</span>
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {member.achievements.map((achievement, index) => (
-                  <span key={index} className="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm backdrop-blur-sm border border-emerald-500/30">
-                    {achievement}
-                  </span>
-                ))}
-              </div>
+            {Array.isArray(safeMember.achievements) &&
+              safeMember.achievements.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
+                    <span>🏆</span>
+                    <span>{safeLabels.modal.achievements}</span>
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {safeMember.achievements.map((achievement, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm backdrop-blur-sm border border-emerald-500/30"
+                      >
+                        {achievement}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            <div className="pt-4 flex justify-end">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onClose}
+                className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 font-semibold"
+              >
+                {safeLabels.modal.close}
+              </motion.button>
             </div>
           </div>
         </div>
