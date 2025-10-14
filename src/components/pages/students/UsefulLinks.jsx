@@ -7,6 +7,7 @@ const UsefulLinks = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   
   const data = t('students.links', { returnObjects: true });
+  const common = t('students.links.common', { returnObjects: true });
 
   const categories = ['all', ...new Set(data.resources.map(resource => resource.category))];
 
@@ -36,7 +37,7 @@ const UsefulLinks = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Поиск ресурсов, сервисов и ссылок..."
+                placeholder={common.search.placeholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
@@ -50,7 +51,7 @@ const UsefulLinks = () => {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
           >
-            <option value="all">Все категории</option>
+            <option value="all">{common.categories.all}</option>
             {categories.filter(cat => cat !== 'all').map(category => (
               <option key={category} value={category}>
                 {data.categories[category]}
@@ -66,7 +67,7 @@ const UsefulLinks = () => {
           <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mr-2">
             🔥
           </div>
-          Популярные ресурсы
+          {common.sections.popular}
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {data.popularResources.map((resource, index) => (
@@ -98,8 +99,8 @@ const UsefulLinks = () => {
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 text-2xl mx-auto mb-3">
             🔍
           </div>
-          <h3 className="text-lg font-semibold text-gray-600 mb-1">Ресурсы не найдены</h3>
-          <p className="text-gray-500 text-sm">Попробуйте изменить параметры поиска</p>
+          <h3 className="text-lg font-semibold text-gray-600 mb-1">{common.noResults.title}</h3>
+          <p className="text-gray-500 text-sm">{common.noResults.description}</p>
         </div>
       )}
 
@@ -109,7 +110,7 @@ const UsefulLinks = () => {
           <div className="w-6 h-6 bg-blue-700 rounded-lg flex items-center justify-center text-white mr-2">
             ⚡
           </div>
-          Быстрый доступ
+          {common.sections.quickAccess}
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {data.quickAccess.map((access, index) => (
@@ -129,7 +130,9 @@ const UsefulLinks = () => {
 };
 
 const ResourceCard = ({ resource, index }) => {
+  const { t } = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
+  const common = t('students.links.common', { returnObjects: true });
 
   return (
     <a
@@ -183,7 +186,7 @@ const ResourceCard = ({ resource, index }) => {
                   ? 'bg-green-100 text-green-700'
                   : 'bg-blue-100 text-blue-700'
               }`}>
-                {resource.access === 'free' ? 'Бесплатно' : 'По логину'}
+                {resource.access === 'free' ? common.access.free : common.access.login}
               </span>
             )}
           </div>
@@ -211,13 +214,13 @@ const ResourceCard = ({ resource, index }) => {
         }`}>
           {resource.lastUpdated && (
             <div className="flex justify-between">
-              <span>Обновлено:</span>
+              <span>{common.resource.lastUpdated}</span>
               <span className="font-medium">{resource.lastUpdated}</span>
             </div>
           )}
           {resource.features && (
             <div className="flex justify-between">
-              <span>Особенности:</span>
+              <span>{common.resource.features}</span>
               <span className="font-medium text-blue-600 text-xs">{resource.features.join(', ')}</span>
             </div>
           )}

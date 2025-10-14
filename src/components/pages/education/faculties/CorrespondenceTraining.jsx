@@ -11,24 +11,22 @@ const CorrespondenceTraining = () => {
   const sectionRef = useRef(null);
 
   const faculty = t('correspondenceTraining', { returnObjects: true });
-
-  const tabs = [
-    { id: 'about', label: t('education.tabs.about', 'О факультете'), icon: '🌐' },
-    { id: 'programs', label: t('education.tabs.programs', 'Программы'), icon: '📱' },
-    { id: 'technology', label: t('correspondenceTraining.tabs.technology', 'Технологии'), icon: '💻' },
-    { id: 'process', label: t('correspondenceTraining.tabs.process', 'Процесс обучения'), icon: '🔄' },
-    { id: 'contacts', label: t('education.tabs.contacts', 'Контакты'), icon: '📞' }
-  ];
+  const tabs = t('correspondenceTraining.tabs', { returnObjects: true });
+  const features = t('correspondenceTraining.features', { returnObjects: true });
+  const programs = t('correspondenceTraining.programs', { returnObjects: true });
+  const technologies = t('correspondenceTraining.technologies', { returnObjects: true });
+  const platforms = t('correspondenceTraining.platforms', { returnObjects: true });
+  const learningProcess = t('correspondenceTraining.learningProcess', { returnObjects: true });
 
   // Автопереключение программ
   useEffect(() => {
     const interval = setInterval(() => {
       if (activeTab === 'programs') {
-        setActiveProgram((prev) => (prev + 1) % faculty.programs.length);
+        setActiveProgram((prev) => (prev + 1) % programs.length);
       }
     }, 4000);
     return () => clearInterval(interval);
-  }, [activeTab, faculty.programs?.length]);
+  }, [activeTab, programs.length]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -93,7 +91,7 @@ const CorrespondenceTraining = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 lg:mb-16"
         >
-          {faculty.features.map((feature, index) => (
+          {features.map((feature, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -159,7 +157,7 @@ const CorrespondenceTraining = () => {
                         <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mr-4">
                           🎯
                         </div>
-                        Миссия факультета
+                        {t('correspondenceTraining.about.missionTitle')}
                       </h3>
                       <p className="text-blue-100 text-lg leading-relaxed mb-6">
                         {faculty.about.mission}
@@ -169,7 +167,7 @@ const CorrespondenceTraining = () => {
                           <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-400 mr-3">
                             ✨
                           </div>
-                          Преимущества
+                          {t('correspondenceTraining.about.advantagesTitle')}
                         </h4>
                         <ul className="space-y-3">
                           {faculty.about.advantages.map((advantage, index) => (
@@ -192,7 +190,7 @@ const CorrespondenceTraining = () => {
                         <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 mr-3">
                           📊
                         </div>
-                        Статистика
+                        {t('correspondenceTraining.about.statsTitle')}
                       </h4>
                       <div className="space-y-4">
                         {faculty?.stats?.map((stat, index) => (
@@ -225,7 +223,7 @@ const CorrespondenceTraining = () => {
                 >
                   {/* Program Cards */}
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {faculty.programs.map((program, index) => (
+                    {programs.map((program, index) => (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -246,11 +244,11 @@ const CorrespondenceTraining = () => {
                         <p className="text-blue-100 text-sm mb-4 leading-relaxed">{program.description}</p>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-blue-200">Длительность:</span>
+                            <span className="text-blue-200">{t('correspondenceTraining.programDetails.duration')}:</span>
                             <span className="text-white font-medium">{program.duration}</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-blue-200">Стоимость:</span>
+                            <span className="text-blue-200">{t('correspondenceTraining.programDetails.cost')}:</span>
                             <span className="text-emerald-400 font-medium">{program.cost}</span>
                           </div>
                         </div>
@@ -260,7 +258,7 @@ const CorrespondenceTraining = () => {
 
                   {/* Active Program Details */}
                   <AnimatePresence mode="wait">
-                    {faculty.programs[activeProgram] && (
+                    {programs[activeProgram] && (
                       <motion.div
                         key={activeProgram}
                         initial={{ opacity: 0, y: 20 }}
@@ -272,39 +270,39 @@ const CorrespondenceTraining = () => {
                         <div className="grid lg:grid-cols-2 gap-8 items-center">
                           <div>
                             <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-                              {faculty.programs[activeProgram].name}
+                              {programs[activeProgram].name}
                             </h3>
                             <p className="text-blue-100 text-lg leading-relaxed mb-6">
-                              {faculty.programs[activeProgram].fullDescription || faculty.programs[activeProgram].description}
+                              {programs[activeProgram].fullDescription || programs[activeProgram].description}
                             </p>
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               className="bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg"
                             >
-                              Подать заявку
+                              {t('correspondenceTraining.buttons.apply')}
                             </motion.button>
                           </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
                               <div className="text-2xl text-emerald-400 mb-2">⏱️</div>
-                              <div className="text-white font-bold">{faculty.programs[activeProgram].duration}</div>
-                              <div className="text-blue-200 text-sm">Длительность</div>
+                              <div className="text-white font-bold">{programs[activeProgram].duration}</div>
+                              <div className="text-blue-200 text-sm">{t('correspondenceTraining.programDetails.duration')}</div>
                             </div>
                             <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
                               <div className="text-2xl text-blue-400 mb-2">💰</div>
-                              <div className="text-white font-bold">{faculty.programs[activeProgram].cost}</div>
-                              <div className="text-blue-200 text-sm">Стоимость</div>
+                              <div className="text-white font-bold">{programs[activeProgram].cost}</div>
+                              <div className="text-blue-200 text-sm">{t('correspondenceTraining.programDetails.cost')}</div>
                             </div>
                             <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
                               <div className="text-2xl text-cyan-400 mb-2">🎓</div>
-                              <div className="text-white font-bold">{faculty.programs[activeProgram].level || 'Бакалавр'}</div>
-                              <div className="text-blue-200 text-sm">Уровень</div>
+                              <div className="text-white font-bold">{programs[activeProgram].level || t('correspondenceTraining.programDetails.defaultLevel')}</div>
+                              <div className="text-blue-200 text-sm">{t('correspondenceTraining.programDetails.level')}</div>
                             </div>
                             <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
                               <div className="text-2xl text-purple-400 mb-2">📚</div>
-                              <div className="text-white font-bold">Online</div>
-                              <div className="text-blue-200 text-sm">Формат</div>
+                              <div className="text-white font-bold">{t('correspondenceTraining.programDetails.defaultFormat')}</div>
+                              <div className="text-blue-200 text-sm">{t('correspondenceTraining.programDetails.format')}</div>
                             </div>
                           </div>
                         </div>
@@ -330,10 +328,10 @@ const CorrespondenceTraining = () => {
                         <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mr-4">
                           🛠️
                         </div>
-                        Технологии обучения
+                        {t('correspondenceTraining.technology.title')}
                       </h3>
                       <div className="space-y-4">
-                        {faculty.technologies.map((tech, index) => (
+                        {technologies.map((tech, index) => (
                           <motion.div
                             key={index}
                             initial={{ opacity: 0, x: -20 }}
@@ -358,10 +356,10 @@ const CorrespondenceTraining = () => {
                         <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 mr-4">
                           📱
                         </div>
-                        Платформы
+                        {t('correspondenceTraining.platformss.title')}
                       </h3>
                       <div className="grid gap-4">
-                        {faculty.platforms.map((platform, index) => (
+                        {platforms.map((platform, index) => (
                           <motion.div
                             key={index}
                             initial={{ opacity: 0, x: 20 }}
@@ -379,7 +377,7 @@ const CorrespondenceTraining = () => {
                               whileHover={{ scale: 1.1 }}
                               className="text-emerald-400 hover:text-emerald-300 transition-colors text-sm font-medium bg-emerald-500/20 px-4 py-2 rounded-lg backdrop-blur-sm"
                             >
-                              Перейти →
+                              {t('correspondenceTraining.buttons.goTo')}
                             </motion.a>
                           </motion.div>
                         ))}
@@ -403,11 +401,11 @@ const CorrespondenceTraining = () => {
                     <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mr-4">
                       🔄
                     </div>
-                    Процесс обучения
+                    {t('correspondenceTraining.learningProcesss.title')}
                   </h3>
                   
                   <div className="space-y-6">
-                    {faculty.learningProcess.map((step, index) => (
+                    {learningProcess.map((step, index) => (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, y: 20 }}
@@ -484,7 +482,7 @@ const CorrespondenceTraining = () => {
                       <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mr-4">
                         📞
                       </div>
-                      Контактная информация
+                      {t('correspondenceTraining.contacts.title')}
                     </h3>
                     <div className="space-y-4">
                       {Object.entries(faculty.contacts).map(([key, value], index) => (
@@ -514,7 +512,7 @@ const CorrespondenceTraining = () => {
                       <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 mr-4">
                         👨‍💼
                       </div>
-                      Руководство
+                      {t('correspondenceTraining.leadership.title')}
                     </h3>
                     <div className="text-center">
                       <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg">

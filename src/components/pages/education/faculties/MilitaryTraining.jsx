@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MilitaryTraining = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('about');
   const [selectedProgram, setSelectedProgram] = useState(0);
   const [expandedSpecialty, setExpandedSpecialty] = useState(null);
@@ -98,10 +98,10 @@ const MilitaryTraining = () => {
           className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 lg:mb-16"
         >
           {(faculty.stats || [
-            { value: '500+', label: 'Курсантов', icon: '🎖️' },
-            { value: '15+', label: 'Программ', icon: '⚔️' },
-            { value: '25', label: 'Преподавателей', icon: '🏅' },
-            { value: '10', label: 'Специальностей', icon: '🎯' }
+            { value: '500+', label: t('militaryTraining.stats.cadets', 'Курсантов'), icon: '🎖️' },
+            { value: '15+', label: t('militaryTraining.stats.programs', 'Программ'), icon: '⚔️' },
+            { value: '25', label: t('militaryTraining.stats.teachers', 'Преподавателей'), icon: '🏅' },
+            { value: '10', label: t('militaryTraining.stats.specialties', 'Специальностей'), icon: '🎯' }
           ]).map((stat, index) => (
             <motion.div
               key={index}
@@ -167,18 +167,22 @@ const MilitaryTraining = () => {
                 >
                   <div className="grid lg:grid-cols-2 gap-8">
                     <div className="space-y-6">
-                      <h3 className="text-2xl font-bold text-white">Военная подготовка</h3>
+                      <h3 className="text-2xl font-bold text-white">
+                        {t('militaryTraining.about.title', 'Военная подготовка')}
+                      </h3>
                       <p className="text-blue-100 text-lg leading-relaxed">
-                        {faculty.about?.description || 'Профессиональная военная подготовка, сочетающая теоретические знания с практическими навыками для подготовки квалифицированных офицеров.'}
+                        {faculty.about?.description || t('militaryTraining.about.description', 'Профессиональная военная подготовка, сочетающая теоретические знания с практическими навыками для подготовки квалифицированных офицеров.')}
                       </p>
                       <div className="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl p-6 border border-white/10">
-                        <h4 className="text-xl font-bold text-white mb-4">Особенности подготовки</h4>
+                        <h4 className="text-xl font-bold text-white mb-4">
+                          {t('militaryTraining.about.featuresTitle', 'Особенности подготовки')}
+                        </h4>
                         <ul className="space-y-3">
                           {(faculty.about?.features || [
-                            'Современные методы обучения',
-                            'Практические тренировки',
-                            'Профессиональные преподаватели',
-                            'Современное оборудование'
+                            t('militaryTraining.about.features.0', 'Современные методы обучения'),
+                            t('militaryTraining.about.features.1', 'Практические тренировки'),
+                            t('militaryTraining.about.features.2', 'Профессиональные преподаватели'),
+                            t('militaryTraining.about.features.3', 'Современное оборудование')
                           ]).map((feature, index) => (
                             <motion.li 
                               key={index} 
@@ -194,12 +198,23 @@ const MilitaryTraining = () => {
                     </div>
                     <div className="space-y-6">
                       <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-white/10">
-                        <h4 className="text-xl font-bold text-white mb-4">Воинские звания</h4>
+                        <h4 className="text-xl font-bold text-white mb-4">
+                          {t('militaryTraining.ranks.title', 'Воинские звания')}
+                        </h4>
                         <div className="space-y-3">
                           {(faculty.ranks || [
-                            { name: 'Курсант', category: 'Начальная подготовка' },
-                            { name: 'Младший лейтенант', category: 'Выпускное звание' },
-                            { name: 'Лейтенант', category: 'Первое офицерское' }
+                            { 
+                              name: t('militaryTraining.ranks.cadet', 'Курсант'), 
+                              category: t('militaryTraining.ranks.cadetCategory', 'Начальная подготовка') 
+                            },
+                            { 
+                              name: t('militaryTraining.ranks.juniorLieutenant', 'Младший лейтенант'), 
+                              category: t('militaryTraining.ranks.juniorLieutenantCategory', 'Выпускное звание') 
+                            },
+                            { 
+                              name: t('militaryTraining.ranks.lieutenant', 'Лейтенант'), 
+                              category: t('militaryTraining.ranks.lieutenantCategory', 'Первое офицерское') 
+                            }
                           ]).map((rank, index) => (
                             <motion.div 
                               key={index} 
@@ -268,24 +283,26 @@ const MilitaryTraining = () => {
                               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center text-white mr-3">
                                 ⏱️
                               </div>
-                              Длительность: {faculty.programs[selectedProgram].duration}
+                              {t('militaryTraining.programs.duration', 'Длительность')}: {faculty.programs[selectedProgram].duration}
                             </div>
                             <div className="flex items-center text-blue-100">
                               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center text-white mr-3">
                                 🎓
                               </div>
-                              Форма: {faculty.programs[selectedProgram].format}
+                              {t('militaryTraining.programs.format', 'Форма')}: {faculty.programs[selectedProgram].format}
                             </div>
                             <div className="flex items-center text-blue-100">
                               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center text-white mr-3">
                                 ⚔️
                               </div>
-                              Специализация: {faculty.programs[selectedProgram].specialization}
+                              {t('militaryTraining.programs.specialization', 'Специализация')}: {faculty.programs[selectedProgram].specialization}
                             </div>
                           </div>
                         </div>
                         <div>
-                          <h4 className="text-xl font-bold text-white mb-4">Дисциплины</h4>
+                          <h4 className="text-xl font-bold text-white mb-4">
+                            {t('militaryTraining.programs.subjects', 'Дисциплины')}
+                          </h4>
                           <div className="grid gap-3">
                             {faculty.programs[selectedProgram].subjects.map((subject, index) => (
                               <motion.div 
@@ -359,7 +376,9 @@ const MilitaryTraining = () => {
                                   {specialty.description}
                                 </p>
                                 <div>
-                                  <h5 className="font-semibold text-white mb-3">Ключевые навыки:</h5>
+                                  <h5 className="font-semibold text-white mb-3">
+                                    {t('militaryTraining.specialties.skills', 'Ключевые навыки')}:
+                                  </h5>
                                   <div className="flex flex-wrap gap-2">
                                     {specialty.skills.map((skill, i) => (
                                       <span key={i} className="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-sm font-medium backdrop-blur-sm">
@@ -390,7 +409,9 @@ const MilitaryTraining = () => {
                 >
                   <div className="grid md:grid-cols-2 gap-8">
                     <div>
-                      <h3 className="text-2xl font-bold text-white mb-6">Учебные объекты</h3>
+                      <h3 className="text-2xl font-bold text-white mb-6">
+                        {t('militaryTraining.facilities.title', 'Учебные объекты')}
+                      </h3>
                       <div className="space-y-4">
                         {(faculty.facilities || []).map((facility, index) => (
                           <motion.div 
@@ -414,7 +435,9 @@ const MilitaryTraining = () => {
                       </div>
                     </div>
                     <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-white/10">
-                      <h3 className="text-2xl font-bold text-white mb-6">Тренировочные программы</h3>
+                      <h3 className="text-2xl font-bold text-white mb-6">
+                        {t('militaryTraining.trainingPrograms.title', 'Тренировочные программы')}
+                      </h3>
                       <div className="space-y-4">
                         {(faculty.trainingPrograms || []).map((program, index) => (
                           <motion.div 
@@ -529,13 +552,15 @@ const MilitaryTraining = () => {
                   className="grid md:grid-cols-2 gap-8"
                 >
                   <div className="space-y-6">
-                    <h3 className="text-2xl font-bold text-white">Контакты</h3>
+                    <h3 className="text-2xl font-bold text-white">
+                      {t('militaryTraining.contacts.title', 'Контакты')}
+                    </h3>
                     <div className="space-y-4">
                       {Object.entries(faculty.contacts || {
-                        phone: '+7 (999) 123-45-67',
-                        email: 'military@academy.edu',
-                        address: 'ул. Военная, 123',
-                        workingHours: 'Пн-Пт: 9:00-18:00'
+                        phone: t('militaryTraining.contacts.phone', '+7 (999) 123-45-67'),
+                        email: t('militaryTraining.contacts.email', 'military@academy.edu'),
+                        address: t('militaryTraining.contacts.address', 'ул. Военная, 123'),
+                        workingHours: t('militaryTraining.contacts.workingHours', 'Пн-Пт: 9:00-18:00')
                       }).map(([key, value], index) => (
                         <motion.div 
                           key={key}
@@ -559,16 +584,18 @@ const MilitaryTraining = () => {
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl p-6 border border-white/10">
-                    <h3 className="text-2xl font-bold text-white mb-4">Начальник факультета</h3>
+                    <h3 className="text-2xl font-bold text-white mb-4">
+                      {t('militaryTraining.dean.title', 'Начальник факультета')}
+                    </h3>
                     <div className="text-center">
                       <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
                         {(faculty.dean?.avatar || '👨‍✈️')}
                       </div>
-                      <h4 className="text-xl font-bold text-white mb-2">{faculty.dean?.name || 'Иванов А.С.'}</h4>
-                      <p className="text-emerald-400 mb-2 font-medium">{faculty.dean?.rank || 'Полковник'}</p>
-                      <p className="text-blue-200 text-sm mb-2">{faculty.dean?.position || 'Начальник факультета'}</p>
-                      <p className="text-blue-100 text-sm mb-3">{faculty.dean?.education || 'Высшее военное образование'}</p>
-                      <p className="text-white">{faculty.dean?.email || 'dean@academy.edu'}</p>
+                      <h4 className="text-xl font-bold text-white mb-2">{faculty.dean?.name || t('militaryTraining.dean.name', 'Иванов А.С.')}</h4>
+                      <p className="text-emerald-400 mb-2 font-medium">{faculty.dean?.rank || t('militaryTraining.dean.rank', 'Полковник')}</p>
+                      <p className="text-blue-200 text-sm mb-2">{faculty.dean?.position || t('militaryTraining.dean.position', 'Начальник факультета')}</p>
+                      <p className="text-blue-100 text-sm mb-3">{faculty.dean?.education || t('militaryTraining.dean.education', 'Высшее военное образование')}</p>
+                      <p className="text-white">{faculty.dean?.email || t('militaryTraining.dean.email', 'dean@academy.edu')}</p>
                     </div>
                   </div>
                 </motion.div>

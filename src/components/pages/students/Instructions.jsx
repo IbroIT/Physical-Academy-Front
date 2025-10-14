@@ -1,21 +1,52 @@
-import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Instructions = () => {
   const { t } = useTranslation();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [isVisible, setIsVisible] = useState(false);
   const [activeUpdate, setActiveUpdate] = useState(0);
   const sectionRef = useRef(null);
 
-  const data = t('students.instructions', { returnObjects: true });
-  const categories = ['all', ...new Set(data.documents.map(doc => doc.category))];
+  // Initialize empty arrays to prevent undefined errors
+  const translatedData =
+    t("students.instructions", { returnObjects: true }) || {};
+
+  // Safe access to data with default empty arrays
+  const data = {
+    title: translatedData.title || "Instructions",
+    subtitle: translatedData.subtitle || "Academic documents and instructions",
+    documents: Array.isArray(translatedData.documents)
+      ? translatedData.documents
+      : [],
+    importantUpdates: Array.isArray(translatedData.importantUpdates)
+      ? translatedData.importantUpdates
+      : [],
+    categories: translatedData.categories || [],
+  };
+
+  // Extract unique categories safely
+  const categories = ["all"];
+  if (Array.isArray(data.documents)) {
+    const uniqueCategories = [
+      ...new Set(
+        data.documents
+          .filter((doc) => doc && typeof doc === "object" && doc.category)
+          .map((doc) => doc.category)
+      ),
+    ];
+    categories.push(...uniqueCategories);
+  }
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
+      ([entry]) => {
+        if (entry) {
+          setIsVisible(entry.isIntersecting);
+        }
+      },
       { threshold: 0.1 }
     );
 
@@ -28,21 +59,40 @@ const Instructions = () => {
 
   // Автопереключение важных обновлений
   useEffect(() => {
+    // Only set interval if updates exist
+    if (
+      !Array.isArray(data.importantUpdates) ||
+      data.importantUpdates.length === 0
+    ) {
+      return;
+    }
+
     const interval = setInterval(() => {
       setActiveUpdate((prev) => (prev + 1) % data.importantUpdates.length);
     }, 4000);
-    return () => clearInterval(interval);
-  }, [data.importantUpdates.length]);
 
-  const filteredDocuments = data.documents.filter(doc => {
-    const matchesCategory = selectedCategory === 'all' || doc.category === selectedCategory;
-    const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         doc.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+    return () => clearInterval(interval);
+  }, [data.importantUpdates]);
+
+  // Filter documents safely
+  const filteredDocuments = Array.isArray(data.documents)
+    ? data.documents.filter((doc) => {
+        if (!doc || typeof doc !== "object") return false;
+
+        const matchesCategory =
+          selectedCategory === "all" || doc.category === selectedCategory;
+        const matchesSearch =
+          (doc.name &&
+            doc.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (doc.description &&
+            doc.description.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        return matchesCategory && matchesSearch;
+      })
+    : [];
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-8 lg:py-12 overflow-hidden"
     >
@@ -51,10 +101,12 @@ const Instructions = () => {
         <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
         <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-        
+
         {/* Спортивные символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🏆</div>
-        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">⚽</div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">
+          ⚽
+        </div>
         <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">🏃‍♂️</div>
       </div>
 
@@ -95,26 +147,39 @@ const Instructions = () => {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder={t('students.instructions.searchPlaceholder')}
+                  placeholder={t(
+                    "students.instructions.searchPlaceholder",
+                    "Поиск документов..."
+                  )}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all text-white placeholder-blue-200 backdrop-blur-sm"
                 />
-                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-400 text-lg">🔍</span>
+                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-400 text-lg">
+                  🔍
+                </span>
               </div>
             </div>
-            
+
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all text-white backdrop-blur-sm"
             >
-              <option value="all" className="bg-slate-800">{t('students.instructions.categories.all')}</option>
-              {categories.filter(cat => cat !== 'all').map(category => (
-                <option key={category} value={category} className="bg-slate-800">
-                  {data.categories[category]}
-                </option>
-              ))}
+              <option value="all" className="bg-slate-800">
+                {t("students.instructions.categories.all", "Все категории")}
+              </option>
+              {categories
+                .filter((cat) => cat !== "all")
+                .map((category) => (
+                  <option
+                    key={category}
+                    value={category}
+                    className="bg-slate-800"
+                  >
+                    {data.categories[category]}
+                  </option>
+                ))}
             </select>
           </div>
         </motion.div>
@@ -152,10 +217,13 @@ const Instructions = () => {
               🔍
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
-              {t('students.instructions.noDocuments')}
+              {t("students.instructions.noDocuments", "Документы не найдены")}
             </h3>
             <p className="text-blue-200">
-              {t('students.instructions.tryChangingSearch')}
+              {t(
+                "students.instructions.tryChangingSearch",
+                "Попробуйте изменить параметры поиска"
+              )}
             </p>
           </motion.div>
         )}
@@ -171,9 +239,12 @@ const Instructions = () => {
             <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-white mr-3 shadow-lg">
               🚨
             </div>
-            {t('students.instructions.importantUpdatess')}
+            {t(
+              "students.instructions.importantUpdatesTitle",
+              "Важные обновления"
+            )}
           </h3>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <AnimatePresence mode="wait">
               <motion.div
@@ -207,8 +278,8 @@ const Instructions = () => {
                   onClick={() => setActiveUpdate(index)}
                   className={`p-3 rounded-xl backdrop-blur-sm border text-left transition-all duration-300 ${
                     activeUpdate === index
-                      ? 'bg-emerald-500/20 border-emerald-400/50 shadow-lg'
-                      : 'bg-white/5 border-white/10 hover:bg-white/10'
+                      ? "bg-emerald-500/20 border-emerald-400/50 shadow-lg"
+                      : "bg-white/5 border-white/10 hover:bg-white/10"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -230,27 +301,42 @@ const Instructions = () => {
 };
 
 const DocumentCard = ({ document, index }) => {
+  const { t } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Check if document is valid
+  if (!document || typeof document !== "object") {
+    return null;
+  }
+
   const handleDownload = async () => {
+    if (!document.downloadUrl) return;
+
     setIsDownloading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsDownloading(false);
-    window.open(document.downloadUrl, '_blank');
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      window.open(document.downloadUrl, "_blank");
+    } catch (error) {
+      console.error("Error downloading document:", error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const getFileIcon = (format) => {
+    if (!format) return "📄";
+
     const icons = {
-      'PDF': '📕',
-      'DOC': '📘',
-      'DOCX': '📘',
-      'XLS': '📊',
-      'XLSX': '📊',
-      'PPT': '📽️',
-      'PPTX': '📽️',
-      'ZIP': '📦',
-      'default': '📄'
+      PDF: "📕",
+      DOC: "📘",
+      DOCX: "📘",
+      XLS: "📊",
+      XLSX: "📊",
+      PPT: "📽️",
+      PPTX: "📽️",
+      ZIP: "📦",
+      default: "📄",
     };
     return icons[format] || icons.default;
   };
@@ -266,19 +352,19 @@ const DocumentCard = ({ document, index }) => {
         {/* Заголовок и иконка */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start space-x-3">
-            <motion.div 
+            <motion.div
               animate={{ rotate: isHovered ? [0, -10, 10, 0] : 0 }}
               transition={{ duration: 0.5 }}
               className="text-3xl text-emerald-400 flex-shrink-0"
             >
-              {getFileIcon(document.format)}
+              {getFileIcon(document.format || "")}
             </motion.div>
             <div className="flex-1 min-w-0">
               <h3 className="font-bold text-white text-base lg:text-lg leading-tight group-hover:text-emerald-300 transition-colors line-clamp-2">
-                {document.name}
+                {document.name || "Untitled Document"}
               </h3>
               <span className="inline-block px-2 py-1 bg-emerald-500/20 text-emerald-300 rounded-lg text-xs font-medium mt-2">
-                {document.format}
+                {document.format || "Unknown"}
               </span>
             </div>
           </div>
@@ -286,18 +372,16 @@ const DocumentCard = ({ document, index }) => {
 
         {/* Описание */}
         <p className="text-blue-100 text-sm leading-relaxed mb-4 line-clamp-3 flex-1">
-          {document.description}
+          {document.description || "No description provided"}
         </p>
 
         {/* Мета-информация */}
         <div className="flex items-center justify-between text-xs text-blue-200 mb-4">
           <div className="flex items-center space-x-4">
             <span className="flex items-center">
-              📊 {document.size}
+              📊 {document.size || "N/A"}
             </span>
-            <span className="flex items-center">
-              🔄 v{document.version}
-            </span>
+            <span className="flex items-center">🔄 v{document.version}</span>
           </div>
           <span className="text-xs bg-white/10 text-blue-200 px-2 py-1 rounded-lg">
             {document.category}
@@ -308,20 +392,32 @@ const DocumentCard = ({ document, index }) => {
         <div className="space-y-2 text-xs text-blue-200 mb-4">
           {document.lastUpdated && (
             <div className="flex justify-between">
-              <span>Обновлено:</span>
-              <span className="font-medium text-emerald-300">{document.lastUpdated}</span>
+              <span>
+                {t("students.instructions.document.updated", "Обновлено")}:
+              </span>
+              <span className="font-medium text-emerald-300">
+                {document.lastUpdated}
+              </span>
             </div>
           )}
           {document.pages && (
             <div className="flex justify-between">
-              <span>Страниц:</span>
-              <span className="font-medium text-emerald-300">{document.pages}</span>
+              <span>
+                {t("students.instructions.document.pages", "Страниц")}:
+              </span>
+              <span className="font-medium text-emerald-300">
+                {document.pages}
+              </span>
             </div>
           )}
           {document.downloads && (
             <div className="flex justify-between">
-              <span>Скачиваний:</span>
-              <span className="font-medium text-emerald-300">{document.downloads}</span>
+              <span>
+                {t("students.instructions.document.downloads", "Скачиваний")}:
+              </span>
+              <span className="font-medium text-emerald-300">
+                {document.downloads}
+              </span>
             </div>
           )}
         </div>
@@ -338,16 +434,16 @@ const DocumentCard = ({ document, index }) => {
             {isDownloading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                Загрузка...
+                {t("students.instructions.document.downloading", "Загрузка...")}
               </>
             ) : (
               <>
                 <span className="mr-2">📥</span>
-                Скачать
+                {t("students.instructions.document.download", "Скачать")}
               </>
             )}
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -361,7 +457,10 @@ const DocumentCard = ({ document, index }) => {
         {document.tags && document.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-4">
             {document.tags.map((tag, i) => (
-              <span key={i} className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-xs">
+              <span
+                key={i}
+                className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-xs"
+              >
                 #{tag}
               </span>
             ))}

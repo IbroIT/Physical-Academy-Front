@@ -13,6 +13,8 @@ const ExchangePrograms = () => {
   const sectionRef = useRef(null);
   
   const data = t('students.exchange', { returnObjects: true });
+  const regions = t('students.exchange.filters.regions', { returnObjects: true });
+  const durations = t('students.exchange.filters.durations', { returnObjects: true });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -41,12 +43,7 @@ const ExchangePrograms = () => {
   }, [data.programs]);
 
   const startCounters = () => {
-    const stats = data.stats || [
-      { value: '50+', label: 'Университетов-партнеров' },
-      { value: '30+', label: 'Стран' },
-      { value: '500+', label: 'Студентов в год' },
-      { value: '95%', label: 'Успешных заявок' }
-    ];
+    const stats = data.stats || [];
 
     const targetValues = stats.map(stat => parseInt(stat.value.replace(/\D/g, '')));
     const duration = 2000;
@@ -70,9 +67,6 @@ const ExchangePrograms = () => {
       }
     }, duration / steps);
   };
-
-  const regions = ['all', ...new Set(data.programs?.map(program => program.region))];
-  const durations = ['all', ...new Set(data.programs?.map(program => program.durationType))];
 
   const filteredPrograms = data.programs?.filter(program => {
     const matchesRegion = selectedRegion === 'all' || program.region === selectedRegion;
@@ -133,12 +127,7 @@ const ExchangePrograms = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 lg:mb-16"
         >
-          {(data.stats || [
-            { value: '50+', label: 'Университетов-партнеров', icon: '🏛️' },
-            { value: '30+', label: 'Стран', icon: '🌍' },
-            { value: '500+', label: 'Студентов в год', icon: '👨‍🎓' },
-            { value: '95%', label: 'Успешных заявок', icon: '✅' }
-          ]).map((stat, index) => (
+          {data.stats?.map((stat, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -220,10 +209,10 @@ const ExchangePrograms = () => {
             >
               <div className="text-6xl mb-4 text-blue-300 opacity-60">🔍</div>
               <h3 className="text-2xl font-semibold text-white mb-2">
-                {data.search?.noResults?.title || 'Программы не найдены'}
+                {data.search?.noResults?.title}
               </h3>
               <p className="text-blue-200 text-lg mb-6">
-                {data.search?.noResults?.description || 'Попробуйте изменить параметры фильтрации'}
+                {data.search?.noResults?.description}
               </p>
               <motion.button 
                 whileHover={{ scale: 1.05 }}
@@ -235,7 +224,7 @@ const ExchangePrograms = () => {
                 }}
                 className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-6 py-3 rounded-2xl hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 font-medium shadow-lg"
               >
-                {data.buttons?.reset || 'Сбросить фильтры'}
+                {data.buttons?.reset}
               </motion.button>
             </motion.div>
           )}
@@ -250,14 +239,10 @@ const ExchangePrograms = () => {
         >
           <h3 className="text-2xl font-bold text-white mb-8 text-center flex items-center justify-center gap-3">
             <span className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">📅</span>
-            {data.deadlines?.title || 'Ближайшие дедлайны'}
+            {data.deadlines?.title}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {(data.deadlines?.list || [
-              { date: '15 марта 2024', program: 'Erasmus+ Европа', daysLeft: 'Осталось 45 дней' },
-              { date: '1 апреля 2024', program: 'Азия-Пасифик', daysLeft: 'Осталось 60 дней' },
-              { date: '15 мая 2024', program: 'Северная Америка', daysLeft: 'Осталось 90 дней' }
-            ]).map((deadline, index) => (
+            {data.deadlines?.list?.map((deadline, index) => (
               <motion.div 
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -281,15 +266,18 @@ const ExchangePrograms = () => {
 };
 
 const ProgramCard = ({ program, index, isActive, onActivate }) => {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
+
+  const common = t('students.exchange.common', { returnObjects: true });
 
   const handleApply = async () => {
     setIsApplying(true);
     // Имитация подачи заявки
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsApplying(false);
-    alert(`Заявка на программу "${program.university}" отправлена!`);
+    alert(t('students.exchange.alerts.applicationSent', { university: program.university }));
   };
 
   const getDifficultyColor = (difficulty) => {
@@ -341,8 +329,8 @@ const ProgramCard = ({ program, index, isActive, onActivate }) => {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-emerald-400 mb-1">{program.cost || 'Бесплатно'}</div>
-                <div className="text-blue-300 text-sm">Стоимость</div>
+                <div className="text-2xl font-bold text-emerald-400 mb-1">{program.cost || common.free}</div>
+                <div className="text-blue-300 text-sm">{common.cost}</div>
               </div>
             </div>
 
@@ -351,20 +339,20 @@ const ProgramCard = ({ program, index, isActive, onActivate }) => {
             {/* Быстрая информация */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="text-center bg-white/5 rounded-2xl p-4 border border-white/10">
-                <div className="text-lg font-bold text-white">{program.language || 'Английский'}</div>
-                <div className="text-blue-300 text-sm">Язык</div>
+                <div className="text-lg font-bold text-white">{program.language || common.defaultLanguage}</div>
+                <div className="text-blue-300 text-sm">{common.language}</div>
               </div>
               <div className="text-center bg-white/5 rounded-2xl p-4 border border-white/10">
-                <div className="text-lg font-bold text-white">{program.grantsAvailable || 'Доступны'}</div>
-                <div className="text-blue-300 text-sm">Гранты</div>
+                <div className="text-lg font-bold text-white">{program.grantsAvailable || common.grantsAvailable}</div>
+                <div className="text-blue-300 text-sm">{common.grants}</div>
               </div>
               <div className="text-center bg-white/5 rounded-2xl p-4 border border-white/10">
-                <div className="text-lg font-bold text-white">{program.deadline || 'Скоро'}</div>
-                <div className="text-blue-300 text-sm">Дедлайн</div>
+                <div className="text-lg font-bold text-white">{program.deadline || common.soon}</div>
+                <div className="text-blue-300 text-sm">{common.deadline}</div>
               </div>
               <div className="text-center bg-white/5 rounded-2xl p-4 border border-white/10">
-                <div className="text-lg font-bold text-white">{program.availableSpots || '10'}</div>
-                <div className="text-blue-300 text-sm">Места</div>
+                <div className="text-lg font-bold text-white">{program.availableSpots || common.defaultSpots}</div>
+                <div className="text-blue-300 text-sm">{common.spots}</div>
               </div>
             </div>
           </div>
@@ -388,12 +376,12 @@ const ProgramCard = ({ program, index, isActive, onActivate }) => {
               {isApplying ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                  Отправка...
+                  {common.sending}
                 </>
               ) : (
                 <>
                   <span className="text-xl mr-3">📝</span>
-                  Подать заявку
+                  {common.apply}
                 </>
               )}
             </motion.button>
@@ -408,7 +396,7 @@ const ProgramCard = ({ program, index, isActive, onActivate }) => {
               className="w-full py-4 px-6 bg-white/10 border border-white/10 text-white rounded-2xl hover:border-emerald-400/30 transition-all duration-300 font-medium flex items-center justify-center backdrop-blur-sm"
             >
               <span className="text-xl mr-3">{isExpanded ? '📋' : '🔍'}</span>
-              {isExpanded ? 'Свернуть' : 'Подробнее'}
+              {isExpanded ? common.collapse : common.more}
             </motion.button>
 
             {program.website && (
@@ -422,7 +410,7 @@ const ProgramCard = ({ program, index, isActive, onActivate }) => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <span className="text-xl mr-3">🌐</span>
-                Сайт вуза
+                {common.website}
               </motion.a>
             )}
           </div>
@@ -443,14 +431,10 @@ const ProgramCard = ({ program, index, isActive, onActivate }) => {
                 <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl p-6 border border-blue-400/30 backdrop-blur-sm">
                   <h4 className="font-semibold text-white mb-4 flex items-center gap-3 text-lg">
                     <span className="text-xl">📋</span>
-                    <span>Требования</span>
+                    <span>{common.requirements}</span>
                   </h4>
                   <ul className="space-y-3">
-                    {(program.requirements || [
-                      'Средний балл от 4.0',
-                      'Уровень языка B2',
-                      'Рекомендации преподавателей'
-                    ]).map((req, reqIndex) => (
+                    {(program.requirements || common.defaultRequirements).map((req, reqIndex) => (
                       <li key={reqIndex} className="flex items-start text-blue-200">
                         <span className="text-emerald-400 mr-3 mt-1 text-lg">•</span>
                         {req}
@@ -463,14 +447,10 @@ const ProgramCard = ({ program, index, isActive, onActivate }) => {
                 <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-2xl p-6 border border-emerald-400/30 backdrop-blur-sm">
                   <h4 className="font-semibold text-white mb-4 flex items-center gap-3 text-lg">
                     <span className="text-xl">⭐</span>
-                    <span>Преимущества</span>
+                    <span>{common.benefits}</span>
                   </h4>
                   <ul className="space-y-3">
-                    {(program.benefits || [
-                      'Стипендия покрывает проживание',
-                      'Языковые курсы',
-                      'Культурная программа'
-                    ]).map((benefit, benefitIndex) => (
+                    {(program.benefits || common.defaultBenefits).map((benefit, benefitIndex) => (
                       <li key={benefitIndex} className="flex items-start text-blue-200">
                         <span className="text-emerald-400 mr-3 mt-1 text-lg">✓</span>
                         {benefit}
@@ -485,7 +465,7 @@ const ProgramCard = ({ program, index, isActive, onActivate }) => {
                 <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl p-6 border border-purple-400/30 backdrop-blur-sm">
                   <h4 className="font-semibold text-white mb-4 flex items-center gap-3 text-lg">
                     <span className="text-xl">📚</span>
-                    <span>Доступные курсы</span>
+                    <span>{common.availableCourses}</span>
                   </h4>
                   <div className="flex flex-wrap gap-3">
                     {program.availableCourses.map((course, courseIndex) => (

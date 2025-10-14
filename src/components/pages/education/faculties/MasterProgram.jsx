@@ -367,16 +367,6 @@ const MasterProgram = () => {
                     ))}
                   </div>
                 </div>
-
-                {/* CTA кнопки */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-6">
-                  <button className={`flex-1 bg-gradient-to-r ${selectedProgram.color} hover:${selectedProgram.hoverColor} text-white font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105`}>
-                    {t('master.applyNow')}
-                  </button>
-                  <button className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-xl transition-all duration-300 border border-white/20">
-                    {t('master.requestInfo')}
-                  </button>
-                </div>
               </div>
             </div>
           </div>

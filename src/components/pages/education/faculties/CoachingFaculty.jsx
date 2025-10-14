@@ -11,15 +11,7 @@ const CoachingFaculty = () => {
   const sectionRef = useRef(null);
 
   const faculty = t('coachingFaculty', { returnObjects: true });
-
-  const tabs = [
-    { id: 'about', label: t('education.tabs.about', 'О факультете'), icon: '🏛️' },
-    { id: 'programs', label: t('education.tabs.programs', 'Программы'), icon: '📚' },
-    { id: 'departments', label: t('education.tabs.departments', 'Кафедры'), icon: '🏢' },
-    { id: 'coaches', label: t('coachingFaculty.tabs.coaches', 'Преподаватели'), icon: '👨‍🏫' },
-    { id: 'achievements', label: t('coachingFaculty.tabs.achievements', 'Достижения'), icon: '🏆' },
-    { id: 'contacts', label: t('education.tabs.contacts', 'Контакты'), icon: '📞' }
-  ];
+  const tabs = t('coachingFaculty.tabs', { returnObjects: true });
 
   // Автопереключение программ
   useEffect(() => {
@@ -125,7 +117,7 @@ const CoachingFaculty = () => {
           {/* Tab Navigation */}
           <div className="border-b border-white/20 bg-white/5">
             <div className="flex overflow-x-auto scrollbar-hide px-4">
-              {tabs.map((tab) => (
+              {Array.isArray(tabs) && tabs.map((tab) => (
                 <motion.button
                   key={tab.id}
                   whileHover={{ scale: 1.05 }}
@@ -172,7 +164,7 @@ const CoachingFaculty = () => {
                         <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-400 mr-3">
                           ✨
                         </div>
-                        Особенности
+                        {t('coachingFaculty.about.featuresTitle')}
                       </h4>
                       <ul className="space-y-3">
                         {faculty.about.features.map((feature, index) => (
@@ -197,7 +189,7 @@ const CoachingFaculty = () => {
                       <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mr-4">
                         🎯
                       </div>
-                      Основные специализации
+                      {t('coachingFaculty.about.specializationsTitle')}
                     </h3>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {faculty.specializations.map((spec, index) => (
@@ -275,18 +267,20 @@ const CoachingFaculty = () => {
                                 <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 mr-4">
                                   ⏱️
                                 </div>
-                                Длительность: {faculty.educationPrograms[selectedProgram].duration}
+                                {t('coachingFaculty.programs.duration')}: {faculty.educationPrograms[selectedProgram].duration}
                               </div>
                               <div className="flex items-center text-blue-100">
                                 <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center text-emerald-400 mr-4">
                                   🎓
                                 </div>
-                                Форма: {faculty.educationPrograms[selectedProgram].format}
+                                {t('coachingFaculty.programs.format')}: {faculty.educationPrograms[selectedProgram].format}
                               </div>
                             </div>
                           </div>
                           <div>
-                            <h4 className="text-xl font-bold text-white mb-4">Основные дисциплины</h4>
+                            <h4 className="text-xl font-bold text-white mb-4">
+                              {t('coachingFaculty.programs.subjectsTitle')}
+                            </h4>
                             <div className="grid gap-3">
                               {faculty.educationPrograms[selectedProgram].subjects.map((subject, index) => (
                                 <motion.div
@@ -368,7 +362,10 @@ const CoachingFaculty = () => {
                       
                       <div className="flex items-center justify-between mt-4">
                         <span className="text-emerald-400 text-sm font-medium">
-                          {expandedDepartment === index ? 'Скрыть детали' : 'Подробнее'}
+                          {expandedDepartment === index 
+                            ? t('coachingFaculty.departments.hideDetails') 
+                            : t('coachingFaculty.departments.showDetails')
+                          }
                         </span>
                         <motion.div
                           animate={{ rotate: expandedDepartment === index ? 180 : 0 }}
@@ -439,7 +436,7 @@ const CoachingFaculty = () => {
                         <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mr-4">
                           🏆
                         </div>
-                        Достижения выпускников
+                        {t('coachingFaculty.achievements.graduatesTitle')}
                       </h3>
                       <div className="space-y-6">
                         {faculty.achievements.graduates.map((achievement, index) => (
@@ -466,7 +463,7 @@ const CoachingFaculty = () => {
                         <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 mr-4">
                           ⭐
                         </div>
-                        Спортивные успехи
+                        {t('coachingFaculty.achievements.sportsTitle')}
                       </h3>
                       <div className="space-y-4">
                         {faculty.achievements.sports.map((sport, index) => (
@@ -502,25 +499,23 @@ const CoachingFaculty = () => {
                       <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mr-4">
                         📞
                       </div>
-                      Контакты
+                      {t('coachingFaculty.contacts.title')}
                     </h3>
                     <div className="space-y-4">
-                      {Object.entries(faculty.contacts).map(([key, value], index) => (
+                      {Object.values(faculty.contacts).map((contact, index) => (
                         <motion.div
-                          key={key}
+                          key={index}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
                           className="flex items-center space-x-4 p-4 bg-white/5 rounded-xl border border-white/10 backdrop-blur-sm hover:border-emerald-400/30 transition-all duration-300"
                         >
                           <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center text-white">
-                            {key === 'phone' && '📞'}
-                            {key === 'email' && '📧'}
-                            {key === 'address' && '🏢'}
-                            {key === 'workingHours' && '🕒'}
+                            {contact.icon}
                           </div>
                           <div>
-                            <div className="text-white font-medium text-lg">{value}</div>
+                            <div className="text-white font-medium text-lg">{contact.label}</div>
+                            <div className="text-blue-200">{contact.value}</div>
                           </div>
                         </motion.div>
                       ))}
@@ -531,7 +526,7 @@ const CoachingFaculty = () => {
                       <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 mr-4">
                         👨‍💼
                       </div>
-                      Декан факультета
+                      {t('coachingFaculty.contacts.deanTitle')}
                     </h3>
                     <div className="text-center">
                       <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg">

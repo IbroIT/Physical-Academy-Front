@@ -65,61 +65,61 @@ const BachelorRegistration = () => {
   const steps = [
     { 
       number: 1, 
-      title: t('bachelor.registration.steps.personal.title', 'Личные данные'), 
+      title: t('bachelor.registration.steps.personal.title'), 
       icon: '👤',
-      description: t('bachelor.registration.steps.personal.description', 'Основная информация о абитуриенте'),
+      description: t('bachelor.registration.steps.personal.description'),
       colorClass: 'from-blue-500 to-blue-600'
     },
     { 
       number: 2, 
-      title: t('bachelor.registration.steps.education.title', 'Образование'), 
+      title: t('bachelor.registration.steps.education.title'), 
       icon: '🎓',
-      description: t('bachelor.registration.steps.education.description', 'Информация об образовании и выборе программы'),
+      description: t('bachelor.registration.steps.education.description'),
       colorClass: 'from-green-500 to-green-600'
     },
     { 
       number: 3, 
-      title: t('bachelor.registration.steps.documents.title', 'Документы'), 
+      title: t('bachelor.registration.steps.documents.title'), 
       icon: '📄',
-      description: t('bachelor.registration.steps.documents.description', 'Загрузка необходимых документов'),
+      description: t('bachelor.registration.steps.documents.description'),
       colorClass: 'from-blue-500 to-green-500'
     },
     { 
       number: 4, 
-      title: t('bachelor.registration.steps.review.title', 'Подтверждение'), 
+      title: t('bachelor.registration.steps.review.title'), 
       icon: '✅',
-      description: t('bachelor.registration.steps.review.description', 'Проверка и отправка заявки'),
+      description: t('bachelor.registration.steps.review.description'),
       colorClass: 'from-green-500 to-blue-500'
     }
   ];
 
   const programs = [
-    { id: 'sports_science', name: t('bachelor.registration.programs.sports_science', 'Спортивная наука') },
-    { id: 'physical_education', name: t('bachelor.registration.programs.physical_education', 'Физическая культура') },
-    { id: 'sports_management', name: t('bachelor.registration.programs.sports_management', 'Спортивный менеджмент') },
-    { id: 'rehabilitation', name: t('bachelor.registration.programs.rehabilitation', 'Спортивная реабилитация') },
-    { id: 'coaching', name: t('bachelor.registration.programs.coaching', 'Тренерская работа') }
+    { id: 'sports_science', name: t('bachelor.registration.programs.sports_science') },
+    { id: 'physical_education', name: t('bachelor.registration.programs.physical_education') },
+    { id: 'sports_management', name: t('bachelor.registration.programs.sports_management') },
+    { id: 'rehabilitation', name: t('bachelor.registration.programs.rehabilitation') },
+    { id: 'coaching', name: t('bachelor.registration.programs.coaching') }
   ];
 
   const deadlines = [
     { 
-      period: t('bachelor.registration.deadlines.main.period', 'Основной набор'), 
-      date: '20 июня - 25 июля',
+      period: t('bachelor.registration.deadlines.main.period'), 
+      date: t('bachelor.registration.deadlines.main.date'),
       status: 'active'
     },
     { 
-      period: t('bachelor.registration.deadlines.additional.period', 'Дополнительный набор'), 
-      date: '1-15 августа',
+      period: t('bachelor.registration.deadlines.additional.period'), 
+      date: t('bachelor.registration.deadlines.additional.date'),
       status: 'upcoming'
     }
   ];
 
   const requirements = [
-    t('bachelor.registration.requirements.age', 'Возраст от 17 до 25 лет'),
-    t('bachelor.registration.requirements.education', 'Аттестат о среднем образовании'),
-    t('bachelor.registration.requirements.exams', 'Результаты вступительных экзаменов'),
-    t('bachelor.registration.requirements.language', 'Владение английским языком (для международных программ)'),
-    t('bachelor.registration.requirements.health', 'Медицинская справка')
+    t('bachelor.registration.requirements.age'),
+    t('bachelor.registration.requirements.education'),
+    t('bachelor.registration.requirements.exams'),
+    t('bachelor.registration.requirements.language'),
+    t('bachelor.registration.requirements.health')
   ];
 
   const validateStep = (step) => {
@@ -172,7 +172,7 @@ const BachelorRegistration = () => {
   const handleSubmit = () => {
     // Here would be API call to submit the application
     console.log('Form submitted:', formData);
-    alert(t('bachelor.registration.success', 'Заявка успешно отправлена!'));
+    alert(t('bachelor.registration.success'));
   };
 
   const getProgressPercentage = () => {
@@ -200,15 +200,15 @@ const BachelorRegistration = () => {
           <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300">
             <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
             <span className="text-green-300 font-medium text-sm md:text-base">
-              {t('bachelor.registration.badge', 'Поступление')}
+              {t('bachelor.registration.badge')}
             </span>
           </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-            {t('bachelor.registration.title', 'Регистрация на бакалавриат')}
+            {t('bachelor.registration.title')}
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-green-400 mx-auto mb-6 md:mb-8"></div>
           <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto px-4 leading-relaxed">
-            {t('bachelor.registration.subtitle', 'Подайте заявку на поступление в академию')}
+            {t('bachelor.registration.subtitle')}
           </p>
         </div>
 
@@ -221,7 +221,7 @@ const BachelorRegistration = () => {
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium text-blue-200">
-                    {t('bachelor.registration.progress', 'Прогресс')}
+                    {t('bachelor.registration.progress')}
                   </span>
                   <span className="text-sm font-bold text-green-300">
                     {Math.round(getProgressPercentage())}%
@@ -282,7 +282,7 @@ const BachelorRegistration = () => {
             }`}>
               <h3 className="font-semibold text-white mb-4 text-lg flex items-center gap-2">
                 <span className="text-blue-400">📋</span>
-                <span>{t('bachelor.registration.requirementsTitle', 'Требования')}</span>
+                <span>{t('bachelor.registration.requirementsTitle')}</span>
               </h3>
               <ul className="space-y-3">
                 {requirements.map((requirement, idx) => (
@@ -326,7 +326,7 @@ const BachelorRegistration = () => {
                     <div className="grid md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-blue-200 mb-2">
-                          {t('bachelor.registration.form.firstName', 'Имя')} *
+                          {t('bachelor.registration.form.firstName')} *
                         </label>
                         <input 
                           type="text" 
@@ -335,7 +335,7 @@ const BachelorRegistration = () => {
                           className={`w-full p-4 bg-white/5 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors text-white placeholder-blue-300 ${
                             formErrors.firstName ? 'border-red-400' : 'border-white/20'
                           }`}
-                          placeholder={t('bachelor.registration.form.firstNamePlaceholder', 'Введите ваше имя')}
+                          placeholder={t('bachelor.registration.form.firstNamePlaceholder')}
                         />
                         {formErrors.firstName && (
                           <p className="text-red-400 text-sm mt-1">{formErrors.firstName}</p>
@@ -343,7 +343,7 @@ const BachelorRegistration = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-blue-200 mb-2">
-                          {t('bachelor.registration.form.lastName', 'Фамилия')} *
+                          {t('bachelor.registration.form.lastName')} *
                         </label>
                         <input 
                           type="text" 
@@ -352,7 +352,7 @@ const BachelorRegistration = () => {
                           className={`w-full p-4 bg-white/5 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors text-white placeholder-blue-300 ${
                             formErrors.lastName ? 'border-red-400' : 'border-white/20'
                           }`}
-                          placeholder={t('bachelor.registration.form.lastNamePlaceholder', 'Введите вашу фамилию')}
+                          placeholder={t('bachelor.registration.form.lastNamePlaceholder')}
                         />
                         {formErrors.lastName && (
                           <p className="text-red-400 text-sm mt-1">{formErrors.lastName}</p>
@@ -360,7 +360,7 @@ const BachelorRegistration = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-blue-200 mb-2">
-                          {t('bachelor.registration.form.email', 'Email')} *
+                          {t('bachelor.registration.form.email')} *
                         </label>
                         <input 
                           type="email" 
@@ -377,7 +377,7 @@ const BachelorRegistration = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-blue-200 mb-2">
-                          {t('bachelor.registration.form.phone', 'Телефон')} *
+                          {t('bachelor.registration.form.phone')} *
                         </label>
                         <input 
                           type="tel" 
@@ -400,7 +400,7 @@ const BachelorRegistration = () => {
                   <div className="space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-blue-200 mb-2">
-                        {t('bachelor.registration.form.selectProgram', 'Выберите программу')} *
+                        {t('bachelor.registration.form.selectProgram')} *
                       </label>
                       <select 
                         value={formData.education.program}
@@ -409,7 +409,7 @@ const BachelorRegistration = () => {
                           formErrors.program ? 'border-red-400' : 'border-white/20'
                         }`}
                       >
-                        <option value="" className="bg-blue-900 text-white">{t('bachelor.registration.form.chooseProgram', 'Выберите программу обучения')}</option>
+                        <option value="" className="bg-blue-900 text-white">{t('bachelor.registration.form.chooseProgram')}</option>
                         {programs.map(program => (
                           <option key={program.id} value={program.id} className="bg-blue-900 text-white">
                             {program.name}
@@ -423,7 +423,7 @@ const BachelorRegistration = () => {
                     
                     <div>
                       <label className="block text-sm font-medium text-blue-200 mb-2">
-                        {t('bachelor.registration.form.motivation', 'Мотивационное письмо')} *
+                        {t('bachelor.registration.form.motivation')} *
                       </label>
                       <textarea 
                         value={formData.education.motivation}
@@ -432,7 +432,7 @@ const BachelorRegistration = () => {
                         className={`w-full p-4 bg-white/5 border rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors text-white placeholder-blue-300 ${
                           formErrors.motivation ? 'border-red-400' : 'border-white/20'
                         }`}
-                        placeholder={t('bachelor.registration.form.motivationPlaceholder', 'Расскажите о ваших целях и почему вы хотите учиться в нашей академии...')}
+                        placeholder={t('bachelor.registration.form.motivationPlaceholder')}
                       />
                       {formErrors.motivation && (
                         <p className="text-red-400 text-sm mt-1">{formErrors.motivation}</p>
@@ -444,14 +444,14 @@ const BachelorRegistration = () => {
                 {currentStep === 2 && (
                   <div className="space-y-6">
                     <p className="text-blue-200 mb-4">
-                      {t('bachelor.registration.uploadDescription', 'Загрузите необходимые документы в формате PDF или JPG')}
+                      {t('bachelor.registration.uploadDescription')}
                     </p>
                     
                     {[
-                      { key: 'passport', label: t('bachelor.registration.documents.passport', 'Копия паспорта') },
-                      { key: 'diploma', label: t('bachelor.registration.documents.diploma', 'Аттестат или диплом') },
-                      { key: 'photos', label: t('bachelor.registration.documents.photos', 'Фотографии 3x4') },
-                      { key: 'medicalCertificate', label: t('bachelor.registration.documents.medical', 'Медицинская справка') }
+                      { key: 'passport', label: t('bachelor.registration.documents.passport') },
+                      { key: 'diploma', label: t('bachelor.registration.documents.diploma') },
+                      { key: 'photos', label: t('bachelor.registration.documents.photos') },
+                      { key: 'medicalCertificate', label: t('bachelor.registration.documents.medical') }
                     ].map((doc, idx) => (
                       <div key={doc.key} className="flex items-center justify-between p-4 bg-white/5 border border-white/20 rounded-xl hover:border-blue-400 transition-colors group">
                         <div className="flex items-center gap-3">
@@ -461,7 +461,7 @@ const BachelorRegistration = () => {
                           <div>
                             <span className="font-medium text-white">{doc.label}</span>
                             <p className="text-sm text-blue-300">
-                              {formData.documents[doc.key] ? '✅ Загружено' : '❌ Не загружено'}
+                              {formData.documents[doc.key] ? t('bachelor.registration.uploaded') : t('bachelor.registration.notUploaded')}
                             </p>
                           </div>
                         </div>
@@ -469,7 +469,7 @@ const BachelorRegistration = () => {
                           onClick={() => document.getElementById(`file-${doc.key}`).click()}
                           className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-green-600 transition-all transform hover:scale-105 text-sm font-medium shadow-lg border border-white/20"
                         >
-                          {t('bachelor.registration.upload', 'Загрузить')}
+                          {t('bachelor.registration.upload')}
                         </button>
                         <input
                           id={`file-${doc.key}`}
@@ -488,42 +488,42 @@ const BachelorRegistration = () => {
                     <div className="text-center py-4">
                       <div className="text-6xl mb-4">🎓</div>
                       <h3 className="text-2xl font-bold text-white mb-4">
-                        {t('bachelor.registration.reviewTitle', 'Проверьте вашу заявку')}
+                        {t('bachelor.registration.reviewTitle')}
                       </h3>
                       <p className="text-blue-200 mb-8">
-                        {t('bachelor.registration.reviewDescription', 'Убедитесь, что все данные указаны верно перед отправкой')}
+                        {t('bachelor.registration.reviewDescription')}
                       </p>
                     </div>
 
                     <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 space-y-4 border border-white/20">
-                      <h4 className="font-semibold text-white text-lg mb-4">Личные данные</h4>
+                      <h4 className="font-semibold text-white text-lg mb-4">{t('bachelor.registration.review.personalInfo')}</h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                          <span className="text-sm text-blue-300">Имя:</span>
+                          <span className="text-sm text-blue-300">{t('bachelor.registration.review.fields.firstName')}:</span>
                           <p className="font-medium text-white">{formData.personal.firstName}</p>
                         </div>
                         <div>
-                          <span className="text-sm text-blue-300">Фамилия:</span>
+                          <span className="text-sm text-blue-300">{t('bachelor.registration.review.fields.lastName')}:</span>
                           <p className="font-medium text-white">{formData.personal.lastName}</p>
                         </div>
                         <div>
-                          <span className="text-sm text-blue-300">Email:</span>
+                          <span className="text-sm text-blue-300">{t('bachelor.registration.review.fields.email')}:</span>
                           <p className="font-medium text-white">{formData.personal.email}</p>
                         </div>
                         <div>
-                          <span className="text-sm text-blue-300">Телефон:</span>
+                          <span className="text-sm text-blue-300">{t('bachelor.registration.review.fields.phone')}:</span>
                           <p className="font-medium text-white">{formData.personal.phone}</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-                      <h4 className="font-semibold text-white text-lg mb-4">Образование</h4>
+                      <h4 className="font-semibold text-white text-lg mb-4">{t('bachelor.registration.review.education')}</h4>
                       <div className="space-y-2">
                         <div>
-                          <span className="text-sm text-blue-300">Программа:</span>
+                          <span className="text-sm text-blue-300">{t('bachelor.registration.review.fields.program')}:</span>
                           <p className="font-medium text-white">
-                            {programs.find(p => p.id === formData.education.program)?.name || 'Не выбрано'}
+                            {programs.find(p => p.id === formData.education.program)?.name || t('bachelor.registration.review.notSelected')}
                           </p>
                         </div>
                       </div>
@@ -540,15 +540,15 @@ const BachelorRegistration = () => {
                     disabled={currentStep === 0}
                     className="px-8 py-3 bg-white/10 border border-white/20 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue-400 hover:bg-white/20 transition-all duration-300 font-medium backdrop-blur-lg"
                   >
-                    {t('bachelor.registration.previous', 'Назад')}
+                    {t('bachelor.registration.previous')}
                   </button>
                   <button
                     onClick={currentStep === steps.length - 1 ? handleSubmit : nextStep}
                     className="px-8 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-xl hover:from-blue-600 hover:to-green-600 transition-all transform hover:scale-105 font-medium shadow-lg border border-white/20"
                   >
                     {currentStep === steps.length - 1 
-                      ? t('bachelor.registration.submit', 'Отправить заявку')
-                      : t('bachelor.registration.next', 'Продолжить')
+                      ? t('bachelor.registration.submit')
+                      : t('bachelor.registration.next')
                     }
                   </button>
                 </div>
@@ -564,7 +564,7 @@ const BachelorRegistration = () => {
             }`}>
               <h3 className="font-semibold text-orange-300 mb-4 flex items-center gap-2">
                 <span className="text-orange-400">⏰</span>
-                <span>{t('bachelor.registration.deadlinesTitle', 'Сроки подачи')}</span>
+                <span>{t('bachelor.registration.deadlinesTitle')}</span>
               </h3>
               <div className="space-y-4">
                 {deadlines.map((deadline, idx) => (
@@ -577,7 +577,7 @@ const BachelorRegistration = () => {
                       <span className="text-orange-300 font-medium">{deadline.period}</span>
                       {deadline.status === 'active' && (
                         <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded-full border border-orange-400/50">
-                          Активно
+                          {t('bachelor.registration.deadlines.active')}
                         </span>
                       )}
                     </div>
@@ -593,13 +593,13 @@ const BachelorRegistration = () => {
             }`}>
               <h3 className="font-semibold text-green-300 mb-3 flex items-center gap-2">
                 <span className="text-green-400">❓</span>
-                <span>{t('bachelor.registration.help.title', 'Нужна помощь?')}</span>
+                <span>{t('bachelor.registration.help.title')}</span>
               </h3>
               <p className="text-green-200 text-sm mb-4">
-                {t('bachelor.registration.help.description', 'Свяжитесь с нами для консультации')}
+                {t('bachelor.registration.help.description')}
               </p>
               <button className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105 text-sm font-medium border border-green-400/30 shadow-lg">
-                {t('bachelor.registration.help.button', 'Связаться с приемной комиссией')}
+                {t('bachelor.registration.help.button')}
               </button>
             </div>
 
@@ -609,20 +609,20 @@ const BachelorRegistration = () => {
             }`}>
               <h3 className="font-semibold text-blue-300 mb-4 flex items-center gap-2">
                 <span className="text-blue-400">📞</span>
-                <span>Контакты</span>
+                <span>{t('bachelor.registration.contacts.title')}</span>
               </h3>
               <div className="space-y-3 text-blue-200 text-sm">
                 <div className="flex items-center gap-2">
                   <span className="text-blue-400">📧</span>
-                  <span>admission@academy.ru</span>
+                  <span>{t('bachelor.registration.contacts.email')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-blue-400">📱</span>
-                  <span>+7 (495) 123-45-67</span>
+                  <span>{t('bachelor.registration.contacts.phone')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-blue-400">🏛️</span>
-                  <span>Главный корпус, каб. 101</span>
+                  <span>{t('bachelor.registration.contacts.address')}</span>
                 </div>
               </div>
             </div>

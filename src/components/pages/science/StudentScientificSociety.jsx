@@ -311,7 +311,10 @@ const StudentScientificSociety = () => {
                                 ? 'bg-blue-500/20 text-blue-300' 
                                 : 'bg-emerald-500/20 text-emerald-300'
                             }`}>
-                              {event.status === 'upcoming' ? 'Предстоящее' : 'Завершено'}
+                              {event.status === 'upcoming' 
+                                ? t('studentScientificSociety.events.status.upcoming', 'Предстоящее')
+                                : t('studentScientificSociety.events.status.completed', 'Завершено')
+                              }
                             </div>
                           </div>
                         </motion.div>
@@ -357,14 +360,14 @@ const StudentScientificSociety = () => {
 
                     <div className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-2xl p-6 mt-8 backdrop-blur-sm border border-blue-400/30">
                       <h3 className="text-xl font-bold text-white mb-4 text-center">
-                        📝 Готовы присоединиться?
+                        {t('studentScientificSociety.join.readyTitle', '📝 Готовы присоединиться?')}
                       </h3>
                       <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <button className="bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
-                          Подать заявку
+                          {t('studentScientificSociety.join.applyButton', 'Подать заявку')}
                         </button>
                         <button className="bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/20">
-                          Задать вопрос
+                          {t('studentScientificSociety.join.askButton', 'Задать вопрос')}
                         </button>
                       </div>
                     </div>
@@ -417,7 +420,7 @@ const StudentScientificSociety = () => {
               className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
             >
               <h3 className="text-xl font-bold text-white mb-6 text-center">
-                🗓️ Ближайшие события
+                {t('studentScientificSociety.upcomingEvents.title', '🗓️ Ближайшие события')}
               </h3>
               
               <div className="space-y-4">

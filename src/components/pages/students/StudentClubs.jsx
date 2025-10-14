@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useStudentClubsPageData, useJoinStudentClub } from '../../../hooks/useApi';
 import { LoadingSkeleton } from '../../common/Loading';
 
 const StudentClubs = () => {
@@ -194,7 +193,6 @@ const ClubCard = ({ club }) => {
         <h3 className="text-lg font-bold mb-1">{club.name}</h3>
         <p className="text-blue-100 text-xs opacity-90">{club.short_description}</p>
       </div>
-
       {/* Контент */}
       <div className="p-4">
         <p className="text-gray-600 text-sm mb-3 leading-relaxed">{club.description}</p>
@@ -262,7 +260,46 @@ const ClubCard = ({ club }) => {
             </div>
           )}
         </div>
-    </div>
+
+        {/* Кнопки действий */}
+        <div className="flex space-x-2 mt-3">
+          <button
+            onClick={handleJoin}
+            disabled={isJoining || club.status === 'inactive'}
+            className={`flex-1 py-2 px-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center text-sm ${club.status !== 'inactive' && !isJoining
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+          >
+            {isJoining ? (
+              <>
+                <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-1.5"></div>
+                {t('students.clubs.sending', 'Отправка...')}
+              </>
+            ) : (
+              <>
+                <span className="mr-1.5">🤝</span>
+                {t('students.clubs.join', 'Присоединиться')}
+              </>
+            )}
+          </button>
+
+
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="w-10 h-10 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center"
+          >
+            <svg
+              className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

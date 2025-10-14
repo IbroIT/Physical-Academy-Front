@@ -1,0 +1,316 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNTSCommitteePage } from '../../../hooks/useApi';
+import Loading from '../../common/Loading';
+
+const NTSCommittee = () => {
+  const { t } = useTranslation();
+  const { data, loading, error } = useNTSCommitteePage();
+  const [activeTab, setActiveTab] = useState('members');
+  const [selectedMember, setSelectedMember] = useState(null);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+          <p>{t('common.errorLoading')}</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+          <p>{t('common.noData')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5
+      }
+    }
+  };
+
+  const tabVariants = {
+    inactive: { 
+      opacity: 0.7, 
+      y: 0,
+      background: 'rgba(255, 255, 255, 0.05)',
+      borderColor: 'rgba(255, 255, 255, 0.1)'
+    },
+    active: { 
+      opacity: 1, 
+      y: -2,
+      background: 'rgba(59, 130, 246, 0.2)',
+      borderColor: 'rgba(59, 130, 246, 0.5)'
+    }
+  };
+
+  const handleMemberClick = (member) => {
+    setSelectedMember(selectedMember === member ? null : member);
+  };
+
+  return (
+    <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 py-16 lg:py-24 overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/3 right-20 w-48 h-48 bg-purple-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        
+        {/* Scientific symbols */}
+        <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🧪</div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">⚛️</div>
+        <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">🔬</div>
+        <div className="absolute top-2/3 right-1/3 text-5xl opacity-5">📚</div>
+      </div>
+
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-8"
+        >
+          {/* Header */}
+          <motion.div variants={itemVariants} className="text-center">
+            <div className="inline-flex flex-col items-center bg-white/5 backdrop-blur-sm rounded-2xl px-8 py-6 shadow-2xl border border-white/10">
+              <motion.div
+                className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white shadow-lg mb-4"
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.8 }}
+              >
+                <span className="text-2xl">⚛️</span>
+              </motion.div>
+              <h2 className="text-3xl font-bold text-white mb-2">
+                {data.title}
+              </h2>
+              <p className="text-indigo-200 max-w-2xl">
+                {data.description}
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Tabs */}
+          <motion.div variants={itemVariants} className="flex justify-center space-x-4">
+            <motion.button
+              variants={tabVariants}
+              animate={activeTab === 'members' ? 'active' : 'inactive'}
+              whileHover={{ y: -2, opacity: 1 }}
+              onClick={() => setActiveTab('members')}
+              className="px-6 py-2 rounded-xl border transition-all duration-300 text-white font-medium"
+            >
+              {t('science.sections.nts.tabs.members')}
+            </motion.button>
+            <motion.button
+              variants={tabVariants}
+              animate={activeTab === 'directions' ? 'active' : 'inactive'}
+              whileHover={{ y: -2, opacity: 1 }}
+              onClick={() => setActiveTab('directions')}
+              className="px-6 py-2 rounded-xl border transition-all duration-300 text-white font-medium"
+            >
+              {t('science.sections.nts.tabs.directions')}
+            </motion.button>
+          </motion.div>
+
+          {/* Content based on active tab */}
+          <AnimatePresence mode="wait">
+            {activeTab === 'members' && (
+              <motion.div
+                key="members"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {data.members.map((member, index) => (
+                  <motion.div
+                    key={index}
+                    variants={itemVariants}
+                    className={`bg-white/5 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border ${
+                      selectedMember === member 
+                        ? 'border-purple-400/50' 
+                        : 'border-white/10 hover:border-indigo-400/30'
+                    } transition-all duration-500 transform hover:-translate-y-1 cursor-pointer relative overflow-hidden`}
+                    onClick={() => handleMemberClick(member)}
+                  >
+                    {/* Background effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
+                    
+                    <div className="flex items-start space-x-4">
+                      {member.photo && (
+                        <div className="relative w-16 h-16 flex-shrink-0">
+                          <img 
+                            src={member.photo} 
+                            alt={member.full_name} 
+                            className="w-full h-full object-cover rounded-lg shadow-md"
+                          />
+                          <div className="absolute inset-0 rounded-lg ring-2 ring-indigo-500/30"></div>
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="font-bold text-white text-lg">{member.full_name}</h3>
+                        <div className="flex items-center mt-1">
+                          <span className="inline-block bg-purple-500/20 px-2 py-0.5 rounded-md text-purple-300 text-xs mr-2">
+                            {member.role.name}
+                          </span>
+                          <span className="text-indigo-200 text-xs">{member.position}</span>
+                        </div>
+                        
+                        {member.scientific_degree && (
+                          <p className="text-blue-200 text-xs mt-1">{member.scientific_degree}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <AnimatePresence>
+                      {selectedMember === member && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="mt-4 space-y-2 overflow-hidden"
+                        >
+                          {member.achievements && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-indigo-300 mb-1">{t('science.sections.nts.achievements')}</h4>
+                              <p className="text-blue-200 text-xs">{member.achievements}</p>
+                            </div>
+                          )}
+                          
+                          {member.research_interests && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-indigo-300 mb-1">{t('science.sections.nts.research')}</h4>
+                              <p className="text-blue-200 text-xs">{member.research_interests}</p>
+                            </div>
+                          )}
+                          
+                          {member.email && (
+                            <div className="flex items-center mt-2">
+                              <span className="text-xs text-blue-400">
+                                <a href={`mailto:${member.email}`} className="flex items-center hover:text-blue-300 transition-colors">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                  </svg>
+                                  {member.email}
+                                </a>
+                              </span>
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Decorative element */}
+                    <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+
+            {activeTab === 'directions' && (
+              <motion.div
+                key="directions"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-6"
+              >
+                {data.research_directions.map((direction, index) => (
+                  <motion.div
+                    key={index}
+                    variants={itemVariants}
+                    className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-white/10 hover:border-indigo-400/30 transition-all duration-500"
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl p-3 text-white text-2xl shadow-lg">
+                        {direction.icon || '🔬'}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-white text-lg">{direction.name}</h3>
+                        <p className="text-indigo-200 text-sm mt-2">{direction.description}</p>
+                        
+                        {direction.key_results && (
+                          <div className="mt-4">
+                            <h4 className="text-sm font-semibold text-indigo-300 mb-2">{t('science.sections.nts.keyResults')}</h4>
+                            <ul className="space-y-2">
+                              {direction.key_results.split(';').map((result, idx) => (
+                                <li key={idx} className="flex items-start">
+                                  <span className="text-purple-400 mr-2">•</span>
+                                  <span className="text-blue-200 text-xs">{result.trim()}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Committee vision */}
+          <motion.div variants={itemVariants} className="mt-12">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-white/10 max-w-3xl mx-auto">
+              <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                <motion.div 
+                  className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white mr-3 shadow-lg"
+                  whileHover={{ rotate: 5, scale: 1.1 }}
+                >
+                  <span className="text-lg">💡</span>
+                </motion.div>
+                {t('science.sections.nts.vision.title')}
+              </h3>
+              <p className="text-indigo-200 text-sm leading-relaxed">
+                {data.vision}
+              </p>
+              
+              {data.contacts && (
+                <div className="mt-6 pt-4 border-t border-white/10">
+                  <h4 className="text-sm font-semibold text-indigo-300 mb-2">{t('science.sections.nts.contacts')}</h4>
+                  <div className="flex flex-wrap gap-4">
+                    {data.contacts.map((contact, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <span className="text-indigo-400">{contact.icon}</span>
+                        <span className="text-blue-200 text-xs">{contact.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default NTSCommittee;
