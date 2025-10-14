@@ -13,19 +13,22 @@ const NewsHomePage = () => {
   // Данные новостей через i18n
   const newsData = t('news.items', { returnObjects: true });
 
-  const navigateNews = useCallback((direction) => {
-    setIsVisible(false);
-    setTimeout(() => {
-      setCurrentNewsIndex(prev => {
-        if (direction === 'next') {
-          return (prev + 1) % newsData.length;
-        } else {
-          return prev === 0 ? newsData.length - 1 : prev - 1;
-        }
-      });
-      setIsVisible(true);
-    }, 300);
-  }, [newsData.length]);
+  const navigateNews = useCallback(
+    (direction) => {
+      setIsVisible(false);
+      setTimeout(() => {
+        setCurrentNewsIndex((prev) => {
+          if (direction === 'next') {
+            return (prev + 1) % newsData.length;
+          } else {
+            return prev === 0 ? newsData.length - 1 : prev - 1;
+          }
+        });
+        setIsVisible(true);
+      }, 300);
+    },
+    [newsData.length]
+  );
 
   // Автоматическая смена новостей
   useEffect(() => {
@@ -49,7 +52,7 @@ const NewsHomePage = () => {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))]" />
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <motion.h1
@@ -89,7 +92,7 @@ const NewsHomePage = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          
+
           <button
             onClick={() => navigateNews('next')}
             className="absolute right-6 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-300 group"
@@ -120,7 +123,7 @@ const NewsHomePage = () => {
             {/* Image Section */}
             <div className="relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 z-10" />
-              <motion.div 
+              <motion.div
                 className={`absolute inset-0 bg-cover bg-center transition-transform duration-700 ${isVisible ? 'scale-110' : 'scale-100'}`}
                 style={{ backgroundImage: `url(${currentNews.image})` }}
                 key={currentNews.id}
@@ -138,33 +141,27 @@ const NewsHomePage = () => {
                   transition={{ duration: 0.5 }}
                   className="space-y-6"
                 >
-                  {/* Category and Date */}
                   <div className="flex items-center gap-4">
                     <span className="px-4 py-2 bg-gradient-to-r from-cyan-100 to-cyan-50 text-cyan-700 rounded-full text-sm font-semibold border border-cyan-200">
                       {currentNews.category}
                     </span>
                     <span className="text-gray-500 font-medium">{currentNews.date}</span>
                   </div>
-                  
-                  {/* Title */}
+
                   <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 leading-tight">
                     {currentNews.title}
                   </h2>
-                  
-                  {/* Description */}
-                  <p className="text-lg text-gray-600 leading-relaxed">
-                    {currentNews.description}
-                  </p>
-                  
-                  {/* CTA Button */}
+
+                  <p className="text-lg text-gray-600 leading-relaxed">{currentNews.description}</p>
+
                   <div className="flex items-center gap-4 pt-4">
-                    <button 
+                    <button
                       onClick={() => handleReadMore(currentNews.id)}
                       className="px-8 py-4 bg-gradient-to-r from-cyan-600 to-emerald-600 text-white rounded-xl hover:from-cyan-700 hover:to-emerald-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     >
                       {t('news.readMore')}
                     </button>
-                    
+
                     <button className="px-6 py-4 border border-gray-300 text-gray-600 rounded-xl hover:border-cyan-400 hover:text-cyan-600 transition-all duration-300 font-semibold">
                       {t('news.share')}
                     </button>
@@ -174,11 +171,11 @@ const NewsHomePage = () => {
             </div>
           </div>
 
-          {/* Progress Indicators */}
+          {/* ✅ Progress Indicators (исправлено) */}
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2">
-            {newsData.map((_, index) => (
+            {newsData.map((news, index) => (
               <button
-                key={index}
+                key={news.id} // ✅ уникальный ключ
                 onClick={() => {
                   setIsVisible(false);
                   setTimeout(() => {
@@ -187,8 +184,8 @@ const NewsHomePage = () => {
                   }, 300);
                 }}
                 className={`h-1 rounded-full transition-all duration-500 ${
-                  index === currentNewsIndex 
-                    ? 'bg-gradient-to-r from-cyan-600 to-emerald-600 w-8' 
+                  index === currentNewsIndex
+                    ? 'bg-gradient-to-r from-cyan-600 to-emerald-600 w-8'
                     : 'bg-gray-300 w-3 hover:bg-cyan-400'
                 }`}
               />
@@ -204,9 +201,7 @@ const NewsHomePage = () => {
           className="mt-20"
         >
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-gray-800">
-              {t('news.allNews')}
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-800">{t('news.allNews')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -222,12 +217,12 @@ const NewsHomePage = () => {
               >
                 <div className="relative overflow-hidden h-48">
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 z-10 group-hover:scale-110 transition-transform duration-700" />
-                  <div 
+                  <div
                     className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
                     style={{ backgroundImage: `url(${news.image})` }}
                   />
                 </div>
-                
+
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-3">
                     <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
@@ -235,16 +230,14 @@ const NewsHomePage = () => {
                     </span>
                     <span className="text-gray-400 text-xs">{news.date}</span>
                   </div>
-                  
+
                   <h3 className="font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-cyan-600 transition-colors">
                     {news.title}
                   </h3>
-                  
-                  <p className="text-gray-600 text-sm line-clamp-2 mb-4">
-                    {news.description}
-                  </p>
-                  
-                  <button 
+
+                  <p className="text-gray-600 text-sm line-clamp-2 mb-4">{news.description}</p>
+
+                  <button
                     onClick={() => handleReadMore(news.id)}
                     className="flex items-center text-cyan-600 text-sm font-semibold group-hover:translate-x-2 transition-transform duration-300"
                   >
