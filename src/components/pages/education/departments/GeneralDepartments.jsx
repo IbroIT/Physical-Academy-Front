@@ -1,4 +1,3 @@
-// GeneralDepartments.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,11 +8,66 @@ const GeneralDepartments = () => {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isVisible, setIsVisible] = useState(false);
+  const [counterValues, setCounterValues] = useState([0, 0, 0, 0]);
   const sectionRef = useRef(null);
+
+  // Получаем данные с проверками
+  const departmentsData = t('departments', { returnObjects: true }) || {};
+  
+  // Функция для нормализации данных
+  const normalizeData = (data) => {
+    const defaultData = {
+      name: t('departments.name', 'Отделы и структуры'),
+      fullDescription: t('departments.fullDescription', 'Организационная структура академии и все подразделения'),
+      badge: t('departments.badge', 'Организационная структура'),
+      stats: Array.isArray(data.stats) ? data.stats : [
+        { label: 'Отделов', value: '25+', icon: '🏢' },
+        { label: 'Сотрудников', value: '150+', icon: '👨‍🏫' },
+        { label: 'Факультетов', value: '15', icon: '🎓' },
+        { label: 'Кампусов', value: '5', icon: '🏛️' }
+      ],
+      categories: Array.isArray(data.categories) ? data.categories : [
+        { id: 'academic', label: 'Академические', icon: '🎓', color: 'blue' },
+        { id: 'administrative', label: 'Административные', icon: '🏢', color: 'green' },
+        { id: 'research', label: 'Научные', icon: '🔬', color: 'purple' },
+        { id: 'student', label: 'Студенческие', icon: '👥', color: 'orange' },
+        { id: 'technical', label: 'Технические', icon: '⚙️', color: 'red' }
+      ],
+      departments: Array.isArray(data.departments) ? data.departments : [
+        {
+          id: 1,
+          name: 'Учебный отдел',
+          description: 'Организация учебного процесса',
+          category: 'academic',
+          head: 'Иван Петров',
+          phone: '+7 (495) 123-45-67',
+          location: 'Главный корпус, каб. 101',
+          icon: '📚',
+          functions: ['Планирование учебного процесса', 'Контроль успеваемости', 'Организация сессий']
+        }
+      ],
+      functions: Array.isArray(data.functions) ? data.functions : [
+        { icon: '📚', title: 'Образование', description: 'Организация учебного процесса и программ' },
+        { icon: '🔬', title: 'Исследования', description: 'Научная деятельность и разработки' },
+        { icon: '🤝', title: 'Сообщество', description: 'Развитие студенческого сообщества' },
+        { icon: '💼', title: 'Управление', description: 'Административное управление академией' }
+      ]
+    };
+
+    return defaultData;
+  };
+
+  // Нормализуем данные
+  const normalizedData = normalizeData(departmentsData);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          startCounters();
+        }
+      },
       { threshold: 0.1 }
     );
 
@@ -24,38 +78,38 @@ const GeneralDepartments = () => {
     return () => observer.disconnect();
   }, []);
 
-  const categories = [
-    { id: 'academic', label: t('departments.categories.academic', 'Академические'), icon: '🎓', color: 'blue' },
-    { id: 'administrative', label: t('departments.categories.administrative', 'Административные'), icon: '🏢', color: 'green' },
-    { id: 'research', label: t('departments.categories.research', 'Научные'), icon: '🔬', color: 'purple' },
-    { id: 'student', label: t('departments.categories.student', 'Студенческие'), icon: '👥', color: 'orange' },
-    { id: 'technical', label: t('departments.categories.technical', 'Технические'), icon: '⚙️', color: 'red' }
-  ];
+  const startCounters = () => {
+    const targetValues = normalizedData.stats.map(stat => parseInt(stat.value.replace(/\D/g, '')) || 0);
+    const duration = 2000;
+    const steps = 60;
+    const stepValues = targetValues.map(target => target / steps);
 
-  const departmentsData = t('departments.list', { returnObjects: true });
-  
+    let currentStep = 0;
+    const counterInterval = setInterval(() => {
+      currentStep++;
+      setCounterValues(prev => 
+        prev.map((value, index) => {
+          if (currentStep <= steps) {
+            return Math.min(value + stepValues[index], targetValues[index]);
+          }
+          return value;
+        })
+      );
+
+      if (currentStep >= steps) {
+        clearInterval(counterInterval);
+      }
+    }, duration / steps);
+  };
+
   // Фильтрация отделов по категории и поиску
-  const filteredDepartments = Array.isArray(departmentsData) ? departmentsData
+  const filteredDepartments = normalizedData.departments
     .filter(dept => dept.category === activeCategory)
     .filter(dept => 
       dept.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       dept.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       dept.head.toLowerCase().includes(searchTerm.toLowerCase())
-    ) : [];
-
-  const stats = [
-    { number: '25+', label: t('departments.stats.departments', 'Отделов'), icon: '🏢' },
-    { number: '150+', label: t('departments.stats.staff', 'Сотрудников'), icon: '👨‍🏫' },
-    { number: '15', label: t('departments.stats.faculties', 'Факультетов'), icon: '🎓' },
-    { number: '5', label: t('departments.stats.campuses', 'Кампусов'), icon: '🏛️' }
-  ];
-
-  const departmentFunctions = [
-    { icon: '📚', title: t('departments.functions.education.title', 'Образование'), description: t('departments.functions.education.description', 'Организация учебного процесса и программ') },
-    { icon: '🔬', title: t('departments.functions.research.title', 'Исследования'), description: t('departments.functions.research.description', 'Научная деятельность и разработки') },
-    { icon: '🤝', title: t('departments.functions.community.title', 'Сообщество'), description: t('departments.functions.community.description', 'Развитие студенческого сообщества') },
-    { icon: '💼', title: t('departments.functions.management.title', 'Управление'), description: t('departments.functions.management.description', 'Административное управление академией') }
-  ];
+    );
 
   const getColorClasses = (color) => {
     switch (color) {
@@ -116,8 +170,29 @@ const GeneralDepartments = () => {
     }
   };
 
-  const currentCategory = categories.find(cat => cat.id === activeCategory);
+  const currentCategory = normalizedData.categories.find(cat => cat.id === activeCategory);
   const categoryColors = currentCategory ? getColorClasses(currentCategory.color) : getColorClasses('blue');
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6
+      }
+    }
+  };
 
   return (
     <section 
@@ -143,48 +218,78 @@ const GeneralDepartments = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12 lg:mb-20"
+          className="text-center mb-16 lg:mb-20"
         >
           <motion.div
             initial={{ scale: 0 }}
             animate={isVisible ? { scale: 1 } : {}}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
+            className="inline-flex items-center px-6 py-3 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/20 mb-6"
           >
-            🏢
+            <span className="w-2 h-2 bg-gradient-to-r from-blue-400 to-emerald-400 rounded-full mr-3 animate-pulse"></span>
+            <span className="text-blue-100 font-medium text-lg">
+              {normalizedData.badge}
+            </span>
           </motion.div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-            {t('departments.title', 'Отделы и структуры')}
-          </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
-          <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {t('departments.subtitle', 'Организационная структура академии и все подразделения')}
-          </p>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight"
+          >
+            {normalizedData.name}
+          </motion.h1>
+          
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={isVisible ? { scale: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-8 rounded-full"
+          ></motion.div>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed"
+          >
+            {normalizedData.fullDescription}
+          </motion.p>
         </motion.div>
 
-        {/* Stats */}
+        {/* Dynamic Stats */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 lg:mb-16"
+          variants={containerVariants}
+          initial="hidden"
+          animate={isVisible ? "visible" : "hidden"}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16 lg:mb-20"
         >
-          {stats.map((stat, index) => (
+          {normalizedData.stats.map((stat, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4 + index * 0.1 }}
-              className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+              variants={itemVariants}
+              className="bg-white/5 rounded-3xl p-8 backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group text-center relative overflow-hidden"
             >
-              <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                {stat.icon}
-              </div>
-              <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-2 group-hover:scale-110 transition-transform duration-300">
-                {stat.number}
-              </div>
-              <div className="text-blue-200 text-sm lg:text-base">
-                {stat.label}
+              {/* Background effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
+              
+              <div className="relative z-10">
+                <motion.div 
+                  className="text-5xl mb-6 transition-transform duration-500 group-hover:scale-110"
+                  whileHover={{ scale: 1.2, rotate: 12 }}
+                >
+                  {stat.icon}
+                </motion.div>
+                <div className="text-4xl lg:text-5xl font-bold text-white mb-4 font-mono bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                  {stat.value.includes('%') 
+                    ? `${Math.round(counterValues[index])}%`
+                    : stat.value.includes('+')
+                    ? `${Math.round(counterValues[index])}+`
+                    : Math.round(counterValues[index])
+                  }
+                </div>
+                <div className="text-blue-100 font-medium text-lg">{stat.label}</div>
               </div>
             </motion.div>
           ))}
@@ -201,11 +306,11 @@ const GeneralDepartments = () => {
             >
               <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
                 <span className="text-2xl">📂</span>
-                <span>{t('departments.categories.title', 'Категории')}</span>
+                <span>Категории</span>
               </h3>
               
               <div className="space-y-2">
-                {categories.map((category) => {
+                {normalizedData.categories.map((category) => {
                   const colors = getColorClasses(category.color);
                   const isActive = activeCategory === category.id;
                   
@@ -238,6 +343,22 @@ const GeneralDepartments = () => {
                   );
                 })}
               </div>
+
+              {/* Search Box */}
+              <div className="mt-6">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Поиск отделов..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-white/5 border border-white/20 rounded-2xl px-4 py-3 text-white placeholder-blue-300 focus:outline-none focus:border-emerald-400/50 transition-all duration-300 backdrop-blur-sm"
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-300">
+                    🔍
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </div>
 
@@ -260,14 +381,12 @@ const GeneralDepartments = () => {
                       {currentCategory?.label}
                     </h2>
                     <p className="text-blue-200">
-                      {t('departments.categoryDescription', { 
-                        category: currentCategory?.label.toLowerCase() 
-                      }, `Отделы ${currentCategory?.label.toLowerCase()} направлений`)}
+                      Отделы {currentCategory?.label.toLowerCase()} направлений
                     </p>
                   </div>
                 </div>
                 <div className="text-sm text-emerald-400 bg-emerald-500/20 px-3 py-2 rounded-lg backdrop-blur-sm">
-                  {filteredDepartments.length} {t('departments.found', 'найдено')}
+                  {filteredDepartments.length} найдено
                 </div>
               </div>
             </motion.div>
@@ -284,7 +403,7 @@ const GeneralDepartments = () => {
                   
                   return (
                     <motion.div
-                      key={department.id || index}
+                      key={department.id}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1 }}
@@ -299,14 +418,10 @@ const GeneralDepartments = () => {
                       <div className="p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
-                            <h3 className={`text-xl font-bold mb-2 ${
-                              isSelected ? 'text-white' : 'text-white'
-                            }`}>
+                            <h3 className="text-xl font-bold text-white mb-2">
                               {department.name}
                             </h3>
-                            <p className={`text-sm ${
-                              isSelected ? 'text-blue-200' : 'text-blue-200'
-                            }`}>
+                            <p className="text-blue-200 text-sm">
                               {department.description}
                             </p>
                           </div>
@@ -324,7 +439,7 @@ const GeneralDepartments = () => {
                           <div>
                             <div className="text-sm font-medium">{department.head}</div>
                             <div className="text-xs text-blue-300">
-                              {t('departments.departmentHead', 'Руководитель отдела')}
+                              Руководитель отдела
                             </div>
                           </div>
                         </div>
@@ -357,7 +472,6 @@ const GeneralDepartments = () => {
                 })}
               </motion.div>
             ) : (
-              /* No Results */
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -365,10 +479,10 @@ const GeneralDepartments = () => {
               >
                 <div className="text-6xl mb-4 text-blue-300">🔍</div>
                 <h3 className="text-xl font-semibold text-white mb-2">
-                  {t('departments.search.noResults.title', 'Отделы не найдены')}
+                  Отделы не найдены
                 </h3>
                 <p className="text-blue-200 mb-6">
-                  {t('departments.search.noResults.description', 'Попробуйте изменить поисковый запрос или выбрать другую категорию')}
+                  Попробуйте изменить поисковый запрос или выбрать другую категорию
                 </p>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -376,7 +490,7 @@ const GeneralDepartments = () => {
                   onClick={() => setSearchTerm('')}
                   className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 shadow-lg"
                 >
-                  {t('departments.search.clear', 'Очистить поиск')}
+                  Очистить поиск
                 </motion.button>
               </motion.div>
             )}
@@ -409,7 +523,7 @@ const GeneralDepartments = () => {
                     <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl p-4 border border-blue-400/30">
                       <h4 className="font-semibold text-blue-400 mb-2 flex items-center gap-2">
                         <span>👤</span>
-                        <span>{t('departments.contact.head', 'Руководитель')}</span>
+                        <span>Руководитель</span>
                       </h4>
                       <p className="text-white font-medium">{selectedDepartment.head}</p>
                       {selectedDepartment.position && (
@@ -420,7 +534,7 @@ const GeneralDepartments = () => {
                     <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-2xl p-4 border border-emerald-400/30">
                       <h4 className="font-semibold text-emerald-400 mb-2 flex items-center gap-2">
                         <span>📞</span>
-                        <span>{t('departments.contact.phone', 'Телефон')}</span>
+                        <span>Телефон</span>
                       </h4>
                       <a 
                         href={`tel:${selectedDepartment.phone}`}
@@ -433,7 +547,7 @@ const GeneralDepartments = () => {
                     <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl p-4 border border-purple-400/30">
                       <h4 className="font-semibold text-purple-400 mb-2 flex items-center gap-2">
                         <span>📍</span>
-                        <span>{t('departments.contact.location', 'Местоположение')}</span>
+                        <span>Местоположение</span>
                       </h4>
                       <p className="text-white font-medium">{selectedDepartment.location}</p>
                     </div>
@@ -444,7 +558,7 @@ const GeneralDepartments = () => {
                     <div>
                       <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
                         <span className="text-2xl">🎯</span>
-                        <span>{t('departments.functions.title', 'Основные функции')}</span>
+                        <span>Основные функции</span>
                       </h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         {selectedDepartment.functions.map((func, index) => (
@@ -474,10 +588,10 @@ const GeneralDepartments = () => {
               className="bg-white/5 rounded-3xl border border-white/20 p-6 backdrop-blur-lg shadow-2xl"
             >
               <h3 className="text-2xl font-bold text-white mb-8 text-center">
-                {t('departments.overview.title', 'Основные направления деятельности')}
+                Основные направления деятельности
               </h3>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {departmentFunctions.map((func, index) => (
+                {normalizedData.functions.map((func, index) => (
                   <motion.div 
                     key={index}
                     initial={{ opacity: 0, scale: 0.9 }}
