@@ -4724,32 +4724,6 @@
     }
   },
   "collegeSports": {
-      "perYear": "per year",
-    "applyNow": "Apply Now",
-    "downloadBrochure": "Download Brochure",
-    "scheduleConsultation": "Schedule Consultation",
-    "startDate": "Start Date",
-    "september": "September 2024",
-    "places": "Available Places",
-    "advantagesTitle": "Why Choose Our College",
-    "advantages": {
-      "0": {
-        "title": "Championship Teams",
-        "description": "Compete at national level with our winning sports teams"
-      },
-      "1": {
-        "title": "Expert Coaches",
-        "description": "Learn from professional coaches and industry experts"
-      },
-      "2": {
-        "title": "Career Success",
-        "description": "95% employment rate within 6 months of graduation"
-      },
-      "3": {
-        "title": "Global Network",
-        "description": "Join our worldwide alumni network of successful graduates"
-      }
-    },
     "badge": "Sports College",
     "title": "College of Physical Culture and Sports",
     "subtitle": "Professional training of specialists in physical culture, sports and fitness. Modern educational programs and practical training.",
