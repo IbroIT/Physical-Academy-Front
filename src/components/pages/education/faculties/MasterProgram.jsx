@@ -9,77 +9,89 @@ const MasterProgram = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  
+  // Временно отключаем загрузку с бэкенда до тех пор, пока API не будет готово
+  const [backendData] = useState({
+    programs: [],
+    loading: false,
+    error: null
+  });
 
-  const programs = [
-    {
-      id: 1,
-      title: t('master.programs.0.title'),
-      duration: t('master.programs.0.duration'),
-      format: t('master.programs.0.format'),
-      description: t('master.programs.0.description'),
-      features: [
-        t('master.programs.0.features.0'),
-        t('master.programs.0.features.1'),
-        t('master.programs.0.features.2'),
-        t('master.programs.0.features.3')
-      ],
-      price: t('master.programs.0.price'),
-      icon: '🏃‍♂️',
-      color: 'from-blue-500 to-blue-600',
-      hoverColor: 'from-blue-600 to-blue-700'
-    },
-    {
-      id: 2,
-      title: t('master.programs.1.title'),
-      duration: t('master.programs.1.duration'),
-      format: t('master.programs.1.format'),
-      description: t('master.programs.1.description'),
-      features: [
-        t('master.programs.1.features.0'),
-        t('master.programs.1.features.1'),
-        t('master.programs.1.features.2'),
-        t('master.programs.1.features.3')
-      ],
-      price: t('master.programs.1.price'),
-      icon: '🏋️‍♂️',
-      color: 'from-green-500 to-green-600',
-      hoverColor: 'from-green-600 to-green-700'
-    },
-    {
-      id: 3,
-      title: t('master.programs.2.title'),
-      duration: t('master.programs.2.duration'),
-      format: t('master.programs.2.format'),
-      description: t('master.programs.2.description'),
-      features: [
-        t('master.programs.2.features.0'),
-        t('master.programs.2.features.1'),
-        t('master.programs.2.features.2'),
-        t('master.programs.2.features.3')
-      ],
-      price: t('master.programs.2.price'),
-      icon: '👨‍⚕️',
-      color: 'from-blue-500 to-green-500',
-      hoverColor: 'from-blue-600 to-green-600'
-    },
-    {
-      id: 4,
-      title: t('master.programs.3.title'),
-      duration: t('master.programs.3.duration'),
-      format: t('master.programs.3.format'),
-      description: t('master.programs.3.description'),
-      features: [
-        t('master.programs.3.features.0'),
-        t('master.programs.3.features.1'),
-        t('master.programs.3.features.2'),
-        t('master.programs.3.features.3')
-      ],
-      price: t('master.programs.3.price'),
-      icon: '🏊‍♂️',
-      color: 'from-green-500 to-blue-500',
-      hoverColor: 'from-green-600 to-blue-600'
-    }
-  ];
+  // Статические данные программ
+  const getProgramsData = () => {
+    return [
+      {
+        id: 1,
+        title: t('master.programs.0.title'),
+        duration: t('master.programs.0.duration'),
+        format: t('master.programs.0.format'),
+        description: t('master.programs.0.description'),
+        features: [
+          t('master.programs.0.features.0'),
+          t('master.programs.0.features.1'),
+          t('master.programs.0.features.2'),
+          t('master.programs.0.features.3')
+        ],
+        price: t('master.programs.0.price'),
+        icon: '🏃‍♂️',
+        color: 'from-blue-500 to-blue-600',
+        hoverColor: 'from-blue-600 to-blue-700'
+      },
+      {
+        id: 2,
+        title: t('master.programs.1.title'),
+        duration: t('master.programs.1.duration'),
+        format: t('master.programs.1.format'),
+        description: t('master.programs.1.description'),
+        features: [
+          t('master.programs.1.features.0'),
+          t('master.programs.1.features.1'),
+          t('master.programs.1.features.2'),
+          t('master.programs.1.features.3')
+        ],
+        price: t('master.programs.1.price'),
+        icon: '🏋️‍♂️',
+        color: 'from-green-500 to-green-600',
+        hoverColor: 'from-green-600 to-green-700'
+      },
+      {
+        id: 3,
+        title: t('master.programs.2.title'),
+        duration: t('master.programs.2.duration'),
+        format: t('master.programs.2.format'),
+        description: t('master.programs.2.description'),
+        features: [
+          t('master.programs.2.features.0'),
+          t('master.programs.2.features.1'),
+          t('master.programs.2.features.2'),
+          t('master.programs.2.features.3')
+        ],
+        price: t('master.programs.2.price'),
+        icon: '👨‍⚕️',
+        color: 'from-blue-500 to-green-500',
+        hoverColor: 'from-blue-600 to-green-600'
+      },
+      {
+        id: 4,
+        title: t('master.programs.3.title'),
+        duration: t('master.programs.3.duration'),
+        format: t('master.programs.3.format'),
+        description: t('master.programs.3.description'),
+        features: [
+          t('master.programs.3.features.0'),
+          t('master.programs.3.features.1'),
+          t('master.programs.3.features.2'),
+          t('master.programs.3.features.3')
+        ],
+        price: t('master.programs.3.price'),
+        icon: '🏊‍♂️',
+        color: 'from-green-500 to-blue-500',
+        hoverColor: 'from-green-600 to-blue-600'
+      }
+    ];
+  };
+
+  const programs = getProgramsData();
 
   useEffect(() => {
     setIsVisible(true);

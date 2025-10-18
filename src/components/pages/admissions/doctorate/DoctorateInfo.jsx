@@ -53,16 +53,25 @@ const DoctorateInfo = () => {
   };
 
   const fetchPrograms = async () => {
-    try {
-      const response = await fetch(`/api/admission/doctor-programs/?lang=${i18n.language}`);
-      const data = await response.json();
-      setApiData(prev => ({ ...prev, programs: data }));
-    } catch (error) {
-      console.error('Error fetching programs:', error);
-    } finally {
-      setLoading(prev => ({ ...prev, programs: false }));
-    }
-  };
+  try {
+    const response = await fetch(`/api/admission/doctor-programs/?lang=${i18n.language}`);
+    const data = await response.json();
+    const fixedData = data.map(program => ({
+      ...program,
+      features: Array.isArray(program.features)
+        ? program.features
+        : typeof program.features === "string"
+        ? program.features.split(",").map(f => f.trim())
+        : []
+    }));
+    setApiData(prev => ({ ...prev, programs: fixedData }));
+  } catch (error) {
+    console.error('Error fetching programs:', error);
+  } finally {
+    setLoading(prev => ({ ...prev, programs: false }));
+  }
+};
+
 
   const fetchProgramDetails = async (programId) => {
     try {

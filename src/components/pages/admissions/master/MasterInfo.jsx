@@ -49,69 +49,79 @@ const GraduateStudies = () => {
   }, [i18n.language]);
 
   // Функция для загрузки данных с бэкенда
-  const fetchBackendData = useCallback(async (type) => {
-    try {
-      setBackendData(prev => ({ 
-        ...prev, 
-        [type]: { ...prev[type], loading: true, error: null } 
-      }));
-      
-      const lang = getApiLanguage();
-      
-      // Используем относительные пути (предполагая, что бэкенд на том же домене)
-      const endpoints = {
-        master: [
-          `/api/admission/master-documents/?lang=${lang}`,
-          `/api/admission/master-programs/?lang=${lang}`,
-          `/api/admission/master-main-dates/?lang=${lang}`,
-          `/api/admission/master-requirements/?lang=${lang}`
-        ],
-        aspirant: [
-          `/api/admission/aspirant-documents/?lang=${lang}`,
-          `/api/admission/aspirant-programs/?lang=${lang}`,
-          `/api/admission/aspirant-main-dates/?lang=${lang}`,
-          `/api/admission/aspirant-requirements/?lang=${lang}`
-        ]
-      };
+const fetchBackendData = useCallback(async (type) => {
+  try {
+    setBackendData(prev => ({ 
+      ...prev, 
+      [type]: { ...prev[type], loading: true, error: null } 
+    }));
+    
+    const lang = getApiLanguage();
+    
+    const endpoints = {
+      master: [
+        `/api/admission/master-documents/?lang=${lang}`,
+        `/api/admission/master-programs/?lang=${lang}`,
+        `/api/admission/master-main-dates/?lang=${lang}`,
+        `/api/admission/master-requirements/?lang=${lang}`
+      ],
+      aspirant: [
+        `/api/admission/aspirant-documents/?lang=${lang}`,
+        `/api/admission/aspirant-programs/?lang=${lang}`,
+        `/api/admission/aspirant-main-dates/?lang=${lang}`,
+        `/api/admission/aspirant-requirements/?lang=${lang}`
+      ]
+    };
 
-      const responses = await Promise.all(
-        endpoints[type].map(url => 
-          fetch(url)
-            .then(res => {
-              if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-              return res.json();
-            })
-            .catch(error => {
-              console.error(`Error fetching ${url}:`, error);
-              return { results: [] };
-            })
-        )
-      );
-
-      setBackendData(prev => ({
-        ...prev,
-        [type]: {
-          documents: responses[0].results || [],
-          programs: responses[1].results || [],
-          dates: responses[2].results || [],
-          requirements: responses[3].results || [],
-          loading: false,
-          error: null
+    const responses = await Promise.all(
+      endpoints[type].map(async (url) => {
+        try {
+          const response = await fetch(url);
+          
+          // Проверяем content-type
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
+            return { results: [] };
+          }
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          return await response.json();
+        } catch (error) {
+          console.error(`Error fetching ${url}:`, error);
+          return { results: [] };
         }
-      }));
+      })
+    );
 
-    } catch (error) {
-      console.error(`Error fetching ${type} data:`, error);
-      setBackendData(prev => ({
-        ...prev,
-        [type]: {
-          ...prev[type],
-          loading: false,
-          error: 'Failed to load data'
-        }
-      }));
-    }
-  }, [getApiLanguage]);
+    setBackendData(prev => ({
+      ...prev,
+      [type]: {
+        documents: responses[0].results || [],
+        programs: responses[1].results || [],
+        dates: responses[2].results || [],
+        requirements: responses[3].results || [],
+        loading: false,
+        error: null
+      }
+    }));
+
+  } catch (error) {
+    console.error(`Error fetching ${type} data:`, error);
+    setBackendData(prev => ({
+      ...prev,
+      [type]: {
+        ...prev[type],
+        loading: false,
+        error: 'Failed to load data'
+      }
+    }));
+  }
+}, [getApiLanguage]);
 
   // Загрузка данных при монтировании
   useEffect(() => {
@@ -159,13 +169,19 @@ const GraduateStudies = () => {
   };
 
   const getCurrentPrograms = () => {
-    const currentData = getCurrentData();
-    return currentData.programs.map(program => ({
-      name: program.program_name,
-      field: program.description,
-      tags: program.features || []
-    }));
-  };
+  const currentData = getCurrentData();
+  return currentData.programs.map(program => ({
+    name: program.program_name,
+    field: program.description,
+    // Преобразуем features в массив, если это строка
+    tags: Array.isArray(program.features)
+      ? program.features
+      : typeof program.features === 'string'
+      ? program.features.split(',').map(tag => tag.trim())
+      : []
+  }));
+};
+
 
   const getCurrentRequirements = () => {
     const currentData = getCurrentData();

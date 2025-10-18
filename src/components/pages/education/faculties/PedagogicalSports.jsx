@@ -3,115 +3,233 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PedagogicalSports = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('about');
   const [hoveredCard, setHoveredCard] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [counterValues, setCounterValues] = useState([0, 0, 0, 0]);
+  const [apiData, setApiData] = useState({
+    faculty: null,
+    loading: true,
+    error: null
+  });
   const sectionRef = useRef(null);
 
-  // Получаем данные с проверками
-  const faculty = t('pedagogicalSports', { returnObjects: true }) || {};
-  
-  // Функция для нормализации данных - гарантирует, что поля являются массивами
-  const normalizeData = (data) => {
-    const defaultFaculty = {
-      name: t('pedagogicalSports.name', 'Факультет педагогики и спорта'),
-      fullDescription: t('pedagogicalSports.fullDescription', 'Современный факультет, объединяющий педагогическое мастерство и спортивное excellence.'),
+  // Загрузка данных с API
+  const fetchFacultyData = async () => {
+    try {
+      setApiData(prev => ({ ...prev, loading: true, error: null }));
+      const response = await fetch(`/api/education/faculties/?lang=${i18n.language}`);
+      const data = await response.json();
+      
+      if (data.results && data.results.length > 0) {
+        setApiData(prev => ({ ...prev, faculty: data.results[0], loading: false }));
+      } else {
+        setApiData(prev => ({ ...prev, error: 'No data found', loading: false }));
+      }
+    } catch (error) {
+      console.error('Error fetching faculty data:', error);
+      setApiData(prev => ({ ...prev, error: error.message, loading: false }));
+    }
+  };
+
+  useEffect(() => {
+    fetchFacultyData();
+  }, [i18n.language]);
+
+  // Функция для нормализации данных из API
+  const normalizeFacultyData = (apiFaculty) => {
+    if (!apiFaculty) return getDefaultData();
+
+    return {
+      name: apiFaculty.name || t('pedagogicalSports.name', 'Факультет педагогики и спорта'),
+      fullDescription: apiFaculty.description || t('pedagogicalSports.fullDescription', 'Современный факультет, объединяющий педагогическое мастерство и спортивное excellence.'),
       badge: t('pedagogicalSports.badge', 'Педагогическое образование'),
-      stats: Array.isArray(data.stats) ? data.stats : [
-        { label: 'Студентов', value: '2000+', icon: '👨‍🎓' },
-        { label: 'Выпускников', value: '5000+', icon: '🎓' },
-        { label: 'Преподавателей', value: '150+', icon: '👨‍🏫' },
-        { label: 'Спортивных секций', value: '25+', icon: '⚽' }
-      ],
+      stats: apiFaculty.statistics?.map(stat => ({
+        label: stat.meaning,
+        value: stat.titleInt,
+        icon: getIconForStat(stat.meaning)
+      })) || getDefaultData().stats,
       about: {
         missionTitle: t('pedagogicalSports.about.missionTitle', 'Миссия факультета'),
         advantagesTitle: t('pedagogicalSports.about.advantagesTitle', 'Ключевые преимущества'),
         achievementsTitle: t('pedagogicalSports.about.achievementsTitle', 'Наши достижения'),
-        mission: t('pedagogicalSports.about.mission', 'Подготовка высококвалифицированных специалистов в области физической культуры и спорта.'),
-        advantages: Array.isArray(data.about?.advantages) ? data.about.advantages : [
-          'Современные методики обучения',
-          'Практико-ориентированный подход',
-          'Международные стажировки'
-        ],
-        achievements: Array.isArray(data.about?.achievements) ? data.about.achievements : [
-          { value: '50+', label: 'Чемпионов мира', icon: '🏆' },
-          { value: '100+', label: 'Кандидатов наук', icon: '🔬' },
-          { value: '3', label: 'Заслуженных тренера', icon: '⭐' }
-        ]
+        mission: Array.isArray(apiFaculty.mission) ? apiFaculty.mission.join('. ') : apiFaculty.mission,
+        advantages: apiFaculty.mission || getDefaultData().about.advantages,
+        achievements: apiFaculty.achievements?.map((achieve, index) => ({
+          value: achieve.split(' ')[0] || `${index + 1}+`,
+          label: achieve.split(' ').slice(1).join(' ') || 'Достижение',
+          icon: getAchievementIcon(index)
+        })) || getDefaultData().about.achievements
       },
-      programs: Array.isArray(data.programs) ? data.programs : [
-        {
-          name: 'Бакалавриат',
-          description: 'Фундаментальная подготовка по педагогике и спортивным дисциплинам',
-          level: 'Бакалавр',
-          duration: '4 года',
-          format: 'Очная',
-          icon: '🎓'
-        },
-        {
-          name: 'Магистратура',
-          description: 'Углубленное изучение современных методик спортивной подготовки',
-          level: 'Магистр',
-          duration: '2 года',
-          format: 'Очная/Заочная',
-          icon: '📚'
-        }
-      ],
-      pedagogicalSpecializations: Array.isArray(data.pedagogicalSpecializations) ? data.pedagogicalSpecializations : [
-        {
-          name: 'Спортивная педагогика',
-          description: 'Методики обучения и воспитания в спортивной деятельности',
-          icon: '👨‍🏫',
-          competencies: ['Методика тренировок', 'Психология спорта', 'Возрастная педагогика']
-        }
-      ],
-      sportsSpecializations: Array.isArray(data.sportsSpecializations) ? data.sportsSpecializations : [
-        {
-          name: 'Футбол',
-          category: 'Игровые виды',
-          coaches: '12',
-          icon: '⚽'
-        }
-      ],
-      sportsFacilities: Array.isArray(data.sportsFacilities) ? data.sportsFacilities : [
-        {
-          name: 'Стадион',
-          description: 'Современный стадион с беговыми дорожками и футбольным полем',
-          facilities: '2 поля',
-          icon: '🏟️'
-        }
-      ],
-      teachers: Array.isArray(data.teachers) ? data.teachers : [
-        {
-          name: 'Иван Петров',
-          position: 'Профессор',
-          qualification: 'Доктор педагогических наук',
-          avatar: 'IP',
-          specializations: ['Спортивная педагогика', 'Методика тренировок']
-        }
-      ],
+      programs: apiFaculty.programs?.map(program => ({
+        id: program.id,
+        name: program.name,
+        description: program.description,
+        level: program.degree,
+        duration: `${program.duration_years} ${t('pedagogicalSports.programs.years', 'лет')}`,
+        format: program.offline ? t('pedagogicalSports.programs.offline', 'Очная') : t('pedagogicalSports.programs.online', 'Онлайн'),
+        icon: program.emoji || '🎓',
+        tuitionFee: program.tuition_fee
+      })) || getDefaultData().programs,
+      pedagogicalSpecializations: apiFaculty.specializations?.map(spec => ({
+        id: spec.id,
+        name: spec.name,
+        description: spec.description,
+        icon: getIconFromName(spec.name),
+        competencies: spec.features || []
+      })) || getDefaultData().pedagogicalSpecializations,
+      sportsSpecializations: apiFaculty.sports?.map(sport => ({
+        id: sport.id,
+        name: sport.name,
+        category: getSportCategory(sport.name),
+        coaches: '12', // Можно добавить в API если нужно
+        icon: sport.emoji || '⚽',
+        description: sport.description
+      })) || getDefaultData().sportsSpecializations,
+      teachers: apiFaculty.teachers?.map(teacher => ({
+        id: teacher.id,
+        name: teacher.full_name,
+        position: teacher.position,
+        qualification: teacher.position, // Можно добавить отдельное поле в API
+        avatar: getInitials(teacher.full_name),
+        photo: teacher.photo,
+        specializations: ['Спортивная педагогика'] // Можно добавить в API
+      })) || getDefaultData().teachers,
       contacts: {
-        phone: data.contacts?.phone || '+7 (495) 123-45-67',
-        email: data.contacts?.email || 'pedagogy@sports-academy.ru',
-        address: data.contacts?.address || 'Москва, ул. Спортивная, д. 25',
-        workingHours: data.contacts?.workingHours || 'Пн-Пт: 9:00-18:00',
+        phone: apiFaculty.contacts?.find(c => c.title?.includes('телефон'))?.value || '+7 (495) 123-45-67',
+        email: apiFaculty.contacts?.find(c => c.title?.includes('email'))?.value || 'pedagogy@sports-academy.ru',
+        address: apiFaculty.contacts?.find(c => c.title?.includes('адрес'))?.value || 'Москва, ул. Спортивная, д. 25',
+        workingHours: apiFaculty.contacts?.find(c => c.title?.includes('время'))?.value || 'Пн-Пт: 9:00-18:00',
         dean: {
-          name: data.contacts?.dean?.name || 'Алексей Волков',
-          position: data.contacts?.dean?.position || 'Декан факультета',
-          degree: data.contacts?.dean?.degree || 'Доктор педагогических наук, профессор',
-          email: data.contacts?.dean?.email || 'volkov@pedagogy.ru',
-          avatar: data.contacts?.dean?.avatar || 'АВ'
+          name: 'Алексей Волков', // Можно добавить в API
+          position: 'Декан факультета',
+          degree: 'Доктор педагогических наук, профессор',
+          email: 'volkov@pedagogy.ru',
+          avatar: 'АВ'
         }
       }
     };
-
-    return defaultFaculty;
   };
 
-  // Нормализуем данные
-  const facultyData = normalizeData(faculty);
+  // Вспомогательные функции
+  const getDefaultData = () => ({
+    name: t('pedagogicalSports.name', 'Факультет педагогики и спорта'),
+    fullDescription: t('pedagogicalSports.fullDescription', 'Современный факультет, объединяющий педагогическое мастерство и спортивное excellence.'),
+    badge: t('pedagogicalSports.badge', 'Педагогическое образование'),
+    stats: [
+      { label: 'Студентов', value: '2000+', icon: '👨‍🎓' },
+      { label: 'Выпускников', value: '5000+', icon: '🎓' },
+      { label: 'Преподавателей', value: '150+', icon: '👨‍🏫' },
+      { label: 'Спортивных секций', value: '25+', icon: '⚽' }
+    ],
+    about: {
+      missionTitle: t('pedagogicalSports.about.missionTitle', 'Миссия факультета'),
+      advantagesTitle: t('pedagogicalSports.about.advantagesTitle', 'Ключевые преимущества'),
+      achievementsTitle: t('pedagogicalSports.about.achievementsTitle', 'Наши достижения'),
+      mission: t('pedagogicalSports.about.mission', 'Подготовка высококвалифицированных специалистов в области физической культуры и спорта.'),
+      advantages: [
+        'Современные методики обучения',
+        'Практико-ориентированный подход',
+        'Международные стажировки'
+      ],
+      achievements: [
+        { value: '50+', label: 'Чемпионов мира', icon: '🏆' },
+        { value: '100+', label: 'Кандидатов наук', icon: '🔬' },
+        { value: '3', label: 'Заслуженных тренера', icon: '⭐' }
+      ]
+    },
+    programs: [
+      {
+        name: 'Бакалавриат',
+        description: 'Фундаментальная подготовка по педагогике и спортивным дисциплинам',
+        level: 'Бакалавр',
+        duration: '4 года',
+        format: 'Очная',
+        icon: '🎓'
+      }
+    ],
+    pedagogicalSpecializations: [
+      {
+        name: 'Спортивная педагогика',
+        description: 'Методики обучения и воспитания в спортивной деятельности',
+        icon: '👨‍🏫',
+        competencies: ['Методика тренировок', 'Психология спорта', 'Возрастная педагогика']
+      }
+    ],
+    sportsSpecializations: [
+      {
+        name: 'Футбол',
+        category: 'Игровые виды',
+        coaches: '12',
+        icon: '⚽'
+      }
+    ],
+    teachers: [
+      {
+        name: 'Иван Петров',
+        position: 'Профессор',
+        qualification: 'Доктор педагогических наук',
+        avatar: 'IP',
+        specializations: ['Спортивная педагогика', 'Методика тренировок']
+      }
+    ],
+    contacts: {
+      phone: '+7 (495) 123-45-67',
+      email: 'pedagogy@sports-academy.ru',
+      address: 'Москва, ул. Спортивная, д. 25',
+      workingHours: 'Пн-Пт: 9:00-18:00',
+      dean: {
+        name: 'Алексей Волков',
+        position: 'Декан факультета',
+        degree: 'Доктор педагогических наук, профессор',
+        email: 'volkov@pedagogy.ru',
+        avatar: 'АВ'
+      }
+    }
+  });
+
+  const getIconForStat = (meaning) => {
+    const icons = {
+      'студентов': '👨‍🎓',
+      'выпускников': '🎓',
+      'преподавателей': '👨‍🏫',
+      'секций': '⚽',
+      'default': '📊'
+    };
+    return icons[meaning?.toLowerCase()] || icons.default;
+  };
+
+  const getAchievementIcon = (index) => {
+    const icons = ['🏆', '🔬', '⭐', '🎯', '🚀'];
+    return icons[index] || icons[0];
+  };
+
+  const getIconFromName = (name) => {
+    if (name?.includes('👨‍🏫')) return '👨‍🏫';
+    if (name?.includes('🏃')) return '🏃‍♂️';
+    if (name?.includes('⚽')) return '⚽';
+    return '🎯';
+  };
+
+  const getSportCategory = (sportName) => {
+    const categories = {
+      'футбол': 'Игровые виды',
+      'баскетбол': 'Игровые виды',
+      'волейбол': 'Игровые виды',
+      'плавание': 'Водные виды',
+      'легкая атлетика': 'Легкая атлетика',
+      'default': 'Спортивные направления'
+    };
+    return categories[sportName?.toLowerCase()] || categories.default;
+  };
+
+  const getInitials = (fullName) => {
+    return fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || 'NN';
+  };
+
+  // Получаем нормализованные данные
+  const facultyData = normalizeFacultyData(apiData.faculty);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -129,7 +247,7 @@ const PedagogicalSports = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [facultyData.stats]);
 
   const startCounters = () => {
     const targetValues = facultyData.stats.map(stat => parseInt(stat.value.replace(/\D/g, '')) || 0);
@@ -184,6 +302,34 @@ const PedagogicalSports = () => {
       }
     }
   };
+
+  if (apiData.loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-500 mb-4"></div>
+          <p className="text-blue-100 text-xl">{t('common.loading', 'Загрузка...')}</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (apiData.error) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">😕</div>
+          <p className="text-blue-100 text-xl mb-4">{t('common.error', 'Ошибка загрузки данных')}</p>
+          <button 
+            onClick={fetchFacultyData}
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 text-white rounded-2xl hover:scale-105 transition-transform duration-300"
+          >
+            {t('common.retry', 'Попробовать снова')}
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section 
@@ -405,7 +551,7 @@ const PedagogicalSports = () => {
                   <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
                     {facultyData.programs.map((program, index) => (
                       <motion.div 
-                        key={index}
+                        key={program.id || index}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.1 }}
@@ -437,6 +583,12 @@ const PedagogicalSports = () => {
                               <span className="text-blue-200">{t('pedagogicalSports.programs.format', 'Форма')}:</span>
                               <span className="text-white font-semibold">{program.format}</span>
                             </div>
+                            {program.tuitionFee && (
+                              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
+                                <span className="text-blue-200">{t('pedagogicalSports.programs.tuition', 'Стоимость')}:</span>
+                                <span className="text-white font-semibold">{program.tuitionFee} ₽</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </motion.div>
@@ -464,7 +616,7 @@ const PedagogicalSports = () => {
                       <div className="space-y-4">
                         {facultyData.pedagogicalSpecializations.map((spec, index) => (
                           <motion.div 
-                            key={index} 
+                            key={spec.id || index}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
@@ -500,7 +652,7 @@ const PedagogicalSports = () => {
                       <div className="space-y-4">
                         {facultyData.sportsSpecializations.map((sport, index) => (
                           <motion.div 
-                            key={index} 
+                            key={sport.id || index}
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
@@ -511,6 +663,7 @@ const PedagogicalSports = () => {
                               <div>
                                 <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">{sport.name}</div>
                                 <div className="text-blue-200 text-lg">{sport.category}</div>
+                                <div className="text-blue-300 text-sm mt-1">{sport.description}</div>
                               </div>
                             </div>
                             <div className="text-right">
