@@ -420,39 +420,7 @@ const AcademicStructure = () => {
           </p>
         </motion.div>
 
-        {/* Статистика */}
-        {stats && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-12 lg:mb-16"
-          >
-            {[
-              { value: stats.total, label: t('structure.stats.total'), gradient: 'from-blue-500 to-emerald-500' },
-              { value: stats.faculties, label: t('structure.stats.faculties'), gradient: 'from-emerald-500 to-blue-600' },
-              { value: stats.administrative, label: t('structure.stats.administrative'), gradient: 'from-blue-600 to-emerald-600' },
-              { value: stats.leadership, label: t('structure.stats.leadership'), gradient: 'from-emerald-400 to-blue-500' },
-              { value: stats.support, label: t('structure.stats.support'), gradient: 'from-blue-500 to-cyan-500' },
-              { value: stats.active, label: t('structure.stats.active'), gradient: 'from-emerald-500 to-green-500' }
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 + index * 0.1 }}
-                className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
-              >
-                <div className={`text-3xl lg:text-4xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}>
-                  {stat.value}
-                </div>
-                <div className="text-blue-200 text-sm lg:text-base">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
+       
 
         {/* Controls */}
         <motion.div
@@ -571,27 +539,7 @@ const AcademicStructure = () => {
           </motion.div>
         )}
 
-        {/* Additional Information */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.9 }}
-          className="mt-16 bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-8 lg:p-12 backdrop-blur-lg border border-white/20 text-center"
-        >
-          <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-            {t('structure.contactInfo.title')}
-          </h3>
-          <p className="text-blue-100 mb-6 max-w-2xl mx-auto text-lg leading-relaxed">
-            {t('structure.contactInfo.description')}
-          </p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl"
-          >
-            {t('structure.contactInfo.button')}
-          </motion.button>
-        </motion.div>
+        
       </div>
     </motion.section>
   );

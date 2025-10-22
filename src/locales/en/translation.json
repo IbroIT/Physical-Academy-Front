@@ -512,76 +512,24 @@
       "studentsDesc": "Active extracurricular activities and events"
     }
   },
-  "accreditation": {
-    "loading": "Loading accreditations...",
-    "stats": {
-      "active": "Active accreditations",
-      "international": "International",
-      "national": "National",
-      "total": "Total"
-    },
-    "filters": {
-      "active": "Active accreditations",
-      "all": "All accreditations"
-    },
-    "empty": {
-      "active": "No active accreditations found",
-      "all": "No accreditations found"
-    },
-    "standards": {
-      "title": "Education Quality Standards"
-    },
-    "additional": {
-      "title": "Need more information?",
-      "description": "Contact us for complete information about accreditations and quality certificates",
-      "contact": "Contact Us",
-      "download": "Download brochure"
-    },
-    "about": {
-      "badge": "About Academy",
-      "title": "ABOUT ACADEMY",
-      "subtitle": "Leading center for training specialists in physical culture and sports with rich history and innovative approach",
-      "stats": {
-        "years": "Years of excellence",
-        "graduates": "Graduates",
-        "programs": "Educational programs",
-        "employment": "Graduate employment"
-      },
-      "media": {
-        "campus": "Academy campus",
-        "campusDesc": "Modern infrastructure for learning and sports",
-        "virtualTour": "Virtual tour",
-        "virtualTourDesc": "Interactive academy tour",
-        "labs": "Scientific laboratories",
-        "labsDesc": "Advanced research equipment",
-        "students": "Student life",
-        "studentsDesc": "Active extracurricular activities"
-      },
-      "features": {
-        "innovation": {
-          "title": "Innovation in Sports",
-          "description": "Implement advanced technologies and methods in training process and educational programs"
-        },
-        "global": {
-          "title": "International Recognition",
-          "description": "Cooperate with leading sports organizations and universities worldwide"
-        },
-        "community": {
-          "title": "Strong Community",
-          "description": "Unite students, graduates and experts to create powerful professional network"
-        }
-      },
-      "content": {
-        "paragraph1": "Our academy was founded to train highly qualified specialists in physical culture and sports. Over the years, we have created a unique educational ecosystem combining traditions and innovations.",
-        "paragraph2": "Today we continue to develop, implementing modern technologies in educational process and expanding international cooperation. Our mission is to educate new generation of sports industry leaders."
-      },
-      "cta": {
-        "title": "Ready to become part of our team?",
-        "description": "Join the leading sports academy of the country and start your path to successful career in sports industry",
-        "primary": "Apply Now",
-        "secondary": "Learn More"
-      }
-    }
+ "accreditation": {
+    "title": "Accreditations",
+    "subtitle": "International and national accreditations confirming the quality of education",
+    "totalAccreditations": "Total Accreditations",
+    "international": "International",
+    "all": "All",
+    "validity": "Validity Period",
+    "certificateNumber": "Certificate Number",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "fullDescription": "Full Description",
+    "type": "Accreditation Type",
+    "certificate": "Certificate",
+    "noAccreditations": "No accreditations available",
+    "noAccreditationsDescription": "There are no accreditations at the moment",
+    "noFilteredAccreditations": "No accreditations found for the selected filter",
+    "errorTitle": "Failed to load data",
+    "retry": "Try Again"
   },
   "academicStructure": {
     "title": "Academic Structure",
@@ -6163,6 +6111,9 @@
     ]
   },
   "administrativeUnits": {
+    "staffCount": "Staff count",
+  "workingHoursTime": "Working hours",
+  "receptionHoursTime": "Reception hours",
     "badge": "Administration",
     "title": "Administrative Departments",
     "subtitle": "Academy management structure ensuring effective organization of educational process and scientific activities",
@@ -7969,5 +7920,11 @@
     "noContacts": "No contacts available",
     "errorTitle": "Failed to load data",
     "retry": "Try Again"
-  }
+  },
+  "structure": {
+  "hierarchicalView": "Hierarchical view",
+  "flatView": "Flat view",
+  "active": "Active",
+  "all": "All"
+}
 }
