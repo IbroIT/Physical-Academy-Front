@@ -60,91 +60,56 @@
     "open_menu": "Open Menu",
     "close_menu": "Close Menu"
   },
-  "vestnik": {
-    "title": "Scientific Bulletin",
-    "subtitle": "Advanced Research in Physical Culture and Sports",
-    "views": {
-      "current": "Current Issue",
-      "archive": "Archive",
-      "metrics": "Metrics"
-    },
-    "current": {
-      "newBadge": "NEW",
-      "currentIssue": "CURRENT ISSUE",
-      "defaultTitle": "Academy of Physical Culture Bulletin",
-      "defaultDescription": "Scientific journal with latest research and publications in physical culture, sports and health",
-      "stats": {
-        "releaseDate": {
-          "label": "Release Date",
-          "default": "2024"
-        },
-        "issn": {
-          "label": "ISSN",
-          "default": "0000-0000"
-        },
-        "articlesCount": {
-          "label": "Articles",
-          "default": "12"
-        },
-        "pages": {
-          "label": "Pages",
-          "default": "150"
+"vestnik": {
+      "errorTitle": "Data Loading Error",
+      "retry": "Retry",
+      "title": "Scientific Bulletin",
+      "subtitle": "Advanced Research in Physical Culture and Sports",
+      "views": {
+        "current": "Current Issue",
+        "archive": "Archive",
+        "metrics": "Metrics"
+      },
+      "current": {
+        "noIssue": "Issue Not Found",
+        "noIssueDescription": "There is currently no active issue",
+        "newBadge": "NEW",
+        "currentIssue": "CURRENT ISSUE",
+        "defaultDescription": "Scientific journal with latest research and publications in physical culture, sports and health",
+        "releaseDate": "Release Date",
+        "articlesCount": "Number of Articles",
+        "volume": "Volume",
+        "issue": "Issue",
+        "issueNumber": "Issue Number",
+        "articles": "articles"
+      },
+      "archive": {
+        "title": "Issue Archive",
+        "allYears": "All Years",
+        "vestnik": "Bulletin",
+        "noIssues": {
+          "title": "No Issues Found",
+          "description": "Try selecting another year to view"
         }
-      }
-    },
-    "archive": {
-      "title": "Issue Archive",
-      "allYears": "All years",
-      "articles": "articles",
-      "pages": "p.",
-      "noIssues": {
-        "title": "No issues found",
-        "description": "Try selecting another year to view"
-      }
-    },
-    "metrics": {
-      "title": "Journal Metrics",
-      "defaultMetrics": [
-        {
-          "value": "4.2",
-          "label": "Impact Factor",
-          "description": "Journal rating",
-          "color": "blue"
-        },
-        {
-          "value": "85%",
-          "label": "Acceptance Rate",
-          "description": "Acceptance level",
-          "color": "green"
-        },
-        {
-          "value": "3.5",
-          "label": "Review Time",
-          "description": "Average weeks",
-          "color": "purple"
-        },
-        {
-          "value": "150+",
-          "label": "Citations",
-          "description": "Total citations",
-          "color": "orange"
+      },
+      "metrics": {
+        "title": "Journal Metrics",
+        "noData": "Metrics data unavailable",
+        "about": {
+          "title": "About Journal Metrics",
+          "description": "Our metrics reflect the quality and impact of the journal in the scientific community. We continuously work to improve indicators and raise publication standards.",
+          "learnMore": "Learn more about metrics",
+          "journalPolicy": "Journal Policy"
         }
-      ],
-      "about": {
-        "title": "About Journal Metrics",
-        "description": "Our metrics reflect the quality and impact of the journal in the scientific community. We continuously work to improve indicators and raise publication standards.",
-        "learnMore": "Learn more about metrics",
-        "journalPolicy": "Journal Policy"
+      },
+      "actions": {
+        "downloadPDF": "Download PDF",
+        "readOnline": "Read Online",
+        "forAuthors": "For Authors",
+        "openIssue": "Open Issue",
+        "open": "Open"
       }
     },
-    "actions": {
-      "downloadPdf": "Download PDF",
-      "readOnline": "Read online",
-      "forAuthors": "For Authors",
-      "openIssue": "Open Issue",
-      "open": "Open"
-    }
-  },
   "academy": {
     "mission": {
       "badge": "Our Philosophy",
@@ -3774,51 +3739,7 @@
           "location": "Assembly Hall",
           "participantsCount": "120"
         }
-      ],
-      "labels": {
-        "tabs": {
-          "members": "Council Members",
-          "initiatives": "Initiatives",
-          "events": "Events"
-        },
-        "roles": {
-          "president": "President"
-        },
-        "goals": {
-          "title": "Main Goals"
-        },
-        "actions": {
-          "title": "Quick Actions",
-          "suggestIdea": "Suggest Idea",
-          "becomeVolunteer": "Become Volunteer",
-          "askQuestion": "Ask Question"
-        },
-        "contacts": {
-          "title": "Contacts",
-          "email": "council@sports-academy.edu",
-          "office": "Room 215, Sports Complex",
-          "hours": "Mon-Fri 14:00-18:00"
-        },
-        "initiatives": {
-          "tasks": "Tasks",
-          "participants": "Participants",
-          "join": "Join Initiative"
-        },
-        "events": {
-          "participants": "participants",
-          "signUp": "Sign Up"
-        },
-        "modal": {
-          "information": "Information",
-          "contacts": "Contacts",
-          "responsibilities": "Responsibilities",
-          "achievements": "Achievements",
-          "faculty": "Faculty",
-          "course": "Course",
-          "role": "Role",
-          "telegram": "Telegram"
-        }
-      }
+      ]
     },
     "scholarships": {
       "title": "Scholarship Programs",
@@ -4671,16 +4592,25 @@
       }
     }
   },
-  "wos": {
-    "title": "Web of Science",
-    "subtitle": "Research metrics and publication data",
-    "loading": "Loading Web of Science data...",
-    "institutions": "institutions",
-    "publications": "publications",
-    "journal_quartiles": "Publications by Journal Quartile",
-    "by_category": "Publications by Category",
-    "collaborations": "International Collaboration"
-  },
+"wos": {
+      "title": "Web of Science",
+      "subtitle": "Research metrics and publication data", 
+      "loading": "Loading Web of Science data...",
+      "institutions": "institutions",
+      "publications": "publications",
+      "journal_quartiles": "Publications by Journal Quartile",
+      "by_category": "Publications by Category",
+      "collaborations": "International Collaboration",
+      "categoriesIcon": "📈",
+      "categoriesTitle": "Publications by Category",
+      "collaborationsIcon": "🌍", 
+      "collaborationsTitle": "International Collaboration",
+      "collaborationsInstitutions": "institutions",
+      "collaborationsPublications": "publications",
+      "topJournalsIcon": "⭐",
+      "topJournalsTitle": "Publications by Journal Quartile",
+      "titleIcon": "📊"
+    },
   "error": {
     "failed_to_load": "Failed to load data",
     "retry": "Retry",

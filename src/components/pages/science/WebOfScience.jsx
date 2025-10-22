@@ -4,18 +4,43 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const WebOfScience = () => {
   const { t, i18n } = useTranslation();
-  const [timeRange, setTimeRange] = useState('5years');
   const [isVisible, setIsVisible] = useState(false);
   const [counterValues, setCounterValues] = useState({});
   const [activeMetric, setActiveMetric] = useState(0);
   const [activeCategory, setActiveCategory] = useState(0);
   
-  // Единое состояние для данных
+  // Единое состояние для данных с бэкенда
   const [backendData, setBackendData] = useState({
-    pageData: null,
-    metrics: {},
-    loading: true,
-    error: null
+    metrics: {
+      results: [],
+      loading: false,
+      error: null
+    },
+    categories: {
+      results: [],
+      loading: false,
+      error: null
+    },
+    collaborations: {
+      results: [],
+      loading: false,
+      error: null
+    },
+    journalQuartiles: {
+      results: [],
+      loading: false,
+      error: null
+    },
+    additionalMetrics: {
+      results: [],
+      loading: false,
+      error: null
+    },
+    sections: {
+      results: [],
+      loading: false,
+      error: null
+    }
   });
 
   const sectionRef = useRef(null);
@@ -33,178 +58,118 @@ const WebOfScience = () => {
   // Функция для загрузки данных с бэкенда
   const fetchBackendData = useCallback(async () => {
     try {
-      setBackendData(prev => ({ 
-        ...prev, 
-        loading: true, 
-        error: null 
-      }));
-      
       const lang = getApiLanguage();
-      console.log('Fetching data for language:', lang); // Для отладки
+      console.log('Fetching Web of Science data for language:', lang);
       
-      const response = await fetch(`/api/science/wos-page/?lang=${lang}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Invalid content type');
-      }
-      
-      const data = await response.json();
-      
-      // Преобразуем данные из API в формат компонента
-      const transformedData = transformApiData(data);
-      
+      // Устанавливаем состояние загрузки для всех разделов
+      setBackendData(prev => ({
+        metrics: { ...prev.metrics, loading: true, error: null },
+        categories: { ...prev.categories, loading: true, error: null },
+        collaborations: { ...prev.collaborations, loading: true, error: null },
+        journalQuartiles: { ...prev.journalQuartiles, loading: true, error: null },
+        additionalMetrics: { ...prev.additionalMetrics, loading: true, error: null },
+        sections: { ...prev.sections, loading: true, error: null }
+      }));
+
+      // Определяем все эндпоинты
+      const endpoints = [
+        `/api/science/wos-metrics/?lang=${lang}`,
+        `/api/science/wos-categories/?lang=${lang}`,
+        `/api/science/wos-collaborations/?lang=${lang}`,
+        `/api/science/wos-journal-quartiles/?lang=${lang}`,
+        `/api/science/wos-additional-metrics/?lang=${lang}`,
+        `/api/science/wos-sections/?lang=${lang}`
+      ];
+
+      const responses = await Promise.all(
+        endpoints.map(async (url) => {
+          try {
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              const text = await response.text();
+              console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
+              return { results: [] };
+            }
+            
+            return await response.json();
+          } catch (error) {
+            console.error(`Error fetching ${url}:`, error);
+            return { results: [] };
+          }
+        })
+      );
+
+      // Обновляем данные для каждого раздела
       setBackendData({
-        pageData: transformedData.pageData,
-        metrics: transformedData.metrics,
-        loading: false,
-        error: null
+        metrics: { 
+          results: responses[0].results || [], 
+          loading: false, 
+          error: null 
+        },
+        categories: { 
+          results: responses[1].results || [], 
+          loading: false, 
+          error: null 
+        },
+        collaborations: { 
+          results: responses[2].results || [], 
+          loading: false, 
+          error: null 
+        },
+        journalQuartiles: { 
+          results: responses[3].results || [], 
+          loading: false, 
+          error: null 
+        },
+        additionalMetrics: { 
+          results: responses[4].results || [], 
+          loading: false, 
+          error: null 
+        },
+        sections: { 
+          results: responses[5].results || [], 
+          loading: false, 
+          error: null 
+        }
+      });
+
+      console.log('Loaded data:', {
+        metrics: responses[0].results?.length || 0,
+        categories: responses[1].results?.length || 0,
+        collaborations: responses[2].results?.length || 0,
+        journalQuartiles: responses[3].results?.length || 0,
+        additionalMetrics: responses[4].results?.length || 0,
+        sections: responses[5].results?.length || 0
       });
 
     } catch (error) {
       console.error('Error fetching Web of Science data:', error);
       setBackendData(prev => ({
-        ...prev,
-        loading: false,
-        error: t('error.failed_to_load') || 'Failed to load Web of Science data'
+        metrics: { ...prev.metrics, loading: false, error: 'Failed to load metrics' },
+        categories: { ...prev.categories, loading: false, error: 'Failed to load categories' },
+        collaborations: { ...prev.collaborations, loading: false, error: 'Failed to load collaborations' },
+        journalQuartiles: { ...prev.journalQuartiles, loading: false, error: 'Failed to load journal quartiles' },
+        additionalMetrics: { ...prev.additionalMetrics, loading: false, error: 'Failed to load additional metrics' },
+        sections: { ...prev.sections, loading: false, error: 'Failed to load sections' }
       }));
     }
-  }, [getApiLanguage, t]);
+  }, [getApiLanguage]);
 
-  // Преобразование данных API в формат компонента
-  const transformApiData = (apiData) => {
-    // Если API возвращает данные в ожидаемом формате, используем их как есть
-    if (apiData.metrics && typeof apiData.metrics === 'object') {
-      return {
-        pageData: apiData,
-        metrics: apiData.metrics
-      };
-    }
-
-    // Иначе преобразуем из структуры API
-    const metrics = {};
-    const timeRanges = {};
-
-    // Обрабатываем временные диапазоны
-    if (apiData.timeRanges && Array.isArray(apiData.timeRanges)) {
-      apiData.timeRanges.forEach(range => {
-        timeRanges[range.key] = range.name;
-      });
-    }
-
-    // Обрабатываем основные метрики
-    if (apiData.metrics && Array.isArray(apiData.metrics)) {
-      // Группируем метрики по временным диапазонам
-      apiData.metrics.forEach(metric => {
-        const rangeKey = metric.time_range || '5years';
-        if (!metrics[rangeKey]) {
-          metrics[rangeKey] = {
-            main: {},
-            categories: [],
-            collaborations: [],
-            topJournals: []
-          };
-        }
-        
-        metrics[rangeKey].main[metric.key] = {
-          value: metric.value,
-          label: metric.label,
-          icon: metric.icon,
-          description: metric.description
-        };
-      });
-    }
-
-    // Обрабатываем категории
-    if (apiData.categories && Array.isArray(apiData.categories)) {
-      apiData.categories.forEach(category => {
-        const rangeKey = category.time_range || '5years';
-        if (!metrics[rangeKey]) {
-          metrics[rangeKey] = {
-            main: {},
-            categories: [],
-            collaborations: [],
-            topJournals: []
-          };
-        }
-        
-        metrics[rangeKey].categories.push({
-          name: category.name,
-          count: category.count
-        });
-      });
-    }
-
-    // Обрабатываем коллаборации
-    if (apiData.collaborations && Array.isArray(apiData.collaborations)) {
-      apiData.collaborations.forEach(collab => {
-        const rangeKey = collab.time_range || '5years';
-        if (!metrics[rangeKey]) {
-          metrics[rangeKey] = {
-            main: {},
-            categories: [],
-            collaborations: [],
-            topJournals: []
-          };
-        }
-        
-        metrics[rangeKey].collaborations.push({
-          country: collab.country,
-          institutions: collab.institutions,
-          publications: collab.publications,
-          flag: collab.flag
-        });
-      });
-    }
-
-    // Обрабатываем квартили журналов
-    if (apiData.topJournals && Array.isArray(apiData.topJournals)) {
-      apiData.topJournals.forEach(journal => {
-        const rangeKey = journal.time_range || '5years';
-        if (!metrics[rangeKey]) {
-          metrics[rangeKey] = {
-            main: {},
-            categories: [],
-            collaborations: [],
-            topJournals: []
-          };
-        }
-        
-        metrics[rangeKey].topJournals.push({
-          quartile: journal.quartile,
-          count: journal.count
-        });
-      });
-    }
-
-    return {
-      pageData: {
-        title: apiData.title || t('wos.title') || "Web of Science",
-        subtitle: apiData.subtitle || t('wos.subtitle') || "Research metrics and publication data",
-        titleIcon: apiData.titleIcon || "📊",
-        categoriesIcon: apiData.categoriesIcon || "📈",
-        collaborationsIcon: apiData.collaborationsIcon || "🌍",
-        topJournalsIcon: apiData.topJournalsIcon || "⭐",
-        timeRanges: timeRanges,
-        collaborationsInstitutions: apiData.collaborationsInstitutions || t('wos.institutions') || "institutions",
-        collaborationsPublications: apiData.collaborationsPublications || t('wos.publications') || "publications",
-        topJournalsTitle: apiData.topJournalsTitle || t('wos.journal_quartiles') || "Publications by Journal Quartile",
-        categoriesTitle: apiData.categoriesTitle || t('wos.by_category') || "Publications by Category",
-        collaborationsTitle: apiData.collaborationsTitle || t('wos.collaborations') || "International Collaboration",
-        additionalMetrics: apiData.additionalMetrics || []
-      },
-      metrics: metrics
-    };
-  };
-
-  // Загрузка данных при монтировании и изменении языка
+  // Загрузка данных при монтировании
   useEffect(() => {
     fetchBackendData();
-  }, [i18n.language]); // Добавляем i18n.language в зависимости
+  }, [fetchBackendData]);
+
+  // Перезагрузка данных при изменении языка
+  useEffect(() => {
+    fetchBackendData();
+  }, [i18n.language]);
 
   // Сброс состояний при изменении языка
   useEffect(() => {
@@ -213,7 +178,7 @@ const WebOfScience = () => {
     setActiveCategory(0);
   }, [i18n.language]);
 
-  // Остальной код без изменений...
+  // Intersection Observer для анимаций
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -232,19 +197,18 @@ const WebOfScience = () => {
     }
 
     return () => observer.disconnect();
-  }, [backendData]);
+  }, [backendData.metrics.results]);
 
   // Автопереключение метрик и категорий
   useEffect(() => {
-    const currentMetrics = backendData.metrics[timeRange];
-    if (!currentMetrics?.main) return;
+    const metricsCount = backendData.metrics.results.length;
+    const categoriesCount = backendData.categories.results.length;
+    
+    if (metricsCount === 0 && categoriesCount === 0) return;
     
     const interval = setInterval(() => {
-      const mainMetricsCount = Object.keys(currentMetrics.main || {}).length;
-      const categoriesCount = currentMetrics.categories?.length || 0;
-      
-      if (mainMetricsCount > 0) {
-        setActiveMetric(prev => (prev + 1) % mainMetricsCount);
+      if (metricsCount > 0) {
+        setActiveMetric(prev => (prev + 1) % metricsCount);
       }
       if (categoriesCount > 0) {
         setActiveCategory(prev => (prev + 1) % categoriesCount);
@@ -252,17 +216,26 @@ const WebOfScience = () => {
     }, 4000);
     
     return () => clearInterval(interval);
-  }, [timeRange, backendData.metrics]);
+  }, [backendData.metrics.results, backendData.categories.results]);
 
+  // Получение текста секции
+  const getSectionText = (sectionKey) => {
+    const section = backendData.sections.results.find(s => s.section_key === sectionKey);
+    return section ? section.text : t(`wos.${sectionKey}`) || sectionKey;
+  };
+
+  // Запуск счетчиков
   const startCounters = () => {
-    const currentMetrics = backendData.metrics[timeRange];
-    if (!currentMetrics?.main) return;
+    const metrics = backendData.metrics.results;
+    if (!metrics || metrics.length === 0) return;
     
     const targetValues = {};
     
-    Object.entries(currentMetrics.main || {}).forEach(([key, metric]) => {
+    metrics.forEach(metric => {
       if (metric && metric.value) {
-        targetValues[key] = parseInt(metric.value.replace(/\D/g, '')) || 0;
+        // Извлекаем числовое значение (убираем все нецифровые символы кроме точки и запятой)
+        const numericValue = parseFloat(metric.value.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+        targetValues[metric.id || metric.key] = isNaN(numericValue) ? 0 : numericValue;
       }
     });
 
@@ -297,10 +270,14 @@ const WebOfScience = () => {
   };
 
   useEffect(() => {
-    if (backendData.pageData && isVisible) {
+    if (isVisible && backendData.metrics.results.length > 0) {
       startCounters();
     }
-  }, [timeRange, backendData, isVisible]);
+  }, [isVisible, backendData.metrics.results]);
+
+  // Проверка загрузки
+  const isLoading = Object.values(backendData).some(section => section.loading);
+  const hasError = Object.values(backendData).some(section => section.error);
 
   // Компонент загрузки
   const LoadingSkeleton = () => (
@@ -329,7 +306,7 @@ const WebOfScience = () => {
           {t('error.failed_to_load') || "Failed to load data"}
         </h2>
         <p className="text-blue-200 mb-6">
-          {backendData.error}
+          {Object.values(backendData).find(section => section.error)?.error}
         </p>
         <button 
           onClick={onRetry}
@@ -341,40 +318,27 @@ const WebOfScience = () => {
     </div>
   );
 
-  if (backendData.loading) {
+  if (isLoading) {
     return <LoadingSkeleton />;
   }
 
-  if (backendData.error) {
+  if (hasError) {
     return <ErrorMessage onRetry={fetchBackendData} />;
   }
 
-  if (!backendData.pageData) {
-    return (
-      <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex justify-center items-center">
-        <div className="text-center">
-          <p className="text-blue-200">{t('error.no_data') || "No data available"}</p>
-          <button 
-            onClick={fetchBackendData}
-            className="mt-4 px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
-          >
-            {t('error.retry') || "Retry"}
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Получаем текущие данные
+  const currentMetrics = backendData.metrics.results;
+  const currentCategories = backendData.categories.results;
+  const currentCollaborations = backendData.collaborations.results;
+  const currentJournalQuartiles = backendData.journalQuartiles.results;
+  const currentAdditionalMetrics = backendData.additionalMetrics.results;
 
-  const currentMetrics = backendData.metrics[timeRange] || {};
-  const mainMetrics = Object.entries(currentMetrics.main || {});
-  const pageData = backendData.pageData;
-
-  // Если нет основных метрик, показываем сообщение
-  if (mainMetrics.length === 0) {
+  // Если нет данных, показываем сообщение
+  if (currentMetrics.length === 0 && currentCategories.length === 0) {
     return (
       <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex justify-center items-center">
         <div className="text-center">
-          <p className="text-blue-200">{t('error.no_metrics') || "No metrics data available"}</p>
+          <p className="text-blue-200">{t('error.no_data') || "No data available"}</p>
           <button 
             onClick={fetchBackendData}
             className="mt-4 px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
@@ -418,47 +382,21 @@ const WebOfScience = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
           >
-            {pageData.titleIcon}
+            {getSectionText('titleIcon') || '📊'}
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-            {pageData.title}
+            {getSectionText('title') || "Web of Science"}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {pageData.subtitle}
+            {getSectionText('subtitle') || "Research metrics and publication data"}
           </p>
-        </motion.div>
-
-        {/* Time Range Selection */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex justify-center mb-12 lg:mb-16"
-        >
-          <div className="bg-white/5 rounded-2xl p-2 backdrop-blur-lg border border-white/20 shadow-2xl">
-            {Object.keys(backendData.metrics).map((range) => (
-              <motion.button
-                key={range}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setTimeRange(range)}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-500 ${
-                  timeRange === range
-                    ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
-                    : 'text-blue-200 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                {pageData.timeRanges?.[range] || range}
-              </motion.button>
-            ))}
-          </div>
         </motion.div>
 
         {/* Main Metrics */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-12 lg:mb-16">
           {/* Активная метрика */}
-          {mainMetrics[activeMetric] && (
+          {currentMetrics[activeMetric] && (
             <motion.div
               key={activeMetric}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -468,21 +406,21 @@ const WebOfScience = () => {
             >
               <div className="flex flex-col lg:flex-row gap-6 items-center">
                 <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg">
-                  {mainMetrics[activeMetric][1]?.icon || "📊"}
+                  {currentMetrics[activeMetric]?.icon || "📊"}
                 </div>
                 <div className="flex-1 text-center lg:text-left">
                   <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">
-                    {mainMetrics[activeMetric][1]?.label || "Metric"}
+                    {currentMetrics[activeMetric]?.label || currentMetrics[activeMetric]?.title || "Metric"}
                   </h3>
                   <div className="text-4xl lg:text-5xl font-bold text-emerald-400 font-mono mb-2">
-                    {counterValues[mainMetrics[activeMetric][0]] 
-                      ? Math.round(counterValues[mainMetrics[activeMetric][0]]).toLocaleString()
+                    {counterValues[currentMetrics[activeMetric]?.id || currentMetrics[activeMetric]?.key] 
+                      ? Math.round(counterValues[currentMetrics[activeMetric]?.id || currentMetrics[activeMetric]?.key]).toLocaleString()
                       : '0'
                     }
-                    {mainMetrics[activeMetric][1]?.value?.includes('%') && '%'}
+                    {currentMetrics[activeMetric]?.value?.includes('%') && '%'}
                   </div>
                   <p className="text-blue-200 text-lg">
-                    {mainMetrics[activeMetric][1]?.description || ""}
+                    {currentMetrics[activeMetric]?.description || ""}
                   </p>
                 </div>
               </div>
@@ -491,9 +429,9 @@ const WebOfScience = () => {
 
           {/* Все метрики */}
           <div className="lg:col-span-3 grid grid-cols-2 gap-4">
-            {mainMetrics.map(([key, metric], index) => (
+            {currentMetrics.map((metric, index) => (
               <motion.div
-                key={key}
+                key={metric.id || metric.key}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 + index * 0.1 }}
@@ -507,120 +445,124 @@ const WebOfScience = () => {
               >
                 <div className="text-2xl mb-3">{metric?.icon || "📊"}</div>
                 <div className="text-2xl font-bold text-emerald-400 mb-1 font-mono">
-                  {counterValues[key] 
-                    ? Math.round(counterValues[key]).toLocaleString()
+                  {counterValues[metric.id || metric.key] 
+                    ? Math.round(counterValues[metric.id || metric.key]).toLocaleString()
                     : '0'
                   }
                   {metric?.value?.includes('%') && '%'}
                 </div>
-                <div className="text-blue-200 text-sm">{metric?.label || "Label"}</div>
+                <div className="text-blue-200 text-sm">{metric?.label || metric?.title || "Label"}</div>
               </motion.div>
             ))}
           </div>
         </div>
 
         {/* Detailed Information */}
-        {currentMetrics.categories && currentMetrics.collaborations && (
+        {(currentCategories.length > 0 || currentCollaborations.length > 0) && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             {/* Publications by Category */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={isVisible ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
-            >
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-                <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">
-                  {pageData.categoriesIcon}
-                </span>
-                {pageData.categoriesTitle}
-              </h3>
-              <div className="space-y-4">
-                {Array.isArray(currentMetrics.categories) && currentMetrics.categories.map((category, index) => {
-                  const maxCount = Math.max(...(currentMetrics.categories || []).map(c => c.count || 0));
-                  const percentage = maxCount > 0 ? ((category.count || 0) / maxCount) * 100 : 0;
-                  
-                  return (
-                    <motion.div 
-                      key={index}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className={`flex items-center justify-between p-4 rounded-2xl backdrop-blur-sm border transition-all duration-300 cursor-pointer ${
-                        activeCategory === index
-                          ? 'bg-white/10 border-emerald-400/30'
-                          : 'bg-white/5 border-white/10 hover:border-emerald-400/30'
-                      }`}
-                      onClick={() => setActiveCategory(index)}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <span className="text-white text-lg font-medium flex-1">{category.name || "Category"}</span>
-                      <div className="flex items-center space-x-4 flex-1 max-w-xs">
-                        <div className="w-full bg-white/10 rounded-full h-3">
-                          <motion.div 
-                            className="bg-gradient-to-r from-blue-500 to-emerald-500 h-3 rounded-full shadow-lg"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${percentage}%` }}
-                            transition={{ duration: 1, delay: index * 0.2 }}
-                          ></motion.div>
+            {currentCategories.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={isVisible ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
+              >
+                <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+                  <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">
+                    {getSectionText('categoriesIcon') || '📈'}
+                  </span>
+                  {getSectionText('categoriesTitle') || "Publications by Category"}
+                </h3>
+                <div className="space-y-4">
+                  {currentCategories.map((category, index) => {
+                    const maxCount = Math.max(...currentCategories.map(c => c.count || 0));
+                    const percentage = maxCount > 0 ? ((category.count || 0) / maxCount) * 100 : 0;
+                    
+                    return (
+                      <motion.div 
+                        key={category.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className={`flex items-center justify-between p-4 rounded-2xl backdrop-blur-sm border transition-all duration-300 cursor-pointer ${
+                          activeCategory === index
+                            ? 'bg-white/10 border-emerald-400/30'
+                            : 'bg-white/5 border-white/10 hover:border-emerald-400/30'
+                        }`}
+                        onClick={() => setActiveCategory(index)}
+                        whileHover={{ scale: 1.02 }}
+                      >
+                        <span className="text-white text-lg font-medium flex-1">{category.name || "Category"}</span>
+                        <div className="flex items-center space-x-4 flex-1 max-w-xs">
+                          <div className="w-full bg-white/10 rounded-full h-3">
+                            <motion.div 
+                              className="bg-gradient-to-r from-blue-500 to-emerald-500 h-3 rounded-full shadow-lg"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${percentage}%` }}
+                              transition={{ duration: 1, delay: index * 0.2 }}
+                            ></motion.div>
+                          </div>
+                          <span className="font-bold text-emerald-400 w-12 text-right text-lg">
+                            {category.count || 0}
+                          </span>
                         </div>
-                        <span className="font-bold text-emerald-400 w-12 text-right text-lg">
-                          {category.count || 0}
-                        </span>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </motion.div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
 
             {/* International Collaboration */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={isVisible ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
-            >
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-                <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">
-                  {pageData.collaborationsIcon}
-                </span>
-                {pageData.collaborationsTitle}
-              </h3>
-              <div className="space-y-4">
-                {(currentMetrics.collaborations || []).map((collab, index) => (
-                  <motion.div 
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group backdrop-blur-sm"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <span className="text-2xl group-hover:scale-110 transition-transform duration-300">{collab.flag || "🇺🇳"}</span>
-                      <div>
-                        <span className="font-semibold text-white text-lg group-hover:text-emerald-300 transition-colors duration-300">
-                          {collab.country || "Country"}
-                        </span>
-                        <div className="text-blue-200 text-sm">
-                          {collab.institutions || 0} {pageData.collaborationsInstitutions}
+            {currentCollaborations.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={isVisible ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
+              >
+                <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+                  <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">
+                    {getSectionText('collaborationsIcon') || '🌍'}
+                  </span>
+                  {getSectionText('collaborationsTitle') || "International Collaboration"}
+                </h3>
+                <div className="space-y-4">
+                  {currentCollaborations.map((collab, index) => (
+                    <motion.div 
+                      key={collab.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group backdrop-blur-sm"
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <span className="text-2xl group-hover:scale-110 transition-transform duration-300">{collab.flag || "🇺🇳"}</span>
+                        <div>
+                          <span className="font-semibold text-white text-lg group-hover:text-emerald-300 transition-colors duration-300">
+                            {collab.country || "Country"}
+                          </span>
+                          <div className="text-blue-200 text-sm">
+                            {collab.institutions || 0} {getSectionText('collaborationsInstitutions') || "institutions"}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-emerald-400 font-bold text-xl">{collab.publications || 0}</div>
-                      <div className="text-blue-300 text-sm">{pageData.collaborationsPublications}</div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+                      <div className="text-right">
+                        <div className="text-emerald-400 font-bold text-xl">{collab.publications || 0}</div>
+                        <div className="text-blue-300 text-sm">{getSectionText('collaborationsPublications') || "publications"}</div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
           </div>
         )}
 
         {/* Q1/Q2 Journals */}
-        {currentMetrics.topJournals && (
+        {currentJournalQuartiles.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
@@ -629,15 +571,14 @@ const WebOfScience = () => {
           >
             <h3 className="text-2xl font-bold mb-8 flex items-center justify-center">
               <span className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3">
-                {pageData.topJournalsIcon}
+                {getSectionText('topJournalsIcon') || '⭐'}
               </span>
-              {pageData.topJournalsTitle}
+              {getSectionText('topJournalsTitle') || "Publications by Journal Quartile"}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {Array.isArray(currentMetrics.topJournals) &&
-              currentMetrics.topJournals.map((journal, index) => (
+              {currentJournalQuartiles.map((journal, index) => (
                 <motion.div 
-                  key={index}
+                  key={journal.id}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
@@ -648,7 +589,7 @@ const WebOfScience = () => {
                     {journal.count || 0}
                   </div>
                   <div className="text-blue-200 text-lg font-medium mb-1">{journal.quartile || "Q"}</div>
-                  <div className="text-white/80 text-sm">{pageData.topJournalsPublications}</div>
+                  <div className="text-white/80 text-sm">{t('wos.publications') || "publications"}</div>
                   <div className="w-0 group-hover:w-full h-1 bg-emerald-400/50 transition-all duration-500 mt-2 mx-auto"></div>
                 </motion.div>
               ))}
@@ -657,16 +598,16 @@ const WebOfScience = () => {
         )}
 
         {/* Additional Metrics */}
-        {pageData.additionalMetrics && pageData.additionalMetrics.length > 0 && (
+        {currentAdditionalMetrics.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.9 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
           >
-            {(pageData.additionalMetrics || []).map((metric, index) => (
+            {currentAdditionalMetrics.map((metric, index) => (
               <motion.div 
-                key={index}
+                key={metric.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 + index * 0.1 }}
@@ -676,7 +617,7 @@ const WebOfScience = () => {
                 <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-300 text-emerald-400">
                   {metric.icon || "📊"}
                 </div>
-                <div className="text-2xl font-bold text-white mb-2">{currentMetrics?.[metric.key] || "0"}</div>
+                <div className="text-2xl font-bold text-white mb-2">{metric.value || "0"}</div>
                 <div className="text-blue-200 font-semibold text-lg mb-2">{metric.title || "Metric"}</div>
                 <div className="text-blue-300 text-sm">{metric.description || ""}</div>
               </motion.div>
