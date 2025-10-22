@@ -4723,6 +4723,22 @@
       }
     }
   },
+  "wos": {
+    "title": "Web of Science",
+    "subtitle": "Research metrics and publication data",
+    "loading": "Loading Web of Science data...",
+    "institutions": "institutions",
+    "publications": "publications",
+    "journal_quartiles": "Publications by Journal Quartile",
+    "by_category": "Publications by Category",
+    "collaborations": "International Collaboration"
+  },
+  "error": {
+    "failed_to_load": "Failed to load data",
+    "retry": "Retry",
+    "no_data": "No data available",
+    "no_metrics": "No metrics data available"
+  },
   "collegeSports": {
       "perYear": "per year",
     "applyNow": "Apply Now",

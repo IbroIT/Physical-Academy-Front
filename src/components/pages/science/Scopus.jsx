@@ -1,39 +1,228 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { useScopusPage } from "../../../hooks/useApi";
 import Loading from "../../common/Loading";
 
 const Scopus = () => {
-  const { t } = useTranslation();
-  const { data, loading, error } = useScopusPage();
+  const { t, i18n } = useTranslation();
   const [hoveredMetric, setHoveredMetric] = useState(null);
   const [hoveredPublication, setHoveredPublication] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
+  
+  // Состояния для данных с бэкенда
+  const [backendData, setBackendData] = useState({
+    stats: [],
+    publications: [],
+    documentTypes: [],
+    metrics: [],
+    authors: [],
+    journals: [],
+    publishers: [],
+    publicationAuthors: [],
+    sections: [],
+    loading: false,
+    error: null
+  });
 
-  if (loading) {
-    return <Loading />;
-  }
+  const sectionRef = useRef(null);
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
-          <p>{t("common.errorLoading")}</p>
-          <p className="text-sm">{error}</p>
-        </div>
-      </div>
+  // Получение текущего языка для API
+  const getApiLanguage = useCallback(() => {
+    const langMap = {
+      'en': 'en',
+      'ru': 'ru',
+      'kg': 'kg'
+    };
+    return langMap[i18n.language] || 'ru';
+  }, [i18n.language]);
+
+  // Функция для загрузки данных с бэкенда
+  const fetchBackendData = useCallback(async () => {
+    try {
+      setBackendData(prev => ({ ...prev, loading: true, error: null }));
+      
+      const lang = getApiLanguage();
+      
+      const endpoints = [
+        '/api/science/scopus-stats/',
+        '/api/science/scopus-publications/',
+        '/api/science/scopus-document-types/',
+        '/api/science/scopus-metrics/',
+        '/api/science/scopus-authors/',
+        '/api/science/scopus-journals/',
+        '/api/science/scopus-publishers/',
+        '/api/science/scopus-publication-authors/',
+        '/api/science/scopus-sections/'
+      ];
+
+      const responses = await Promise.all(
+        endpoints.map(async (url) => {
+          try {
+            const fullUrl = `${url}?lang=${lang}`;
+            const response = await fetch(fullUrl);
+            
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              const text = await response.text();
+              console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
+              return { results: [] };
+            }
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+          } catch (error) {
+            console.error(`Error fetching ${url}:`, error);
+            return { results: [] };
+          }
+        })
+      );
+
+      setBackendData({
+        stats: responses[0].results || [],
+        publications: responses[1].results || [],
+        documentTypes: responses[2].results || [],
+        metrics: responses[3].results || [],
+        authors: responses[4].results || [],
+        journals: responses[5].results || [],
+        publishers: responses[6].results || [],
+        publicationAuthors: responses[7].results || [],
+        sections: responses[8].results || [],
+        loading: false,
+        error: null
+      });
+
+    } catch (error) {
+      console.error('Error fetching Scopus data:', error);
+      setBackendData(prev => ({
+        ...prev,
+        loading: false,
+        error: 'Failed to load data'
+      }));
+    }
+  }, [getApiLanguage]);
+
+  // Загрузка данных при монтировании
+  useEffect(() => {
+    fetchBackendData();
+  }, []);
+
+  // Перезагрузка данных при изменении языка
+  useEffect(() => {
+    fetchBackendData();
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
     );
-  }
 
-  if (!data) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-          <p>{t("common.noData")}</p>
-        </div>
-      </div>
-    );
-  }
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Преобразование данных в формат, ожидаемый компонентом
+  const transformData = () => {
+    const { stats, publications, documentTypes, metrics, journals, publicationAuthors, authors } = backendData;
+
+    // Подсчет документов по типам
+    const docTypeCounts = {};
+    publications.forEach(pub => {
+      // Здесь нужно определить тип документа для каждой публикации
+      // Временное решение - используем первый доступный тип
+      const docType = documentTypes[0]?.label || 'Article';
+      docTypeCounts[docType] = (docTypeCounts[docType] || 0) + 1;
+    });
+
+    const totalPublications = publications.length;
+    const documentTypesWithStats = documentTypes.map((docType, index) => {
+      const count = docTypeCounts[docType.label] || 0;
+      const percentage = totalPublications > 0 ? Math.round((count / totalPublications) * 100) : 0;
+      
+      // Цвета для круговой диаграммы
+      const colors = ['#3B82F6', '#10B981', '#EF4444', '#F59E0B', '#8B5CF6'];
+      
+      return {
+        name: docType.label,
+        count: count,
+        percentage: percentage,
+        color: colors[index % colors.length]
+      };
+    });
+
+    // Преобразование публикаций
+    const transformedPublications = publications.map(pub => {
+      // Находим журнал
+      const journal = journals.find(j => j.id === pub.journal) || {};
+      
+      // Находим авторов для этой публикации
+      const pubAuthors = publicationAuthors
+        .filter(pa => pa.publication === pub.id)
+        .map(pa => {
+          const author = authors.find(a => a.id === pa.author);
+          return author ? `${author.first_name} ${author.last_name}` : '';
+        })
+        .filter(name => name)
+        .join(', ');
+
+      return {
+        title: pub[`title_${getApiLanguage()}`] || pub.title,
+        authors: pubAuthors || 'Unknown Authors',
+        journal: journal[`title_${getApiLanguage()}`] || journal.title || 'Unknown Journal',
+        year: pub.year,
+        document_type: documentTypes[0]?.label || 'Article',
+        subject_area: 'Computer Science', // Временное значение
+        citation_count: pub.citation_count || 0,
+        url: pub.url || '#'
+      };
+    });
+
+    // Статистика для нижних карточек
+    const statsCards = [
+      { icon: "📊", value: metrics[0]?.citation_count || "0", label: t("science.sections.scopus.totalCitations") },
+      { icon: "📈", value: metrics[0]?.h_index || "0", label: t("science.sections.scopus.hIndex") },
+      { icon: "📚", value: journals.length.toString(), label: t("science.sections.scopus.journals") },
+      { icon: "👨‍🎓", value: authors.length.toString(), label: t("science.sections.scopus.authors") }
+    ];
+
+    // Внешние ссылки (можно оставить статичными или получать с бэкенда)
+    const links = [
+      {
+        icon: "🔍",
+        title: t("science.sections.scopus.scopusProfile"),
+        description: t("science.sections.scopus.viewOfficialProfile"),
+        url: "https://www.scopus.com"
+      },
+      {
+        icon: "📖",
+        title: t("science.sections.scopus.researchPortal"),
+        description: t("science.sections.scopus.accessPublications"),
+        url: "#"
+      }
+    ];
+
+    return {
+      title: t("science.sections.scopus.title"),
+      subtitle: t("science.sections.scopus.subtitle"),
+      metrics: stats.map(stat => ({
+        value: stat.value,
+        label: stat.label,
+        description: "" // Можно добавить описание если будет в API
+      })),
+      document_types: documentTypesWithStats,
+      publications: transformedPublications,
+      stats: statsCards,
+      links: links
+    };
+  };
+
+  const data = transformData();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -56,8 +245,43 @@ const Scopus = () => {
     },
   };
 
+  // Компонент загрузки
+  if (backendData.loading) {
+    return <Loading />;
+  }
+
+  // Компонент ошибки
+  if (backendData.error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
+        >
+          <div className="text-red-400 text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl text-white mb-4">
+            {t("common.errorLoading")}
+          </h2>
+          <p className="text-blue-200 mb-6">
+            {backendData.error}
+          </p>
+          <button
+            onClick={fetchBackendData}
+            className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+          >
+            {t("common.retry")}
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden">
+    <section 
+      ref={sectionRef}
+      className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
+    >
       {/* Анимированный фон */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -77,24 +301,27 @@ const Scopus = () => {
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          animate="visible"
+          animate={isVisible ? "visible" : "hidden"}
           className="space-y-8"
         >
           {/* Заголовок с логотипом */}
           <motion.div variants={itemVariants} className="text-center">
-            <div className="inline-flex items-center space-x-4 bg-white/5 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group">
+            <motion.div 
+              className="inline-flex items-center space-x-4 bg-white/5 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+              whileHover={{ scale: 1.02 }}
+            >
               <motion.div
                 className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300"
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.5 }}
               >
-                <span className="text-xl">�</span>
+                <span className="text-xl">🔍</span>
               </motion.div>
               <div className="text-left">
                 <h2 className="text-2xl font-bold text-white">{data.title}</h2>
                 <p className="text-blue-200 text-sm">{data.subtitle}</p>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* Основные метрики */}
@@ -146,7 +373,7 @@ const Scopus = () => {
                 className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white mr-3 shadow-lg"
                 whileHover={{ scale: 1.1, rotate: 5 }}
               >
-                �
+                📑
               </motion.div>
               {t("science.sections.scopus.documentTypes")}
             </h3>
