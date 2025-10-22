@@ -1,7 +1,6 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import apiService from "../../../services/api";
 
 const ScientificPublications = () => {
   const { t, i18n } = useTranslation();
@@ -14,17 +13,94 @@ const ScientificPublications = () => {
   const [activeStat, setActiveStat] = useState(0);
   const sectionRef = useRef(null);
 
-  // Get translations data
-  const publicationsData = t("science.sections.publications", {
-    returnObjects: true,
+  // Состояния для данных с бэкенда
+  const [backendData, setBackendData] = useState({
+    stats: { results: [], loading: false, error: null },
+    publications: { results: [], loading: false, error: null }
   });
 
-  // New state for API data
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [publications, setPublications] = useState([]);
-  const [stats, setStats] = useState([]);
-  const [featured, setFeatured] = useState([]);
+  // Получение текущего языка для API
+  const getApiLanguage = useCallback(() => {
+    const langMap = {
+      'en': 'en',
+      'ru': 'ru',
+      'kg': 'kg'
+    };
+    return langMap[i18n.language] || 'ru';
+  }, [i18n.language]);
+
+  // Функция для загрузки данных с бэкенда
+  const fetchBackendData = useCallback(async (type) => {
+    try {
+      setBackendData(prev => ({ 
+        ...prev, 
+        [type]: { ...prev[type], loading: true, error: null } 
+      }));
+      
+      const lang = getApiLanguage();
+      
+      const endpoints = {
+        stats: `/api/science/publication-stats/?lang=${lang}`,
+        publications: `/api/science/publications/?lang=${lang}`
+      };
+
+      const response = await fetch(endpoints[type]);
+      
+      // Проверяем content-type
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.warn(`Non-JSON response from ${endpoints[type]}:`, text.substring(0, 200));
+        setBackendData(prev => ({
+          ...prev,
+          [type]: {
+            results: [],
+            loading: false,
+            error: 'Invalid response format'
+          }
+        }));
+        return;
+      }
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      setBackendData(prev => ({
+        ...prev,
+        [type]: {
+          results: data.results || [],
+          loading: false,
+          error: null
+        }
+      }));
+
+    } catch (error) {
+      console.error(`Error fetching ${type} data:`, error);
+      setBackendData(prev => ({
+        ...prev,
+        [type]: {
+          ...prev[type],
+          loading: false,
+          error: 'Failed to load data'
+        }
+      }));
+    }
+  }, [getApiLanguage]);
+
+  // Загрузка всех данных при монтировании
+  useEffect(() => {
+    fetchBackendData('stats');
+    fetchBackendData('publications');
+  }, []);
+
+  // Перезагрузка данных при изменении языка
+  useEffect(() => {
+    fetchBackendData('stats');
+    fetchBackendData('publications');
+  }, [i18n.language, fetchBackendData]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -45,23 +121,23 @@ const ScientificPublications = () => {
 
   // Separate effect to start counters when both conditions are met
   useEffect(() => {
-    if (isVisible && stats.length > 0) {
+    if (isVisible && backendData.stats.results.length > 0) {
       startCounters();
     }
-  }, [isVisible, stats]);
+  }, [isVisible, backendData.stats.results]);
 
   // Автопереключение статистики
   useEffect(() => {
-    if (stats.length === 0) return;
+    if (backendData.stats.results.length === 0) return;
     const interval = setInterval(() => {
-      setActiveStat((prev) => (prev + 1) % stats.length);
+      setActiveStat((prev) => (prev + 1) % backendData.stats.results.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [stats.length]);
+  }, [backendData.stats.results.length]);
 
   const startCounters = () => {
-    if (stats.length === 0) return;
-    const targetValues = stats.map((stat) => {
+    if (backendData.stats.results.length === 0) return;
+    const targetValues = backendData.stats.results.map((stat) => {
       // Handle both string and number values
       if (typeof stat.value === "string") {
         return parseInt(stat.value.replace(/\D/g, "")) || 0;
@@ -93,34 +169,37 @@ const ScientificPublications = () => {
     }, duration / steps);
   };
 
-  // Fetch data from API
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await apiService.getPublicationsPage(i18n.language);
-        const newStats = data.stats || [];
-        setStats(newStats);
-        setCounterValues(new Array(newStats.length).fill(0));
-        setFeatured(data.featured || []);
-        setPublications(data.publications || []);
-      } catch (err) {
-        console.error("Failed to fetch publications:", err);
-        setError(err.message);
-        // Fallback to translation data if API fails
-        const fallbackData = t("science.sections.publications", {
-          returnObjects: true,
-        });
-        setStats(fallbackData.stats || []);
-        setPublications(fallbackData.publications || []);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Преобразование данных для компонента
+  const getPublications = () => {
+    return backendData.publications.results.map(pub => ({
+      id: pub.id,
+      title: pub.title,
+      abstract: pub.abstract || t("science.sections.publications.defaultAbstract"),
+      author: pub.authors,
+      year: pub.year,
+      doi: pub.doi,
+      journal: pub.journal,
+      publisher: pub.publisher,
+      url: pub.url,
+      publication_type: pub.pub_type_display,
+      citation_count: pub.citation_count || 0,
+      is_active: pub.is_active,
+      icon: "📖"
+    }));
+  };
 
-    fetchData();
-  }, [i18n.language]);
+  const getStats = () => {
+    return backendData.stats.results.map(stat => ({
+      id: stat.id,
+      label: stat.label,
+      value: stat.value,
+      icon: stat.icon || "📊",
+      order: stat.order
+    }));
+  };
+
+  const publications = getPublications();
+  const stats = getStats();
 
   const filteredPublications = useMemo(() => {
     let filtered = publications.filter(
@@ -140,13 +219,7 @@ const ScientificPublications = () => {
       if (sortBy === "citations")
         return (b.citation_count || 0) - (a.citation_count || 0);
       if (sortBy === "date") {
-        const dateA = pub.publication_date
-          ? new Date(a.publication_date)
-          : new Date(a.year, 0);
-        const dateB = pub.publication_date
-          ? new Date(b.publication_date)
-          : new Date(b.year, 0);
-        return dateB - dateA;
+        return b.year - a.year;
       }
       return 0;
     });
@@ -161,6 +234,95 @@ const ScientificPublications = () => {
     setFilterYear("all");
     setSortBy("date");
   };
+
+  // Получение переводов
+  const publicationsData = t("science.sections.publications", {
+    returnObjects: true,
+  });
+
+  // Компонент загрузки
+  const LoadingSkeleton = () => (
+    <div className="animate-pulse space-y-4">
+      <div className="bg-white/10 rounded-2xl h-8 mb-4"></div>
+      <div className="bg-white/10 rounded-2xl h-4 mb-2"></div>
+      <div className="bg-white/10 rounded-2xl h-4 w-3/4"></div>
+      <div className="grid grid-cols-2 gap-4 mt-6">
+        <div className="bg-white/10 rounded-2xl h-20"></div>
+        <div className="bg-white/10 rounded-2xl h-20"></div>
+      </div>
+    </div>
+  );
+
+  // Компонент ошибки
+  const ErrorMessage = ({ onRetry, type }) => (
+    <div className="text-center py-8 bg-white/5 rounded-2xl">
+      <div className="text-red-400 text-6xl mb-4">⚠️</div>
+      <h2 className="text-2xl text-white mb-4">
+        {t("common.errorLoading")}
+      </h2>
+      <p className="text-blue-200 mb-6">
+        {backendData[type].error}
+      </p>
+      <button
+        onClick={onRetry}
+        className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+      >
+        {t("common.retry")}
+      </button>
+    </div>
+  );
+
+  // Проверка загрузки и ошибок
+  const isLoading = backendData.stats.loading || backendData.publications.loading;
+  const hasError = backendData.stats.error || backendData.publications.error;
+
+  if (isLoading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="text-center mb-12">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl">
+              📚
+            </div>
+            <div className="bg-white/10 rounded-2xl h-8 mb-4 w-64 mx-auto"></div>
+            <div className="bg-white/10 rounded-2xl h-4 mb-2 w-96 mx-auto"></div>
+          </div>
+          <LoadingSkeleton />
+        </div>
+      </section>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="text-center mb-12">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl">
+              📚
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+              {t("science.sections.publications.title")}
+            </h1>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {backendData.stats.error && (
+              <ErrorMessage 
+                onRetry={() => fetchBackendData('stats')}
+                type="stats"
+              />
+            )}
+            {backendData.publications.error && (
+              <ErrorMessage 
+                onRetry={() => fetchBackendData('publications')}
+                type="publications"
+              />
+            )}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -216,10 +378,6 @@ const ScientificPublications = () => {
             <div className="text-blue-200">
               Please add publication statistics in the Django admin panel.
             </div>
-            <div className="text-blue-300 text-sm mt-2">
-              Stats loaded: {stats.length}, Loading:{" "}
-              {loading ? "true" : "false"}
-            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-12 lg:mb-16">
@@ -258,7 +416,7 @@ const ScientificPublications = () => {
             <div className="lg:col-span-3 grid grid-cols-2 gap-4">
               {stats.map((stat, index) => (
                 <motion.div
-                  key={index}
+                  key={stat.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 + index * 0.1 }}
@@ -439,7 +597,7 @@ const ScientificPublications = () => {
             <AnimatePresence>
               {filteredPublications.map((pub, index) => (
                 <PublicationCard
-                  key={pub.id || index}
+                  key={pub.id}
                   publication={pub}
                   index={index}
                   onSelect={setSelectedPublication}
@@ -533,15 +691,6 @@ const PublicationCard = ({ publication, index, onSelect }) => {
             <h3 className="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors duration-300 mb-3 leading-tight">
               {publication.title}
             </h3>
-            {publication.image_url && (
-              <div className="mb-3">
-                <img
-                  src={publication.image_url}
-                  alt={publication.title}
-                  className="w-full h-32 object-cover rounded-xl"
-                />
-              </div>
-            )}
             <div className="flex flex-wrap gap-2 mb-3">
               <motion.span
                 className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-xl text-sm font-medium hover:bg-blue-500/30 transition-colors duration-300 backdrop-blur-sm"
@@ -552,7 +701,7 @@ const PublicationCard = ({ publication, index, onSelect }) => {
             </div>
           </div>
           <span className="text-3xl opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 flex-shrink-0 ml-4">
-            📖
+            {publication.icon || "📖"}
           </span>
         </div>
 
@@ -569,11 +718,6 @@ const PublicationCard = ({ publication, index, onSelect }) => {
           <span className="px-3 py-2 bg-blue-500/20 text-blue-300 rounded-xl text-sm font-medium backdrop-blur-sm">
             {publication.year}
           </span>
-          {publication.publication_date && (
-            <span className="px-3 py-2 bg-cyan-500/20 text-cyan-300 rounded-xl text-sm font-medium backdrop-blur-sm">
-              {new Date(publication.publication_date).toLocaleDateString()}
-            </span>
-          )}
           <span className="px-3 py-2 bg-purple-500/20 text-purple-300 rounded-xl text-sm font-medium backdrop-blur-sm">
             {publication.citation_count || 0} citations
           </span>
@@ -582,7 +726,7 @@ const PublicationCard = ({ publication, index, onSelect }) => {
           </span>
         </div>
 
-        {/* Keywords section - can be removed since not in the new model or add custom tags */}
+        {/* Keywords section */}
         <div className="flex flex-wrap gap-2 mb-4">
           <motion.span
             className="px-3 py-1 bg-white/10 text-blue-200 rounded-xl text-sm hover:bg-white/20 transition-colors duration-300 backdrop-blur-sm"
@@ -590,14 +734,6 @@ const PublicationCard = ({ publication, index, onSelect }) => {
           >
             #{publication.publication_type}
           </motion.span>
-          {publication.impact_factor && (
-            <motion.span
-              className="px-3 py-1 bg-yellow-500/20 text-yellow-200 rounded-xl text-sm hover:bg-yellow-500/30 transition-colors duration-300 backdrop-blur-sm"
-              whileHover={{ scale: 1.05 }}
-            >
-              IF: {publication.impact_factor}
-            </motion.span>
-          )}
         </div>
 
         <div className="flex justify-between items-center">
@@ -617,17 +753,6 @@ const PublicationCard = ({ publication, index, onSelect }) => {
             </a>
           )}
           <div className="flex gap-2">
-            {publication.pdf_url && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e) => handleButtonClick(e, "pdf")}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 font-medium text-sm shadow-lg"
-              >
-                <span>📥</span>
-                <span>Download PDF</span>
-              </motion.button>
-            )}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -746,28 +871,6 @@ const PublicationModal = ({ publication, onClose }) => {
                   <p className="text-blue-200 font-mono">{publication.doi}</p>
                 </div>
               )}
-              {publication.publication_date && (
-                <div>
-                  <h4 className="font-semibold text-white mb-2">
-                    Publication Date
-                  </h4>
-                  <p className="text-blue-200">
-                    {new Date(
-                      publication.publication_date
-                    ).toLocaleDateString()}
-                  </p>
-                </div>
-              )}
-              {publication.impact_factor && (
-                <div>
-                  <h4 className="font-semibold text-white mb-2">
-                    Impact Factor
-                  </h4>
-                  <p className="text-yellow-400 font-semibold">
-                    {publication.impact_factor}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
 
@@ -779,8 +882,6 @@ const PublicationModal = ({ publication, onClose }) => {
               {publication.abstract}
             </p>
           </div>
-
-          {/* Remove keywords section for now since not in new model */}
 
           <div>
             <h4 className="font-semibold text-white mb-2">Citation</h4>
@@ -796,17 +897,6 @@ const PublicationModal = ({ publication, onClose }) => {
           </div>
 
           <div className="flex gap-4 pt-4">
-            {publication.pdf_url && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => window.open(publication.pdf_url, "_blank")}
-                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 text-white rounded-2xl hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 font-medium shadow-lg"
-              >
-                <span>📥</span>
-                <span>Download PDF</span>
-              </motion.button>
-            )}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

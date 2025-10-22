@@ -1,46 +1,215 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const WebOfScience = () => {
   const { t, i18n } = useTranslation();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [timeRange, setTimeRange] = useState('5years');
   const [isVisible, setIsVisible] = useState(false);
   const [counterValues, setCounterValues] = useState({});
   const [activeMetric, setActiveMetric] = useState(0);
   const [activeCategory, setActiveCategory] = useState(0);
+  
+  // Единое состояние для данных
+  const [backendData, setBackendData] = useState({
+    pageData: null,
+    metrics: {},
+    loading: true,
+    error: null
+  });
+
   const sectionRef = useRef(null);
 
-  // Загружаем данные при монтировании компонента
-  useEffect(() => {
-    const loadData = () => {
-      try {
-        const scienceData = t('science.sections.webofscience', { returnObjects: true });
-        
-        // Проверяем, что данные действительно загрузились
-        if (scienceData && typeof scienceData === 'object' && scienceData.metrics) {
-          setData(scienceData);
-          setError(false);
-        } else {
-          // Если данные не загрузились, создаем fallback данные
-          console.warn('Web of Science data not found in translations, using fallback data');
-          setData(getFallbackData());
-        }
-      } catch (err) {
-        console.error('Error loading Web of Science data:', err);
-        setData(getFallbackData());
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
+  // Получение текущего языка для API
+  const getApiLanguage = useCallback(() => {
+    const langMap = {
+      'en': 'en',
+      'ru': 'ru',
+      'kg': 'kg'
     };
+    return langMap[i18n.language] || 'ru';
+  }, [i18n.language]);
 
-    // Загружаем данные сразу и при изменении языка
-    loadData();
-  }, [t, i18n.language]);
+  // Функция для загрузки данных с бэкенда
+  const fetchBackendData = useCallback(async () => {
+    try {
+      setBackendData(prev => ({ 
+        ...prev, 
+        loading: true, 
+        error: null 
+      }));
+      
+      const lang = getApiLanguage();
+      const response = await fetch(`/api/science/wos-page/?lang=${lang}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Invalid content type');
+      }
+      
+      const data = await response.json();
+      
+      // Преобразуем данные из API в формат компонента
+      const transformedData = transformApiData(data);
+      
+      setBackendData({
+        pageData: transformedData.pageData,
+        metrics: transformedData.metrics,
+        loading: false,
+        error: null
+      });
+
+    } catch (error) {
+      console.error('Error fetching Web of Science data:', error);
+      setBackendData(prev => ({
+        ...prev,
+        loading: false,
+        error: t('error.failed_to_load') || 'Failed to load Web of Science data'
+      }));
+    }
+  }, [getApiLanguage, t]);
+
+  // Преобразование данных API в формат компонента
+  const transformApiData = (apiData) => {
+    // Если API возвращает данные в ожидаемом формате, используем их как есть
+    if (apiData.metrics && typeof apiData.metrics === 'object') {
+      return {
+        pageData: apiData,
+        metrics: apiData.metrics
+      };
+    }
+
+    // Иначе преобразуем из структуры API
+    const metrics = {};
+    const timeRanges = {};
+
+    // Обрабатываем временные диапазоны
+    if (apiData.timeRanges && Array.isArray(apiData.timeRanges)) {
+      apiData.timeRanges.forEach(range => {
+        timeRanges[range.key] = range.name;
+      });
+    }
+
+    // Обрабатываем основные метрики
+    if (apiData.metrics && Array.isArray(apiData.metrics)) {
+      // Группируем метрики по временным диапазонам
+      apiData.metrics.forEach(metric => {
+        const rangeKey = metric.time_range || '5years';
+        if (!metrics[rangeKey]) {
+          metrics[rangeKey] = {
+            main: {},
+            categories: [],
+            collaborations: [],
+            topJournals: []
+          };
+        }
+        
+        metrics[rangeKey].main[metric.key] = {
+          value: metric.value,
+          label: metric.label,
+          icon: metric.icon,
+          description: metric.description
+        };
+      });
+    }
+
+    // Обрабатываем категории
+    if (apiData.categories && Array.isArray(apiData.categories)) {
+      apiData.categories.forEach(category => {
+        const rangeKey = category.time_range || '5years';
+        if (!metrics[rangeKey]) {
+          metrics[rangeKey] = {
+            main: {},
+            categories: [],
+            collaborations: [],
+            topJournals: []
+          };
+        }
+        
+        metrics[rangeKey].categories.push({
+          name: category.name,
+          count: category.count
+        });
+      });
+    }
+
+    // Обрабатываем коллаборации
+    if (apiData.collaborations && Array.isArray(apiData.collaborations)) {
+      apiData.collaborations.forEach(collab => {
+        const rangeKey = collab.time_range || '5years';
+        if (!metrics[rangeKey]) {
+          metrics[rangeKey] = {
+            main: {},
+            categories: [],
+            collaborations: [],
+            topJournals: []
+          };
+        }
+        
+        metrics[rangeKey].collaborations.push({
+          country: collab.country,
+          institutions: collab.institutions,
+          publications: collab.publications,
+          flag: collab.flag
+        });
+      });
+    }
+
+    // Обрабатываем квартили журналов
+    if (apiData.topJournals && Array.isArray(apiData.topJournals)) {
+      apiData.topJournals.forEach(journal => {
+        const rangeKey = journal.time_range || '5years';
+        if (!metrics[rangeKey]) {
+          metrics[rangeKey] = {
+            main: {},
+            categories: [],
+            collaborations: [],
+            topJournals: []
+          };
+        }
+        
+        metrics[rangeKey].topJournals.push({
+          quartile: journal.quartile,
+          count: journal.count
+        });
+      });
+    }
+
+    return {
+      pageData: {
+        title: apiData.title || t('wos.title') || "Web of Science",
+        subtitle: apiData.subtitle || t('wos.subtitle') || "Research metrics and publication data",
+        titleIcon: apiData.titleIcon || "📊",
+        categoriesIcon: apiData.categoriesIcon || "📈",
+        collaborationsIcon: apiData.collaborationsIcon || "🌍",
+        topJournalsIcon: apiData.topJournalsIcon || "⭐",
+        timeRanges: timeRanges,
+        collaborationsInstitutions: apiData.collaborationsInstitutions || t('wos.institutions') || "institutions",
+        collaborationsPublications: apiData.collaborationsPublications || t('wos.publications') || "publications",
+        topJournalsTitle: apiData.topJournalsTitle || t('wos.journal_quartiles') || "Publications by Journal Quartile",
+        categoriesTitle: apiData.categoriesTitle || t('wos.by_category') || "Publications by Category",
+        collaborationsTitle: apiData.collaborationsTitle || t('wos.collaborations') || "International Collaboration",
+        additionalMetrics: apiData.additionalMetrics || []
+      },
+      metrics: metrics
+    };
+  };
+
+  // Загрузка данных при монтировании и изменении языка
+  useEffect(() => {
+    fetchBackendData();
+  }, [fetchBackendData]);
+
+  // Сброс состояний при изменении языка
+  useEffect(() => {
+    setCounterValues({});
+    setActiveMetric(0);
+    setActiveCategory(0);
+  }, [i18n.language]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -60,15 +229,16 @@ const WebOfScience = () => {
     }
 
     return () => observer.disconnect();
-  }, [data]); // Добавляем data в зависимости
+  }, [backendData]);
 
   // Автопереключение метрик и категорий
   useEffect(() => {
-    if (!data?.metrics?.[timeRange]) return;
+    const currentMetrics = backendData.metrics[timeRange];
+    if (!currentMetrics?.main) return;
     
     const interval = setInterval(() => {
-      const mainMetricsCount = data.metrics[timeRange]?.main ? Object.keys(data.metrics[timeRange].main).length : 0;
-      const categoriesCount = data.metrics[timeRange]?.categories?.length || 0;
+      const mainMetricsCount = Object.keys(currentMetrics.main || {}).length;
+      const categoriesCount = currentMetrics.categories?.length || 0;
       
       if (mainMetricsCount > 0) {
         setActiveMetric(prev => (prev + 1) % mainMetricsCount);
@@ -79,15 +249,15 @@ const WebOfScience = () => {
     }, 4000);
     
     return () => clearInterval(interval);
-  }, [timeRange, data]);
+  }, [timeRange, backendData.metrics]);
 
   const startCounters = () => {
-    if (!data?.metrics?.[timeRange]) return;
+    const currentMetrics = backendData.metrics[timeRange];
+    if (!currentMetrics?.main) return;
     
-    const filteredData = data.metrics[timeRange];
     const targetValues = {};
     
-    Object.entries(filteredData.main || {}).forEach(([key, metric]) => {
+    Object.entries(currentMetrics.main || {}).forEach(([key, metric]) => {
       if (metric && metric.value) {
         targetValues[key] = parseInt(metric.value.replace(/\D/g, '')) || 0;
       }
@@ -124,145 +294,90 @@ const WebOfScience = () => {
   };
 
   useEffect(() => {
-    if (data && isVisible) {
+    if (backendData.pageData && isVisible) {
       startCounters();
     }
-  }, [timeRange, data, isVisible]);
+  }, [timeRange, backendData, isVisible]);
 
-  // Fallback данные на случай проблем с загрузкой
-  const getFallbackData = () => ({
-    title: "Web of Science",
-    subtitle: "Research metrics and publication data",
-    titleIcon: "📊",
-    categoriesIcon: "📈",
-    collaborationsIcon: "🌍",
-    topJournalsIcon: "⭐",
-    timeRanges: {
-      '1year': '1 Year',
-      '3years': '3 Years', 
-      '5years': '5 Years'
-    },
-    metrics: {
-      '5years': {
-        main: {
-          publications: {
-            value: '150',
-            label: 'Publications',
-            icon: '📄',
-            description: 'Total research papers'
-          },
-          citations: {
-            value: '2500', 
-            label: 'Citations',
-            icon: '🔗',
-            description: 'Total citations received'
-          },
-          hindex: {
-            value: '18',
-            label: 'H-index',
-            icon: '📊',
-            description: 'Hirsch index'
-          },
-          collaborations: {
-            value: '45',
-            label: 'Collaborations',
-            icon: '🤝',
-            description: 'International collaborations'
-          }
-        },
-        categories: [
-          { name: 'Computer Science', count: 45 },
-          { name: 'Engineering', count: 38 },
-          { name: 'Mathematics', count: 32 },
-          { name: 'Physics', count: 25 },
-          { name: 'Chemistry', count: 10 }
-        ],
-        collaborations: [
-          { country: 'USA', institutions: 12, publications: 28, flag: '🇺🇸' },
-          { country: 'Germany', institutions: 8, publications: 15, flag: '🇩🇪' },
-          { country: 'UK', institutions: 6, publications: 12, flag: '🇬🇧' },
-          { country: 'Japan', institutions: 5, publications: 10, flag: '🇯🇵' }
-        ],
-        topJournals: [
-          { quartile: 'Q1', count: '85' },
-          { quartile: 'Q2', count: '42' },
-          { quartile: 'Q3', count: '18' },
-          { quartile: 'Q4', count: '5' }
-        ]
-      }
-    },
-    collaborationsInstitutions: 'institutions',
-    collaborationsPublications: 'publications',
-    topJournalsTitle: 'Publications by Journal Quartile',
-    topJournalsPublications: 'publications',
-    categoriesTitle: 'Publications by Category',
-    additionalMetrics: [
-      {
-        icon: '📈',
-        key: 'averageCitations',
-        title: 'Avg. Citations',
-        description: 'Per publication'
-      },
-      {
-        icon: '🔥',
-        key: 'hotPapers', 
-        title: 'Hot Papers',
-        description: 'Highly cited papers'
-      },
-      {
-        icon: '🌐',
-        key: 'international',
-        title: 'International',
-        description: 'Collaboration rate'
-      }
-    ]
-  });
+  // Компонент загрузки
+  const LoadingSkeleton = () => (
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex justify-center items-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center"
+      >
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-400 mx-auto mb-4"></div>
+        <p className="text-blue-200">{t('wos.loading') || "Loading Web of Science data..."}</p>
+      </motion.div>
+    </div>
+  );
 
-  if (loading) {
-    return (
-      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex justify-center items-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
+  // Компонент ошибки
+  const ErrorMessage = ({ onRetry }) => (
+    <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex justify-center items-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center"
+      >
+        <div className="text-6xl mb-4">⚠️</div>
+        <h2 className="text-2xl text-white mb-4">
+          {t('error.failed_to_load') || "Failed to load data"}
+        </h2>
+        <p className="text-blue-200 mb-6">
+          {backendData.error}
+        </p>
+        <button 
+          onClick={onRetry}
+          className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
         >
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-400 mx-auto mb-4"></div>
-          <p className="text-blue-200">Loading Web of Science data...</p>
-        </motion.div>
-      </section>
-    );
+          {t('error.retry') || "Retry"}
+        </button>
+      </motion.div>
+    </div>
+  );
+
+  if (backendData.loading) {
+    return <LoadingSkeleton />;
   }
 
-  if (!data) {
+  if (backendData.error) {
+    return <ErrorMessage onRetry={fetchBackendData} />;
+  }
+
+  if (!backendData.pageData) {
     return (
-      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex justify-center items-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="text-6xl mb-4">⚠️</div>
-          <p className="text-blue-200">Failed to load data</p>
+      <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex justify-center items-center">
+        <div className="text-center">
+          <p className="text-blue-200">{t('error.no_data') || "No data available"}</p>
           <button 
-            onClick={() => window.location.reload()}
+            onClick={fetchBackendData}
             className="mt-4 px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
           >
-            Retry
+            {t('error.retry') || "Retry"}
           </button>
-        </motion.div>
-      </section>
+        </div>
+      </div>
     );
   }
 
-  const filteredData = data.metrics[timeRange];
-  const mainMetrics = Object.entries(filteredData?.main || {});
+  const currentMetrics = backendData.metrics[timeRange] || {};
+  const mainMetrics = Object.entries(currentMetrics.main || {});
+  const pageData = backendData.pageData;
 
   // Если нет основных метрик, показываем сообщение
   if (mainMetrics.length === 0) {
     return (
       <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex justify-center items-center">
         <div className="text-center">
-          <p className="text-blue-200">No data available</p>
+          <p className="text-blue-200">{t('error.no_metrics') || "No metrics data available"}</p>
+          <button 
+            onClick={fetchBackendData}
+            className="mt-4 px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+          >
+            {t('error.retry') || "Retry"}
+          </button>
         </div>
       </section>
     );
@@ -300,14 +415,14 @@ const WebOfScience = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
           >
-            {data.titleIcon || "📊"}
+            {pageData.titleIcon}
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-            {data.title || "Web of Science"}
+            {pageData.title}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {data.subtitle || "Research metrics and publication data"}
+            {pageData.subtitle}
           </p>
         </motion.div>
 
@@ -319,7 +434,7 @@ const WebOfScience = () => {
           className="flex justify-center mb-12 lg:mb-16"
         >
           <div className="bg-white/5 rounded-2xl p-2 backdrop-blur-lg border border-white/20 shadow-2xl">
-            {Object.keys(data.metrics || {}).map((range) => (
+            {Object.keys(backendData.metrics).map((range) => (
               <motion.button
                 key={range}
                 whileHover={{ scale: 1.05 }}
@@ -331,7 +446,7 @@ const WebOfScience = () => {
                     : 'text-blue-200 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                {data.timeRanges?.[range] || range}
+                {pageData.timeRanges?.[range] || range}
               </motion.button>
             ))}
           </div>
@@ -402,7 +517,7 @@ const WebOfScience = () => {
         </div>
 
         {/* Detailed Information */}
-        {filteredData?.categories && filteredData.collaborations && (
+        {currentMetrics.categories && currentMetrics.collaborations && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             {/* Publications by Category */}
             <motion.div
@@ -413,13 +528,13 @@ const WebOfScience = () => {
             >
               <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
                 <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">
-                  {data.categoriesIcon || "📈"}
+                  {pageData.categoriesIcon}
                 </span>
-                {data.categoriesTitle || "Publications by Category"}
+                {pageData.categoriesTitle}
               </h3>
               <div className="space-y-4">
-                {(filteredData.categories || []).map((category, index) => {
-                  const maxCount = Math.max(...(filteredData.categories || []).map(c => c.count || 0));
+                {Array.isArray(currentMetrics.categories) && currentMetrics.categories.map((category, index) => {
+                  const maxCount = Math.max(...(currentMetrics.categories || []).map(c => c.count || 0));
                   const percentage = maxCount > 0 ? ((category.count || 0) / maxCount) * 100 : 0;
                   
                   return (
@@ -465,12 +580,12 @@ const WebOfScience = () => {
             >
               <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
                 <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white mr-3 text-sm">
-                  {data.collaborationsIcon || "🌍"}
+                  {pageData.collaborationsIcon}
                 </span>
-                {data.collaborationsTitle || "International Collaboration"}
+                {pageData.collaborationsTitle}
               </h3>
               <div className="space-y-4">
-                {(filteredData.collaborations || []).map((collab, index) => (
+                {(currentMetrics.collaborations || []).map((collab, index) => (
                   <motion.div 
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
@@ -486,13 +601,13 @@ const WebOfScience = () => {
                           {collab.country || "Country"}
                         </span>
                         <div className="text-blue-200 text-sm">
-                          {collab.institutions || 0} {data.collaborationsInstitutions || "institutions"}
+                          {collab.institutions || 0} {pageData.collaborationsInstitutions}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-emerald-400 font-bold text-xl">{collab.publications || 0}</div>
-                      <div className="text-blue-300 text-sm">{data.collaborationsPublications || "publications"}</div>
+                      <div className="text-blue-300 text-sm">{pageData.collaborationsPublications}</div>
                     </div>
                   </motion.div>
                 ))}
@@ -502,7 +617,7 @@ const WebOfScience = () => {
         )}
 
         {/* Q1/Q2 Journals */}
-        {filteredData?.topJournals && (
+        {currentMetrics.topJournals && (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
@@ -511,12 +626,13 @@ const WebOfScience = () => {
           >
             <h3 className="text-2xl font-bold mb-8 flex items-center justify-center">
               <span className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3">
-                {data.topJournalsIcon || "⭐"}
+                {pageData.topJournalsIcon}
               </span>
-              {data.topJournalsTitle || "Publications by Journal Quartile"}
+              {pageData.topJournalsTitle}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {(filteredData.topJournals || []).map((journal, index) => (
+              {Array.isArray(currentMetrics.topJournals) &&
+              currentMetrics.topJournals.map((journal, index) => (
                 <motion.div 
                   key={index}
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -529,7 +645,7 @@ const WebOfScience = () => {
                     {journal.count || 0}
                   </div>
                   <div className="text-blue-200 text-lg font-medium mb-1">{journal.quartile || "Q"}</div>
-                  <div className="text-white/80 text-sm">{data.topJournalsPublications || "publications"}</div>
+                  <div className="text-white/80 text-sm">{pageData.topJournalsPublications}</div>
                   <div className="w-0 group-hover:w-full h-1 bg-emerald-400/50 transition-all duration-500 mt-2 mx-auto"></div>
                 </motion.div>
               ))}
@@ -538,14 +654,14 @@ const WebOfScience = () => {
         )}
 
         {/* Additional Metrics */}
-        {data.additionalMetrics && (
+        {pageData.additionalMetrics && pageData.additionalMetrics.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.9 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
           >
-            {(data.additionalMetrics || []).map((metric, index) => (
+            {(pageData.additionalMetrics || []).map((metric, index) => (
               <motion.div 
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -557,7 +673,7 @@ const WebOfScience = () => {
                 <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-300 text-emerald-400">
                   {metric.icon || "📊"}
                 </div>
-                <div className="text-2xl font-bold text-white mb-2">{filteredData?.[metric.key] || "0"}</div>
+                <div className="text-2xl font-bold text-white mb-2">{currentMetrics?.[metric.key] || "0"}</div>
                 <div className="text-blue-200 font-semibold text-lg mb-2">{metric.title || "Metric"}</div>
                 <div className="text-blue-300 text-sm">{metric.description || ""}</div>
               </motion.div>

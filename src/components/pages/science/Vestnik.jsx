@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import apiService from "../../../services/api";
 
 const Vestnik = () => {
   const { t, i18n } = useTranslation();
@@ -11,52 +10,88 @@ const Vestnik = () => {
   const [activeIssue, setActiveIssue] = useState(0);
   const sectionRef = useRef(null);
 
-  // API data states
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [stats, setStats] = useState([]);
-  const [featuredIssues, setFeaturedIssues] = useState([]);
-  const [recentIssues, setRecentIssues] = useState([]);
-  const [recentArticles, setRecentArticles] = useState([]);
+  // Состояния для данных с бэкенда
+  const [backendData, setBackendData] = useState({
+    stats: [],
+    featuredIssues: [],
+    recentIssues: [],
+    recentArticles: [],
+    loading: false,
+    error: null
+  });
 
-  // Add error display component if needed
-
-  // Get unique years for archive filtering
-  const archiveYears =
-    recentIssues.length > 0
-      ? [...new Set(recentIssues.map((issue) => issue.year))]
-      : [];
-
-  // Fetch data from API
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await apiService.getVestnikPage(i18n.language);
-
-        console.log("Vestnik API Response:", data);
-        setStats(data.stats || []);
-        setFeaturedIssues(data.featured_issues || []);
-        setRecentIssues(data.recent_issues || []);
-        setRecentArticles(data.recent_articles || []);
-        console.log("Vestnik data set:", {
-          stats: data.stats?.length,
-          featuredIssues: data.featured_issues?.length,
-          recentIssues: data.recent_issues?.length,
-          recentArticles: data.recent_articles?.length,
-        });
-      } catch (err) {
-        console.error("Failed to fetch Vestnik data:", err);
-        setError(err.message);
-        // Data will fallback to translation file
-      } finally {
-        setLoading(false);
-      }
+  // Получение текущего языка для API
+  const getApiLanguage = useCallback(() => {
+    const langMap = {
+      'en': 'en',
+      'ru': 'ru',
+      'kg': 'kg'
     };
-
-    fetchData();
+    return langMap[i18n.language] || 'ru';
   }, [i18n.language]);
+
+  // Функция для загрузки данных с бэкенда
+  const fetchBackendData = useCallback(async () => {
+    try {
+      setBackendData(prev => ({ ...prev, loading: true, error: null }));
+      
+      const lang = getApiLanguage();
+      
+      const endpoints = [
+        `/api/science/vestnik-stats/?lang=${lang}`,
+        `/api/science/vestnik-issues/?lang=${lang}&is_featured=true`,
+        `/api/science/vestnik-issues/?lang=${lang}&ordering=-publication_date`,
+        `/api/science/vestnik-articles/?lang=${lang}&ordering=-id`
+      ];
+
+      const responses = await Promise.all(
+        endpoints.map(async (url) => {
+          try {
+            const response = await fetch(url);
+            
+            // Проверяем content-type
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              const text = await response.text();
+              console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
+              return { results: [] };
+            }
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+          } catch (error) {
+            console.error(`Error fetching ${url}:`, error);
+            return { results: [] };
+          }
+        })
+      );
+
+      setBackendData({
+        stats: responses[0].results || [],
+        featuredIssues: responses[1].results || [],
+        recentIssues: responses[2].results || [],
+        recentArticles: responses[3].results || [],
+        loading: false,
+        error: null
+      });
+
+    } catch (error) {
+      console.error('Error fetching Vestnik data:', error);
+      setBackendData(prev => ({
+        ...prev,
+        loading: false,
+        error: 'Failed to load data'
+      }));
+    }
+  }, [getApiLanguage]);
+
+  // Загрузка данных при монтировании и изменении языка
+  useEffect(() => {
+    fetchBackendData();
+  }, [fetchBackendData]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -73,19 +108,56 @@ const Vestnik = () => {
 
   // Auto-switching issues in archive
   useEffect(() => {
-    if (currentView === "archive" && recentIssues.length > 0) {
+    if (currentView === "archive" && backendData.recentIssues.length > 0) {
       const interval = setInterval(() => {
-        setActiveIssue((prev) => (prev + 1) % recentIssues.length);
+        setActiveIssue((prev) => (prev + 1) % backendData.recentIssues.length);
       }, 4000);
       return () => clearInterval(interval);
     }
-  }, [currentView, recentIssues]);
+  }, [currentView, backendData.recentIssues]);
 
   const views = [
     { id: "current", label: t("vestnik.views.current"), icon: "🌟" },
     { id: "archive", label: t("vestnik.views.archive"), icon: "📚" },
     { id: "metrics", label: t("vestnik.views.metrics"), icon: "📊" },
   ];
+
+  // Get unique years for archive filtering
+  const archiveYears = backendData.recentIssues.length > 0
+    ? [...new Set(backendData.recentIssues.map((issue) => issue.year))]
+    : [];
+
+  // Компонент загрузки
+  const LoadingSkeleton = () => (
+    <div className="animate-pulse space-y-4">
+      <div className="bg-white/10 rounded-2xl h-8 mb-4"></div>
+      <div className="bg-white/10 rounded-2xl h-4 mb-2"></div>
+      <div className="bg-white/10 rounded-2xl h-4 w-3/4"></div>
+      <div className="grid grid-cols-2 gap-4 mt-6">
+        <div className="bg-white/10 rounded-2xl h-20"></div>
+        <div className="bg-white/10 rounded-2xl h-20"></div>
+      </div>
+    </div>
+  );
+
+  // Компонент ошибки
+  const ErrorMessage = ({ onRetry }) => (
+    <div className="text-center py-8">
+      <div className="text-red-400 text-6xl mb-4">⚠️</div>
+      <h2 className="text-2xl text-white mb-4">
+        {t('vestnik.errorTitle')}
+      </h2>
+      <p className="text-blue-200 mb-6">
+        {backendData.error}
+      </p>
+      <button
+        onClick={onRetry}
+        className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+      >
+        {t('vestnik.retry')}
+      </button>
+    </div>
+  );
 
   return (
     <section
@@ -132,20 +204,6 @@ const Vestnik = () => {
           </p>
         </motion.div>
 
-        {/* Error Display */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-red-500/10 border border-red-500/30 rounded-2xl p-6 mb-8 text-center"
-          >
-            <div className="text-red-400 text-lg font-semibold mb-2">
-              Failed to load Vestnik data
-            </div>
-            <div className="text-red-300 text-sm">{error}</div>
-          </motion.div>
-        )}
-
         {/* Main Content */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -177,34 +235,38 @@ const Vestnik = () => {
 
           {/* View Content */}
           <div className="p-6 lg:p-8">
-            <AnimatePresence mode="wait">
-              {currentView === "current" && (
-                <CurrentIssue
-                  data={featuredIssues.length > 0 ? featuredIssues[0] : null}
-                  loading={loading}
-                  t={t}
-                />
-              )}
-              {currentView === "archive" && (
-                <Archive
-                  data={recentIssues.length > 0 ? recentIssues : []}
-                  selectedYear={selectedYear}
-                  onYearChange={setSelectedYear}
-                  years={archiveYears}
-                  activeIssue={activeIssue}
-                  onIssueChange={setActiveIssue}
-                  loading={loading}
-                  t={t}
-                />
-              )}
-              {currentView === "metrics" && (
-                <Metrics
-                  data={stats.length > 0 ? stats : []}
-                  loading={loading}
-                  t={t}
-                />
-              )}
-            </AnimatePresence>
+            {backendData.error ? (
+              <ErrorMessage onRetry={fetchBackendData} />
+            ) : (
+              <AnimatePresence mode="wait">
+                {currentView === "current" && (
+                  <CurrentIssue
+                    data={backendData.featuredIssues.length > 0 ? backendData.featuredIssues[0] : null}
+                    loading={backendData.loading}
+                    t={t}
+                  />
+                )}
+                {currentView === "archive" && (
+                  <Archive
+                    data={backendData.recentIssues}
+                    selectedYear={selectedYear}
+                    onYearChange={setSelectedYear}
+                    years={archiveYears}
+                    activeIssue={activeIssue}
+                    onIssueChange={setActiveIssue}
+                    loading={backendData.loading}
+                    t={t}
+                  />
+                )}
+                {currentView === "metrics" && (
+                  <Metrics
+                    data={backendData.stats}
+                    loading={backendData.loading}
+                    t={t}
+                  />
+                )}
+              </AnimatePresence>
+            )}
           </div>
         </motion.div>
       </div>
@@ -214,16 +276,7 @@ const Vestnik = () => {
 
 const CurrentIssue = ({ data, loading, t }) => {
   if (loading) {
-    return (
-      <motion.div
-        key="current"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex justify-center items-center py-16"
-      >
-        <div className="text-white text-xl">Loading...</div>
-      </motion.div>
-    );
+    return <LoadingSkeleton />;
   }
 
   if (!data) {
@@ -236,10 +289,10 @@ const CurrentIssue = ({ data, loading, t }) => {
       >
         <div className="text-yellow-400 text-xl mb-2">📰</div>
         <div className="text-white text-xl mb-2">
-          No Current Issue Available
+          {t("vestnik.current.noIssue")}
         </div>
         <div className="text-blue-200">
-          Please add a featured Vestnik issue in the admin panel.
+          {t("vestnik.current.noIssueDescription")}
         </div>
       </motion.div>
     );
@@ -280,43 +333,39 @@ const CurrentIssue = ({ data, loading, t }) => {
           </div>
 
           <h3 className="text-3xl lg:text-4xl font-bold text-white">
-            {data?.title ||
-              `Вестник том ${data?.volume_number || "X"} №${
-                data?.issue_number || "X"
-              } (${data?.year || "XXXX"})`}
+            {data.title || 
+             `Вестник том ${data.volume_number || "X"} №${data.issue_number || "X"} (${data.year || "XXXX"})`}
           </h3>
 
           <p className="text-blue-100 text-lg leading-relaxed">
-            {data?.description || "Научный журнал Физической Академии"}
+            {data.description || t("vestnik.current.defaultDescription")}
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               {
-                value: data?.publication_date
+                value: data.publication_date
                   ? new Date(data.publication_date).toLocaleDateString()
-                  : new Date().getFullYear().toString(),
-                label: "Дата выпуска",
+                  : data.year || new Date().getFullYear().toString(),
+                label: t("vestnik.current.releaseDate"),
                 color: "blue",
                 icon: "📅",
               },
               {
-                value: data?.issn_print || data?.issn_online || "ISSN",
+                value: data.issn_print || data.issn_online || "ISSN",
                 label: "ISSN",
                 color: "green",
                 icon: "🏷️",
               },
               {
-                value: data?.articles?.length?.toString() || "0",
-                label: "Статей",
+                value: data.articles_count?.toString() || "0",
+                label: t("vestnik.current.articlesCount"),
                 color: "purple",
                 icon: "📄",
               },
               {
-                value: `Том ${data?.volume_number || "X"} №${
-                  data?.issue_number || "X"
-                }`,
-                label: "Номер выпуска",
+                value: `${t("vestnik.current.volume")} ${data.volume_number || "X"} ${t("vestnik.current.issue")} ${data.issue_number || "X"}`,
+                label: t("vestnik.current.issueNumber"),
                 color: "orange",
                 icon: "📏",
               },
@@ -353,18 +402,16 @@ const CurrentIssue = ({ data, loading, t }) => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() =>
-                data?.pdf_url && window.open(data.pdf_url, "_blank")
-              }
-              disabled={!data?.pdf_url}
+              onClick={() => data.pdf_file && window.open(data.pdf_file, "_blank")}
+              disabled={!data.pdf_file}
               className={`px-6 py-3 rounded-xl transition-all shadow-lg font-medium flex items-center gap-2 ${
-                data?.pdf_url
+                data.pdf_file
                   ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white hover:from-blue-600 hover:to-emerald-600"
                   : "bg-gray-500 text-gray-300 cursor-not-allowed"
               }`}
             >
               <span>📥</span>
-              <span>Скачать PDF</span>
+              <span>{t("vestnik.actions.downloadPDF")}</span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -400,22 +447,12 @@ const Archive = ({
   t,
 }) => {
   if (loading) {
-    return (
-      <motion.div
-        key="archive"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex justify-center items-center py-16"
-      >
-        <div className="text-white text-xl">Loading archive...</div>
-      </motion.div>
-    );
+    return <LoadingSkeleton />;
   }
-  const filteredData = Array.isArray(data)
-    ? selectedYear === "all"
-      ? data
-      : data.filter((issue) => issue.year === parseInt(selectedYear))
-    : [];
+
+  const filteredData = selectedYear === "all"
+    ? data
+    : data.filter((issue) => issue.year === parseInt(selectedYear));
 
   return (
     <motion.div
@@ -431,7 +468,7 @@ const Archive = ({
           {t("vestnik.archive.title")}
         </h3>
 
-        {/* Фильтр по годам */}
+        {/* Year Filter */}
         <div className="flex flex-wrap gap-2">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -445,7 +482,7 @@ const Archive = ({
           >
             {t("vestnik.archive.allYears")}
           </motion.button>
-          {years?.map((year) => (
+          {years.map((year) => (
             <motion.button
               key={year}
               whileHover={{ scale: 1.05 }}
@@ -463,7 +500,7 @@ const Archive = ({
         </div>
       </div>
 
-      {Array.isArray(filteredData) && filteredData.length > 0 ? (
+      {filteredData.length > 0 ? (
         <>
           {/* Featured Issue */}
           <motion.div
@@ -475,34 +512,31 @@ const Archive = ({
               <div>
                 <h4 className="text-xl lg:text-2xl font-bold text-white mb-4">
                   {filteredData[activeIssue]?.title ||
-                    `Вестник том ${filteredData[activeIssue]?.volume_number} №${filteredData[activeIssue]?.issue_number} (${filteredData[activeIssue]?.year})`}
+                    `${t("vestnik.archive.vestnik")} ${t("vestnik.current.volume")} ${filteredData[activeIssue]?.volume_number} ${t("vestnik.current.issue")} ${filteredData[activeIssue]?.issue_number} (${filteredData[activeIssue]?.year})`}
                 </h4>
                 <p className="text-blue-100 mb-4">
-                  {filteredData[activeIssue]?.description || "Научный журнал"}
+                  {filteredData[activeIssue]?.description || t("vestnik.current.defaultDescription")}
                 </p>
                 <div className="flex items-center gap-4 mb-4">
                   <span className="text-blue-200 text-sm">
                     📅{" "}
                     {filteredData[activeIssue]?.publication_date
-                      ? new Date(
-                          filteredData[activeIssue].publication_date
-                        ).toLocaleDateString()
+                      ? new Date(filteredData[activeIssue].publication_date).toLocaleDateString()
                       : filteredData[activeIssue]?.year}
                   </span>
                   <span className="text-blue-200 text-sm">
-                    📄 {filteredData[activeIssue]?.articles?.length || 0} статей
+                    📄 {filteredData[activeIssue]?.articles_count || 0} {t("vestnik.current.articles")}
                   </span>
                   <span className="text-blue-200 text-sm">
-                    📏 Том {filteredData[activeIssue]?.volume_number} №
-                    {filteredData[activeIssue]?.issue_number}
+                    📏 {t("vestnik.current.volume")} {filteredData[activeIssue]?.volume_number} {t("vestnik.current.issue")} {filteredData[activeIssue]?.issue_number}
                   </span>
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() =>
-                    filteredData[activeIssue]?.pdf_url &&
-                    window.open(filteredData[activeIssue].pdf_url, "_blank")
+                    filteredData[activeIssue]?.pdf_file &&
+                    window.open(filteredData[activeIssue].pdf_file, "_blank")
                   }
                   className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-emerald-600 transition-all shadow-lg"
                 >
@@ -521,7 +555,7 @@ const Archive = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredData.map((issue, index) => (
               <motion.div
-                key={index}
+                key={issue.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
@@ -537,7 +571,7 @@ const Archive = ({
                   <div>
                     <h4 className="font-bold text-white text-lg mb-2">
                       {issue.title ||
-                        `Том ${issue.volume_number} №${issue.issue_number} (${issue.year})`}
+                        `${t("vestnik.current.volume")} ${issue.volume_number} ${t("vestnik.current.issue")} ${issue.issue_number} (${issue.year})`}
                     </h4>
                     <p className="text-blue-200 text-sm">
                       {issue.publication_date
@@ -557,15 +591,15 @@ const Archive = ({
                 </div>
 
                 <p className="text-blue-100 text-sm mb-4 leading-relaxed">
-                  {issue.description || "Научный журнал Физической Академии"}
+                  {issue.description || t("vestnik.current.defaultDescription")}
                 </p>
 
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-blue-200 text-sm">
-                    📄 {issue.articles?.length || 0} статей
+                    📄 {issue.articles_count || 0} {t("vestnik.current.articles")}
                   </span>
                   <span className="text-blue-200 text-sm">
-                    📏 Том {issue.volume_number} №{issue.issue_number}
+                    📏 {t("vestnik.current.volume")} {issue.volume_number} {t("vestnik.current.issue")} {issue.issue_number}
                   </span>
                 </div>
 
@@ -583,18 +617,18 @@ const Archive = ({
                     whileTap={{ scale: 0.95 }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (issue.pdf_url) {
-                        window.open(issue.pdf_url, "_blank");
+                      if (issue.pdf_file) {
+                        window.open(issue.pdf_file, "_blank");
                       }
                     }}
-                    disabled={!issue.pdf_url}
+                    disabled={!issue.pdf_file}
                     className={`px-4 py-2 rounded-lg transition-all text-sm font-medium shadow-lg ${
-                      issue.pdf_url
+                      issue.pdf_file
                         ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white hover:from-blue-600 hover:to-emerald-600"
                         : "bg-gray-500 text-gray-300 cursor-not-allowed"
                     }`}
                   >
-                    Открыть
+                    {t("vestnik.actions.open")}
                   </motion.button>
                 </div>
               </motion.div>
@@ -622,16 +656,7 @@ const Archive = ({
 
 const Metrics = ({ data, loading, t }) => {
   if (loading) {
-    return (
-      <motion.div
-        key="metrics"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex justify-center items-center py-16"
-      >
-        <div className="text-white text-xl">Loading metrics...</div>
-      </motion.div>
-    );
+    return <LoadingSkeleton />;
   }
 
   return (
@@ -648,65 +673,32 @@ const Metrics = ({ data, loading, t }) => {
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {!Array.isArray(data) || data.length === 0 ? (
-          <div className="col-span-full text-center text-blue-200 py-8">
-            No metrics available
-          </div>
+        {data.length > 0 ? (
+          data.map((metric, index) => (
+            <motion.div
+              key={metric.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300"
+            >
+              <div className="text-3xl mb-3">{metric.icon || "📊"}</div>
+              <div className="text-2xl font-bold text-emerald-400 mb-2">
+                {metric.value}
+              </div>
+              <div className="text-blue-200 text-sm font-medium">
+                {metric.label}
+              </div>
+            </motion.div>
+          ))
         ) : (
-          data
-            .filter((item) => {
-              // Check if it's a proper metric object, not an article object
-              return (
-                item &&
-                typeof item === "object" &&
-                ("value" in item || "label" in item || "icon" in item) &&
-                // Exclude article objects that have title/author properties
-                !("title" in item && "author" in item)
-              );
-            })
-            .map((metric, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300"
-              >
-                <div className="text-3xl mb-3">{metric.icon || "📊"}</div>
-                <div className="text-2xl font-bold text-emerald-400 mb-2">
-                  {String(metric.value || "0")}
-                </div>
-                <div className="text-blue-200 text-sm font-medium">
-                  {String(metric.label || "Metric")}
-                </div>
-              </motion.div>
-            ))
+          <div className="col-span-full text-center py-8 text-blue-200">
+            {t("vestnik.metrics.noData")}
+          </div>
         )}
-
-        {/* Show warning if data structure doesn't match expected format */}
-        {Array.isArray(data) &&
-          data.length > 0 &&
-          data.filter(
-            (item) =>
-              item &&
-              typeof item === "object" &&
-              ("value" in item || "label" in item || "icon" in item) &&
-              !("title" in item && "author" in item)
-          ).length === 0 && (
-            <div className="col-span-full text-center py-8">
-              <div className="text-yellow-400 mb-2 text-lg">
-                ⚠️ Data Format Issue
-              </div>
-              <div className="text-blue-200 text-sm">
-                Expected metrics data, but received article data instead.
-                <br />
-                Please check your backend API configuration.
-              </div>
-            </div>
-          )}
       </div>
 
-      {/* Дополнительная информация о метриках */}
+      {/* Additional metrics information */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -739,5 +731,18 @@ const Metrics = ({ data, loading, t }) => {
     </motion.div>
   );
 };
+
+// Reuse the LoadingSkeleton component from above
+const LoadingSkeleton = () => (
+  <div className="animate-pulse space-y-4">
+    <div className="bg-white/10 rounded-2xl h-8 mb-4"></div>
+    <div className="bg-white/10 rounded-2xl h-4 mb-2"></div>
+    <div className="bg-white/10 rounded-2xl h-4 w-3/4"></div>
+    <div className="grid grid-cols-2 gap-4 mt-6">
+      <div className="bg-white/10 rounded-2xl h-20"></div>
+      <div className="bg-white/10 rounded-2xl h-20"></div>
+    </div>
+  </div>
+);
 
 export default Vestnik;
