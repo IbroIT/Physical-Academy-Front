@@ -277,7 +277,6 @@ const PedagogicalSports = () => {
     { id: 'about', label: t('pedagogicalSports.tabs.about', 'О факультете'), icon: '🏃‍♂️', color: 'from-blue-500 to-cyan-500' },
     { id: 'programs', label: t('pedagogicalSports.tabs.programs', 'Программы'), icon: '📚', color: 'from-green-500 to-emerald-500' },
     { id: 'specializations', label: t('pedagogicalSports.tabs.specializations', 'Специализации'), icon: '🎯', color: 'from-blue-500 to-green-500' },
-    { id: 'sports', label: t('pedagogicalSports.tabs.sports', 'Виды спорта'), icon: '⚽', color: 'from-green-500 to-blue-500' },
     { id: 'teachers', label: t('pedagogicalSports.tabs.teachers', 'Преподаватели'), icon: '👨‍🏫', color: 'from-cyan-500 to-blue-500' },
     { id: 'contacts', label: t('pedagogicalSports.tabs.contacts', 'Контакты'), icon: '📞', color: 'from-emerald-500 to-green-500' }
   ];

@@ -385,6 +385,7 @@ const Contacts = ({ data, uiTexts }) => (
     </div>
 
     {/* Экстренная поддержка */}
+   {data.emergency && (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -405,6 +406,8 @@ const Contacts = ({ data, uiTexts }) => (
         <span>{data.emergency.phone}</span>
       </motion.a>
     </motion.div>
+)}
+
   </div>
 );
 

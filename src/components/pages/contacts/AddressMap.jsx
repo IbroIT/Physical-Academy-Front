@@ -40,12 +40,6 @@ const AddressMap = () => {
 
   const transportTypes = [
     { 
-      id: 'metro', 
-      name: t('contact.map.transport.metro.title', 'Метро'), 
-      icon: '🚇',
-      color: 'from-red-500 to-pink-500'
-    },
-    { 
       id: 'bus', 
       name: t('contact.map.transport.bus.title', 'Автобус'), 
       icon: '🚌',
@@ -65,11 +59,6 @@ const AddressMap = () => {
     }
   ];
 
-  const mapViews = [
-    { id: 'standard', name: t('contact.map.views.standard', 'Стандартная'), icon: '🗺️' },
-    { id: 'satellite', name: t('contact.map.views.satellite', 'Спутник'), icon: '🛰️' },
-    { id: 'terrain', name: t('contact.map.views.terrain', 'Рельеф'), icon: '🏔️' }
-  ];
 
   const getTransportDetails = (type) => {
     const details = transportData[type];
@@ -114,7 +103,6 @@ const AddressMap = () => {
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🗺️</div>
         <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">📍</div>
         <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">🧭</div>
-        <div className="absolute top-2/3 right-1/3 text-5xl opacity-5">🚇</div>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
@@ -169,27 +157,8 @@ const AddressMap = () => {
                     </span>
                     {t('contact.map.interactiveMap', 'Интерактивная карта')}
                   </h3>
-                  
-                  {/* Map View Controls */}
-                  <div className="flex bg-white/10 rounded-xl p-1 backdrop-blur-sm">
-                    {mapViews.map((view) => (
-                      <button
-                        key={view.id}
-                        onClick={() => setMapView(view.id)}
-                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
-                          mapView === view.id
-                            ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
-                            : 'text-blue-200 hover:text-white'
-                        }`}
-                      >
-                        <span className="mr-2">{view.icon}</span>
-                        {view.name}
-                      </button>
-                    ))}
-                  </div>
                 </div>
               </div>
-
               {/* Map Container */}
               <div className="aspect-video relative bg-gradient-to-br from-slate-800 to-blue-900/50">
                 {/* Interactive Map Elements */}

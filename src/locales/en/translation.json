@@ -7480,10 +7480,6 @@
         "name": "About College"
       },
       {
-        "id": "departments",
-        "name": "Departments"
-      },
-      {
         "id": "programs",
         "name": "Programs"
       },
@@ -7846,9 +7842,116 @@
       }
     }
   },
-  "common": {
-    "errors": {
-      "apiError": "Error loading data from the server. Please try again later."
+  "studentCouncil": {
+    "title": "Student Council",
+    "subtitle": "Empowering student voices, driving campus change, and building community together",
+    "membersTitle": "Council Members",
+    "initiativesTitle": "Our Initiatives",
+    "eventsTitle": "Upcoming Events",
+    "commonInfo": {
+      "description": "The Student Council represents the student body, working to enhance campus life and address student concerns through various initiatives and events.",
+      "mission": "To serve as the official voice of students and promote a vibrant campus community",
+      "vision": "Creating an inclusive environment where every student can thrive"
+    },
+    "viewDetails": "View Details",
+    "bio": "Biography",
+    "achievements": "Achievements",
+    "goals": "Goals & Objectives",
+    "timeline": "Timeline",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "leadMembers": "Lead Members",
+    "relatedInitiative": "Related Initiative",
+    "register": "Register Now",
+    "ongoing": "Ongoing",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "noMembers": "No council members available at the moment",
+    "noInitiatives": "No initiatives currently active",
+    "noEvents": "No upcoming events scheduled",
+    "errorTitle": "Failed to load data",
+    "retry": "Try Again",
+    "stats": {
+      "members": "Council Members",
+      "initiatives": "Active Initiatives",
+      "events": "Annual Events",
+      "participation": "Student Participation"
     }
+  },
+   "instructions": {
+    "title": "Instructions & Documents",
+    "subtitle": "Academic documents and instructions for students",
+    "searchPlaceholder": "Search documents...",
+    "categories": {
+      "all": "All Categories"
+    },
+    "totalDocuments": "Total Documents",
+    "categoriesCount": "Categories",
+    "totalDownloads": "Total Downloads",
+    "updatesCount": "Updates",
+    "importantUpdatesTitle": "Important Updates",
+    "noDocuments": "No documents found",
+    "noDocumentsAvailable": "No documents available",
+    "tryChangingSearch": "Try changing your search criteria",
+    "checkBackLater": "Please check back later",
+    "errorTitle": "Failed to load data",
+    "retry": "Try Again",
+    "document": {
+      "updated": "Updated",
+      "pages": "Pages",
+      "downloads": "Downloads",
+      "downloading": "Downloading...",
+      "download": "Download"
+    }
+  },
+   "scholarship": {
+    "title": "Scholarship Programs",
+    "subtitle": "Financial support for talented and motivated students",
+    "programs": "Scholarship Programs",
+    "requiredDocuments": "Required Documents",
+    "contactInfo": "Contact Information",
+    "deadlines": "Application Deadlines",
+    "totalScholarships": "Total Scholarships",
+    "activeScholarships": "Active Scholarships",
+    "deadline": "Deadline",
+    "email": "Email",
+    "phone": "Phone",
+    "applyOnline": "Apply Online",
+    "required": "Required",
+    "optional": "Optional",
+    "active": "Active",
+    "inactive": "Inactive",
+    "noPrograms": "No scholarship programs available",
+    "noDocuments": "No documents required",
+    "noDeadlines": "No deadlines set",
+    "errorTitle": "Failed to load data",
+    "retry": "Try Again"
+  },
+  "visa": {
+    "title": "Visa Support",
+    "subtitle": "Comprehensive visa assistance and immigration services for international students",
+    "services": "Visa Services",
+    "serviceDetails": "Service Details",
+    "contacts": "Contact Persons",
+    "quickActions": "Quick Actions",
+    "featured": "Featured",
+    "featuredService": "Featured Service",
+    "standardService": "Standard Service",
+    "standard": "Standard",
+    "serviceOrder": "Service Order",
+    "order": "Order",
+    "active": "Active",
+    "inactive": "Inactive",
+    "email": "Email",
+    "phone": "Phone",
+    "office": "Office Location",
+    "hours": "Office Hours",
+    "emailSupport": "Email Support",
+    "downloadForms": "Download Forms",
+    "scheduleAppointment": "Schedule Appointment",
+    "noServices": "No visa services available",
+    "noContacts": "No contacts available",
+    "errorTitle": "Failed to load data",
+    "retry": "Try Again"
   }
 }
