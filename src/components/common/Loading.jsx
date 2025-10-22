@@ -34,7 +34,7 @@ export const LoadingSkeleton = ({ className = "", lines = 3 }) => {
 export const CardSkeleton = ({ className = "" }) => {
   return (
     <div
-      className={`bg-white rounded-lg shadow-md p-6 animate-pulse ${className}`}
+      className={`bg-blue-500 rounded-lg shadow-md p-6 animate-pulse ${className}`}
     >
       <div className="flex items-center space-x-4 mb-4">
         <div className="rounded-full bg-gray-200 h-16 w-16"></div>

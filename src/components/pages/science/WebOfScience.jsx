@@ -40,6 +40,8 @@ const WebOfScience = () => {
       }));
       
       const lang = getApiLanguage();
+      console.log('Fetching data for language:', lang); // Для отладки
+      
       const response = await fetch(`/api/science/wos-page/?lang=${lang}`);
       
       if (!response.ok) {
@@ -202,7 +204,7 @@ const WebOfScience = () => {
   // Загрузка данных при монтировании и изменении языка
   useEffect(() => {
     fetchBackendData();
-  }, [fetchBackendData]);
+  }, [i18n.language]); // Добавляем i18n.language в зависимости
 
   // Сброс состояний при изменении языка
   useEffect(() => {
@@ -211,6 +213,7 @@ const WebOfScience = () => {
     setActiveCategory(0);
   }, [i18n.language]);
 
+  // Остальной код без изменений...
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
