@@ -1,5 +1,5 @@
 // StudentScientificSociety.jsx
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -26,22 +26,23 @@ const StudentScientificSociety = () => {
 
   const sectionRef = useRef(null);
 
-  // Получение текущего языка для API
+  // Получение текущего языка для API - ИСПРАВЛЕННАЯ ВЕРСИЯ
   const getApiLanguage = useCallback(() => {
     const langMap = {
       'en': 'en',
-      'ru': 'ru',
-      'kg': 'kg'
+      'ru': 'ru', 
+      'kg': 'ky'
     };
     return langMap[i18n.language] || 'ru';
   }, [i18n.language]);
 
-  // Функция для загрузки данных с бэкенда
+  // Функция для загрузки данных с бэкенда - ИСПРАВЛЕННАЯ ВЕРСИЯ
   const fetchBackendData = useCallback(async () => {
     try {
       setBackendData(prev => ({ ...prev, loading: true, error: null }));
       
       const lang = getApiLanguage();
+      console.log('Fetching data for language:', lang); // Для отладки
       
       const endpoints = [
         '/api/science/sss-info/',
@@ -57,21 +58,32 @@ const StudentScientificSociety = () => {
       const responses = await Promise.all(
         endpoints.map(async (url) => {
           try {
-            const fullUrl = `${url}?lang=${lang}`;
-            const response = await fetch(fullUrl);
+            // ИСПРАВЛЕНИЕ: Добавляем language в параметры запроса
+            const fullUrl = `${url}?language=${lang}`;
+            console.log('Fetching:', fullUrl); // Для отладки
             
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-              const text = await response.text();
-              console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
-              return { results: [] };
-            }
+            const response = await fetch(fullUrl, {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/json',
+                'Accept-Language': lang, // Добавляем заголовок языка
+              },
+              cache: 'no-cache' // Отключаем кеширование
+            });
             
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            return await response.json();
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              console.warn(`Non-JSON response from ${url}`);
+              return { results: [] };
+            }
+            
+            const data = await response.json();
+            console.log(`Data from ${url}:`, data); // Для отладки
+            return data;
           } catch (error) {
             console.error(`Error fetching ${url}:`, error);
             return { results: [] };
@@ -79,15 +91,16 @@ const StudentScientificSociety = () => {
         })
       );
 
+      // ИСПРАВЛЕНИЕ: Убеждаемся, что данные обновляются
       setBackendData({
-        info: responses[0].results || [],
-        stats: responses[1].results || [],
-        features: responses[2].results || [],
-        projects: responses[3].results || [],
-        events: responses[4].results || [],
-        joinSteps: responses[5].results || [],
-        leadership: responses[6].results || [],
-        contacts: responses[7].results || [],
+        info: responses[0]?.results || [],
+        stats: responses[1]?.results || [],
+        features: responses[2]?.results || [],
+        projects: responses[3]?.results || [],
+        events: responses[4]?.results || [],
+        joinSteps: responses[5]?.results || [],
+        leadership: responses[6]?.results || [],
+        contacts: responses[7]?.results || [],
         loading: false,
         error: null
       });
@@ -97,20 +110,38 @@ const StudentScientificSociety = () => {
       setBackendData(prev => ({
         ...prev,
         loading: false,
-        error: 'Failed to load data'
+        error: t('studentScientificSociety.error') || 'Failed to load data'
       }));
     }
-  }, [getApiLanguage]);
+  }, [getApiLanguage, t]);
 
-  // Загрузка данных при монтировании
+  // Загрузка данных при монтировании и изменении языка - ИСПРАВЛЕННАЯ ВЕРСИЯ
   useEffect(() => {
+    console.log('Language changed to:', i18n.language); // Для отладки
     fetchBackendData();
-  }, []);
+  }, [i18n.language, fetchBackendData]);
 
-  // Перезагрузка данных при изменении языка
+  // Сброс состояний при изменении языка
   useEffect(() => {
-    fetchBackendData();
+    setActiveTab('about');
+    setActiveProject(0);
+    setExpandedFeature(null);
   }, [i18n.language]);
+
+  // Добавляем обработчик изменения языка
+  useEffect(() => {
+    const handleLanguageChanged = (lng) => {
+      console.log('Language changed in i18n:', lng);
+      // Принудительно перезагружаем данные
+      fetchBackendData();
+    };
+
+    i18n.on('languageChanged', handleLanguageChanged);
+    
+    return () => {
+      i18n.off('languageChanged', handleLanguageChanged);
+    };
+  }, [i18n, fetchBackendData]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -135,149 +166,221 @@ const StudentScientificSociety = () => {
     }
   }, [backendData.projects.length]);
 
-  // Получение основной информации
-  const getMainInfo = () => {
+  // Функция для безопасного получения строки
+  const safeString = (value, defaultValue = '') => {
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return value.toString();
+    return defaultValue;
+  };
+
+  // Функция для безопасного получения массива
+  const safeArray = (value) => {
+    return Array.isArray(value) ? value : [];
+  };
+
+  // Получение основной информации с использованием useMemo для оптимизации
+  const societyData = useMemo(() => {
     const info = backendData.info[0] || {};
+    console.log('Current society data:', info); // Для отладки
+    
     return {
-      title: info.title || t('studentScientificSociety.title'),
-      subtitle: info.subtitle || t('studentScientificSociety.subtitle'),
+      title: safeString(info.title, t('studentScientificSociety.title', "Student Scientific Society")),
+      subtitle: safeString(info.subtitle, t('studentScientificSociety.subtitle', "Join our research community")),
       about: {
-        title: info.about_title || t('studentScientificSociety.about.title'),
-        description: info.about_description || t('studentScientificSociety.about.description')
+        title: safeString(info.about_title, t('studentScientificSociety.about.title', "About SSS")),
+        description: safeString(info.about_description, t('studentScientificSociety.about.description', "Student Scientific Society description"))
       },
       projects: {
-        title: info.projects_title || t('studentScientificSociety.projects.title')
+        title: safeString(info.projects_title, t('studentScientificSociety.projects.title', "Our Projects"))
       },
       events: {
-        title: info.events_title || t('studentScientificSociety.events.title')
+        title: safeString(info.events_title, t('studentScientificSociety.events.title', "Events"))
       },
       join: {
-        title: info.join_title || t('studentScientificSociety.join.title')
+        title: safeString(info.join_title, t('studentScientificSociety.join.title', "How to Join"))
       },
       leadership: {
-        title: info.leadership_title || t('studentScientificSociety.leadership.title')
+        title: safeString(info.leadership_title, t('studentScientificSociety.leadership.title', "Leadership"))
       },
       contacts: {
-        title: info.contacts_title || t('studentScientificSociety.contacts.title')
+        title: safeString(info.contacts_title, t('studentScientificSociety.contacts.title', "Contacts"))
       },
       upcomingEvents: {
-        title: info.upcoming_events_title || t('studentScientificSociety.upcomingEvents.title')
+        title: safeString(info.upcoming_events_title, t('studentScientificSociety.upcomingEvents.title', "Upcoming Events"))
       }
     };
-  };
+  }, [backendData.info, t, i18n.language]); // Добавляем i18n.language в зависимости
 
-  // Преобразование статистики
-  const getStats = () => {
-    return backendData.stats.map(stat => ({
-      id: stat.id,
-      value: stat.value,
-      label: stat.label
+  // Преобразование статистики с useMemo
+  const stats = useMemo(() => {
+    return safeArray(backendData.stats).map(stat => ({
+      id: stat.id || Math.random(),
+      value: safeString(stat.value, '0'),
+      label: safeString(stat.label, 'Stat')
     }));
-  };
+  }, [backendData.stats, i18n.language]); // Добавляем i18n.language
 
-  // Преобразование фич
-  const getFeatures = () => {
-    return backendData.features.map(feature => ({
-      id: feature.id,
-      title: feature.title,
-      description: feature.description,
-      icon: feature.icon || '🔬'
+  // Преобразование фич с useMemo
+  const features = useMemo(() => {
+    return safeArray(backendData.features).map(feature => ({
+      id: feature.id || Math.random(),
+      title: safeString(feature.title, 'Feature'),
+      description: safeString(feature.description, 'Description'),
+      icon: safeString(feature.icon, '🔬')
     }));
-  };
+  }, [backendData.features, i18n.language]);
 
-  // Преобразование проектов
-  const getProjects = () => {
-    return backendData.projects.map(project => ({
-      id: project.id,
-      name: project.name,
-      shortDescription: project.short_description,
-      description: project.description,
-      icon: project.icon || '📚',
-      tags: Array.isArray(project.tags) ? project.tags : []
+  // Преобразование проектов с useMemo
+  const projects = useMemo(() => {
+    return safeArray(backendData.projects).map(project => {
+      let tags = [];
+      if (Array.isArray(project.tags)) {
+        tags = project.tags.map(tag => {
+          if (typeof tag === 'string') return tag;
+          if (tag && typeof tag === 'object' && tag.name) return safeString(tag.name);
+          return 'Tag';
+        });
+      }
+      
+      return {
+        id: project.id || Math.random(),
+        name: safeString(project.name, 'Project'),
+        shortDescription: safeString(project.short_description, 'Short description'),
+        description: safeString(project.description, 'Project description'),
+        icon: safeString(project.icon, '📚'),
+        tags: tags
+      };
+    });
+  }, [backendData.projects, i18n.language]);
+
+  // Преобразование событий с useMemo
+  const events = useMemo(() => {
+    return safeArray(backendData.events).map(event => ({
+      id: event.id || Math.random(),
+      name: safeString(event.name, 'Event'),
+      description: safeString(event.description, 'Event description'),
+      icon: safeString(event.icon, '📅'),
+      date: safeString(event.date, ''),
+      time: safeString(event.time, ''),
+      status: safeString(event.status, ''),
+      status_display: safeString(event.status_display, ''),
+      days_left: event.days_left || 0
     }));
-  };
+  }, [backendData.events, i18n.language]);
 
-  // Преобразование событий
-  const getEvents = () => {
-    return backendData.events.map(event => ({
-      id: event.id,
-      name: event.name,
-      description: event.description,
-      icon: event.icon || '📅',
-      date: event.date,
-      time: event.time,
-      status: event.status,
-      status_display: event.status_display,
-      days_left: event.days_left
+  // Преобразование шагов вступления с useMemo
+  const joinSteps = useMemo(() => {
+    return safeArray(backendData.joinSteps).map(step => ({
+      id: step.id || Math.random(),
+      step: safeString(step.step, '1'),
+      title: safeString(step.title, 'Step'),
+      description: safeString(step.description, 'Step description')
     }));
-  };
+  }, [backendData.joinSteps, i18n.language]);
 
-  // Преобразование шагов вступления
-  const getJoinSteps = () => {
-    return backendData.joinSteps.map(step => ({
-      id: step.id,
-      step: step.step,
-      title: step.title,
-      description: step.description
+  // Преобразование руководства с useMemo
+  const leadership = useMemo(() => {
+    return safeArray(backendData.leadership).map(member => ({
+      id: member.id || Math.random(),
+      name: safeString(member.name, 'Name'),
+      position: safeString(member.position, 'Position'),
+      department: safeString(member.department, 'Department')
     }));
-  };
+  }, [backendData.leadership, i18n.language]);
 
-  // Преобразование руководства
-  const getLeadership = () => {
-    return backendData.leadership.map(member => ({
-      id: member.id,
-      name: member.name,
-      position: member.position,
-      department: member.department
+  // Преобразование контактов с useMemo
+  const contacts = useMemo(() => {
+    return safeArray(backendData.contacts).map(contact => ({
+      id: contact.id || Math.random(),
+      label: safeString(contact.label, 'Contact'),
+      value: safeString(contact.value, ''),
+      icon: safeString(contact.icon, '📞')
     }));
-  };
+  }, [backendData.contacts, i18n.language]);
 
-  // Преобразование контактов
-  const getContacts = () => {
-    return backendData.contacts.map(contact => ({
-      id: contact.id,
-      label: contact.label,
-      value: contact.value,
-      icon: contact.icon || '📞'
-    }));
-  };
-
-  // Получение предстоящих событий (фильтруем по статусу upcoming)
-  const getUpcomingEvents = () => {
-    return backendData.events
+  // Получение предстоящих событий с useMemo
+  const upcomingEvents = useMemo(() => {
+    return safeArray(backendData.events)
       .filter(event => event.status === 'upcoming')
-      .slice(0, 3) // Берем только 3 ближайших события
+      .slice(0, 3)
       .map(event => ({
-        name: event.name,
-        date: event.date,
+        name: safeString(event.name, 'Event'),
+        date: safeString(event.date, ''),
         daysLeft: event.days_left || 0
       }));
-  };
+  }, [backendData.events, i18n.language]);
 
-  const societyData = getMainInfo();
-  const stats = getStats();
-  const features = getFeatures();
-  const projects = getProjects();
-  const events = getEvents();
-  const joinSteps = getJoinSteps();
-  const leadership = getLeadership();
-  const contacts = getContacts();
-  const upcomingEvents = getUpcomingEvents();
+  // Табы с использованием useMemo для перевода
+  const tabs = useMemo(() => {
+    try {
+      // Пробуем получить переведенные табы
+      const translatedTabs = t('studentScientificSociety.tabs', { 
+        returnObjects: true,
+        defaultValue: [
+          { id: 'about', name: 'About SSS' },
+          { id: 'projects', name: 'Projects' },
+          { id: 'events', name: 'Events' },
+          { id: 'join', name: 'Join Us' }
+        ]
+      });
+      
+      if (Array.isArray(translatedTabs)) {
+        return translatedTabs;
+      }
+      
+      // Если это объект, преобразуем в массив
+      if (translatedTabs && typeof translatedTabs === 'object') {
+        return Object.keys(translatedTabs).map(key => ({
+          id: key,
+          name: translatedTabs[key]
+        }));
+      }
+      
+      return [
+        { id: 'about', name: 'About SSS' },
+        { id: 'projects', name: 'Projects' },
+        { id: 'events', name: 'Events' },
+        { id: 'join', name: 'Join Us' }
+      ];
+    } catch (error) {
+      console.warn('Error loading tabs translation:', error);
+      return [
+        { id: 'about', name: 'About SSS' },
+        { id: 'projects', name: 'Projects' },
+        { id: 'events', name: 'Events' },
+        { id: 'join', name: 'Join Us' }
+      ];
+    }
+  }, [t, i18n.language]); // Добавляем i18n.language
 
-  const tabs = t('studentScientificSociety.tabs', { returnObjects: true });
+  // Локальные переводы для статических текстов
+  const localTranslations = useMemo(() => ({
+    loading: t('studentScientificSociety.loading', "Loading..."),
+    errorTitle: t('studentScientificSociety.errorTitle', "Error"),
+    retry: t('studentScientificSociety.retry', "Retry"),
+    noProjects: t('studentScientificSociety.noProjects', "No projects available"),
+    noEvents: t('studentScientificSociety.noEvents', "No events available"),
+    noJoinSteps: t('studentScientificSociety.noJoinSteps', "No join steps available"),
+    noLeadership: t('studentScientificSociety.noLeadership', "No leadership information"),
+    noUpcomingEvents: t('studentScientificSociety.noUpcomingEvents', "No upcoming events"),
+    noContacts: t('studentScientificSociety.noContacts', "No contacts available"),
+    joinApplySuccess: t('studentScientificSociety.join.applySuccess', "Application submitted successfully!"),
+    joinAskSuccess: t('studentScientificSociety.join.askSuccess', "Your question has been sent!"),
+    joinReadyTitle: t('studentScientificSociety.join.readyTitle', "📝 Ready to join?"),
+    joinApplyButton: t('studentScientificSociety.join.applyButton', "Apply Now"),
+    joinAskButton: t('studentScientificSociety.join.askButton', "Ask a Question")
+  }), [t, i18n.language]); // Добавляем i18n.language
 
   const toggleFeature = (index) => {
     setExpandedFeature(expandedFeature === index ? null : index);
   };
 
   const handleJoinClick = () => {
-    // Здесь можно добавить логику для подачи заявки
-    alert(t('studentScientificSociety.join.applySuccess'));
+    alert(localTranslations.joinApplySuccess);
   };
 
   const handleAskClick = () => {
-    // Здесь можно добавить логику для связи
-    alert(t('studentScientificSociety.join.askSuccess'));
+    alert(localTranslations.joinAskSuccess);
   };
 
   // Компонент загрузки
@@ -298,7 +401,7 @@ const StudentScientificSociety = () => {
     <div className="text-center py-8">
       <div className="text-red-400 text-6xl mb-4">⚠️</div>
       <h2 className="text-2xl text-white mb-4">
-        {t('studentScientificSociety.errorTitle')}
+        {localTranslations.errorTitle}
       </h2>
       <p className="text-blue-200 mb-6">
         {backendData.error}
@@ -307,10 +410,11 @@ const StudentScientificSociety = () => {
         onClick={onRetry}
         className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
       >
-        {t('studentScientificSociety.retry')}
+        {localTranslations.retry}
       </button>
     </div>
   );
+
 
   if (backendData.loading) {
     return (
@@ -595,7 +699,7 @@ const StudentScientificSociety = () => {
                       </div>
                     ) : (
                       <div className="text-center py-8 text-blue-200">
-                        {t('studentScientificSociety.noProjects')}
+                        {localTranslations.noProjects}
                       </div>
                     )}
                   </motion.div>
@@ -657,7 +761,7 @@ const StudentScientificSociety = () => {
                       </div>
                     ) : (
                       <div className="text-center py-8 text-blue-200">
-                        {t('studentScientificSociety.noEvents')}
+                        {localTranslations.noEvents}
                       </div>
                     )}
                   </motion.div>
@@ -700,26 +804,26 @@ const StudentScientificSociety = () => {
                       </div>
                     ) : (
                       <div className="text-center py-8 text-blue-200">
-                        {t('studentScientificSociety.noJoinSteps')}
+                        {localTranslations.noJoinSteps}
                       </div>
                     )}
 
                     <div className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-2xl p-6 mt-8 backdrop-blur-sm border border-blue-400/30">
                       <h3 className="text-xl font-bold text-white mb-4 text-center">
-                        {t('studentScientificSociety.join.readyTitle', '📝 Готовы присоединиться?')}
+                        {localTranslations.joinReadyTitle}
                       </h3>
                       <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <button 
                           onClick={handleJoinClick}
                           className="bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
                         >
-                          {t('studentScientificSociety.join.applyButton', 'Подать заявку')}
+                          {localTranslations.joinApplyButton}
                         </button>
                         <button 
                           onClick={handleAskClick}
                           className="bg-white/20 hover:bg-white/30 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 backdrop-blur-sm border border-white/20"
                         >
-                          {t('studentScientificSociety.join.askButton', 'Задать вопрос')}
+                          {localTranslations.joinAskButton}
                         </button>
                       </div>
                     </div>
@@ -765,7 +869,7 @@ const StudentScientificSociety = () => {
                 </div>
               ) : (
                 <div className="text-center py-4 text-blue-200">
-                  {t('studentScientificSociety.noLeadership')}
+                  {localTranslations.noLeadership}
                 </div>
               )}
             </motion.div>
@@ -797,7 +901,7 @@ const StudentScientificSociety = () => {
                 </div>
               ) : (
                 <div className="text-center py-4 text-blue-200">
-                  {t('studentScientificSociety.noUpcomingEvents')}
+                  {localTranslations.noUpcomingEvents}
                 </div>
               )}
             </motion.div>
@@ -829,7 +933,7 @@ const StudentScientificSociety = () => {
                 </div>
               ) : (
                 <div className="text-center py-4 text-blue-200">
-                  {t('studentScientificSociety.noContacts')}
+                  {localTranslations.noContacts}
                 </div>
               )}
             </motion.div>
