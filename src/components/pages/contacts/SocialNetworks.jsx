@@ -132,35 +132,6 @@ const SocialNetworks = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="space-y-8"
             >
-              {/* Platform Filter */}
-              <div className="bg-white/5 rounded-3xl p-6 backdrop-blur-lg border border-white/20 shadow-2xl">
-                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                  <span className="text-2xl">🎯</span>
-                  {labels.filters.title}
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {platforms.map((platform) => (
-                    <motion.button
-                      key={platform.id}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setActivePlatform(platform.id)}
-                      className={`group flex items-center space-x-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-500 ${
-                        activePlatform === platform.id
-                          ? `bg-gradient-to-r ${platform.color} text-white shadow-xl`
-                          : 'bg-white/10 text-blue-100 border border-white/20 hover:border-emerald-400/50 hover:shadow-lg'
-                      } backdrop-blur-sm`}
-                    >
-                      <span className={`text-xl transition-transform duration-300 ${
-                        activePlatform === platform.id ? 'scale-110' : 'group-hover:scale-110'
-                      }`}>
-                        {platform.icon}
-                      </span>
-                      <span className="text-lg">{platform.name}</span>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
 
               {/* Networks Grid */}
               <div className="space-y-6">
@@ -304,75 +275,7 @@ const SocialNetworks = () => {
             </div>
           </div>
 
-          {/* Social Media Highlights */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 1.1 }}
-            className="space-y-8"
-          >
-            {/* Активный хайлайт */}
-            {highlights[activeHighlight] && (
-              <motion.div
-                key={activeHighlight}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-8 backdrop-blur-lg border border-white/20 shadow-2xl mb-8"
-              >
-                <div className="flex flex-col lg:flex-row items-center gap-6">
-                  <div className="flex-shrink-0 text-6xl">
-                    {highlights[activeHighlight].icon}
-                  </div>
-                  <div className="flex-1 text-center lg:text-left">
-                    <h3 className="text-2xl font-bold text-white mb-4">
-                      {highlights[activeHighlight].title}
-                    </h3>
-                    <p className="text-blue-200 text-lg">
-                      {highlights[activeHighlight].description}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            <h3 className="text-3xl font-bold text-white mb-8 text-center">
-              {labels.highlights.title}
-            </h3>
-            <div className="grid md:grid-cols-3 gap-6">
-              {highlights.map((highlight, index) => (
-                <motion.div 
-                  key={highlight.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white/5 rounded-3xl p-8 border border-white/10 text-center hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden backdrop-blur-sm"
-                  onMouseEnter={() => setActiveHighlight(index)}
-                >
-                  {/* Background effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
-                  
-                  <div className="relative z-10">
-                    <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-500">
-                      {highlight.icon}
-                    </div>
-                    <h4 className="font-bold text-white text-xl mb-4 group-hover:text-emerald-300 transition-colors duration-300">
-                      {highlight.title}
-                    </h4>
-                    <p className="text-blue-200 text-lg mb-6 leading-relaxed">
-                      {highlight.description}
-                    </p>
-                    <motion.button 
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-8 py-3 rounded-2xl font-semibold hover:shadow-lg transition-all duration-300"
-                    >
-                      {highlight.action}
-                    </motion.button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          
         </div>
       </div>
     </section>

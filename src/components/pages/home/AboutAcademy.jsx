@@ -158,23 +158,25 @@ const AboutAcademy = () => {
             ))}
           </motion.div>
 
-          {/* Основной контент с интерактивными фичами */}
+          {/* Основной контент с фоткой справа */}
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-            {/* Текст контент */}
+            {/* Текст контент слева */}
             <motion.div
               variants={itemVariants}
-              className="space-y-6"
+              className="space-y-8"
             >
-              <h2 className="text-4xl font-bold text-gray-800 mb-6">
-                {t('about.mission.title')}
-              </h2>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                {t('about.mission.description')}
-              </p>
+              <div className="space-y-6">
+                <h2 className="text-4xl font-bold text-gray-800 mb-6">
+                  {t('about.mission.title')}
+                </h2>
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  {t('about.mission.description')}
+                </p>
+              </div>
               
               <motion.div
                 whileHover={{ scale: 1.02 }}
-                className="bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl p-8 text-white mt-8"
+                className="bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl p-8 text-white"
               >
                 <h3 className="text-2xl font-bold mb-4">
                   {t('about.vision.title')}
@@ -183,48 +185,131 @@ const AboutAcademy = () => {
                   {t('about.vision.description')}
                 </p>
               </motion.div>
+
+              {/* Интерактивные фичи под текстом */}
+              <div className="grid grid-cols-2 gap-4 mt-8">
+                {features.map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`bg-gradient-to-br ${feature.color} rounded-xl p-4 text-white cursor-pointer transition-all duration-300 ${
+                      activeFeature === index ? 'ring-4 ring-white ring-opacity-50' : 'opacity-80'
+                    }`}
+                    onClick={() => setActiveFeature(index)}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <motion.span
+                        animate={{ 
+                          rotate: activeFeature === index ? [0, -10, 10, 0] : 0,
+                          scale: activeFeature === index ? [1, 1.2, 1] : 1
+                        }}
+                        transition={{ duration: 0.5 }}
+                        className="text-2xl"
+                      >
+                        {feature.icon}
+                      </motion.span>
+                      <span className="font-semibold text-sm">
+                        {t(feature.title)}
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
 
-            {/* Интерактивные фичи */}
+            {/* Фотка справа с анимацией */}
             <motion.div
               variants={itemVariants}
-              className="relative h-96"
+              className="relative"
             >
-              {features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: 100 }}
-                  animate={{ 
-                    opacity: activeFeature === index ? 1 : 0.3,
-                    x: activeFeature === index ? 0 : 50,
-                    scale: activeFeature === index ? 1 : 0.9
-                  }}
-                  transition={{ duration: 0.6 }}
-                  className={`absolute inset-0 bg-gradient-to-br ${feature.color} rounded-3xl p-8 text-white shadow-2xl cursor-pointer`}
-                  onClick={() => setActiveFeature(index)}
-                >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="relative rounded-3xl overflow-hidden shadow-2xl"
+              >
+                {/* Замените этот div на вашу фотку */}
+                <div className="w-full h-90 bg-gradient-to-br from-blue-400 to-green-500 relative">
+                  {/* Пример фотки - замените на ваше изображение */}
+                  <img src="https://cdn-1.aki.kg/cdn-st-0/qdd/9/md-3369.jpg" alt="" />
+                  
+                  {/* Декоративные элементы на фотке */}
                   <motion.div
                     animate={{ 
-                      rotate: [0, -10, 10, 0],
-                      scale: [1, 1.1, 1]
+                      y: [0, -20, 0],
+                      opacity: [0.3, 0.6, 0.3]
                     }}
                     transition={{ 
-                      duration: 2, 
-                      repeat: Infinity,
-                      repeatType: "reverse"
+                      duration: 4, 
+                      repeat: Infinity 
                     }}
-                    className="text-6xl mb-6"
-                  >
-                    {feature.icon}
-                  </motion.div>
-                  <h3 className="text-2xl font-bold mb-4">
-                    {t(feature.title)}
-                  </h3>
-                  <p className="text-lg opacity-90">
-                    {t(feature.description)}
-                  </p>
+                    className="absolute top-4 right-4 w-16 h-16 bg-white/30 rounded-full"
+                  ></motion.div>
+                  <motion.div
+                    animate={{ 
+                      y: [0, 15, 0],
+                      opacity: [0.4, 0.8, 0.4]
+                    }}
+                    transition={{ 
+                      duration: 3, 
+                      repeat: Infinity,
+                      delay: 1 
+                    }}
+                    className="absolute bottom-6 left-6 w-12 h-12 bg-yellow-300/40 rounded-lg"
+                  ></motion.div>
+                </div>
+
+                {/* Плавающие элементы */}
+                <motion.div
+                  animate={{ 
+                    y: [0, -30, 0],
+                    x: [0, 10, 0],
+                    rotate: [0, 5, 0]
+                  }}
+                  transition={{ 
+                    duration: 6, 
+                    repeat: Infinity 
+                  }}
+                  className="absolute -top-4 -left-4 w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-2xl"
+                >
+                  🎓
                 </motion.div>
-              ))}
+                <motion.div
+                  animate={{ 
+                    y: [0, 20, 0],
+                    x: [0, -15, 0],
+                    rotate: [0, -3, 0]
+                  }}
+                  transition={{ 
+                    duration: 5, 
+                    repeat: Infinity,
+                    delay: 2 
+                  }}
+                  className="absolute -bottom-4 -right-4 w-16 h-16 bg-green-400/30 backdrop-blur-sm rounded-2xl flex items-center justify-center text-xl"
+                >
+                  ⚽
+                </motion.div>
+              </motion.div>
+
+              {/* Активная фича отображается рядом с фоткой */}
+              <motion.div
+                key={activeFeature}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className={`mt-6 bg-gradient-to-r ${features[activeFeature].color} rounded-2xl p-6 text-white shadow-xl`}
+              >
+                <div className="flex items-center space-x-3 mb-3">
+                  <span className="text-2xl">{features[activeFeature].icon}</span>
+                  <h3 className="text-xl font-bold">
+                    {t(features[activeFeature].title)}
+                  </h3>
+                </div>
+                <p className="text-white/90">
+                  {t(features[activeFeature].description)}
+                </p>
+              </motion.div>
             </motion.div>
           </div>
         </motion.div>

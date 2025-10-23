@@ -1464,7 +1464,18 @@
       "submit": "Submit Request"
     }
   },
-  "events": {
+  "events": {"actions": {
+    "details": "Details",
+    "register": "Register",
+    "addToCalendar": "Add to Calendar",
+    "share": "Share"
+  },
+  "details": {
+    "aboutEvent": "About the Event",
+    "basicInfo": "Basic Information",
+    "registrationInfo": "Registration",
+    "organizer": "Organizer"
+  },
     "title": "University Events",
     "subtitle": "Participate in conferences, workshops, sports and cultural events of our university",
     "noEvents": "No events found",
@@ -1486,6 +1497,7 @@
         { "id": "open_day", "name": "Open Days" }
       ]
     },
+    
     "departments": {
       "cs": "Computer Science Faculty",
       "all": "All Faculties",
@@ -5759,6 +5771,23 @@
       ]
     },
     "events": {
+      "actions": {
+    "details": "Details",
+    "share": "Share",
+    "shareSuccess": "Link copied to clipboard",
+    "copyLink": "Copy the link:"
+  },
+  "details": {
+    "aboutEvent": "About the Event",
+    "basicInfo": "Basic Information",
+    "additionalInfo": "Additional Information",
+    "organizer": "Organizer"
+  },
+  "labels": {
+    "audience": "Audience",
+    "format": "Format",
+    "duration": "Duration"
+  },
       "title": "Union Events",
       "upcoming": "Upcoming",
       "participants": "participants",

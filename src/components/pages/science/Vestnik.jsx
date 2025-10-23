@@ -413,22 +413,6 @@ const CurrentIssue = ({ data, loading, t }) => {
               <span>📥</span>
               <span>{t("vestnik.actions.downloadPDF")}</span>
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl hover:bg-white/20 transition-all font-medium flex items-center gap-2"
-            >
-              <span>🌐</span>
-              <span>{t("vestnik.actions.readOnline")}</span>
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-white/10 backdrop-blur-sm border border-emerald-400/30 text-emerald-400 rounded-xl hover:bg-emerald-500/20 transition-all font-medium flex items-center gap-2"
-            >
-              <span>📋</span>
-              <span>{t("vestnik.actions.forAuthors")}</span>
-            </motion.button>
           </div>
         </div>
       </div>
@@ -697,37 +681,6 @@ const Metrics = ({ data, loading, t }) => {
           </div>
         )}
       </div>
-
-      {/* Additional metrics information */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl p-6 lg:p-8 border border-emerald-400/20"
-      >
-        <h4 className="text-xl font-bold text-white mb-4">
-          {t("vestnik.metrics.about.title")}
-        </h4>
-        <p className="text-blue-100 mb-6 leading-relaxed">
-          {t("vestnik.metrics.about.description")}
-        </p>
-        <div className="flex flex-wrap gap-4">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 text-white rounded-lg hover:from-blue-600 hover:to-emerald-600 transition-all shadow-lg font-medium"
-          >
-            {t("vestnik.metrics.about.learnMore")}
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all font-medium"
-          >
-            {t("vestnik.metrics.about.journalPolicy")}
-          </motion.button>
-        </div>
-      </motion.div>
     </motion.div>
   );
 };

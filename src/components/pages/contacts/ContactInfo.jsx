@@ -62,7 +62,6 @@ const ContactInfo = () => {
 
   const infoTabs = [
     { key: 'general', label: t('contact.info.tabs.general', 'Общая информация'), icon: '🏢' },
-    { key: 'transport', label: t('contact.info.tabs.transport', 'Транспорт'), icon: '🚇' },
     { key: 'facilities', label: t('contact.info.tabs.facilities', 'Спорт объекты'), icon: '⚽' }
   ];
 
@@ -115,23 +114,6 @@ const ContactInfo = () => {
         icon: '🌐', 
         title: t('contact.info.general.wifi', 'Wi-Fi Pro'), 
         description: t('contact.info.general.wifiDesc', 'Высокоскоростной Wi-Fi по всему кампусу') 
-      }
-    ],
-    transport: [
-      { 
-        icon: '🚇', 
-        title: t('contact.info.transport.metro', 'Метро'), 
-        description: t('contact.info.transport.metroDesc', 'Станция "Спортивная", 3 минуты пешком') 
-      },
-      { 
-        icon: '🚌', 
-        title: t('contact.info.transport.bus', 'Автобусы'), 
-        description: t('contact.info.transport.busDesc', '10 маршрутов до академии') 
-      },
-      { 
-        icon: '🚗', 
-        title: t('contact.info.transport.parking', 'Парковка'), 
-        description: t('contact.info.transport.parkingDesc', 'Бесплатная парковка на 500 мест') 
       }
     ],
     facilities: [
@@ -200,34 +182,6 @@ const ContactInfo = () => {
           <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
             {t('contact.info.subtitle', 'Свяжитесь с нами - мы всегда на связи для будущих чемпионов!')}
           </p>
-        </motion.div>
-
-        {/* Статистика */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 lg:mb-16"
-        >
-          {stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4 + index * 0.1 }}
-              className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
-            >
-              <div className="text-2xl mb-3 text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                {stat.icon}
-              </div>
-              <div className="text-2xl lg:text-3xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
-                {stat.value}
-              </div>
-              <div className="text-blue-200 text-sm lg:text-base">
-                {stat.label}
-              </div>
-            </motion.div>
-          ))}
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">

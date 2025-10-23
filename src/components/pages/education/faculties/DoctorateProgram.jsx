@@ -413,17 +413,8 @@ const DoctorateProgram = () => {
                         </div>
 
                         <div className="space-y-4">
-                          <button
-                            onClick={() => handleLearnMore(researchDirections[activeDirection])}
-                            className={`w-full bg-gradient-to-r ${researchDirections[activeDirection].color} hover:${researchDirections[activeDirection].hoverColor} text-white font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg`}
-                          >
-                            {t('doctorateProgram.applyNow')}
-                          </button>
                           <button className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-xl transition-all duration-300 border border-white/20">
                             {t('doctorateProgram.downloadBrochure')}
-                          </button>
-                          <button className="w-full bg-transparent hover:bg-white/5 text-white font-bold py-4 rounded-xl transition-all duration-300 border border-white/20">
-                            {t('doctorateProgram.scheduleConsultation')}
                           </button>
                         </div>
 
@@ -486,45 +477,6 @@ const DoctorateProgram = () => {
                   </p>
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Финансирование */}
-          <div className={`mt-12 md:mt-16 transition-all duration-1000 delay-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl md:rounded-3xl p-6 md:p-8 border border-emerald-400/20">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div>
-                  <h2 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-                    {t('doctorateProgram.funding.title')}
-                  </h2>
-                  <p className="text-blue-100 text-lg mb-6">
-                    {t('doctorateProgram.funding.description')}
-                  </p>
-                  <button
-                    onClick={handleApplyNow}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-emerald-600 transition-all shadow-lg transform hover:scale-105"
-                  >
-                    {t('doctorateProgram.applyForFunding')}
-                  </button>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { value: '100%', label: t('doctorateProgram.funding.tuitionCovered') },
-                    { value: '₽40,000', label: t('doctorateProgram.funding.monthlyStipend') },
-                    { value: '₽100,000', label: t('doctorateProgram.funding.researchGrant') },
-                    { value: '5', label: t('doctorateProgram.funding.internationalConferences') }
-                  ].map((item, index) => (
-                    <div
-                      key={index}
-                      className="bg-white/20 rounded-xl p-4 text-center backdrop-blur-sm border border-white/30 transform hover:scale-105 transition-all duration-300"
-                    >
-                      <div className="text-xl font-bold text-white">{item.value}</div>
-                      <div className="text-blue-100 text-sm opacity-90">{item.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </div>

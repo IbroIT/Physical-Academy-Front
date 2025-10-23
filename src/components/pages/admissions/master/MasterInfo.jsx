@@ -658,84 +658,11 @@ const fetchBackendData = useCallback(async (type) => {
 
             {/* Боковая панель */}
             <div className="space-y-8">
-              {/* Форма запроса информации */}
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={isVisible ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.7 }}
-                className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
-              >
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl">
-                    📧
-                  </div>
-                  <h2 className="text-2xl lg:text-3xl font-bold text-white">
-                    {t('graduateStudies.requestInfo')}
-                  </h2>
-                </div>
+             
                 
-                <form onSubmit={handleFormSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-blue-200 text-sm font-medium mb-2">
-                      {t('graduateStudies.form.name')}
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-blue-300 focus:outline-none focus:border-emerald-400 transition-colors duration-300"
-                      placeholder={t('graduateStudies.form.namePlaceholder')}
-                      required
-                    />
-                  </div>
+                
                   
-                  <div>
-                    <label className="block text-blue-200 text-sm font-medium mb-2">
-                      {t('graduateStudies.form.email')}
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-blue-300 focus:outline-none focus:border-emerald-400 transition-colors duration-300"
-                      placeholder={t('graduateStudies.form.emailPlaceholder')}
-                      required
-                    />
-                  </div>
                   
-                  <div>
-                    <label className="block text-blue-200 text-sm font-medium mb-2">
-                      {t('graduateStudies.form.program')}
-                    </label>
-                    <select
-                      name="program"
-                      value={formData.program}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-400 transition-colors duration-300"
-                      required
-                    >
-                      <option value="">{t('graduateStudies.form.selectProgram')}</option>
-                      {currentPrograms.map((program, index) => (
-                        <option key={index} value={program.name} className="bg-slate-800">
-                          {program.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <motion.button
-                    type="submit"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-full py-4 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-bold rounded-xl transition-all duration-300 shadow-lg"
-                  >
-                    {t('graduateStudies.form.submit')}
-                  </motion.button>
-                </form>
-              </motion.div>
-
               {/* Документы */}
               <motion.div
                 initial={{ opacity: 0, x: 50 }}

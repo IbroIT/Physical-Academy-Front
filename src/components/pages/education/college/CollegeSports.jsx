@@ -450,17 +450,8 @@ const CollegeSports = () => {
                       </div>
 
                       <div className="space-y-4">
-                        <button
-                          onClick={() => handleLearnMore(formattedPrograms[activeProgram])}
-                          className={`w-full bg-gradient-to-r ${formattedPrograms[activeProgram].color} hover:${formattedPrograms[activeProgram].hoverColor} text-white font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg`}
-                        >
-                          {t('collegeSports.applyNow')}
-                        </button>
                         <button className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-xl transition-all duration-300 border border-white/20">
                           {t('collegeSports.downloadBrochure')}
-                        </button>
-                        <button className="w-full bg-transparent hover:bg-white/5 text-white font-bold py-4 rounded-xl transition-all duration-300 border border-white/20">
-                          {t('collegeSports.scheduleConsultation')}
                         </button>
                       </div>
 

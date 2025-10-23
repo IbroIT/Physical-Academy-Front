@@ -1,12 +1,228 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
+// Компонент для детального просмотра мероприятия
+const EventDetailsModal = ({ event, isOpen, onClose }) => {
+  const { t } = useTranslation();
+
+  if (!isOpen || !event) return null;
+
+  // Функция для поделиться
+  const handleShare = async () => {
+    const shareData = {
+      title: event.title,
+      text: event.description,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log('Ошибка при использовании Web Share API:', err);
+      }
+    } else {
+      // Fallback для браузеров без поддержки Web Share API
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        alert(t('events.actions.shareSuccess'));
+      }).catch(() => {
+        // Если clipboard не поддерживается, показываем URL для ручного копирования
+        prompt(t('events.actions.copyLink'), window.location.href);
+      });
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="relative">
+          <div 
+            className="h-64 bg-cover bg-center rounded-t-2xl"
+            style={{ backgroundImage: `url(${event.image})` }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-t-2xl" />
+            
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all duration-300 group"
+            >
+              <svg className="w-5 h-5 text-white group-hover:text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Event Badges */}
+            <div className="absolute top-4 left-4 flex gap-2">
+              <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-semibold">
+                {t(`events.categories.${event.category}`)}
+              </span>
+            </div>
+
+            {/* Event Title */}
+            <div className="absolute bottom-6 left-6 right-6">
+              <h1 className="text-3xl font-bold text-white mb-2">
+                {event.title}
+              </h1>
+              <div className="flex items-center text-white/90">
+                <span className="text-sm bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
+                  {t(`events.departments.${event.department}`)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 lg:p-8">
+          {/* Description */}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              {t('events.details.aboutEvent')}
+            </h2>
+            <p className="text-gray-600 leading-relaxed">
+              {event.fullDescription || event.description}
+            </p>
+          </div>
+
+          {/* Event Details Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">
+                {t('events.details.basicInfo')}
+              </h3>
+              
+              <div className="space-y-3">
+                <div className="flex items-center text-gray-600">
+                  <svg className="w-5 h-5 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <div>
+                    <div className="font-medium">{t('events.labels.date')}</div>
+                    <div>{event.date}</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center text-gray-600">
+                  <svg className="w-5 h-5 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <div className="font-medium">{t('events.labels.time')}</div>
+                    <div>{event.time}</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center text-gray-600">
+                  <svg className="w-5 h-5 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  </svg>
+                  <div>
+                    <div className="font-medium">{t('events.labels.location')}</div>
+                    <div>{event.location}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">
+                {t('events.details.additionalInfo')}
+              </h3>
+              
+              <div className="space-y-3">
+                {event.audience && (
+                  <div className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <div>
+                      <div className="font-medium">{t('events.labels.audience')}</div>
+                      <div>{event.audience}</div>
+                    </div>
+                  </div>
+                )}
+
+                {event.format && (
+                  <div className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <div>
+                      <div className="font-medium">{t('events.labels.format')}</div>
+                      <div>{event.format}</div>
+                    </div>
+                  </div>
+                )}
+
+                {event.duration && (
+                  <div className="flex items-center text-gray-600">
+                    <svg className="w-5 h-5 mr-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <div className="font-medium">{t('events.labels.duration')}</div>
+                      <div>{event.duration}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Organizer Information */}
+          {event.organizer && (
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                {t('events.details.organizer')}
+              </h3>
+              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
+                  {event.organizer.name?.charAt(0) || 'O'}
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-800">
+                    {event.organizer.name}
+                  </div>
+                  {event.organizer.contact && (
+                    <div className="text-sm text-gray-600">
+                      {event.organizer.contact}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+            <button 
+              onClick={handleShare}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-emerald-600 text-white py-3 px-6 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              {t('events.actions.share')}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const UniversityEventsPage = () => {
   const { t } = useTranslation();
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Данные мероприятий через i18n
   const eventsData = t('events.items', { returnObjects: true });
@@ -42,6 +258,18 @@ const UniversityEventsPage = () => {
   }, [isAutoPlaying, navigateEvents]);
 
   const currentEvent = filteredEvents[currentEventIndex];
+
+  // Функция для открытия деталей мероприятия
+  const handleEventDetails = (event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  // Функция для закрытия модального окна
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-emerald-50">
@@ -137,11 +365,6 @@ const UniversityEventsPage = () => {
                   <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-semibold">
                     {t(`events.categories.${currentEvent.category}`)}
                   </span>
-                  {currentEvent.registrationRequired && (
-                    <span className="px-3 py-1 bg-emerald-500 text-white rounded-full text-sm font-semibold">
-                      {t('events.badges.registrationRequired')}
-                    </span>
-                  )}
                 </div>
               </div>
 
@@ -184,73 +407,19 @@ const UniversityEventsPage = () => {
                     <div className="flex items-center text-sm text-gray-600">
                       <svg className="w-4 h-4 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                       <span className="font-medium w-16">{t('events.labels.location')}</span>
                       <span>{currentEvent.location}</span>
                     </div>
-                    
-                    {/* Registration Info */}
-                    {currentEvent.registrationRequired && (
-                      <>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <svg className="w-4 h-4 mr-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          <span className="font-medium w-16">{t('events.labels.seats')}</span>
-                          <span>{currentEvent.registered}/{currentEvent.seats}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <svg className="w-4 h-4 mr-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span className="font-medium w-16">{t('events.labels.deadline')}</span>
-                          <span>{currentEvent.deadline}</span>
-                        </div>
-                        {currentEvent.prize && (
-                          <div className="flex items-center text-sm text-emerald-600 font-semibold">
-                            <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                            </svg>
-                            <span>{t('events.labels.prize')} {currentEvent.prize}</span>
-                          </div>
-                        )}
-                      </>
-                    )}
                   </div>
-                  
-                  {/* Progress Bar for Registration */}
-                  {currentEvent.registrationRequired && (
-                    <div className="mb-6">
-                      <div className="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>{t('events.labels.registrationProgress')}</span>
-                        <span>{Math.round((currentEvent.registered / currentEvent.seats) * 100)}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-gradient-to-r from-blue-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${(currentEvent.registered / currentEvent.seats) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* CTA Buttons */}
-                  <div className="flex items-center gap-3">
-                    {currentEvent.registrationRequired ? (
-                      <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-lg hover:from-blue-700 hover:to-emerald-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm">
-                        {t('events.buttons.registerNow')}
-                      </button>
-                    ) : (
-                      <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-emerald-600 text-white rounded-lg hover:from-blue-700 hover:to-emerald-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm">
-                        {t('events.buttons.moreDetails')}
-                      </button>
-                    )}
-                    
-                    <button className="px-5 py-3 border border-gray-300 text-gray-600 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-all duration-300 font-semibold text-sm">
-                      {t('events.buttons.addToCalendar')}
-                    </button>
-                  </div>
+
+                  {/* Кнопка Подробнее */}
+                  <button
+                    onClick={() => handleEventDetails(currentEvent)}
+                    className="bg-gradient-to-r from-blue-600 to-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
+                  >
+                    {t('events.actions.details')}
+                  </button>
                 </div>
               </div>
             </div>
@@ -319,11 +488,6 @@ const UniversityEventsPage = () => {
                     <span className="px-2 py-1 bg-blue-600 text-white rounded text-xs font-semibold">
                       {t(`events.categories.${event.category}`)}
                     </span>
-                    {event.registrationRequired && (
-                      <span className="px-2 py-1 bg-emerald-500 text-white rounded text-xs font-semibold">
-                        {t('events.badges.registration')}
-                      </span>
-                    )}
                   </div>
                   
                   {/* Date Badge */}
@@ -367,40 +531,30 @@ const UniversityEventsPage = () => {
                       {event.location}
                     </div>
                   </div>
-                  
-                  {/* Registration Info */}
-                  {event.registrationRequired && (
-                    <div className="flex items-center justify-between text-xs text-gray-600 mb-3">
-                      <span>
-                        {t('events.labels.registered')} {event.registered}/{event.seats}
-                      </span>
-                      <span className="font-semibold text-blue-600">
-                        {Math.round((event.registered / event.seats) * 100)}%
-                      </span>
-                    </div>
-                  )}
-                  
-                  {/* CTA */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center text-blue-600 text-sm font-semibold group-hover:translate-x-1 transition-transform duration-300">
-                      {event.registrationRequired ? t('events.buttons.register') : t('events.buttons.view')}
-                      <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                    
-                    {event.prize && (
-                      <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-semibold">
-                        🏆 {event.prize}
-                      </span>
-                    )}
-                  </div>
+
+                  {/* Кнопка Подробнее в карточке */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEventDetails(event);
+                    }}
+                    className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                  >
+                    {t('events.actions.details')}
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Модальное окно с деталями мероприятия */}
+      <EventDetailsModal
+        event={selectedEvent}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };

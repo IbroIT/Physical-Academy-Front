@@ -528,57 +528,6 @@ const VisaSupport = () => {
                   </div>
                 )}
               </motion.div>
-
-              {/* Быстрые действия */}
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={isVisible ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.9 }}
-                className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl"
-              >
-                <h2 className="text-2xl lg:text-3xl font-bold text-white mb-6">
-                  {t('visa.quickActions')}
-                </h2>
-                
-                <div className="space-y-4">
-                  <motion.a
-                    href="mailto:visa-support@university.edu"
-                    className="flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-2xl border border-blue-400/30 hover:border-emerald-400 transition-all duration-300 group"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <span className="text-blue-300 group-hover:text-emerald-300 transition-colors duration-300">
-                      📧
-                    </span>
-                    <span className="text-white font-semibold group-hover:text-emerald-300 transition-colors duration-300">
-                      {t('visa.emailSupport')}
-                    </span>
-                  </motion.a>
-                  
-                  <motion.button
-                    className="w-full flex items-center justify-center space-x-3 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-blue-400/30 transition-all duration-300 group"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <span className="text-emerald-300 group-hover:text-blue-300 transition-colors duration-300">
-                      📋
-                    </span>
-                    <span className="text-white font-semibold group-hover:text-blue-300 transition-colors duration-300">
-                      {t('visa.downloadForms')}
-                    </span>
-                  </motion.button>
-                  
-                  <motion.button
-                    className="w-full flex items-center justify-center space-x-3 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <span className="text-blue-300 group-hover:text-emerald-300 transition-colors duration-300">
-                      🗓️
-                    </span>
-                    <span className="text-white font-semibold group-hover:text-emerald-300 transition-colors duration-300">
-                      {t('visa.scheduleAppointment')}
-                    </span>
-                  </motion.button>
-                </div>
-              </motion.div>
             </div>
           </div>
         )}

@@ -230,21 +230,6 @@ const AuditCommission = () => {
             </div>
           </motion.div>
         </div>
-
-        {/* CTA секция */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="text-center mt-16"
-        >
-          <button className="bg-gradient-to-r from-emerald-400 to-blue-500 hover:from-emerald-500 hover:to-blue-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-            {t('auditCommission.contactButton', 'Связаться с комиссией')}
-          </button>
-          <p className="text-blue-200 mt-4 text-sm">
-            {t('auditCommission.contactDescription', 'Для вопросов по финансовой отчетности')}
-          </p>
-        </motion.div>
       </div>
     </section>
   );

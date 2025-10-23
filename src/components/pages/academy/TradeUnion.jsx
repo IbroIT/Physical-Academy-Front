@@ -340,14 +340,6 @@ const TradeUnion = () => {
                   </motion.div>
                 ))}
               </div>
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full mt-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg"
-              >
-                {t('tradeUnion.events.viewAll')}
-              </motion.button>
             </motion.div>
           </div>
         </div>

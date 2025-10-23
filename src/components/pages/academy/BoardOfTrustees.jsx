@@ -281,50 +281,6 @@ const BoardOfTrustees = () => {
                       </ul>
                     </>
                   )}
-
-                  {/* Контактная информация */}
-                  {(currentTrustee.email || currentTrustee.phone) && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                      {currentTrustee.email && (
-                        <div className="flex items-center text-blue-100 group hover:text-white transition-colors">
-                          <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-500/30 transition-colors">
-                            <span className="text-blue-300">📧</span>
-                          </div>
-                          <div>
-                            <div className="text-sm text-blue-300">Email</div>
-                            <div className="font-medium">{currentTrustee.email}</div>
-                          </div>
-                        </div>
-                      )}
-                      {currentTrustee.phone && (
-                        <div className="flex items-center text-blue-100 group hover:text-white transition-colors">
-                          <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-green-500/30 transition-colors">
-                            <span className="text-green-300">📞</span>
-                          </div>
-                          <div>
-                            <div className="text-sm text-green-300">{t('phone', 'Телефон')}</div>
-                            <div className="font-medium">{currentTrustee.phone}</div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-                    <button className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-                      </svg>
-                      {t('boardOfTrustees.contact')}
-                    </button>
-                    <button className="flex items-center justify-center px-6 py-3 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 hover:border-green-400/30 transition-all duration-300">
-                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fillRule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clipRule="evenodd"></path>
-                      </svg>
-                      {t('boardOfTrustees.profile')}
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>

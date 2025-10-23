@@ -361,7 +361,7 @@ const AcademyDocuments = () => {
             >
               {isExpanded
                 ? t('documents.actions.hide')
-                : t('documents.actions.details')
+                : t('documents.actions.view', 'Посмотреть')
               }
             </motion.button>
 
@@ -376,7 +376,7 @@ const AcademyDocuments = () => {
                   className="flex-1 bg-gradient-to-r from-blue-500 to-emerald-500 text-white py-3 px-4 rounded-xl text-center font-semibold hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 shadow-lg text-sm lg:text-base flex items-center justify-center gap-2"
                 >
                   <span>👁️</span>
-                  {t('documents.actions.view')}
+                  {t('documents.actions.preview')}
                 </motion.a>
                 <motion.a
                   whileHover={{ scale: 1.05 }}
@@ -598,28 +598,6 @@ const AcademyDocuments = () => {
             />
           </motion.div>
         )}
-
-        {/* Additional Information */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.9 }}
-          className="mt-16 bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-8 lg:p-12 backdrop-blur-lg border border-white/20 text-center"
-        >
-          <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-            {t('documents.contactInfo.title')}
-          </h3>
-          <p className="text-blue-100 mb-6 max-w-2xl mx-auto text-lg leading-relaxed">
-            {t('documents.contactInfo.description')}
-          </p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white px-8 py-4 rounded-xl font-bold transition-all duration-300 shadow-2xl hover:shadow-3xl"
-          >
-            {t('documents.contactInfo.button')}
-          </motion.button>
-        </motion.div>
       </div>
     </motion.section>
   );

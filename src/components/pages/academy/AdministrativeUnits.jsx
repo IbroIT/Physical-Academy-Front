@@ -136,22 +136,6 @@ const AdministrativeUnits = () => {
           <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto px-4 leading-relaxed">
             {t('administrativeUnits.subtitle')}
           </p>
-
-          {/* Поисковая строка */}
-          <div className="max-w-2xl mx-auto mt-8">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder={t('administrativeUnits.searchPlaceholder')}
-                className="w-full px-6 py-4 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent shadow-lg"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <svg className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
@@ -295,12 +279,10 @@ const AdministrativeUnits = () => {
                         </li>
                       ))}
                     </ul>
-
                     {/* Дополнительная информация */}
                     <div className="mt-8 bg-blue-500/20 backdrop-blur-lg rounded-xl p-6 border border-blue-400/30">
                       <h4 className="font-semibold text-blue-300 mb-2">{t('administrativeUnits.workingHours')}</h4>
                       <p className="text-blue-100">{t('administrativeUnits.workingHoursTime')}</p>
-
                       <h4 className="font-semibold text-green-300 mt-4 mb-2">{t('administrativeUnits.receptionHours')}</h4>
                       <p className="text-blue-100">{t('administrativeUnits.receptionHoursTime')}</p>
                     </div>
