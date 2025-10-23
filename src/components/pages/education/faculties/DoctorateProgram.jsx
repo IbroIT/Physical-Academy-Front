@@ -1,81 +1,105 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const DoctorateProgram = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeDirection, setActiveDirection] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedDirection, setSelectedDirection] = useState(null);
 
-  // Научные направления
-  const researchDirections = [
-    {
-      id: 1,
-      title: t('doctorateProgram.researchDirections.sportsPhysiology.title'),
-      duration: '3-4 года',
-      format: t('doctorateProgram.fullTime'),
-      description: t('doctorateProgram.researchDirections.sportsPhysiology.description'),
-      supervisor: t('doctorateProgram.researchDirections.sportsPhysiology.supervisor'),
-      requirements: [
-        t('doctorateProgram.researchDirections.sportsPhysiology.requirements.0'),
-        t('doctorateProgram.researchDirections.sportsPhysiology.requirements.1'),
-        t('doctorateProgram.researchDirections.sportsPhysiology.requirements.2')
-      ],
-      icon: '🧬',
-      color: 'from-blue-500 to-blue-600',
-      hoverColor: 'from-blue-600 to-blue-700'
-    },
-    {
-      id: 2,
-      title: t('doctorateProgram.researchDirections.sportsPsychology.title'),
-      duration: '3-4 года',
-      format: t('doctorateProgram.fullTime'),
-      description: t('doctorateProgram.researchDirections.sportsPsychology.description'),
-      supervisor: t('doctorateProgram.researchDirections.sportsPsychology.supervisor'),
-      requirements: [
-        t('doctorateProgram.researchDirections.sportsPsychology.requirements.0'),
-        t('doctorateProgram.researchDirections.sportsPsychology.requirements.1'),
-        t('doctorateProgram.researchDirections.sportsPsychology.requirements.2')
-      ],
-      icon: '🧠',
-      color: 'from-green-500 to-green-600',
-      hoverColor: 'from-green-600 to-green-700'
-    },
-    {
-      id: 3,
-      title: t('doctorateProgram.researchDirections.biomechanics.title'),
-      duration: '3-4 года',
-      format: t('doctorateProgram.fullTime'),
-      description: t('doctorateProgram.researchDirections.biomechanics.description'),
-      supervisor: t('doctorateProgram.researchDirections.biomechanics.supervisor'),
-      requirements: [
-        t('doctorateProgram.researchDirections.biomechanics.requirements.0'),
-        t('doctorateProgram.researchDirections.biomechanics.requirements.1'),
-        t('doctorateProgram.researchDirections.biomechanics.requirements.2')
-      ],
-      icon: '⚙️',
-      color: 'from-blue-500 to-green-500',
-      hoverColor: 'from-blue-600 to-green-600'
-    },
-    {
-      id: 4,
-      title: t('doctorateProgram.researchDirections.sportsManagement.title'),
-      duration: '3-4 года',
-      format: t('doctorateProgram.fullTime'),
-      description: t('doctorateProgram.researchDirections.sportsManagement.description'),
-      supervisor: t('doctorateProgram.researchDirections.sportsManagement.supervisor'),
-      requirements: [
-        t('doctorateProgram.researchDirections.sportsManagement.requirements.0'),
-        t('doctorateProgram.researchDirections.sportsManagement.requirements.1'),
-        t('doctorateProgram.researchDirections.sportsManagement.requirements.2')
-      ],
-      icon: '📊',
-      color: 'from-green-500 to-blue-500',
-      hoverColor: 'from-green-600 to-blue-600'
+  // Состояния для данных с бэкенда
+  const [backendData, setBackendData] = useState({
+    programs: [],
+    loading: false,
+    error: null
+  });
+
+  // Получение текущего языка для API
+  const getApiLanguage = useCallback(() => {
+    const langMap = {
+      'en': 'en',
+      'ru': 'ru',
+      'kg': 'kg'
+    };
+    return langMap[i18n.language] || 'ru';
+  }, [i18n.language]);
+
+  // Функция для загрузки данных с бэкенда
+  const fetchBackendData = useCallback(async () => {
+    try {
+      setBackendData(prev => ({ 
+        ...prev, 
+        loading: true, 
+        error: null 
+      }));
+      
+      const lang = getApiLanguage();
+      const response = await fetch(`/api/education/phd-programs/?lang=${lang}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      setBackendData({
+        programs: data.results || [],
+        loading: false,
+        error: null
+      });
+
+    } catch (error) {
+      console.error('Error fetching PhD programs data:', error);
+      setBackendData(prev => ({
+        ...prev,
+        loading: false,
+        error: 'Failed to load PhD programs data'
+      }));
     }
-  ];
+  }, [getApiLanguage]);
+
+  // Загрузка данных при монтировании
+  useEffect(() => {
+    fetchBackendData();
+  }, []);
+
+  // Перезагрузка данных при изменении языка
+  useEffect(() => {
+    fetchBackendData();
+  }, [i18n.language]);
+
+  // Преобразование данных бэкенда в формат компонента
+  const getResearchDirections = useCallback(() => {
+    if (!backendData.programs.length) return [];
+
+    const colors = [
+      { color: 'from-blue-500 to-blue-600', hoverColor: 'from-blue-600 to-blue-700' },
+      { color: 'from-green-500 to-green-600', hoverColor: 'from-green-600 to-green-700' },
+      { color: 'from-blue-500 to-green-500', hoverColor: 'from-blue-600 to-green-600' },
+      { color: 'from-green-500 to-blue-500', hoverColor: 'from-green-600 to-blue-600' }
+    ];
+
+    return backendData.programs.map((program, index) => {
+      const colorSet = colors[index % colors.length];
+      
+      return {
+        id: program.id,
+        title: program.name,
+        duration: `${program.duration_years} ${t('doctorateProgram.years')}`,
+        format: program.offline ? t('doctorateProgram.fullTime') : t('doctorateProgram.online'),
+        description: program.description,
+        supervisor: t('doctorateProgram.defaultSupervisor'),
+        requirements: program.features || [],
+        icon: program.emoji || '🎓',
+        color: colorSet.color,
+        hoverColor: colorSet.hoverColor,
+        tuition_fee: program.tuition_fee,
+        offline: program.offline
+      };
+    });
+  }, [backendData.programs, t]);
 
   // Преимущества программы
   const benefits = [
@@ -100,6 +124,13 @@ const DoctorateProgram = () => {
       icon: '🎯'
     }
   ];
+
+  const researchDirections = getResearchDirections();
+
+  // Сбрасываем активное направление при изменении языка или данных
+  useEffect(() => {
+    setActiveDirection(0);
+  }, [i18n.language, researchDirections.length]);
 
   useEffect(() => {
     setIsVisible(true);
@@ -132,6 +163,70 @@ const DoctorateProgram = () => {
     alert(t('doctorateProgram.applicationSuccess'));
   };
 
+  // Компонент загрузки
+  const LoadingSkeleton = () => (
+    <div className="animate-pulse space-y-8">
+      {/* Скелетон для заголовка */}
+      <div className="text-center mb-12">
+        <div className="h-12 bg-white/20 rounded w-3/4 mx-auto mb-6"></div>
+        <div className="h-4 bg-white/20 rounded w-1/2 mx-auto"></div>
+      </div>
+
+      {/* Скелетон для статистики */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        {[1, 2, 3, 4].map((item) => (
+          <div key={item} className="bg-white/10 rounded-2xl p-6 h-24"></div>
+        ))}
+      </div>
+
+      {/* Скелетон для направлений */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {[1, 2, 3, 4].map((item) => (
+          <div key={item} className="bg-white/10 rounded-2xl p-6 h-80"></div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Компонент ошибки
+  const ErrorMessage = () => (
+    <div className="text-center py-16">
+      <div className="text-red-400 text-6xl mb-6">⚠️</div>
+      <h3 className="text-2xl text-white mb-4">
+        {t('doctorateProgram.errorTitle')}
+      </h3>
+      <p className="text-blue-200 mb-6">
+        {backendData.error}
+      </p>
+      <button
+        onClick={fetchBackendData}
+        className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
+      >
+        {t('doctorateProgram.retry')}
+      </button>
+    </div>
+  );
+
+  if (backendData.loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-12 md:py-20 overflow-hidden">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+          <LoadingSkeleton />
+        </div>
+      </section>
+    );
+  }
+
+  if (backendData.error && !researchDirections.length) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-12 md:py-20 overflow-hidden">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+          <ErrorMessage />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <>
       <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-12 md:py-20 overflow-hidden">
@@ -154,6 +249,12 @@ const DoctorateProgram = () => {
               {t('doctorateProgram.subtitle')}
             </p>
           </div>
+
+          {backendData.error && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-8 text-center">
+              <p className="text-red-300">{backendData.error}</p>
+            </div>
+          )}
 
           {/* Ключевые показатели */}
           <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
@@ -179,161 +280,189 @@ const DoctorateProgram = () => {
           </div>
 
           {/* Научные направления */}
-          <div className={`mb-12 md:mb-16 transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-              {researchDirections.map((direction, index) => (
-                <div
-                  key={direction.id}
-                  className={`relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl transition-all duration-500 transform hover:scale-105 cursor-pointer ${
-                    activeDirection === index ? 'ring-2 ring-emerald-400 ring-opacity-50' : ''
-                  }`}
-                  onClick={() => handleDirectionClick(index)}
-                >
-                  {/* Иконка направления */}
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${direction.color} flex items-center justify-center text-2xl mb-4 mx-auto`}>
-                    {direction.icon}
-                  </div>
+          {researchDirections.length > 0 ? (
+            <>
+              <div className={`mb-12 md:mb-16 transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                  {researchDirections.map((direction, index) => (
+                    <div
+                      key={direction.id}
+                      className={`relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl transition-all duration-500 transform hover:scale-105 cursor-pointer ${
+                        activeDirection === index ? 'ring-2 ring-emerald-400 ring-opacity-50' : ''
+                      }`}
+                      onClick={() => handleDirectionClick(index)}
+                    >
+                      {/* Иконка направления */}
+                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${direction.color} flex items-center justify-center text-2xl mb-4 mx-auto`}>
+                        {direction.icon}
+                      </div>
 
-                  {/* Заголовок */}
-                  <h3 className="text-xl font-bold text-white text-center mb-3 line-clamp-2">
-                    {direction.title}
-                  </h3>
+                      {/* Заголовок */}
+                      <h3 className="text-xl font-bold text-white text-center mb-3 line-clamp-2">
+                        {direction.title}
+                      </h3>
 
-                  {/* Длительность и формат */}
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-emerald-300 text-sm font-semibold bg-emerald-500/20 px-2 py-1 rounded-lg">
-                      {direction.duration}
-                    </span>
-                    <span className="text-blue-300 text-sm bg-blue-500/20 px-2 py-1 rounded-lg">
-                      {direction.format}
-                    </span>
-                  </div>
-
-                  {/* Описание */}
-                  <p className="text-blue-100 text-sm mb-4 line-clamp-3">
-                    {direction.description}
-                  </p>
-
-                  {/* Научный руководитель */}
-                  <div className="text-center mb-4">
-                    <span className="text-blue-200 text-sm">{t('doctorateProgram.supervisedBy')}</span>
-                    <div className="text-white font-semibold text-sm mt-1">{direction.supervisor}</div>
-                  </div>
-
-                  {/* Кнопка */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleLearnMore(direction);
-                    }}
-                    className={`w-full bg-gradient-to-r ${direction.color} hover:${direction.hoverColor} text-white font-bold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg`}
-                  >
-                    {t('doctorateProgram.learnMore')}
-                  </button>
-
-                  {/* Индикатор активного направления */}
-                  {activeDirection === index && (
-                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-emerald-400 rounded-full animate-ping"></div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Детали активного направления */}
-          <div className={`transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl">
-              <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
-                {/* Основная информация */}
-                <div className="lg:w-2/3">
-                  <div className="flex items-start mb-6">
-                    <div className={`w-20 h-20 rounded-2xl bg-gradient-to-r ${researchDirections[activeDirection].color} flex items-center justify-center text-3xl mr-4 md:mr-6`}>
-                      {researchDirections[activeDirection].icon}
-                    </div>
-                    <div>
-                      <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                        {researchDirections[activeDirection].title}
-                      </h2>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="text-emerald-300 font-semibold bg-emerald-500/20 px-3 py-1 rounded-lg">
-                          {researchDirections[activeDirection].duration}
+                      {/* Длительность и формат */}
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-emerald-300 text-sm font-semibold bg-emerald-500/20 px-2 py-1 rounded-lg">
+                          {direction.duration}
                         </span>
-                        <span className="text-blue-300 bg-blue-500/20 px-3 py-1 rounded-lg">
-                          {researchDirections[activeDirection].format}
+                        <span className="text-blue-300 text-sm bg-blue-500/20 px-2 py-1 rounded-lg">
+                          {direction.format}
                         </span>
                       </div>
-                    </div>
-                  </div>
 
-                  <p className="text-blue-100 text-lg mb-6">
-                    {researchDirections[activeDirection].description}
-                  </p>
+                      {/* Описание */}
+                      <p className="text-blue-100 text-sm mb-4 line-clamp-3">
+                        {direction.description}
+                      </p>
 
-                  {/* Требования */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {researchDirections[activeDirection].requirements.map((requirement, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center bg-white/5 rounded-xl p-4 border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
-                      >
-                        <div className="w-8 h-8 bg-emerald-400/20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-emerald-400/30 transition-colors">
-                          <span className="text-emerald-300">✓</span>
+                      {/* Стоимость (если есть) */}
+                      {direction.tuition_fee && direction.tuition_fee !== "0.00" && (
+                        <div className="text-center mb-4">
+                          <span className="text-blue-200 text-sm">{t('doctorateProgram.tuitionFee')}</span>
+                          <div className="text-white font-semibold text-sm mt-1">
+                            {direction.tuition_fee} ₽/{t('doctorateProgram.perYear')}
+                          </div>
                         </div>
-                        <span className="text-white group-hover:text-emerald-300 transition-colors">
-                          {requirement}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                      )}
 
-                {/* Боковая панель с действиями */}
-                <div className="lg:w-1/3">
-                  <div className="bg-white/5 rounded-2xl p-6 border border-white/10 sticky top-6">
-                    <div className="text-center mb-6">
-                      <div className="text-2xl font-bold text-white mb-2">
-                        {t('doctorateProgram.freeTuition')}
-                      </div>
-                      <div className="text-emerald-300 font-semibold">{t('doctorateProgram.fundingAvailable')}</div>
-                    </div>
-
-                    <div className="space-y-4">
+                      {/* Кнопка */}
                       <button
-                        onClick={() => handleLearnMore(researchDirections[activeDirection])}
-                        className={`w-full bg-gradient-to-r ${researchDirections[activeDirection].color} hover:${researchDirections[activeDirection].hoverColor} text-white font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLearnMore(direction);
+                        }}
+                        className={`w-full bg-gradient-to-r ${direction.color} hover:${direction.hoverColor} text-white font-bold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg`}
                       >
-                        {t('doctorateProgram.applyNow')}
+                        {t('doctorateProgram.learnMore')}
                       </button>
-                      <button className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-xl transition-all duration-300 border border-white/20">
-                        {t('doctorateProgram.downloadBrochure')}
-                      </button>
-                      <button className="w-full bg-transparent hover:bg-white/5 text-white font-bold py-4 rounded-xl transition-all duration-300 border border-white/20">
-                        {t('doctorateProgram.scheduleConsultation')}
-                      </button>
+
+                      {/* Индикатор активного направления */}
+                      {activeDirection === index && (
+                        <div className="absolute -top-2 -right-2 w-4 h-4 bg-emerald-400 rounded-full animate-ping"></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Детали активного направления */}
+              <div className={`transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl">
+                  <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
+                    {/* Основная информация */}
+                    <div className="lg:w-2/3">
+                      <div className="flex items-start mb-6">
+                        <div className={`w-20 h-20 rounded-2xl bg-gradient-to-r ${researchDirections[activeDirection].color} flex items-center justify-center text-3xl mr-4 md:mr-6`}>
+                          {researchDirections[activeDirection].icon}
+                        </div>
+                        <div>
+                          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                            {researchDirections[activeDirection].title}
+                          </h2>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="text-emerald-300 font-semibold bg-emerald-500/20 px-3 py-1 rounded-lg">
+                              {researchDirections[activeDirection].duration}
+                            </span>
+                            <span className="text-blue-300 bg-blue-500/20 px-3 py-1 rounded-lg">
+                              {researchDirections[activeDirection].format}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="text-blue-100 text-lg mb-6">
+                        {researchDirections[activeDirection].description}
+                      </p>
+
+                      {/* Требования */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {researchDirections[activeDirection].requirements.map((requirement, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center bg-white/5 rounded-xl p-4 border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+                          >
+                            <div className="w-8 h-8 bg-emerald-400/20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-emerald-400/30 transition-colors">
+                              <span className="text-emerald-300">✓</span>
+                            </div>
+                            <span className="text-white group-hover:text-emerald-300 transition-colors">
+                              {requirement}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
-                    {/* Дополнительная информация */}
-                    <div className="mt-6 pt-6 border-t border-white/10">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-blue-200">{t('doctorateProgram.startDate')}</span>
-                        <span className="text-white font-semibold">{t('doctorateProgram.september')}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-blue-200">{t('doctorateProgram.places')}</span>
-                        <span className="text-emerald-300 font-semibold">8-10</span>
-                      </div>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-blue-200">{t('doctorateProgram.supervisor')}</span>
-                        <span className="text-white font-semibold text-sm text-right">
-                          {researchDirections[activeDirection].supervisor}
-                        </span>
+                    {/* Боковая панель с действиями */}
+                    <div className="lg:w-1/3">
+                      <div className="bg-white/5 rounded-2xl p-6 border border-white/10 sticky top-6">
+                        <div className="text-center mb-6">
+                          <div className="text-2xl font-bold text-white mb-2">
+                            {researchDirections[activeDirection].tuition_fee && researchDirections[activeDirection].tuition_fee !== "0.00" 
+                              ? `${researchDirections[activeDirection].tuition_fee} ₽/${t('doctorateProgram.perYear')}`
+                              : t('doctorateProgram.freeTuition')
+                            }
+                          </div>
+                          <div className="text-emerald-300 font-semibold">
+                            {researchDirections[activeDirection].tuition_fee && researchDirections[activeDirection].tuition_fee !== "0.00" 
+                              ? t('doctorateProgram.tuitionRequired')
+                              : t('doctorateProgram.fundingAvailable')
+                            }
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <button
+                            onClick={() => handleLearnMore(researchDirections[activeDirection])}
+                            className={`w-full bg-gradient-to-r ${researchDirections[activeDirection].color} hover:${researchDirections[activeDirection].hoverColor} text-white font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg`}
+                          >
+                            {t('doctorateProgram.applyNow')}
+                          </button>
+                          <button className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-xl transition-all duration-300 border border-white/20">
+                            {t('doctorateProgram.downloadBrochure')}
+                          </button>
+                          <button className="w-full bg-transparent hover:bg-white/5 text-white font-bold py-4 rounded-xl transition-all duration-300 border border-white/20">
+                            {t('doctorateProgram.scheduleConsultation')}
+                          </button>
+                        </div>
+
+                        {/* Дополнительная информация */}
+                        <div className="mt-6 pt-6 border-t border-white/10">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-blue-200">{t('doctorateProgram.startDate')}</span>
+                            <span className="text-white font-semibold">{t('doctorateProgram.september')}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-blue-200">{t('doctorateProgram.places')}</span>
+                            <span className="text-emerald-300 font-semibold">8-10</span>
+                          </div>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-blue-200">{t('doctorateProgram.format')}</span>
+                            <span className="text-white font-semibold text-sm text-right">
+                              {researchDirections[activeDirection].format}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </>
+          ) : (
+            !backendData.loading && (
+              <div className="text-center py-16">
+                <div className="text-6xl mb-6">🎓</div>
+                <h3 className="text-2xl text-white mb-4">
+                  {t('doctorateProgram.noPrograms')}
+                </h3>
+                <p className="text-blue-200">
+                  {t('doctorateProgram.noProgramsDescription')}
+                </p>
+              </div>
+            )
+          )}
 
           {/* Преимущества программы */}
           <div className={`mt-12 md:mt-16 transition-all duration-1000 delay-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
@@ -457,22 +586,16 @@ const DoctorateProgram = () => {
                   </div>
                 </div>
 
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-4">
-                    {t('doctorateProgram.supervisor')}
-                  </h3>
+                {/* Информация о стоимости */}
+                {selectedDirection.tuition_fee && selectedDirection.tuition_fee !== "0.00" && (
                   <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <div className="flex items-center">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
-                        {selectedDirection.supervisor.split(' ').map(n => n[0]).join('')}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">{selectedDirection.supervisor}</h4>
-                        <p className="text-blue-200 text-sm">{t('doctorateProgram.professor')}</p>
-                      </div>
-                    </div>
+                    <h4 className="font-semibold text-white mb-2">{t('doctorateProgram.tuitionInformation')}</h4>
+                    <p className="text-emerald-300 font-bold text-lg">
+                      {selectedDirection.tuition_fee} ₽/{t('doctorateProgram.perYear')}
+                    </p>
+                    <p className="text-blue-200 text-sm mt-1">{selectedDirection.format}</p>
                   </div>
-                </div>
+                )}
 
                 <button
                   onClick={handleApplyNow}

@@ -1,9 +1,9 @@
 // AcademyNumbers.jsx
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const AcademyNumbers = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [counters, setCounters] = useState({
     students: 0,
@@ -16,8 +16,152 @@ const AcademyNumbers = () => {
     international: 0
   });
   
+  // Состояния для данных с бэкенда
+  const [backendData, setBackendData] = useState({
+    achievements: [],
+    statistics: [],
+    infrastructure: [],
+    loading: false,
+    error: null
+  });
+  
   const sectionRef = useRef(null);
   const hasAnimated = useRef(false);
+
+  // Получение текущего языка для API
+  const getApiLanguage = useCallback(() => {
+    const langMap = {
+      'en': 'en',
+      'ru': 'ru',
+      'kg': 'kg'
+    };
+    return langMap[i18n.language] || 'ru';
+  }, [i18n.language]);
+
+  // Функция для загрузки данных с бэкенда
+  const fetchBackendData = useCallback(async () => {
+    try {
+      setBackendData(prev => ({ 
+        ...prev, 
+        loading: true, 
+        error: null 
+      }));
+      
+      const lang = getApiLanguage();
+      
+      const endpoints = [
+        `/api/academy/achievements/?lang=${lang}`,
+        `/api/academy/statistics/?lang=${lang}`,
+        `/api/academy/infrastructure/?lang=${lang}`
+      ];
+
+      const responses = await Promise.all(
+        endpoints.map(async (url) => {
+          try {
+            const response = await fetch(url);
+            
+            // Проверяем content-type
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              const text = await response.text();
+              console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
+              return { results: [] };
+            }
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+          } catch (error) {
+            console.error(`Error fetching ${url}:`, error);
+            return { results: [] };
+          }
+        })
+      );
+
+      setBackendData(prev => ({
+        ...prev,
+        achievements: responses[0].results || [],
+        statistics: responses[1].results || [],
+        infrastructure: responses[2].results || [],
+        loading: false,
+        error: null
+      }));
+
+    } catch (error) {
+      console.error('Error fetching academy numbers data:', error);
+      setBackendData(prev => ({
+        ...prev,
+        loading: false,
+        error: 'Failed to load data'
+      }));
+    }
+  }, [getApiLanguage]);
+
+  // Загрузка данных при монтировании
+  useEffect(() => {
+    fetchBackendData();
+  }, []);
+
+  // Перезагрузка данных при изменении языка
+  useEffect(() => {
+    fetchBackendData();
+  }, [i18n.language]);
+
+  // Преобразование данных статистики в формат для счетчиков
+  const getStatisticsData = () => {
+    const stats = backendData.statistics.reduce((acc, stat) => {
+      // Преобразуем titleInt в число, убирая нечисловые символы
+      const value = parseInt(stat.titleInt?.replace(/\D/g, '') || '0');
+      
+      // Сопоставляем с существующими ключами на основе title
+      const title = stat.title?.toLowerCase();
+      if (title.includes('студент') || title.includes('student')) {
+        acc.students = value;
+      } else if (title.includes('выпускник') || title.includes('graduate')) {
+        acc.graduates = value;
+      } else if (title.includes('преподаватель') || title.includes('professor')) {
+        acc.professors = value;
+      } else if (title.includes('программ') || title.includes('program')) {
+        acc.programs = value;
+      } else if (title.includes('спорт') || title.includes('sport')) {
+        acc.sports = value;
+      } else if (title.includes('исследован') || title.includes('research')) {
+        acc.research = value;
+      } else if (title.includes('чемпион') || title.includes('champion')) {
+        acc.champions = value;
+      } else if (title.includes('международ') || title.includes('international')) {
+        acc.international = value;
+      }
+      return acc;
+    }, { students: 0, graduates: 0, professors: 0, programs: 0, sports: 0, research: 0, champions: 0, international: 0 });
+
+    return stats;
+  };
+
+  // Получение данных инфраструктуры
+  const getInfrastructureData = () => {
+    return backendData.infrastructure.map(item => ({
+      icon: item.emoji || '🏟️',
+      value: item.titleInt || '0',
+      label: item.description || ''
+    }));
+  };
+
+  // Получение данных достижений
+  const getAchievementsData = () => {
+    return backendData.achievements.map(achievement => ({
+      year: achievement.year || '2024',
+      title: achievement.title || '',
+      description: achievement.description || '',
+      icon: '🏆' // Можно добавить поле emoji в API, если нужно
+    }));
+  };
+
+  const statisticsData = getStatisticsData();
+  const infrastructureData = getInfrastructureData();
+  const achievementsData = getAchievementsData();
 
   const statsData = [
     {
@@ -102,7 +246,8 @@ const AcademyNumbers = () => {
     }
   ];
 
-  const achievements = [
+  // Fallback achievements если нет данных с бэкенда
+  const fallbackAchievements = [
     {
       year: t('numbers.achievements.0.year'),
       title: t('numbers.achievements.0.title'),
@@ -123,16 +268,7 @@ const AcademyNumbers = () => {
     }
   ];
 
-  const finalValues = {
-    students: 12500,
-    graduates: 8500,
-    professors: 250,
-    programs: 45,
-    sports: 28,
-    research: 120,
-    champions: 350,
-    international: 65
-  };
+  const achievements = achievementsData.length > 0 ? achievementsData : fallbackAchievements;
 
   const animateCounter = (start, end, duration, setter, key) => {
     const startTime = performance.now();
@@ -160,10 +296,10 @@ const AcademyNumbers = () => {
           setIsVisible(true);
           hasAnimated.current = true;
           
-          // Start counter animations with slight delays for visual effect
-          Object.keys(finalValues).forEach((key, index) => {
+          // Start counter animations with data from backend
+          Object.keys(statisticsData).forEach((key, index) => {
             setTimeout(() => {
-              animateCounter(0, finalValues[key], 2000, setCounters, key);
+              animateCounter(0, statisticsData[key], 2000, setCounters, key);
             }, index * 150);
           });
         }
@@ -180,7 +316,63 @@ const AcademyNumbers = () => {
         observer.unobserve(sectionRef.current);
       }
     };
-  }, []);
+  }, [statisticsData]);
+
+  // Компонент загрузки
+  const LoadingSkeleton = () => (
+    <div className="space-y-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16">
+        {[...Array(8)].map((_, index) => (
+          <div key={index} className="animate-pulse">
+            <div className="bg-white/10 rounded-2xl md:rounded-3xl p-4 md:p-6 h-40">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl mb-4 mx-auto"></div>
+              <div className="h-8 bg-white/20 rounded w-3/4 mx-auto mb-2"></div>
+              <div className="h-4 bg-white/20 rounded w-full mx-auto"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Компонент ошибки
+  const ErrorMessage = ({ onRetry }) => (
+    <div className="text-center py-8">
+      <div className="text-red-400 text-6xl mb-4">⚠️</div>
+      <h2 className="text-2xl text-white mb-4">
+        {t('numbers.errorTitle', { defaultValue: 'Ошибка загрузки данных' })}
+      </h2>
+      <p className="text-blue-200 mb-6">
+        {backendData.error}
+      </p>
+      <button
+        onClick={onRetry}
+        className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+      >
+        {t('numbers.retry', { defaultValue: 'Попробовать снова' })}
+      </button>
+    </div>
+  );
+
+  if (backendData.loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <LoadingSkeleton />
+        </div>
+      </section>
+    );
+  }
+
+  if (backendData.error) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 overflow-hidden">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <ErrorMessage onRetry={fetchBackendData} />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section 
@@ -252,7 +444,7 @@ const AcademyNumbers = () => {
                     <div
                       className="bg-gradient-to-r from-green-400 to-green-500 h-1 rounded-full transition-all duration-2000"
                       style={{ 
-                        width: isVisible ? `${(stat.value / finalValues[Object.keys(finalValues)[stat.id - 1]]) * 100}%` : '0%'
+                        width: isVisible ? `${(stat.value / statisticsData[Object.keys(statisticsData)[stat.id - 1]]) * 100}%` : '0%'
                       }}
                     ></div>
                   </div>
@@ -354,27 +546,47 @@ const AcademyNumbers = () => {
               {t('numbers.facilitiesTitle')}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {[
-                { icon: '🏟️', value: '12', label: t('numbers.facilities.sportsHalls') },
-                { icon: '🏊', value: '8', label: t('numbers.facilities.pools') },
-                { icon: '💪', value: '25', label: t('numbers.facilities.gyms') },
-                { icon: '🔬', value: '15', label: t('numbers.facilities.labs') }
-              ].map((facility, index) => (
-                <div
-                  key={index}
-                  className="text-center group hover:transform hover:scale-105 transition-all duration-300"
-                >
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500/20 to-green-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-blue-500/30 group-hover:to-green-500/30 transition-colors">
-                    <span className="text-2xl">{facility.icon}</span>
+              {infrastructureData.length > 0 ? (
+                infrastructureData.map((facility, index) => (
+                  <div
+                    key={index}
+                    className="text-center group hover:transform hover:scale-105 transition-all duration-300"
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500/20 to-green-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-blue-500/30 group-hover:to-green-500/30 transition-colors">
+                      <span className="text-2xl">{facility.icon}</span>
+                    </div>
+                    <div className="text-2xl md:text-3xl font-bold text-white mb-1">
+                      {facility.value}
+                    </div>
+                    <div className="text-blue-200 text-sm">
+                      {facility.label}
+                    </div>
                   </div>
-                  <div className="text-2xl md:text-3xl font-bold text-white mb-1">
-                    {facility.value}
+                ))
+              ) : (
+                // Fallback если нет данных инфраструктуры
+                [
+                  { icon: '🏟️', value: '12', label: t('numbers.facilities.sportsHalls') },
+                  { icon: '🏊', value: '8', label: t('numbers.facilities.pools') },
+                  { icon: '💪', value: '25', label: t('numbers.facilities.gyms') },
+                  { icon: '🔬', value: '15', label: t('numbers.facilities.labs') }
+                ].map((facility, index) => (
+                  <div
+                    key={index}
+                    className="text-center group hover:transform hover:scale-105 transition-all duration-300"
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500/20 to-green-500/20 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-blue-500/30 group-hover:to-green-500/30 transition-colors">
+                      <span className="text-2xl">{facility.icon}</span>
+                    </div>
+                    <div className="text-2xl md:text-3xl font-bold text-white mb-1">
+                      {facility.value}
+                    </div>
+                    <div className="text-blue-200 text-sm">
+                      {facility.label}
+                    </div>
                   </div>
-                  <div className="text-blue-200 text-sm">
-                    {facility.label}
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>

@@ -1,14 +1,91 @@
 // components/AcademyMission.jsx
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AcademyMission = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('mission');
   const [isVisible, setIsVisible] = useState(false);
   const [hoveredValue, setHoveredValue] = useState(null);
   const sectionRef = useRef(null);
+
+  // Состояния для данных с бэкенда
+  const [backendData, setBackendData] = useState({
+    missions: [],
+    loading: false,
+    error: null
+  });
+
+  // Получение текущего языка для API
+  const getApiLanguage = useCallback(() => {
+    const langMap = {
+      'en': 'en',
+      'ru': 'ru',
+      'kg': 'kg'
+    };
+    return langMap[i18n.language] || 'ru';
+  }, [i18n.language]);
+
+  // Функция для загрузки данных с бэкенда
+  const fetchBackendData = useCallback(async () => {
+    try {
+      setBackendData(prev => ({ 
+        ...prev, 
+        loading: true, 
+        error: null 
+      }));
+      
+      const lang = getApiLanguage();
+      const url = `/api/academy/missions/?lang=${lang}`;
+      
+      const response = await fetch(url);
+      
+      // Проверяем content-type
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
+        setBackendData(prev => ({
+          ...prev,
+          missions: [],
+          loading: false
+        }));
+        return;
+      }
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      setBackendData(prev => ({
+        ...prev,
+        missions: data.results || [],
+        loading: false,
+        error: null
+      }));
+
+    } catch (error) {
+      console.error('Error fetching academy missions:', error);
+      setBackendData(prev => ({
+        ...prev,
+        loading: false,
+        error: 'Failed to load data'
+      }));
+    }
+  }, [getApiLanguage]);
+
+  // Загрузка данных при монтировании
+  useEffect(() => {
+    fetchBackendData();
+  }, []);
+
+  // Перезагрузка данных при изменении языка
+  useEffect(() => {
+    fetchBackendData();
+  }, [i18n.language]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -54,6 +131,25 @@ const AcademyMission = () => {
     }
   ];
 
+  // Получение данных миссии и видения с бэкенда
+  const getMissionData = () => {
+    return backendData.missions.find(mission => 
+      mission.category?.name?.toLowerCase().includes('миссия') || 
+      mission.category?.name?.toLowerCase().includes('mission')
+    );
+  };
+
+  const getVisionData = () => {
+    return backendData.missions.find(mission => 
+      mission.category?.name?.toLowerCase().includes('видение') || 
+      mission.category?.name?.toLowerCase().includes('vision')
+    );
+  };
+
+  const missionData = getMissionData();
+  const visionData = getVisionData();
+
+  // Статические данные для values и strategy (из i18n)
   const values = t('academy.mission.values.list', { returnObjects: true });
   const strategicGoals = t('academy.mission.strategy.goals', { returnObjects: true });
 
@@ -79,7 +175,52 @@ const AcademyMission = () => {
     }
   };
 
+  // Компонент загрузки
+  const LoadingSkeleton = () => (
+    <div className="space-y-8">
+      <div className="bg-gradient-to-br from-blue-500/10 to-emerald-500/10 rounded-3xl p-8 lg:p-12 backdrop-blur-lg border border-white/20 relative overflow-hidden">
+        <div className="animate-pulse">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-8">
+            <div className="flex-shrink-0 w-24 h-24 bg-white/20 rounded-3xl"></div>
+            <div className="flex-1 space-y-4">
+              <div className="h-8 bg-white/20 rounded w-3/4"></div>
+              <div className="h-4 bg-white/20 rounded w-full"></div>
+              <div className="h-4 bg-white/20 rounded w-5/6"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Компонент ошибки
+  const ErrorMessage = ({ onRetry }) => (
+    <div className="text-center py-8">
+      <div className="text-red-400 text-6xl mb-4">⚠️</div>
+      <h2 className="text-2xl text-white mb-4">
+        {t('academy.mission.errorTitle', { defaultValue: 'Ошибка загрузки данных' })}
+      </h2>
+      <p className="text-blue-200 mb-6">
+        {backendData.error}
+      </p>
+      <button
+        onClick={onRetry}
+        className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+      >
+        {t('academy.mission.retry', { defaultValue: 'Попробовать снова' })}
+      </button>
+    </div>
+  );
+
   const renderContent = () => {
+    if (backendData.loading) {
+      return <LoadingSkeleton />;
+    }
+
+    if (backendData.error && (activeTab === 'mission' || activeTab === 'vision')) {
+      return <ErrorMessage onRetry={fetchBackendData} />;
+    }
+
     switch (activeTab) {
       case 'mission':
         return (
@@ -113,7 +254,7 @@ const AcademyMission = () => {
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
                     >
-                      {t('academy.mission.missionTitle')}
+                      {missionData ? missionData.title : t('academy.mission.missionTitle')}
                     </motion.h3>
                     <motion.p 
                       className="text-blue-100 text-xl lg:text-2xl leading-relaxed bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
@@ -121,7 +262,7 @@ const AcademyMission = () => {
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
                     >
-                      {t('academy.mission.missionStatement')}
+                      {missionData ? missionData.description : t('academy.mission.missionStatement')}
                     </motion.p>
                   </div>
                 </div>
@@ -162,7 +303,7 @@ const AcademyMission = () => {
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
                     >
-                      {t('academy.mission.visionTitle')}
+                      {visionData ? visionData.title : t('academy.mission.visionTitle')}
                     </motion.h3>
                     <motion.p 
                       className="text-blue-100 text-xl lg:text-2xl leading-relaxed bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
@@ -170,7 +311,7 @@ const AcademyMission = () => {
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
                     >
-                      {t('academy.mission.visionStatement')}
+                      {visionData ? visionData.description : t('academy.mission.visionStatement')}
                     </motion.p>
                   </div>
                 </div>
