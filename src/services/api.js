@@ -364,7 +364,7 @@ class ApiService {
   async getBachelorQuotas(language = "ru") {
     const langParam = this.getLanguageParam(language);
     return await this.request(
-      `/admission/api/bachelor-quotas/data/?lang=${langParam}`,
+      `/admission/bachelor-quotas/?lang=${langParam}`,
       {
         headers: {
           "Accept-Language": langParam,

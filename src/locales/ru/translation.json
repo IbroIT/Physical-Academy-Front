@@ -7837,6 +7837,33 @@
     "noContacts": "Контакты отсутствуют",
     "errorTitle": "Не удалось загрузить данные",
     "retry": "Попробовать снова"
+  },
+  "scopus": {
+    "title": "Публикации Scopus",
+    "subtitle": "Научные публикации и исследовательские метрики в базе данных Scopus",
+    "researchMetrics": "Научные метрики",
+    "citations": "Цитирования",
+    "hIndex": "H-Индекс",
+    "year": "Год",
+    "doi": "DOI",
+    "authors": "Авторы",
+    "journal": "Журнал",
+    "abstract": "Аннотация",
+    "viewPublication": "Посмотреть публикацию",
+    "viewDOI": "Посмотреть DOI",
+    "view": "Просмотр",
+    "filterByYear": "Фильтр по году",
+    "filterByType": "Фильтр по типу документа",
+    "filterByJournal": "Фильтр по журналу",
+    "allYears": "Все годы",
+    "allTypes": "Все типы документов",
+    "allJournals": "Все журналы",
+    "showMore": "Подробнее",
+    "showLess": "Скрыть",
+    "noPublications": "Публикации не найдены",
+    "noPublicationsDescription": "Нет публикаций, соответствующих выбранным фильтрам",
+    "errorTitle": "Не удалось загрузить данные",
+    "retry": "Попробовать снова"
   }
   
 }

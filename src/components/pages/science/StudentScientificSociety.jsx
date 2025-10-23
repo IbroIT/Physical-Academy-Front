@@ -1,5 +1,5 @@
 // StudentScientificSociety.jsx
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -10,7 +10,6 @@ const StudentScientificSociety = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [expandedFeature, setExpandedFeature] = useState(null);
   
-  // Состояния для данных с бэкенда
   const [backendData, setBackendData] = useState({
     info: [],
     stats: [],
@@ -26,23 +25,22 @@ const StudentScientificSociety = () => {
 
   const sectionRef = useRef(null);
 
-  // Получение текущего языка для API
-  const getApiLanguage = useCallback(() => {
-    const langMap = {
-      'en': 'en',
-      'ru': 'ru',
-      'kg': 'kg'
-    };
-    return langMap[i18n.language] || 'ru';
-  }, [i18n.language]);
-
-  // Функция для загрузки данных с бэкенда
-  const fetchBackendData = useCallback(async () => {
+  // Простая функция загрузки данных
+  const fetchBackendData = async () => {
     try {
       setBackendData(prev => ({ ...prev, loading: true, error: null }));
       
-      const lang = getApiLanguage();
+      // Получаем текущий язык
+      const currentLang = i18n.language;
+      const langMap = {
+        'en': 'en',
+        'ru': 'ru',
+        'kg': 'kg'
+      };
+      const lang = langMap[currentLang] || 'ru';
       
+      console.log('Fetching data for language:', lang);
+
       const endpoints = [
         '/api/science/sss-info/',
         '/api/science/sss-stats/',
@@ -57,21 +55,15 @@ const StudentScientificSociety = () => {
       const responses = await Promise.all(
         endpoints.map(async (url) => {
           try {
-            const fullUrl = `${url}?lang=${lang}`;
+            const fullUrl = `${url}?lang=${lang}&t=${Date.now()}`; // Добавляем timestamp чтобы избежать кеширования
             const response = await fetch(fullUrl);
-            
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-              const text = await response.text();
-              console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
-              return { results: [] };
-            }
             
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            return await response.json();
+            const data = await response.json();
+            return data;
           } catch (error) {
             console.error(`Error fetching ${url}:`, error);
             return { results: [] };
@@ -93,25 +85,42 @@ const StudentScientificSociety = () => {
       });
 
     } catch (error) {
-      console.error('Error fetching Student Scientific Society data:', error);
+      console.error('Error fetching data:', error);
       setBackendData(prev => ({
         ...prev,
         loading: false,
         error: 'Failed to load data'
       }));
     }
-  }, [getApiLanguage]);
+  };
 
-  // Загрузка данных при монтировании
+  // Загрузка при монтировании
   useEffect(() => {
     fetchBackendData();
   }, []);
 
-  // Перезагрузка данных при изменении языка
+  // Слушатель изменения языка
   useEffect(() => {
-    fetchBackendData();
-  }, [i18n.language]);
+    const handleLanguageChange = () => {
+      console.log('Language changed, refetching data...');
+      fetchBackendData();
+    };
 
+    // Слушаем событие изменения языка
+    i18n.on('languageChanged', handleLanguageChange);
+
+    // Очистка
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
+
+  // Альтернативный вариант - использовать useEffect с зависимостью от i18n.language
+  // useEffect(() => {
+  //   fetchBackendData();
+  // }, [i18n.language]);
+
+  // Остальные useEffect
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
@@ -125,7 +134,6 @@ const StudentScientificSociety = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Автопереключение проектов
   useEffect(() => {
     if (backendData.projects.length > 0) {
       const interval = setInterval(() => {
@@ -135,7 +143,7 @@ const StudentScientificSociety = () => {
     }
   }, [backendData.projects.length]);
 
-  // Получение основной информации
+  // Функции получения данных остаются без изменений
   const getMainInfo = () => {
     const info = backendData.info[0] || {};
     return {
@@ -166,7 +174,6 @@ const StudentScientificSociety = () => {
     };
   };
 
-  // Преобразование статистики
   const getStats = () => {
     return backendData.stats.map(stat => ({
       id: stat.id,
@@ -175,7 +182,6 @@ const StudentScientificSociety = () => {
     }));
   };
 
-  // Преобразование фич
   const getFeatures = () => {
     return backendData.features.map(feature => ({
       id: feature.id,
@@ -185,7 +191,6 @@ const StudentScientificSociety = () => {
     }));
   };
 
-  // Преобразование проектов
   const getProjects = () => {
     return backendData.projects.map(project => ({
       id: project.id,
@@ -197,7 +202,6 @@ const StudentScientificSociety = () => {
     }));
   };
 
-  // Преобразование событий
   const getEvents = () => {
     return backendData.events.map(event => ({
       id: event.id,
@@ -212,7 +216,6 @@ const StudentScientificSociety = () => {
     }));
   };
 
-  // Преобразование шагов вступления
   const getJoinSteps = () => {
     return backendData.joinSteps.map(step => ({
       id: step.id,
@@ -222,7 +225,6 @@ const StudentScientificSociety = () => {
     }));
   };
 
-  // Преобразование руководства
   const getLeadership = () => {
     return backendData.leadership.map(member => ({
       id: member.id,
@@ -232,7 +234,6 @@ const StudentScientificSociety = () => {
     }));
   };
 
-  // Преобразование контактов
   const getContacts = () => {
     return backendData.contacts.map(contact => ({
       id: contact.id,
@@ -242,11 +243,10 @@ const StudentScientificSociety = () => {
     }));
   };
 
-  // Получение предстоящих событий (фильтруем по статусу upcoming)
   const getUpcomingEvents = () => {
     return backendData.events
       .filter(event => event.status === 'upcoming')
-      .slice(0, 3) // Берем только 3 ближайших события
+      .slice(0, 3)
       .map(event => ({
         name: event.name,
         date: event.date,
@@ -271,12 +271,10 @@ const StudentScientificSociety = () => {
   };
 
   const handleJoinClick = () => {
-    // Здесь можно добавить логику для подачи заявки
     alert(t('studentScientificSociety.join.applySuccess'));
   };
 
   const handleAskClick = () => {
-    // Здесь можно добавить логику для связи
     alert(t('studentScientificSociety.join.askSuccess'));
   };
 
