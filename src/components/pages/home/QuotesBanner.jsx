@@ -1,35 +1,38 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 
 const QuotesBanner = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [quotes, setQuotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const quotes = [
-    {
-      text: t('quotes.quote1'),
-      author: t('quotes.author1')
-    },
-    {
-      text: t('quotes.quote2'),
-      author: t('quotes.author2')
-    },
-    {
-      text: t('quotes.quote3'),
-      author: t('quotes.author3')
-    },
-    {
-      text: t('quotes.quote4'),
-      author: t('quotes.author4')
-    },
-    {
-      text: t('quotes.quote5'),
-      author: t('quotes.author5')
-    }
-  ];
+  // Загрузка цитат с бэкенда
+  useEffect(() => {
+    const fetchQuotes = async () => {
+      try {
+        const currentLanguage = i18n.language;
+        const response = await axios.get(`http://localhost:8000/api/quotes/?lang=${currentLanguage}`);
+        if (response.data.success) {
+          setQuotes(response.data.quotes);
+        }
+      } catch (err) {
+        setError('Ошибка загрузки цитат');
+        console.error('Error fetching quotes:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuotes();
+  }, [i18n.language]);
 
   const nextQuote = useCallback(() => {
+    if (quotes.length === 0) return;
+    
     setIsVisible(false);
     setTimeout(() => {
       setCurrentQuoteIndex((prevIndex) => 
@@ -40,9 +43,41 @@ const QuotesBanner = () => {
   }, [quotes.length]);
 
   useEffect(() => {
+    if (quotes.length === 0) return;
+    
     const interval = setInterval(nextQuote, 5000);
     return () => clearInterval(interval);
-  }, [nextQuote]);
+  }, [nextQuote, quotes.length]);
+
+  if (loading) {
+    return (
+      <div className="relative w-full bg-gradient-to-br from-cyan-50 via-white to-emerald-50 py-16 overflow-hidden border-b border-cyan-100">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-cyan-600">Загрузка цитат...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="relative w-full bg-gradient-to-br from-cyan-50 via-white to-emerald-50 py-16 overflow-hidden border-b border-cyan-100">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-red-600">{error}</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (quotes.length === 0) {
+    return (
+      <div className="relative w-full bg-gradient-to-br from-cyan-50 via-white to-emerald-50 py-16 overflow-hidden border-b border-cyan-100">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-gray-500">Нет доступных цитат</div>
+        </div>
+      </div>
+    );
+  }
 
   const currentQuote = quotes[currentQuoteIndex];
 
@@ -72,15 +107,25 @@ const QuotesBanner = () => {
           {/* Карточка с цитатой */}
           <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-cyan-100/50 p-8 md:p-12">
             <div className="text-center">
-              {/* Иконка цитаты */}
-              <div className="mb-6">
-                <svg 
-                  className="w-14 h-14 mx-auto text-cyan-500/30" 
-                  fill="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z"/>
-                </svg>
+              {/* Иконка цитаты и изображение автора */}
+              <div className="mb-6 flex flex-col items-center">
+                {currentQuote.image_url ? (
+                  <div className="mb-4">
+                    <img 
+                      src={`http://localhost:8000${currentQuote.image_url}`}
+                      alt={currentQuote.author}
+                      className="w-20 h-20 rounded-full object-cover border-4 border-cyan-100 shadow-md"
+                    />
+                  </div>
+                ) : (
+                  <svg 
+                    className="w-14 h-14 mx-auto text-cyan-500/30 mb-4" 
+                    fill="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z"/>
+                  </svg>
+                )}
               </div>
               
               {/* Текст цитаты */}
@@ -94,9 +139,16 @@ const QuotesBanner = () => {
               </div>
               
               {/* Автор */}
-              <p className="text-lg md:text-xl text-cyan-700 font-semibold">
-                — {currentQuote.author}
-              </p>
+              <div>
+                <p className="text-lg md:text-xl text-cyan-700 font-semibold mb-1">
+                  — {currentQuote.author}
+                </p>
+                {currentQuote.author_title && (
+                  <p className="text-sm text-gray-600">
+                    {currentQuote.author_title}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -105,6 +157,7 @@ const QuotesBanner = () => {
             {/* Стрелка назад */}
             <button
               onClick={() => {
+                if (quotes.length === 0) return;
                 setIsVisible(false);
                 setTimeout(() => {
                   setCurrentQuoteIndex(prev => 
@@ -169,6 +222,35 @@ const QuotesBanner = () => {
 
       {/* Декоративный нижний бордер */}
       <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 via-emerald-400 to-cyan-400"></div>
+
+      {/* CSS анимации */}
+      <style jsx>{`
+        @keyframes progress {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes float-delayed {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+        }
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.25; }
+          50% { opacity: 0.4; }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float-delayed 8s ease-in-out infinite;
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 4s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 };

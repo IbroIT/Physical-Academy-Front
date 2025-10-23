@@ -1,13 +1,35 @@
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
 const UniversityAnnouncementsPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [announcementsData, setAnnouncementsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Данные объявлений через i18n
-  const announcementsData = t('announcements.items', { returnObjects: true });
+  // Загрузка объявлений с бэкенда
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const currentLanguage = i18n.language;
+        const response = await axios.get(`http://localhost:8000/api/announcements/?lang=${currentLanguage}`);
+        if (response.data.success) {
+          setAnnouncementsData(response.data.announcements);
+        }
+      } catch (err) {
+        setError('Ошибка загрузки объявлений');
+        console.error('Error fetching announcements:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnnouncements();
+  }, [i18n.language]);
 
   const getUrgencyBadge = (urgency) => {
     const styles = {
@@ -28,8 +50,32 @@ const UniversityAnnouncementsPage = () => {
   };
 
   const handleReadMore = (announcementId) => {
-    navigate(`/announcements/${announcementId}`);
+    navigate(`/announcement/${announcementId}`);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-cyan-600 text-xl">Загрузка объявлений...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-red-600 text-xl">{error}</div>
+      </div>
+    );
+  }
+
+  if (announcementsData.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600 text-xl">Нет доступных объявлений</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -79,7 +125,7 @@ const UniversityAnnouncementsPage = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 z-10 group-hover:scale-110 transition-transform duration-700" />
                 <div 
                   className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
-                  style={{ backgroundImage: `url(${announcement.image})` }}
+                  style={{ backgroundImage: `url(http://localhost:8000${announcement.image_url})` }}
                 />
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getUrgencyBadge(announcement.urgency)}`}>

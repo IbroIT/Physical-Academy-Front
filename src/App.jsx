@@ -77,6 +77,8 @@ import StudentScientificSociety from "./components/pages/science/StudentScientif
 import VisaSupport from "./components/pages/students/VisaSupport";
 import DetailPage from "./components/Details";
 import AnnouncementDetailPage from "./components/AnnouncementDetail";
+import PrivacyPolicy from './components/Privacy';
+import TermsOfService from './components/Terms';
 
 function App() {
   return (
@@ -86,7 +88,8 @@ function App() {
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
-
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
             <Route path="/details/:id" element={<DetailPage />} />
             <Route
               path="/announcement/:id"

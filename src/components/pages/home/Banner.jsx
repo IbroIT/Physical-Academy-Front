@@ -1,28 +1,35 @@
 import { useState, useEffect } from 'react';
-import img1 from '/img3.jpg';
-import img2 from '/img3.jpg';
-import img3 from '/img3.jpg';
+import axios from 'axios';
+
 const Banner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Массив с изображениями для слайдера
-  const slides = [
-    {
-      id: 1,
-      image: img1,
-    },
-    {
-      id: 2,
-      image: img2,
-    },
-    {
-      id: 3,
-      image: img3,
-    },
-  ];
+  // Загрузка слайдов с бэкенда
+  useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/banner/slides/');
+        if (response.data.success) {
+          setSlides(response.data.slides);
+        }
+      } catch (err) {
+        setError('Ошибка загрузки слайдов');
+        console.error('Error fetching slides:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSlides();
+  }, []);
 
   // Автоматическая смена слайдов
   useEffect(() => {
+    if (slides.length === 0) return;
+
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
@@ -45,6 +52,30 @@ const Banner = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
+  if (loading) {
+    return (
+      <div className="relative w-full h-screen flex items-center justify-center">
+        <div className="text-green-600">Загрузка баннера...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="relative w-full h-screen flex items-center justify-center">
+        <div className="text-red-600">{error}</div>
+      </div>
+    );
+  }
+
+  if (slides.length === 0) {
+    return (
+      <div className="relative w-full h-screen flex items-center justify-center">
+        <div className="text-gray-600">Нет доступных слайдов</div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-screen overflow-hidden">
       {/* Слайды */}
@@ -57,8 +88,8 @@ const Banner = () => {
             }`}
           >
             <img
-              src={slide.image}
-              alt={slide.alt}
+              src={`http://localhost:8000${slide.image_url}`}
+              alt={slide.alt_text || slide.title}
               className="w-full h-full object-cover"
             />
           </div>

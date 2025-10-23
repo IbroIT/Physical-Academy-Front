@@ -2,19 +2,42 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 const NewsHomePage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [newsData, setNewsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Данные новостей через i18n
-  const newsData = t('news.items', { returnObjects: true });
+  // Загрузка новостей с бэкенда
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const currentLanguage = i18n.language;
+        const response = await axios.get(`http://localhost:8000/api/news/?lang=${currentLanguage}`);
+        if (response.data.success) {
+          setNewsData(response.data.news);
+        }
+      } catch (err) {
+        setError('Ошибка загрузки новостей');
+        console.error('Error fetching news:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, [i18n.language]);
 
   const navigateNews = useCallback(
     (direction) => {
+      if (newsData.length === 0) return;
+      
       setIsVisible(false);
       setTimeout(() => {
         setCurrentNewsIndex((prev) => {
@@ -32,19 +55,43 @@ const NewsHomePage = () => {
 
   // Автоматическая смена новостей
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || newsData.length === 0) return;
 
     const interval = setInterval(() => {
       navigateNews('next');
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, navigateNews]);
+  }, [isAutoPlaying, navigateNews, newsData.length]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-cyan-600 text-xl">Загрузка новостей...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-red-600 text-xl">{error}</div>
+      </div>
+    );
+  }
+
+  if (newsData.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-600 text-xl">Нет доступных новостей</div>
+      </div>
+    );
+  }
 
   const currentNews = newsData[currentNewsIndex];
 
   const handleReadMore = (newsId) => {
-    navigate(`/news/${newsId}`);
+    navigate(`/details/${newsId}`);
   };
 
   return (
@@ -125,7 +172,7 @@ const NewsHomePage = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 z-10" />
               <motion.div
                 className={`absolute inset-0 bg-cover bg-center transition-transform duration-700 ${isVisible ? 'scale-110' : 'scale-100'}`}
-                style={{ backgroundImage: `url(${currentNews.image})` }}
+                style={{ backgroundImage: `url(http://localhost:8000${currentNews.image_url})` }}
                 key={currentNews.id}
               />
             </div>
@@ -145,7 +192,9 @@ const NewsHomePage = () => {
                     <span className="px-4 py-2 bg-gradient-to-r from-cyan-100 to-cyan-50 text-cyan-700 rounded-full text-sm font-semibold border border-cyan-200">
                       {currentNews.category}
                     </span>
-                    <span className="text-gray-500 font-medium">{currentNews.date}</span>
+                    <span className="text-gray-500 font-medium">
+                      {new Date(currentNews.created_at).toLocaleDateString()}
+                    </span>
                   </div>
 
                   <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 leading-tight">
@@ -171,11 +220,11 @@ const NewsHomePage = () => {
             </div>
           </div>
 
-          {/* ✅ Progress Indicators (исправлено) */}
+          {/* Progress Indicators */}
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2">
             {newsData.map((news, index) => (
               <button
-                key={news.id} // ✅ уникальный ключ
+                key={news.id}
                 onClick={() => {
                   setIsVisible(false);
                   setTimeout(() => {
@@ -219,7 +268,7 @@ const NewsHomePage = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 z-10 group-hover:scale-110 transition-transform duration-700" />
                   <div
                     className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
-                    style={{ backgroundImage: `url(${news.image})` }}
+                    style={{ backgroundImage: `url(http://localhost:8000${news.image_url})` }}
                   />
                 </div>
 
@@ -228,7 +277,9 @@ const NewsHomePage = () => {
                     <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
                       {news.category}
                     </span>
-                    <span className="text-gray-400 text-xs">{news.date}</span>
+                    <span className="text-gray-400 text-xs">
+                      {new Date(news.created_at).toLocaleDateString()}
+                    </span>
                   </div>
 
                   <h3 className="font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-cyan-600 transition-colors">
