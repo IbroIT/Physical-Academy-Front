@@ -87,6 +87,12 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
 
+            <Route path="/details/:id" element={<DetailPage />} />
+            <Route
+              path="/announcement/:id"
+              element={<AnnouncementDetailPage />}
+            />
+
             {/* Academy routes */}
             <Route path="/academy/about" element={<AcademyAbout />} />
             <Route path="/academy/history" element={<AcademyHistory />} />

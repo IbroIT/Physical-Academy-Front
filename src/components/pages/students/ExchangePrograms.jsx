@@ -613,57 +613,6 @@ const ExchangePrograms = () => {
                 </div>
               </motion.div>
             )}
-
-            {/* Программы обмена */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              className="space-y-6 mb-12"
-            >
-              {filteredPrograms.length === 0 && !backendData.loading ? (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-16 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm"
-                >
-                  <div className="text-6xl mb-4 text-blue-300 opacity-60">🔍</div>
-                  <h3 className="text-2xl font-semibold text-white mb-2">
-                    {t('students.exchange.search.noResults.title')}
-                  </h3>
-                  <p className="text-blue-200 text-lg mb-6">
-                    {t('students.exchange.search.noResults.description')}
-                  </p>
-                  <motion.button 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      setSelectedRegion('all');
-                      setSelectedDuration('all');
-                      setSearchTerm('');
-                    }}
-                    className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-6 py-3 rounded-2xl hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 font-medium shadow-lg"
-                  >
-                    {t('students.exchange.buttons.reset')}
-                  </motion.button>
-                </motion.div>
-              ) : (
-                <AnimatePresence>
-                  {filteredPrograms.map((program, index) => (
-                    <ProgramCard 
-                      key={program.id} 
-                      program={program} 
-                      index={index}
-                      isExpanded={expandedProgram === index}
-                      isApplying={isApplying === program.id}
-                      onToggle={() => toggleProgram(index)}
-                      onApply={() => handleApply(program.id, getTranslatedText(program, 'university'))}
-                      getTranslatedText={getTranslatedText}
-                    />
-                  ))}
-                </AnimatePresence>
-              )}
-            </motion.div>
           </>
         )}
       </div>
