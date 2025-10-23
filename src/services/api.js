@@ -8,11 +8,11 @@ class ApiService {
   getLanguageParam(language) {
     const langMap = {
       ru: "ru",
-      kg: "ky", // Map kg to ky for backend compatibility
+      kg: "kg", // Map kg to kg for backend (changed from ky)
       en: "en",
-      ky: "ky", // Keep ky as ky for backend
+      ky: "kg", // Map ky to kg for backend compatibility
     };
-    return langMap[language] || "en";
+    return langMap[language] || "ru";
   }
 
   // Generic API request method
