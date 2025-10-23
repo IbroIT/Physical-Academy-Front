@@ -25,23 +25,18 @@ const StudentScientificSociety = () => {
 
   const sectionRef = useRef(null);
 
-  // Получение текущего языка для API - ИСПРАВЛЕННАЯ ВЕРСИЯ
+  // Получение текущего языка для API - УПРОЩЕННАЯ ВЕРСИЯ
   const getApiLanguage = useCallback(() => {
-    const langMap = {
-      'en': 'en',
-      'ru': 'ru', 
-      'kg': 'ky'
-    };
-    return langMap[i18n.language] || 'ru';
+    return i18n.language; // Просто возвращаем текущий язык
   }, [i18n.language]);
 
-  // Функция для загрузки данных с бэкенда - ИСПРАВЛЕННАЯ ВЕРСИЯ
+  // Функция для загрузки данных с бэкенда - УЛУЧШЕННАЯ ВЕРСИЯ
   const fetchBackendData = useCallback(async () => {
     try {
       setBackendData(prev => ({ ...prev, loading: true, error: null }));
       
       const lang = getApiLanguage();
-      console.log('Fetching data for language:', lang); // Для отладки
+      console.log('🔄 Fetching data for language:', lang);
       
       const endpoints = [
         '/api/science/sss-info/',
@@ -57,40 +52,41 @@ const StudentScientificSociety = () => {
       const responses = await Promise.all(
         endpoints.map(async (url) => {
           try {
-            // ИСПРАВЛЕНИЕ: Добавляем language в параметры запроса
-            const fullUrl = `${url}?language=${lang}`;
-            console.log('Fetching:', fullUrl); // Для отладки
+            // ПРОБУЕМ РАЗНЫЕ ВАРИАНТЫ ПАРАМЕТРОВ ЯЗЫКА
+            const params = new URLSearchParams({
+              lang: lang, // Основной вариант
+              language: lang, // Альтернативный вариант
+              locale: lang, // Еще один вариант
+              _: Date.now() // Для предотвращения кеширования
+            });
+            
+            const fullUrl = `${url}?${params}`;
+            console.log('📡 Fetching:', fullUrl);
             
             const response = await fetch(fullUrl, {
               method: 'GET',
               headers: {
                 'Accept': 'application/json',
-                'Accept-Language': lang, // Добавляем заголовок языка
+                'Accept-Language': lang,
+                'Content-Type': 'application/json',
               },
-              cache: 'no-cache' // Отключаем кеширование
+              cache: 'no-store' // Более строгое отключение кеширования
             });
             
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-              console.warn(`Non-JSON response from ${url}`);
-              return { results: [] };
-            }
-            
             const data = await response.json();
-            console.log(`Data from ${url}:`, data); // Для отладки
+            console.log(`✅ Data from ${url}:`, data.results ? data.results.length : 'no results');
             return data;
           } catch (error) {
-            console.error(`Error fetching ${url}:`, error);
+            console.error(`❌ Error fetching ${url}:`, error);
             return { results: [] };
           }
         })
       );
 
-      // ИСПРАВЛЕНИЕ: Убеждаемся, что данные обновляются
       setBackendData({
         info: responses[0]?.results || [],
         stats: responses[1]?.results || [],
@@ -104,8 +100,10 @@ const StudentScientificSociety = () => {
         error: null
       });
 
+      console.log('🎉 Data loaded successfully for language:', lang);
+
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('💥 Error fetching data:', error);
       setBackendData(prev => ({
         ...prev,
         loading: false,
@@ -114,11 +112,11 @@ const StudentScientificSociety = () => {
     }
   }, [getApiLanguage, t]);
 
-  // Загрузка данных при монтировании и изменении языка - ИСПРАВЛЕННАЯ ВЕРСИЯ
+  // Загрузка данных при монтировании и изменении языка - УЛУЧШЕННАЯ ВЕРСИЯ
   useEffect(() => {
-    console.log('Language changed to:', i18n.language); // Для отладки
+    console.log('🌐 Language changed to:', i18n.language);
     fetchBackendData();
-  }, [i18n.language, fetchBackendData]);
+  }, [i18n.language]); // Убираем fetchBackendData из зависимостей
 
   // Сброс состояний при изменении языка
   useEffect(() => {
@@ -127,11 +125,10 @@ const StudentScientificSociety = () => {
     setExpandedFeature(null);
   }, [i18n.language]);
 
-  // Добавляем обработчик изменения языка
+  // Упрощаем обработчик изменения языка
   useEffect(() => {
-    const handleLanguageChanged = (lng) => {
-      console.log('Language changed in i18n:', lng);
-      // Принудительно перезагружаем данные
+    const handleLanguageChanged = () => {
+      console.log('🔁 Language changed, refetching data...');
       fetchBackendData();
     };
 
@@ -140,9 +137,9 @@ const StudentScientificSociety = () => {
     return () => {
       i18n.off('languageChanged', handleLanguageChanged);
     };
-  }, [i18n, fetchBackendData]);
+  }, []); // Убираем зависимости
 
-  // Остальные useEffect
+  // Остальные useEffect остаются без изменений
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
@@ -177,61 +174,66 @@ const StudentScientificSociety = () => {
     return Array.isArray(value) ? value : [];
   };
 
-  // Получение основной информации с использованием useMemo для оптимизации
+  // Получение основной информации - УПРОЩЕННАЯ ВЕРСИЯ
   const societyData = useMemo(() => {
     const info = backendData.info[0] || {};
-    console.log('Current society data:', info); // Для отладки
+    console.log('📊 Current society data:', info);
+    
+    // Используем fallback на переводы если данные с бэкенда пустые
+    const hasBackendData = backendData.info.length > 0;
     
     return {
-      title: safeString(info.title, t('studentScientificSociety.title', "Student Scientific Society")),
-      subtitle: safeString(info.subtitle, t('studentScientificSociety.subtitle', "Join our research community")),
+      title: hasBackendData ? safeString(info.title) : t('studentScientificSociety.title', "Student Scientific Society"),
+      subtitle: hasBackendData ? safeString(info.subtitle) : t('studentScientificSociety.subtitle', "Join our research community"),
       about: {
-        title: safeString(info.about_title, t('studentScientificSociety.about.title', "About SSS")),
-        description: safeString(info.about_description, t('studentScientificSociety.about.description', "Student Scientific Society description"))
+        title: hasBackendData ? safeString(info.about_title) : t('studentScientificSociety.about.title', "About SSS"),
+        description: hasBackendData ? safeString(info.about_description) : t('studentScientificSociety.about.description', "Student Scientific Society description")
       },
       projects: {
-        title: safeString(info.projects_title, t('studentScientificSociety.projects.title', "Our Projects"))
+        title: hasBackendData ? safeString(info.projects_title) : t('studentScientificSociety.projects.title', "Our Projects")
       },
       events: {
-        title: safeString(info.events_title, t('studentScientificSociety.events.title', "Events"))
+        title: hasBackendData ? safeString(info.events_title) : t('studentScientificSociety.events.title', "Events")
       },
       join: {
-        title: safeString(info.join_title, t('studentScientificSociety.join.title', "How to Join"))
+        title: hasBackendData ? safeString(info.join_title) : t('studentScientificSociety.join.title', "How to Join")
       },
       leadership: {
-        title: safeString(info.leadership_title, t('studentScientificSociety.leadership.title', "Leadership"))
+        title: hasBackendData ? safeString(info.leadership_title) : t('studentScientificSociety.leadership.title', "Leadership")
       },
       contacts: {
-        title: safeString(info.contacts_title, t('studentScientificSociety.contacts.title', "Contacts"))
+        title: hasBackendData ? safeString(info.contacts_title) : t('studentScientificSociety.contacts.title', "Contacts")
       },
       upcomingEvents: {
-        title: safeString(info.upcoming_events_title, t('studentScientificSociety.upcomingEvents.title', "Upcoming Events"))
+        title: hasBackendData ? safeString(info.upcoming_events_title) : t('studentScientificSociety.upcomingEvents.title', "Upcoming Events")
       }
     };
-  }, [backendData.info, t, i18n.language]); // Добавляем i18n.language в зависимости
+  }, [backendData.info, t, i18n.language]);
 
-  // Преобразование статистики с useMemo
+  // Все остальные useMemo остаются аналогичными, но с консоль логами для отладки
   const stats = useMemo(() => {
-    return safeArray(backendData.stats).map(stat => ({
+    const data = safeArray(backendData.stats).map(stat => ({
       id: stat.id || Math.random(),
       value: safeString(stat.value, '0'),
       label: safeString(stat.label, 'Stat')
     }));
-  }, [backendData.stats, i18n.language]); // Добавляем i18n.language
+    console.log('📈 Stats data:', data);
+    return data;
+  }, [backendData.stats, i18n.language]);
 
-  // Преобразование фич с useMemo
   const features = useMemo(() => {
-    return safeArray(backendData.features).map(feature => ({
+    const data = safeArray(backendData.features).map(feature => ({
       id: feature.id || Math.random(),
       title: safeString(feature.title, 'Feature'),
       description: safeString(feature.description, 'Description'),
       icon: safeString(feature.icon, '🔬')
     }));
+    console.log('🔧 Features data:', data);
+    return data;
   }, [backendData.features, i18n.language]);
 
-  // Преобразование проектов с useMemo
   const projects = useMemo(() => {
-    return safeArray(backendData.projects).map(project => {
+    const data = safeArray(backendData.projects).map(project => {
       let tags = [];
       if (Array.isArray(project.tags)) {
         tags = project.tags.map(tag => {
@@ -250,11 +252,12 @@ const StudentScientificSociety = () => {
         tags: tags
       };
     });
+    console.log('🚀 Projects data:', data);
+    return data;
   }, [backendData.projects, i18n.language]);
 
-  // Преобразование событий с useMemo
   const events = useMemo(() => {
-    return safeArray(backendData.events).map(event => ({
+    const data = safeArray(backendData.events).map(event => ({
       id: event.id || Math.random(),
       name: safeString(event.name, 'Event'),
       description: safeString(event.description, 'Event description'),
@@ -265,111 +268,103 @@ const StudentScientificSociety = () => {
       status_display: safeString(event.status_display, ''),
       days_left: event.days_left || 0
     }));
+    console.log('📅 Events data:', data);
+    return data;
   }, [backendData.events, i18n.language]);
 
-  // Преобразование шагов вступления с useMemo
   const joinSteps = useMemo(() => {
-    return safeArray(backendData.joinSteps).map(step => ({
+    const data = safeArray(backendData.joinSteps).map(step => ({
       id: step.id || Math.random(),
       step: safeString(step.step, '1'),
       title: safeString(step.title, 'Step'),
       description: safeString(step.description, 'Step description')
     }));
+    console.log('👣 Join steps data:', data);
+    return data;
   }, [backendData.joinSteps, i18n.language]);
 
-  // Преобразование руководства с useMemo
   const leadership = useMemo(() => {
-    return safeArray(backendData.leadership).map(member => ({
+    const data = safeArray(backendData.leadership).map(member => ({
       id: member.id || Math.random(),
       name: safeString(member.name, 'Name'),
       position: safeString(member.position, 'Position'),
       department: safeString(member.department, 'Department')
     }));
+    console.log('👥 Leadership data:', data);
+    return data;
   }, [backendData.leadership, i18n.language]);
 
-  // Преобразование контактов с useMemo
   const contacts = useMemo(() => {
-    return safeArray(backendData.contacts).map(contact => ({
+    const data = safeArray(backendData.contacts).map(contact => ({
       id: contact.id || Math.random(),
       label: safeString(contact.label, 'Contact'),
       value: safeString(contact.value, ''),
       icon: safeString(contact.icon, '📞')
     }));
+    console.log('📞 Contacts data:', data);
+    return data;
   }, [backendData.contacts, i18n.language]);
 
-  // Получение предстоящих событий с useMemo
   const upcomingEvents = useMemo(() => {
-    return safeArray(backendData.events)
+    const data = safeArray(backendData.events)
       .filter(event => event.status === 'upcoming')
-      .slice(0, 3)
       .slice(0, 3)
       .map(event => ({
         name: safeString(event.name, 'Event'),
         date: safeString(event.date, ''),
         daysLeft: event.days_left || 0
       }));
+    console.log('⏰ Upcoming events data:', data);
+    return data;
   }, [backendData.events, i18n.language]);
 
-  // Табы с использованием useMemo для перевода
+  // Табы с использованием useMemo для перевода - УПРОЩЕННАЯ ВЕРСИЯ
   const tabs = useMemo(() => {
+    const defaultTabs = [
+      { id: 'about', name: 'About SSS' },
+      { id: 'projects', name: 'Projects' },
+      { id: 'events', name: 'Events' },
+      { id: 'join', name: 'Join Us' }
+    ];
+
     try {
-      // Пробуем получить переведенные табы
-      const translatedTabs = t('studentScientificSociety.tabs', { 
-        returnObjects: true,
-        defaultValue: [
-          { id: 'about', name: 'About SSS' },
-          { id: 'projects', name: 'Projects' },
-          { id: 'events', name: 'Events' },
-          { id: 'join', name: 'Join Us' }
-        ]
-      });
+      // Пробуем получить перевод для табов
+      const translated = t('studentScientificSociety.tabs', { returnObjects: true });
       
-      if (Array.isArray(translatedTabs)) {
-        return translatedTabs;
+      if (Array.isArray(translated)) {
+        return translated;
       }
       
-      // Если это объект, преобразуем в массив
-      if (translatedTabs && typeof translatedTabs === 'object') {
-        return Object.keys(translatedTabs).map(key => ({
-          id: key,
-          name: translatedTabs[key]
-        }));
-      }
-      
-      return [
-        { id: 'about', name: 'About SSS' },
-        { id: 'projects', name: 'Projects' },
-        { id: 'events', name: 'Events' },
-        { id: 'join', name: 'Join Us' }
-      ];
+      // Если перевод не найден, используем дефолтные значения
+      return defaultTabs.map(tab => ({
+        ...tab,
+        name: t(`studentScientificSociety.tabs.${tab.id}`, tab.name)
+      }));
     } catch (error) {
       console.warn('Error loading tabs translation:', error);
-      return [
-        { id: 'about', name: 'About SSS' },
-        { id: 'projects', name: 'Projects' },
-        { id: 'events', name: 'Events' },
-        { id: 'join', name: 'Join Us' }
-      ];
+      return defaultTabs;
     }
-  }, [t, i18n.language]); // Добавляем i18n.language
+  }, [t, i18n.language]);
 
-  // Локальные переводы для статических текстов
-  const localTranslations = useMemo(() => ({
-    loading: t('studentScientificSociety.loading', "Loading..."),
-    errorTitle: t('studentScientificSociety.errorTitle', "Error"),
-    retry: t('studentScientificSociety.retry', "Retry"),
-    noProjects: t('studentScientificSociety.noProjects', "No projects available"),
-    noEvents: t('studentScientificSociety.noEvents', "No events available"),
-    noJoinSteps: t('studentScientificSociety.noJoinSteps', "No join steps available"),
-    noLeadership: t('studentScientificSociety.noLeadership', "No leadership information"),
-    noUpcomingEvents: t('studentScientificSociety.noUpcomingEvents', "No upcoming events"),
-    noContacts: t('studentScientificSociety.noContacts', "No contacts available"),
-    joinApplySuccess: t('studentScientificSociety.join.applySuccess', "Application submitted successfully!"),
-    joinAskSuccess: t('studentScientificSociety.join.askSuccess', "Your question has been sent!"),
-    joinReadyTitle: t('studentScientificSociety.join.readyTitle', "📝 Ready to join?"),
-    joinApplyButton: t('studentScientificSociety.join.applyButton', "Apply Now"),
-    joinAskButton: t('studentScientificSociety.join.askButton', "Ask a Question")
-  }), [t, i18n.language]); // Добавляем i18n.language
+  // Локальные переводы для статических текстов - УПРОЩЕННАЯ ВЕРСИЯ
+  const localTranslations = useMemo(() => {
+    return {
+      loading: t('studentScientificSociety.loading', "Loading..."),
+      errorTitle: t('studentScientificSociety.errorTitle', "Error"),
+      retry: t('studentScientificSociety.retry', "Retry"),
+      noProjects: t('studentScientificSociety.noProjects', "No projects available"),
+      noEvents: t('studentScientificSociety.noEvents', "No events available"),
+      noJoinSteps: t('studentScientificSociety.noJoinSteps', "No join steps available"),
+      noLeadership: t('studentScientificSociety.noLeadership', "No leadership information"),
+      noUpcomingEvents: t('studentScientificSociety.noUpcomingEvents', "No upcoming events"),
+      noContacts: t('studentScientificSociety.noContacts', "No contacts available"),
+      joinApplySuccess: t('studentScientificSociety.join.applySuccess', "Application submitted successfully!"),
+      joinAskSuccess: t('studentScientificSociety.join.askSuccess', "Your question has been sent!"),
+      joinReadyTitle: t('studentScientificSociety.join.readyTitle', "📝 Ready to join?"),
+      joinApplyButton: t('studentScientificSociety.join.applyButton', "Apply Now"),
+      joinAskButton: t('studentScientificSociety.join.askButton', "Ask a Question")
+    };
+  }, [t, i18n.language]);
 
   const toggleFeature = (index) => {
     setExpandedFeature(expandedFeature === index ? null : index);
@@ -382,6 +377,7 @@ const StudentScientificSociety = () => {
   const handleAskClick = () => {
     alert(localTranslations.joinAskSuccess);
   };
+
 
   // Компонент загрузки
   const LoadingSkeleton = () => (
