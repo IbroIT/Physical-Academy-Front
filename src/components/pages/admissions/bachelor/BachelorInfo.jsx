@@ -593,24 +593,6 @@ const safeArray = useCallback((data) => {
                         </div>
                       </div>
                     </div>
-
-                    {/* CTA Button */}
-                    <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-8 border-t border-white/10">
-                      <motion.button 
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={`flex-1 bg-gradient-to-r ${currentProgram.color} text-white font-bold py-4 px-6 rounded-xl hover:shadow-2xl transition-all duration-300`}
-                      >
-                        {t('bachelor.info.applyNow')}
-                      </motion.button>
-                      <motion.button 
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex-1 bg-white/10 text-white font-bold py-4 px-6 rounded-xl border border-white/20 hover:bg-white/20 hover:border-green-400/30 transition-all duration-300"
-                      >
-                        {t('bachelor.info.learnMore')}
-                      </motion.button>
-                    </div>
                   </div>
                 </motion.div>
               )}
