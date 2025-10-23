@@ -1,5 +1,5 @@
 // components/AcademyAbout.jsx
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const AcademyAbout = () => {
@@ -10,6 +10,7 @@ const AcademyAbout = () => {
   const [isMobile, setIsMobile] = useState(false);
   const sectionRef = useRef(null);
   const hasAnimated = useRef(false);
+  const mediaIntervalRef = useRef(null);
 
   // Состояния для данных с бэкенда
   const [backendData, setBackendData] = useState({
@@ -47,9 +48,6 @@ const AcademyAbout = () => {
         const photosResponse = await fetch(`/api/about/about-photos/?lang=${lang}`);
         if (photosResponse.ok) {
           photosData = await photosResponse.json();
-          console.log('Photos loaded from backend:', photosData);
-        } else {
-          console.warn('Photos endpoint not available, using demo data');
         }
       } catch (photosError) {
         console.warn('Failed to fetch photos, using demo data:', photosError);
@@ -135,7 +133,6 @@ const AcademyAbout = () => {
   }, []);
 
   const startCounters = () => {
-    // Используем данные с бэкенда или дефолтные значения
     const targetValues = backendData.stats.length > 0 
       ? backendData.stats.map(stat => stat.value)
       : [15, 10000, 50, 98];
@@ -177,7 +174,6 @@ const AcademyAbout = () => {
       }));
     }
 
-    // Дефолтные данные если с бэкенда ничего не пришло
     return [
       { 
         number: counterValues[0], 
@@ -210,18 +206,19 @@ const AcademyAbout = () => {
     ];
   };
 
-  const getMediaData = () => {
+  // УПРОЩЕННАЯ ФУНКЦИЯ ДЛЯ МЕДИА ДАННЫХ
+  const getMediaData = useCallback(() => {
     if (backendData.photos.length > 0) {
-      return backendData.photos.map(photo => ({
+      return backendData.photos.slice(0, 4).map(photo => ({
         type: 'image',
         url: photo.photo,
-        title: photo.description,
-        description: photo.description,
+        title: photo.description || 'Фото академии',
+        description: photo.description || 'Описание фото',
         thumbnail: photo.photo
       }));
     }
 
-    // Дефолтные данные если с бэкенда ничего не пришло
+    // Фиксированные демо-данные без дублирования
     return [
       {
         type: 'image',
@@ -231,8 +228,8 @@ const AcademyAbout = () => {
         thumbnail: '/images/academy/campus-thumb.jpg'
       },
       {
-        type: 'video',
-        url: 'https://example.com/video.mp4',
+        type: 'image', 
+        url: '/images/academy/virtual-tour.jpg',
         title: t('academy.about.media.virtualTour'),
         description: t('academy.about.media.virtualTourDesc'),
         thumbnail: '/images/academy/tour-thumb.jpg'
@@ -252,7 +249,7 @@ const AcademyAbout = () => {
         thumbnail: '/images/academy/students-thumb.jpg'
       }
     ];
-  };
+  }, [backendData.photos]);
 
   const getFeaturesData = () => {
     if (backendData.features.length > 0) {
@@ -265,7 +262,6 @@ const AcademyAbout = () => {
       }));
     }
 
-    // Дефолтные данные если с бэкенда ничего не пришло
     return [
       {
         icon: '⚡',
@@ -291,27 +287,55 @@ const AcademyAbout = () => {
     ];
   };
 
-  const stats = getStatsData();
-  const mediaItems = getMediaData();
-  const features = getFeaturesData();
+  const stats = useMemo(() => getStatsData(), [backendData.stats, counterValues, t]);
+  const mediaItems = useMemo(() => getMediaData(), [getMediaData]);
+  const features = useMemo(() => getFeaturesData(), [backendData.features, t]);
 
-  // Автопереключение медиа - ПЕРЕМЕЩЕНО ПОСЛЕ ОПРЕДЕЛЕНИЯ mediaItems
-  useEffect(() => {
-    if (mediaItems.length > 0) {
-      const interval = setInterval(() => {
-        setActiveMedia((prev) => (prev + 1) % mediaItems.length);
-      }, 5000);
-      return () => clearInterval(interval);
-    }
+  // ПРОСТЫЕ ФУНКЦИИ ДЛЯ НАВИГАЦИИ
+  const nextMedia = useCallback(() => {
+    setActiveMedia(prev => (prev + 1) % mediaItems.length);
   }, [mediaItems.length]);
 
-  const nextMedia = () => {
-    setActiveMedia((prev) => (prev + 1) % mediaItems.length);
-  };
+  const prevMedia = useCallback(() => {
+    setActiveMedia(prev => (prev - 1 + mediaItems.length) % mediaItems.length);
+  }, [mediaItems.length]);
 
-  const prevMedia = () => {
-    setActiveMedia((prev) => (prev - 1 + mediaItems.length) % mediaItems.length);
-  };
+  const goToMedia = useCallback((index) => {
+    setActiveMedia(index);
+  }, []);
+
+  // УПРОЩЕННЫЙ КОМПОНЕНТ ИЗОБРАЖЕНИЯ
+  const SimpleImage = useCallback(({ src, alt, className }) => {
+    const [loaded, setLoaded] = useState(false);
+
+    return (
+      <div className={`relative ${className}`}>
+        {!loaded && (
+          <div className="absolute inset-0 bg-gray-600 animate-pulse rounded-lg flex items-center justify-center">
+            <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+          </div>
+        )}
+        <img
+          src={src}
+          alt={alt}
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
+            loaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          onLoad={() => setLoaded(true)}
+          onError={(e) => {
+            // Заглушка при ошибке загрузки
+            e.target.src = `data:image/svg+xml;base64,${btoa(`
+              <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+                <rect width="400" height="300" fill="#1e3a8a"/>
+                <text x="200" y="150" text-anchor="middle" fill="white" font-family="Arial" font-size="18">${alt}</text>
+              </svg>
+            `)}`;
+            setLoaded(true);
+          }}
+        />
+      </div>
+    );
+  }, []);
 
   // Компонент загрузки
   const LoadingSkeleton = () => (
@@ -326,18 +350,18 @@ const AcademyAbout = () => {
     </div>
   );
 
-  // Компонент уведомления (вместо ошибки)
+  // Компонент уведомления
   const DemoDataNotice = ({ onRetry }) => (
     <div className="text-center py-4 mb-4">
       <div className="inline-flex items-center px-4 py-2 bg-yellow-500/20 backdrop-blur-lg rounded-2xl border border-yellow-400/30">
         <span className="text-yellow-400 text-sm">
-          ⚠️ {t('academy.about.usingDemoData')}
+          ⚠️ {t('academy.about.partialData', 'Часть данных недоступна.')} {t('academy.about.usingDefaultData', 'Используются демонстрационные данные.')}
         </span>
         <button
           onClick={onRetry}
           className="ml-3 px-3 py-1 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm"
         >
-          {t('academy.about.retry')}
+          {t('academy.about.retry', 'Повторить попытку')}
         </button>
       </div>
     </div>
@@ -364,15 +388,15 @@ const AcademyAbout = () => {
           <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300">
             <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
             <span className="text-green-300 font-medium text-sm md:text-base">
-              {t('academy.about.badge')}
+              {t('academy.about.badge', 'О Академии')}
             </span>
           </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-            {t('academy.about.title')}
+            {t('academy.about.subtitle2', 'Наша академия')}
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-green-400 mx-auto mb-6 md:mb-8"></div>
           <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto px-4 leading-relaxed">
-            {t('academy.about.subtitle')}
+            {t('academy.about.badge3', 'Узнайте больше о нашей истории, миссии и достижениях в области физической культуры и спорта.')}
           </p>
         </div>
 
@@ -392,21 +416,17 @@ const AcademyAbout = () => {
                   key={index}
                   className="group relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl transition-all duration-500 hover:scale-105 hover:border-green-400/30 text-center"
                 >
-                  {/* Иконка */}
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center text-2xl mb-4 mx-auto group-hover:scale-110 transition-transform duration-300`}>
                     {stat.icon}
                   </div>
 
-                  {/* Число с анимацией */}
                   <div className="text-3xl md:text-4xl font-bold text-white mb-2 font-mono">
                     {stat.number}
                     <span className="text-green-300">{stat.suffix}</span>
                   </div>
 
-                  {/* Описание */}
                   <div className="text-blue-100 font-medium text-sm md:text-base">{stat.label}</div>
 
-                  {/* Анимированная полоска прогресса */}
                   <div className="mt-4">
                     <div className="w-full bg-white/20 rounded-full h-1">
                       <div
@@ -418,7 +438,6 @@ const AcademyAbout = () => {
                     </div>
                   </div>
 
-                  {/* Декоративные элементы */}
                   <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-ping"></div>
                 </div>
               ))}
@@ -433,10 +452,10 @@ const AcademyAbout = () => {
                 {/* Основной текст */}
                 <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl">
                   <p className="text-blue-100 leading-relaxed text-lg md:text-xl mb-6 pb-6 border-b border-white/10">
-                    {t('academy.about.content.paragraph1')}
+                    {t('academy.about.intro', 'Наша академия была основана с целью предоставления высококачественного образования в области физической культуры и спорта. Мы гордимся нашей историей и достижениями, которые сделали нас одним из ведущих учебных заведений в этой сфере.')}
                   </p>
                   <p className="text-blue-100 leading-relaxed text-lg md:text-xl">
-                    {t('academy.about.content.paragraph2')}
+                    {t('academy.about.intro2', 'Наши студенты получают не только теоретические знания, но и практические навыки, необходимые для успешной карьеры в области физической культуры, спорта и оздоровления. Мы стремимся создать вдохновляющую образовательную среду, которая способствует развитию талантов и достижению высоких результатов.')}
                   </p>
                 </div>
 
@@ -465,119 +484,96 @@ const AcademyAbout = () => {
                 </div>
               </div>
 
-              {/* Медиа галерея */}
+              {/* ПЕРЕПИСАННАЯ МЕДИА ГАЛЕРЕЯ */}
               <div className={`transition-all duration-1000 delay-700 ${
                 isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
               }`}>
                 {mediaItems.length > 0 ? (
-                  <>
-                    <div className="relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl overflow-hidden border border-white/20 shadow-2xl group">
+                  <div className="space-y-4">
+                    {/* Основное изображение */}
+                    <div className="relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl overflow-hidden border border-white/20 shadow-2xl">
                       <div className="aspect-video relative">
-                        {mediaItems[activeMedia].type === 'image' ? (
-                          <img
-                            src={mediaItems[activeMedia].url}
-                            alt={mediaItems[activeMedia].title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            onError={(e) => {
-                              // Если изображение не загружается, показываем заглушку
-                              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgZmlsbD0iIzFlNzJhZCIvPjx0ZXh0IHg9IjQwMCIgeT0iMzAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkFjYWRlbXkgSW1hZ2U8L3RleHQ+PC9zdmc+';
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-blue-500/10 to-green-500/10 flex items-center justify-center">
-                            <div className="text-center p-6 md:p-8">
-                              <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-10 h-10 md:w-12 md:h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M8 5v14l11-7z"/>
-                                </svg>
-                              </div>
-                              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">{mediaItems[activeMedia].title}</h3>
-                              <p className="text-blue-100 text-lg">{mediaItems[activeMedia].description}</p>
-                            </div>
-                          </div>
-                        )}
+                        <SimpleImage
+                          src={mediaItems[activeMedia].url}
+                          alt={mediaItems[activeMedia].title}
+                          className="w-full h-full"
+                        />
                         
-                        {/* Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                          <div>
-                            <h3 className="text-white text-xl font-bold mb-2">{mediaItems[activeMedia].title}</h3>
-                            <p className="text-blue-100 text-sm">{mediaItems[activeMedia].description}</p>
-                          </div>
-                        </div>
-                        
-                        {/* Navigation Arrows */}
-                        {!isMobile && (
+                        {/* Кнопки навигации */}
+                        {mediaItems.length > 1 && (
                           <>
                             <button
                               onClick={prevMedia}
-                              className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-gray-700 hover:bg-white hover:text-blue-600 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-lg"
+                              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-700 hover:bg-white hover:text-blue-600 transition-all duration-300 shadow-lg"
                             >
-                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                               </svg>
                             </button>
                             <button
                               onClick={nextMedia}
-                              className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-gray-700 hover:bg-white hover:text-blue-600 transition-all duration-300 opacity-0 group-hover:opacity-100 shadow-lg"
+                              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center text-gray-700 hover:bg-white hover:text-blue-600 transition-all duration-300 shadow-lg"
                             >
-                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                               </svg>
                             </button>
                           </>
                         )}
                       </div>
-                    </div>
-                    
-                    {/* Media Thumbnails */}
-                    <div className="grid grid-cols-4 gap-3 mt-4">
-                      {mediaItems.map((item, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setActiveMedia(index)}
-                          className={`aspect-video rounded-xl overflow-hidden border-2 transition-all duration-300 group ${
-                            activeMedia === index
-                              ? 'border-green-400 shadow-lg scale-105'
-                              : 'border-white/20 hover:border-green-400/50 hover:shadow-md'
-                          }`}
-                        >
-                          <img
-                            src={item.thumbnail}
-                            alt={item.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            onError={(e) => {
-                              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzFlNzJhZCIvPjx0ZXh0IHg9IjEwMCIgeT0iNzUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+SW1hZ2U8L3RleHQ+PC9zdmc+';
-                            }}
-                          />
-                          <div className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-2 transition-all duration-300 ${
-                            activeMedia === index ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                          }`}>
-                            <span className="text-white text-xs font-medium truncate">{item.title}</span>
-                          </div>
-                        </button>
-                      ))}
+                      
+                      {/* Информация о текущем медиа */}
+                      <div className="p-4">
+                        <h3 className="text-white font-bold text-lg mb-1">
+                          {mediaItems[activeMedia].title}
+                        </h3>
+                        <p className="text-blue-100 text-sm">
+                          {mediaItems[activeMedia].description}
+                        </p>
+                      </div>
+
+                      {/* Индикатор прогресса */}
+                      {mediaItems.length > 1 && (
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                          {mediaItems.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => goToMedia(index)}
+                              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                activeMedia === index ? 'bg-green-400' : 'bg-white/40 hover:bg-white/60'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Mobile Navigation Dots */}
-                    {isMobile && (
-                      <div className="flex justify-center space-x-3 mt-6">
-                        {mediaItems.map((_, index) => (
+                    {/* Миниатюры */}
+                    {mediaItems.length > 1 && (
+                      <div className="grid grid-cols-4 gap-2">
+                        {mediaItems.map((item, index) => (
                           <button
                             key={index}
-                            onClick={() => setActiveMedia(index)}
-                            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                            onClick={() => goToMedia(index)}
+                            className={`aspect-video rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                               activeMedia === index
-                                ? 'bg-green-400 scale-125'
-                                : 'bg-white/30 hover:bg-white/50'
+                                ? 'border-green-400 shadow-md'
+                                : 'border-white/20 hover:border-green-400/50'
                             }`}
-                          />
+                          >
+                            <SimpleImage
+                              src={item.thumbnail}
+                              alt={item.title}
+                              className="w-full h-full"
+                            />
+                          </button>
                         ))}
                       </div>
                     )}
-                  </>
+                  </div>
                 ) : (
                   <div className="text-center py-12 text-blue-200">
-                    {t('academy.about.noMedia')}
+                    {t('academy.about.noMedia', 'Медиа контент недоступен')}
                   </div>
                 )}
               </div>
@@ -585,14 +581,6 @@ const AcademyAbout = () => {
           </>
         )}
       </div>
-
-      {/* Плавающие элементы для десктопа */}
-      {!isMobile && (
-        <>
-          <div className="absolute bottom-20 left-5 w-6 h-6 bg-green-400/20 rounded-full animate-bounce"></div>
-          <div className="absolute top-20 right-5 w-4 h-4 bg-blue-400/20 rounded-full animate-ping"></div>
-        </>
-      )}
     </section>
   );
 };

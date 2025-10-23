@@ -27,22 +27,22 @@ const CoachingFaculty = () => {
       ],
       about: {
         missionTitle: t('coachingFaculty.about.missionTitle', 'Миссия факультета'),
-        featuresTitle: t('coachingFaculty.about.featuresTitle', 'Ключевые особенности'),
+        advantagesTitle: t('coachingFaculty.about.advantagesTitle', 'Ключевые преимущества'),
+        achievementsTitle: t('coachingFaculty.about.achievementsTitle', 'Наши достижения'),
         mission: t('coachingFaculty.about.mission', 'Подготовка профессиональных тренеров и специалистов в области физической культуры и спорта.'),
-        features: Array.isArray(data.about?.features) ? data.about.features : [
+        advantages: Array.isArray(data.about?.advantages) ? data.about.advantages : [
           'Современные методики тренировок',
           'Практическая подготовка',
-          'Международные стандарты'
+          'Международные стандарты',
+          'Индивидуальный подход'
+        ],
+        achievements: Array.isArray(data.about?.achievements) ? data.about.achievements : [
+          { value: '50+', label: 'Чемпионов мира', icon: '🏆' },
+          { value: '100+', label: 'Кандидатов наук', icon: '🔬' },
+          { value: '25', label: 'Заслуженных тренеров', icon: '⭐' }
         ]
       },
-      specializations: Array.isArray(data.specializations) ? data.specializations : [
-        {
-          name: 'Спортивная подготовка',
-          description: 'Методики спортивной тренировки и подготовки спортсменов',
-          icon: '🏃‍♂️'
-        }
-      ],
-      educationPrograms: Array.isArray(data.educationPrograms) ? data.educationPrograms : [
+      programs: Array.isArray(data.programs) ? data.programs : [
         {
           name: 'Бакалавриат',
           description: 'Фундаментальная подготовка по тренерским дисциплинам',
@@ -50,42 +50,82 @@ const CoachingFaculty = () => {
           duration: '4 года',
           format: 'Очная',
           icon: '🎓',
-          subjects: ['Теория спорта', 'Методика тренировок', 'Спортивная психология']
-        }
-      ],
-      departments: Array.isArray(data.departments) ? data.departments : [
+          tuitionFee: '350000'
+        },
         {
-          name: 'Кафедра спортивных дисциплин',
-          field: 'Спортивная подготовка',
-          description: 'Подготовка специалистов в области спортивных дисциплин',
-          icon: '⚽',
-          head: 'Проф. Иванов А.С.',
-          email: 'sports@coaching.ru'
+          name: 'Магистратура',
+          description: 'Углубленная подготовка для профессиональных тренеров',
+          level: 'Магистр',
+          duration: '2 года',
+          format: 'Очная',
+          icon: '📚',
+          tuitionFee: '420000'
         }
       ],
-      coaches: Array.isArray(data.coaches) ? data.coaches : [
+      specializations: {
+        coachingTitle: t('coachingFaculty.specializations.coachingTitle', 'Тренерские специализации'),
+        sportsTitle: t('coachingFaculty.specializations.sportsTitle', 'Спортивные направления'),
+        coaching: Array.isArray(data.specializations?.coaching) ? data.specializations.coaching : [
+          {
+            name: 'Спортивная подготовка',
+            description: 'Методики спортивной тренировки и подготовки спортсменов',
+            icon: '🏃‍♂️',
+            competencies: ['Методика тренировок', 'Спортивная психология', 'Биомеханика']
+          },
+          {
+            name: 'Детско-юношеский спорт',
+            description: 'Подготовка тренеров для работы с молодыми спортсменами',
+            icon: '👦',
+            competencies: ['Возрастная физиология', 'Педагогика спорта', 'Отбор талантов']
+          }
+        ],
+        sports: Array.isArray(data.specializations?.sports) ? data.specializations.sports : [
+          {
+            name: 'Футбол',
+            category: 'Игровые виды',
+            coaches: '8',
+            icon: '⚽',
+            description: 'Подготовка тренеров по футболу'
+          },
+          {
+            name: 'Баскетбол',
+            category: 'Игровые виды',
+            coaches: '6',
+            icon: '🏀',
+            description: 'Подготовка тренеров по баскетболу'
+          },
+          {
+            name: 'Плавание',
+            category: 'Водные виды',
+            coaches: '5',
+            icon: '🏊',
+            description: 'Подготовка тренеров по плаванию'
+          }
+        ]
+      },
+      teachers: Array.isArray(data.teachers) ? data.teachers : [
         {
           name: 'Петр Сидоров',
           position: 'Старший тренер',
           qualification: 'Мастер спорта международного класса',
           avatar: 'ПС',
           specializations: ['Футбол', 'Баскетбол']
+        },
+        {
+          name: 'Мария Иванова',
+          position: 'Профессор',
+          qualification: 'Доктор педагогических наук',
+          avatar: 'МИ',
+          specializations: ['Спортивная психология', 'Методика тренировок']
+        },
+        {
+          name: 'Алексей Козлов',
+          position: 'Доцент',
+          qualification: 'Заслуженный тренер России',
+          avatar: 'АК',
+          specializations: ['Плавание', 'Биомеханика']
         }
       ],
-      achievements: {
-        graduatesTitle: t('coachingFaculty.achievements.graduatesTitle', 'Достижения выпускников'),
-        sportsTitle: t('coachingFaculty.achievements.sportsTitle', 'Спортивные достижения'),
-        graduates: Array.isArray(data.achievements?.graduates) ? data.achievements.graduates : [
-          {
-            title: 'Чемпионы мира',
-            description: 'Наши выпускники подготовили 50+ чемпионов мира',
-            icon: '🏆'
-          }
-        ],
-        sports: Array.isArray(data.achievements?.sports) ? data.achievements.sports : [
-          { discipline: 'Футбол', medals: '25' }
-        ]
-      },
       contacts: {
         title: t('coachingFaculty.contacts.title', 'Контакты'),
         deanTitle: t('coachingFaculty.contacts.deanTitle', 'Декан факультета'),
@@ -103,6 +143,11 @@ const CoachingFaculty = () => {
           label: 'Адрес',
           value: data.contacts?.address?.value || 'Москва, ул. Тренерская, д. 15',
           icon: '📍'
+        },
+        workingHours: {
+          label: 'Время работы',
+          value: data.contacts?.workingHours?.value || 'Пн-Пт: 9:00-18:00',
+          icon: '🕒'
         },
         dean: {
           name: data.contacts?.dean?.name || 'Сергей Козлов',
@@ -165,9 +210,8 @@ const CoachingFaculty = () => {
   const tabs = [
     { id: 'about', label: t('coachingFaculty.tabs.about', 'О факультете'), icon: '🎯', color: 'from-blue-500 to-cyan-500' },
     { id: 'programs', label: t('coachingFaculty.tabs.programs', 'Программы'), icon: '📚', color: 'from-green-500 to-emerald-500' },
-    { id: 'departments', label: t('coachingFaculty.tabs.departments', 'Кафедры'), icon: '🏢', color: 'from-purple-500 to-pink-500' },
-    { id: 'coaches', label: t('coachingFaculty.tabs.coaches', 'Тренеры'), icon: '👨‍🏫', color: 'from-orange-500 to-red-500' },
-    { id: 'achievements', label: t('coachingFaculty.tabs.achievements', 'Достижения'), icon: '🏆', color: 'from-yellow-500 to-amber-500' },
+    { id: 'specializations', label: t('coachingFaculty.tabs.specializations', 'Специализации'), icon: '🏃‍♂️', color: 'from-purple-500 to-pink-500' },
+    { id: 'teachers', label: t('coachingFaculty.tabs.teachers', 'Преподаватели'), icon: '👨‍🏫', color: 'from-orange-500 to-red-500' },
     { id: 'contacts', label: t('coachingFaculty.tabs.contacts', 'Контакты'), icon: '📞', color: 'from-indigo-500 to-purple-500' }
   ];
 
@@ -196,7 +240,8 @@ const CoachingFaculty = () => {
   const contactItems = [
     facultyData.contacts.phone,
     facultyData.contacts.email,
-    facultyData.contacts.address
+    facultyData.contacts.address,
+    facultyData.contacts.workingHours
   ].filter(Boolean);
 
   return (
@@ -362,10 +407,10 @@ const CoachingFaculty = () => {
                       <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl p-6 border border-blue-500/20 backdrop-blur-sm">
                         <h4 className="text-xl font-bold text-white mb-4 flex items-center">
                           <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white mr-3 text-sm">✨</span>
-                          {facultyData.about.featuresTitle}
+                          {facultyData.about.advantagesTitle}
                         </h4>
                         <ul className="space-y-4">
-                          {facultyData.about.features.map((feature, index) => (
+                          {facultyData.about.advantages.map((advantage, index) => (
                             <motion.li 
                               key={index} 
                               className="flex items-start group"
@@ -373,35 +418,33 @@ const CoachingFaculty = () => {
                               transition={{ duration: 0.3 }}
                             >
                               <span className="w-3 h-3 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full mt-2 mr-4 flex-shrink-0 group-hover:scale-150 transition-transform duration-300"></span>
-                              <span className="text-blue-100 text-lg group-hover:text-white transition-colors duration-300">{feature}</span>
+                              <span className="text-blue-100 text-lg group-hover:text-white transition-colors duration-300">{advantage}</span>
                             </motion.li>
                           ))}
                         </ul>
                       </div>
                     </div>
                     <div className="space-y-6">
-                      <h3 className="text-2xl font-bold text-white flex items-center">
-                        <span className="w-3 h-12 bg-gradient-to-b from-emerald-400 to-green-400 rounded mr-4"></span>
-                        {t('coachingFaculty.about.specializationsTitle', 'Специализации')}
-                      </h3>
-                      <div className="space-y-4">
-                        {facultyData.specializations.map((spec, index) => (
-                          <motion.div 
-                            key={index} 
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="flex items-start space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
-                          >
-                            <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
-                              {spec.icon}
-                            </div>
-                            <div>
-                              <h4 className="font-bold text-white text-xl mb-3 group-hover:text-emerald-300 transition-colors duration-300">{spec.name}</h4>
-                              <p className="text-blue-100 text-lg">{spec.description}</p>
-                            </div>
-                          </motion.div>
-                        ))}
+                      <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 rounded-2xl p-6 border border-emerald-500/20 backdrop-blur-sm">
+                        <h4 className="text-xl font-bold text-white mb-4 flex items-center">
+                          <span className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl flex items-center justify-center text-white mr-3 text-sm">🏆</span>
+                          {facultyData.about.achievementsTitle}
+                        </h4>
+                        <div className="space-y-4">
+                          {facultyData.about.achievements.map((achievement, index) => (
+                            <motion.div 
+                              key={index} 
+                              className="flex items-center space-x-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+                              whileHover={{ scale: 1.02 }}
+                            >
+                              <span className="text-3xl text-emerald-400 group-hover:scale-110 transition-transform duration-300">{achievement.icon}</span>
+                              <div>
+                                <div className="text-white font-bold text-xl">{achievement.value}</div>
+                                <div className="text-blue-200 text-lg">{achievement.label}</div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -419,7 +462,7 @@ const CoachingFaculty = () => {
                   className="space-y-8"
                 >
                   <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {facultyData.educationPrograms.map((program, index) => (
+                    {facultyData.programs.map((program, index) => (
                       <motion.div 
                         key={index}
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -453,6 +496,12 @@ const CoachingFaculty = () => {
                               <span className="text-blue-200">Форма:</span>
                               <span className="text-white font-semibold">{program.format}</span>
                             </div>
+                            {program.tuitionFee && (
+                              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
+                                <span className="text-blue-200">Стоимость:</span>
+                                <span className="text-white font-semibold">{program.tuitionFee} ₽</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </motion.div>
@@ -461,66 +510,91 @@ const CoachingFaculty = () => {
                 </motion.div>
               )}
 
-              {/* Departments Tab */}
-              {activeTab === 'departments' && (
+              {/* Specializations Tab */}
+              {activeTab === 'specializations' && (
                 <motion.div
-                  key="departments"
+                  key="specializations"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5 }}
                   className="space-y-8"
                 >
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {facultyData.departments.map((department, index) => (
-                      <motion.div 
-                        key={index}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-purple-400/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden backdrop-blur-sm"
-                        onMouseEnter={() => setHoveredCard(`department-${index}`)}
-                        onMouseLeave={() => setHoveredCard(null)}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
-                        
-                        <div className="relative z-10">
-                          <div className="flex items-start justify-between mb-4">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div>
+                      <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+                        <span className="w-3 h-12 bg-gradient-to-b from-blue-400 to-cyan-400 rounded mr-4"></span>
+                        {facultyData.specializations.coachingTitle}
+                      </h3>
+                      <div className="space-y-4">
+                        {facultyData.specializations.coaching.map((spec, index) => (
+                          <motion.div 
+                            key={index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-start space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-blue-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
+                          >
+                            <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
+                              {spec.icon}
+                            </div>
                             <div className="flex-1">
-                              <h3 className="text-2xl font-bold text-white group-hover:text-purple-300 transition-colors duration-300">
-                                {department.name}
-                              </h3>
-                              <p className="text-blue-200 text-lg mt-2">{department.field}</p>
-                            </div>
-                            <div className="w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white text-2xl ml-4 group-hover:scale-110 transition-transform duration-300">
-                              {department.icon}
-                            </div>
-                          </div>
-                          <p className="text-blue-100 text-lg leading-relaxed mb-6">{department.description}</p>
-                          
-                          <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center text-purple-400">
-                                👤
+                              <h4 className="font-bold text-white text-xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">{spec.name}</h4>
+                              <p className="text-blue-100 text-lg mb-4">{spec.description}</p>
+                              <div className="flex flex-wrap gap-2">
+                                {spec.competencies?.map((comp, i) => (
+                                  <motion.span 
+                                    key={i} 
+                                    className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-2xl text-base font-medium hover:bg-blue-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-blue-400/30"
+                                    whileHover={{ scale: 1.05 }}
+                                  >
+                                    {comp}
+                                  </motion.span>
+                                ))}
                               </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+                        <span className="w-3 h-12 bg-gradient-to-b from-emerald-400 to-green-400 rounded mr-4"></span>
+                        {facultyData.specializations.sportsTitle}
+                      </h3>
+                      <div className="space-y-4">
+                        {facultyData.specializations.sports.map((sport, index) => (
+                          <motion.div 
+                            key={index}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
+                          >
+                            <div className="flex items-center space-x-4">
+                              <span className="text-4xl group-hover:scale-110 transition-transform duration-300">{sport.icon}</span>
                               <div>
-                                <div className="text-white font-semibold">Заведующий</div>
-                                <div className="text-blue-200 text-sm">{department.head}</div>
+                                <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">{sport.name}</div>
+                                <div className="text-blue-200 text-lg">{sport.category}</div>
+                                <div className="text-blue-300 text-sm mt-1">{sport.description}</div>
                               </div>
                             </div>
-                            <div className="text-purple-400 font-semibold">{department.email}</div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
+                            <div className="text-right">
+                              <div className="text-white font-bold text-2xl">{sport.coaches}</div>
+                              <div className="text-blue-300 text-base">тренеров</div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               )}
 
-              {/* Coaches Tab */}
-              {activeTab === 'coaches' && (
+              {/* Teachers Tab */}
+              {activeTab === 'teachers' && (
                 <motion.div
-                  key="coaches"
+                  key="teachers"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -528,27 +602,27 @@ const CoachingFaculty = () => {
                   className="space-y-8"
                 >
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {facultyData.coaches.map((coach, index) => (
+                    {facultyData.teachers.map((teacher, index) => (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.1 }}
                         className="bg-white/5 rounded-2xl p-6 text-center border border-white/10 hover:border-orange-400/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden backdrop-blur-sm"
-                        onMouseEnter={() => setHoveredCard(`coach-${index}`)}
+                        onMouseEnter={() => setHoveredCard(`teacher-${index}`)}
                         onMouseLeave={() => setHoveredCard(null)}
                       >
                         <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
                         
                         <div className="relative z-10">
                           <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                            {coach.avatar}
+                            {teacher.avatar}
                           </div>
-                          <h4 className="text-xl font-bold text-white mb-2 group-hover:text-orange-300 transition-colors duration-300">{coach.name}</h4>
-                          <p className="text-orange-400 text-lg font-medium mb-2">{coach.position}</p>
-                          <p className="text-blue-200 text-base mb-4">{coach.qualification}</p>
+                          <h4 className="text-xl font-bold text-white mb-2 group-hover:text-orange-300 transition-colors duration-300">{teacher.name}</h4>
+                          <p className="text-orange-400 text-lg font-medium mb-2">{teacher.position}</p>
+                          <p className="text-blue-200 text-base mb-4">{teacher.qualification}</p>
                           <div className="flex flex-wrap gap-2 justify-center">
-                            {coach.specializations.map((spec, i) => (
+                            {teacher.specializations.map((spec, i) => (
                               <motion.span 
                                 key={i} 
                                 className="px-3 py-1 bg-orange-500/20 rounded-2xl text-orange-300 text-sm backdrop-blur-sm hover:bg-orange-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-orange-400/30"
@@ -561,69 +635,6 @@ const CoachingFaculty = () => {
                         </div>
                       </motion.div>
                     ))}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Achievements Tab */}
-              {activeTab === 'achievements' && (
-                <motion.div
-                  key="achievements"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  className="space-y-8"
-                >
-                  <div className="grid lg:grid-cols-2 gap-8">
-                    <div className="bg-gradient-to-br from-blue-500/10 to-transparent rounded-2xl p-8 border border-blue-400/20 backdrop-blur-sm">
-                      <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-                        <span className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">🏆</span>
-                        {facultyData.achievements.graduatesTitle}
-                      </h3>
-                      <div className="space-y-6">
-                        {facultyData.achievements.graduates.map((achievement, index) => (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="flex items-start space-x-6 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-blue-400/30 transition-all duration-300 group"
-                          >
-                            <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
-                              {achievement.icon}
-                            </div>
-                            <div>
-                              <h4 className="font-bold text-white text-xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">{achievement.title}</h4>
-                              <p className="text-blue-100 text-lg">{achievement.description}</p>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="bg-gradient-to-br from-yellow-500/10 to-amber-500/10 rounded-2xl p-8 border border-yellow-400/20 backdrop-blur-sm">
-                      <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-                        <span className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">⭐</span>
-                        {facultyData.achievements.sportsTitle}
-                      </h3>
-                      <div className="space-y-4">
-                        {facultyData.achievements.sports.map((sport, index) => (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-yellow-400/30 transition-all duration-300 group"
-                          >
-                            <span className="text-white font-bold text-xl group-hover:text-yellow-300 transition-colors duration-300">{sport.discipline}</span>
-                            <div className="text-right">
-                              <span className="text-yellow-400 font-bold text-3xl">{sport.medals}</span>
-                              <div className="text-yellow-300 text-base">медалей</div>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 </motion.div>
               )}

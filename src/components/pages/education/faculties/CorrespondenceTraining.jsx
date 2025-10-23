@@ -3,116 +3,259 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CorrespondenceTraining = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('about');
   const [hoveredCard, setHoveredCard] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [counterValues, setCounterValues] = useState([0, 0, 0, 0]);
+  const [apiData, setApiData] = useState({
+    faculty: null,
+    loading: true,
+    error: null
+  });
   const sectionRef = useRef(null);
 
-  // Получаем данные с проверками
-  const faculty = t('correspondenceTraining', { returnObjects: true }) || {};
-  
-  // Функция для нормализации данных - гарантирует, что поля являются массивами
-  const normalizeData = (data) => {
-    const defaultFaculty = {
-      name: t('correspondenceTraining.name', 'Заочное обучение'),
-      fullDescription: t('correspondenceTraining.fullDescription', 'Современное дистанционное образование с использованием передовых технологий.'),
+  // Загрузка данных с API
+  const fetchFacultyData = async () => {
+    try {
+      setApiData(prev => ({ ...prev, loading: true, error: null }));
+      const response = await fetch(`/api/education/faculties/?lang=${i18n.language}`);
+      const data = await response.json();
+      
+      if (data.results && data.results.length > 0) {
+        setApiData(prev => ({ ...prev, faculty: data.results[0], loading: false }));
+      } else {
+        setApiData(prev => ({ ...prev, error: 'No data found', loading: false }));
+      }
+    } catch (error) {
+      console.error('Error fetching faculty data:', error);
+      setApiData(prev => ({ ...prev, error: error.message, loading: false }));
+    }
+  };
+
+  useEffect(() => {
+    fetchFacultyData();
+  }, [i18n.language]);
+
+  // Функция для нормализации данных из API
+  const normalizeFacultyData = (apiFaculty) => {
+    if (!apiFaculty) return getDefaultData();
+
+    return {
+      name: apiFaculty.name || t('correspondenceTraining.name', 'Заочное обучение'),
+      fullDescription: apiFaculty.description || t('correspondenceTraining.fullDescription', 'Современное дистанционное образование с использованием передовых технологий.'),
       badge: t('correspondenceTraining.badge', 'Дистанционное образование'),
-      stats: Array.isArray(data.stats) ? data.stats : [
-        { label: 'Студентов онлайн', value: '3000+', icon: '👨‍💻' },
-        { label: 'Выпускников', value: '8000+', icon: '🎓' },
-        { label: 'Преподавателей', value: '200+', icon: '👨‍🏫' },
-        { label: 'Онлайн-курсов', value: '150+', icon: '📚' }
-      ],
+      stats: apiFaculty.statistics?.map(stat => ({
+        label: stat.meaning,
+        value: stat.titleInt,
+        icon: getIconForStat(stat.meaning)
+      })) || getDefaultData().stats,
       about: {
         missionTitle: t('correspondenceTraining.about.missionTitle', 'Миссия факультета'),
         advantagesTitle: t('correspondenceTraining.about.advantagesTitle', 'Ключевые преимущества'),
         achievementsTitle: t('correspondenceTraining.about.achievementsTitle', 'Наши достижения'),
-        mission: t('correspondenceTraining.about.mission', 'Обеспечение качественного дистанционного образования с использованием современных технологий.'),
-        advantages: Array.isArray(data.about?.advantages) ? data.about.advantages : [
-          'Гибкий график обучения',
-          'Доступ к материалам 24/7',
-          'Современные образовательные платформы'
-        ],
-        achievements: Array.isArray(data.about?.achievements) ? data.about.achievements : [
-          { value: '95%', label: 'Успеваемость', icon: '📊' },
-          { value: '50+', label: 'Партнеров', icon: '🤝' },
-          { value: '10', label: 'Лет опыта', icon: '⭐' }
-        ]
+        mission: Array.isArray(apiFaculty.mission) ? apiFaculty.mission.join('. ') : apiFaculty.mission,
+        advantages: apiFaculty.mission || getDefaultData().about.advantages,
+        achievements: apiFaculty.achievements?.map((achieve, index) => ({
+          value: achieve.split(' ')[0] || `${index + 1}+`,
+          label: achieve.split(' ').slice(1).join(' ') || 'Достижение',
+          icon: getAchievementIcon(index)
+        })) || getDefaultData().about.achievements
       },
-      programs: Array.isArray(data.programs) ? data.programs : [
-        {
-          name: 'Бакалавриат',
-          description: 'Фундаментальная подготовка по выбранной специальности',
-          level: 'Бакалавр',
-          duration: '4-4.5 года',
-          format: 'Заочная',
-          icon: '🎓'
-        },
-        {
-          name: 'Магистратура',
-          description: 'Углубленное изучение профессиональных дисциплин',
-          level: 'Магистр',
-          duration: '2-2.5 года',
-          format: 'Заочная',
-          icon: '📚'
-        }
-      ],
-      technologies: Array.isArray(data.technologies) ? data.technologies : [
-        {
-          name: 'LMS платформы',
-          description: 'Системы управления обучением',
-          icon: '🖥️',
-          features: ['Moodle', 'Canvas', 'Blackboard']
-        }
-      ],
-      platforms: Array.isArray(data.platforms) ? data.platforms : [
-        {
-          name: 'Онлайн-платформа',
-          description: 'Основная образовательная платформа',
-          students: '95%',
-          icon: '🌐'
-        }
-      ],
-      learningProcess: Array.isArray(data.learningProcess) ? data.learningProcess : [
-        {
-          step: '1',
-          title: 'Поступление',
-          description: 'Подача документов и зачисление',
-          duration: '1-2 недели',
-          icon: '📝'
-        }
-      ],
-      teachers: Array.isArray(data.teachers) ? data.teachers : [
-        {
-          name: 'Мария Иванова',
-          position: 'Профессор',
-          qualification: 'Доктор педагогических наук',
-          avatar: 'МИ',
-          specializations: ['Дистанционное образование', 'EdTech']
-        }
-      ],
+      programs: apiFaculty.programs?.map(program => ({
+        id: program.id,
+        name: program.name,
+        description: program.description,
+        level: program.degree,
+        duration: `${program.duration_years} ${t('correspondenceTraining.programs.years', 'лет')}`,
+        format: program.offline ? t('correspondenceTraining.programs.offline', 'Очная') : t('correspondenceTraining.programs.online', 'Онлайн'),
+        icon: program.emoji || '🎓',
+        tuitionFee: program.tuition_fee
+      })) || getDefaultData().programs,
+      specializations: apiFaculty.specializations?.map(spec => ({
+        id: spec.id,
+        name: spec.name,
+        description: spec.description,
+        icon: getSpecializationIcon(spec.name),
+        competencies: spec.features || getDefaultCompetencies(spec.name)
+      })) || getDefaultData().specializations,
+      technologies: apiFaculty.technologies?.map(tech => ({
+        id: tech.id,
+        name: tech.name,
+        description: tech.description,
+        icon: tech.emoji || '🖥️',
+        usage: tech.usage_percentage || '95%'
+      })) || getDefaultData().technologies,
+      teachers: apiFaculty.teachers?.map(teacher => ({
+        id: teacher.id,
+        name: teacher.full_name,
+        position: teacher.position,
+        qualification: teacher.qualification,
+        avatar: getInitials(teacher.full_name),
+        photo: teacher.photo,
+        specializations: teacher.specializations || ['Дистанционное образование']
+      })) || getDefaultData().teachers,
       contacts: {
-        phone: data.contacts?.phone || '+7 (495) 123-45-67',
-        email: data.contacts?.email || 'distance@university.ru',
-        address: data.contacts?.address || 'Москва, ул. Образовательная, д. 15',
-        workingHours: data.contacts?.workingHours || 'Пн-Пт: 9:00-18:00',
+        phone: apiFaculty.contacts?.find(c => c.title?.includes('телефон'))?.value || '+7 (495) 123-45-67',
+        email: apiFaculty.contacts?.find(c => c.title?.includes('email'))?.value || 'distance@university.ru',
+        address: apiFaculty.contacts?.find(c => c.title?.includes('адрес'))?.value || 'Москва, ул. Образовательная, д. 15',
+        workingHours: apiFaculty.contacts?.find(c => c.title?.includes('время'))?.value || 'Пн-Пт: 9:00-18:00',
         dean: {
-          name: data.contacts?.dean?.name || 'Сергей Петров',
-          position: data.contacts?.dean?.position || 'Декан факультета',
-          degree: data.contacts?.dean?.degree || 'Доктор педагогических наук, профессор',
-          email: data.contacts?.dean?.email || 'petrov@distance.ru',
-          avatar: data.contacts?.dean?.avatar || 'СП'
+          name: apiFaculty.dean?.name || 'Сергей Петров',
+          position: apiFaculty.dean?.position || 'Декан факультета',
+          degree: apiFaculty.dean?.degree || 'Доктор педагогических наук, профессор',
+          email: apiFaculty.dean?.email || 'petrov@distance.ru',
+          avatar: getInitials(apiFaculty.dean?.name || 'Сергей Петров')
         }
       }
     };
-
-    return defaultFaculty;
   };
 
-  // Нормализуем данные
-  const facultyData = normalizeData(faculty);
+  // Вспомогательные функции
+  const getDefaultData = () => ({
+    name: t('correspondenceTraining.name', 'Заочное обучение'),
+    fullDescription: t('correspondenceTraining.fullDescription', 'Современное дистанционное образование с использованием передовых технологий.'),
+    badge: t('correspondenceTraining.badge', 'Дистанционное образование'),
+    stats: [
+      { label: 'Студентов онлайн', value: '3000+', icon: '👨‍💻' },
+      { label: 'Выпускников', value: '8000+', icon: '🎓' },
+      { label: 'Преподавателей', value: '200+', icon: '👨‍🏫' },
+      { label: 'Онлайн-курсов', value: '150+', icon: '📚' }
+    ],
+    about: {
+      missionTitle: t('correspondenceTraining.about.missionTitle', 'Миссия факультета'),
+      advantagesTitle: t('correspondenceTraining.about.advantagesTitle', 'Ключевые преимущества'),
+      achievementsTitle: t('correspondenceTraining.about.achievementsTitle', 'Наши достижения'),
+      mission: t('correspondenceTraining.about.mission', 'Обеспечение качественного дистанционного образования с использованием современных технологий.'),
+      advantages: [
+        'Гибкий график обучения',
+        'Доступ к материалам 24/7',
+        'Современные образовательные платформы',
+        'Индивидуальный подход'
+      ],
+      achievements: [
+        { value: '95%', label: 'Успеваемость', icon: '📊' },
+        { value: '50+', label: 'Партнеров', icon: '🤝' },
+        { value: '10', label: 'Лет опыта', icon: '⭐' }
+      ]
+    },
+    programs: [
+      {
+        name: 'Бакалавриат',
+        description: 'Фундаментальная подготовка по выбранной специальности',
+        level: 'Бакалавр',
+        duration: '4-4.5 года',
+        format: 'Заочная',
+        icon: '🎓'
+      },
+      {
+        name: 'Магистратура',
+        description: 'Углубленное изучение профессиональных дисциплин',
+        level: 'Магистр',
+        duration: '2-2.5 года',
+        format: 'Заочная',
+        icon: '📚'
+      }
+    ],
+    specializations: [
+      {
+        name: 'Электронное обучение',
+        description: 'Технологии и методики дистанционного образования',
+        icon: '💻',
+        competencies: ['LMS системы', 'Электронные курсы', 'Виртуальные классы']
+      },
+      {
+        name: 'Образовательные технологии',
+        description: 'Современные подходы к организации учебного процесса',
+        icon: '🚀',
+        competencies: ['EdTech', 'Геймификация', 'Адаптивное обучение']
+      }
+    ],
+    technologies: [
+      {
+        name: 'LMS платформы',
+        description: 'Системы управления обучением',
+        icon: '🖥️',
+        usage: '95%'
+      },
+      {
+        name: 'Виртуальные классы',
+        description: 'Онлайн-платформы для проведения занятий',
+        icon: '🎥',
+        usage: '85%'
+      }
+    ],
+    teachers: [
+      {
+        name: 'Мария Иванова',
+        position: 'Профессор',
+        qualification: 'Доктор педагогических наук',
+        avatar: 'МИ',
+        specializations: ['Дистанционное образование', 'EdTech']
+      },
+      {
+        name: 'Алексей Смирнов',
+        position: 'Доцент',
+        qualification: 'Кандидат технических наук',
+        avatar: 'АС',
+        specializations: ['Образовательные технологии', 'LMS']
+      }
+    ],
+    contacts: {
+      phone: '+7 (495) 123-45-67',
+      email: 'distance@university.ru',
+      address: 'Москва, ул. Образовательная, д. 15',
+      workingHours: 'Пн-Пт: 9:00-18:00',
+      dean: {
+        name: 'Сергей Петров',
+        position: 'Декан факультета',
+        degree: 'Доктор педагогических наук, профессор',
+        email: 'petrov@distance.ru',
+        avatar: 'СП'
+      }
+    }
+  });
+
+  const getIconForStat = (meaning) => {
+    const icons = {
+      'студентов': '👨‍🎓',
+      'выпускников': '🎓',
+      'преподавателей': '👨‍🏫',
+      'курсов': '📚',
+      'онлайн': '👨‍💻',
+      'default': '📊'
+    };
+    return icons[meaning?.toLowerCase()] || icons.default;
+  };
+
+  const getAchievementIcon = (index) => {
+    const icons = ['📊', '🤝', '⭐', '🎯', '🚀'];
+    return icons[index] || icons[0];
+  };
+
+  const getSpecializationIcon = (name) => {
+    const icons = {
+      'электронное': '💻',
+      'образовательные': '🚀',
+      'дистанционное': '🌐',
+      'default': '🎯'
+    };
+    return icons[name?.toLowerCase().split(' ')[0]] || icons.default;
+  };
+
+  const getDefaultCompetencies = (name) => {
+    if (name?.includes('Электронное')) {
+      return ['LMS системы', 'Электронные курсы', 'Виртуальные классы'];
+    }
+    return ['EdTech', 'Геймификация', 'Адаптивное обучение'];
+  };
+
+  const getInitials = (fullName) => {
+    return fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || 'NN';
+  };
+
+  // Получаем нормализованные данные
+  const facultyData = normalizeFacultyData(apiData.faculty);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -130,7 +273,7 @@ const CorrespondenceTraining = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [facultyData.stats]);
 
   const startCounters = () => {
     const targetValues = facultyData.stats.map(stat => parseInt(stat.value.replace(/\D/g, '')) || 0);
@@ -156,11 +299,12 @@ const CorrespondenceTraining = () => {
     }, duration / steps);
   };
 
+  // Табы в нужном порядке
   const tabs = [
     { id: 'about', label: t('correspondenceTraining.tabs.about', 'О факультете'), icon: '🏢', color: 'from-blue-500 to-cyan-500' },
     { id: 'programs', label: t('correspondenceTraining.tabs.programs', 'Программы'), icon: '📚', color: 'from-green-500 to-emerald-500' },
-    { id: 'technology', label: t('correspondenceTraining.tabs.technology', 'Технологии'), icon: '🖥️', color: 'from-blue-500 to-green-500' },
-    { id: 'process', label: t('correspondenceTraining.tabs.process', 'Процесс обучения'), icon: '🔄', color: 'from-cyan-500 to-blue-500' },
+    { id: 'specializations', label: t('correspondenceTraining.tabs.specializations', 'Специализации'), icon: '🎯', color: 'from-blue-500 to-green-500' },
+    { id: 'teachers', label: t('correspondenceTraining.tabs.teachers', 'Преподаватели'), icon: '👨‍🏫', color: 'from-cyan-500 to-blue-500' },
     { id: 'contacts', label: t('correspondenceTraining.tabs.contacts', 'Контакты'), icon: '📞', color: 'from-emerald-500 to-green-500' }
   ];
 
@@ -184,6 +328,34 @@ const CorrespondenceTraining = () => {
       }
     }
   };
+
+  if (apiData.loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-500 mb-4"></div>
+          <p className="text-blue-100 text-xl">{t('common.loading', 'Загрузка...')}</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (apiData.error) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">😕</div>
+          <p className="text-blue-100 text-xl mb-4">{t('common.error', 'Ошибка загрузки данных')}</p>
+          <button 
+            onClick={fetchFacultyData}
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 text-white rounded-2xl hover:scale-105 transition-transform duration-300"
+          >
+            {t('common.retry', 'Попробовать снова')}
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section 
@@ -264,7 +436,6 @@ const CorrespondenceTraining = () => {
               onMouseEnter={() => setHoveredCard(index)}
               onMouseLeave={() => setHoveredCard(null)}
             >
-              {/* Background effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
               
               <div className="relative z-10">
@@ -405,7 +576,7 @@ const CorrespondenceTraining = () => {
                   <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
                     {facultyData.programs.map((program, index) => (
                       <motion.div 
-                        key={index}
+                        key={program.id || index}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.1 }}
@@ -413,7 +584,6 @@ const CorrespondenceTraining = () => {
                         onMouseEnter={() => setHoveredCard(`program-${index}`)}
                         onMouseLeave={() => setHoveredCard(null)}
                       >
-                        {/* Background effect */}
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
                         
                         <div className="relative z-10">
@@ -437,6 +607,12 @@ const CorrespondenceTraining = () => {
                               <span className="text-blue-200">{t('correspondenceTraining.programs.format', 'Форма')}:</span>
                               <span className="text-white font-semibold">{program.format}</span>
                             </div>
+                            {program.tuitionFee && (
+                              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
+                                <span className="text-blue-200">{t('correspondenceTraining.programs.tuition', 'Стоимость')}:</span>
+                                <span className="text-white font-semibold">{program.tuitionFee} ₽</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </motion.div>
@@ -445,10 +621,10 @@ const CorrespondenceTraining = () => {
                 </motion.div>
               )}
 
-              {/* Technology Tab */}
-              {activeTab === 'technology' && (
+              {/* Specializations Tab */}
+              {activeTab === 'specializations' && (
                 <motion.div
-                  key="technology"
+                  key="specializations"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -459,31 +635,31 @@ const CorrespondenceTraining = () => {
                     <div>
                       <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
                         <span className="w-3 h-12 bg-gradient-to-b from-blue-400 to-cyan-400 rounded mr-4"></span>
-                        {t('correspondenceTraining.technology.title', 'Технологии обучения')}
+                        {t('correspondenceTraining.specializations.title', 'Направления подготовки')}
                       </h3>
                       <div className="space-y-4">
-                        {facultyData.technologies.map((tech, index) => (
+                        {facultyData.specializations.map((spec, index) => (
                           <motion.div 
-                            key={index} 
+                            key={spec.id || index}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
                             className="flex items-start space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-blue-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
                           >
                             <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
-                              {tech.icon}
+                              {spec.icon}
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-bold text-white text-xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">{tech.name}</h4>
-                              <p className="text-blue-100 text-lg mb-4">{tech.description}</p>
+                              <h4 className="font-bold text-white text-xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">{spec.name}</h4>
+                              <p className="text-blue-100 text-lg mb-4">{spec.description}</p>
                               <div className="flex flex-wrap gap-2">
-                                {tech.features?.map((feature, i) => (
+                                {spec.competencies?.map((comp, i) => (
                                   <motion.span 
                                     key={i} 
                                     className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-2xl text-base font-medium hover:bg-blue-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-blue-400/30"
                                     whileHover={{ scale: 1.05 }}
                                   >
-                                    {feature}
+                                    {comp}
                                   </motion.span>
                                 ))}
                               </div>
@@ -495,27 +671,27 @@ const CorrespondenceTraining = () => {
                     <div>
                       <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
                         <span className="w-3 h-12 bg-gradient-to-b from-emerald-400 to-green-400 rounded mr-4"></span>
-                        {t('correspondenceTraining.platforms.title', 'Образовательные платформы')}
+                        {t('correspondenceTraining.technologies.title', 'Технологии обучения')}
                       </h3>
                       <div className="space-y-4">
-                        {facultyData.platforms.map((platform, index) => (
+                        {facultyData.technologies.map((tech, index) => (
                           <motion.div 
-                            key={index} 
+                            key={tech.id || index}
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
                             className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
                           >
                             <div className="flex items-center space-x-4">
-                              <span className="text-4xl group-hover:scale-110 transition-transform duration-300">{platform.icon}</span>
+                              <span className="text-4xl group-hover:scale-110 transition-transform duration-300">{tech.icon}</span>
                               <div>
-                                <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">{platform.name}</div>
-                                <div className="text-blue-200 text-lg">{platform.description}</div>
+                                <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">{tech.name}</div>
+                                <div className="text-blue-200 text-lg">{tech.description}</div>
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-white font-bold text-2xl">{platform.students}</div>
-                              <div className="text-blue-300 text-base">{t('correspondenceTraining.platforms.usage', 'студентов')}</div>
+                              <div className="text-white font-bold text-2xl">{tech.usage}</div>
+                              <div className="text-emerald-300 text-base">{t('correspondenceTraining.technologies.usage', 'использование')}</div>
                             </div>
                           </motion.div>
                         ))}
@@ -525,10 +701,10 @@ const CorrespondenceTraining = () => {
                 </motion.div>
               )}
 
-              {/* Process Tab */}
-              {activeTab === 'process' && (
+              {/* Teachers Tab */}
+              {activeTab === 'teachers' && (
                 <motion.div
-                  key="process"
+                  key="teachers"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -536,38 +712,40 @@ const CorrespondenceTraining = () => {
                   className="space-y-8"
                 >
                   <h3 className="text-3xl font-bold text-white text-center mb-8 flex items-center justify-center">
-                    <span className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">🔄</span>
-                    {t('correspondenceTraining.learningProcess.title', 'Процесс обучения')}
+                    <span className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">👨‍🏫</span>
+                    {t('correspondenceTraining.teachers.title', 'Преподавательский состав')}
                   </h3>
                   
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {facultyData.learningProcess.map((step, index) => (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+                    {facultyData.teachers.map((teacher, index) => (
                       <motion.div
-                        key={index}
+                        key={teacher.id || index}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
                         className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-cyan-400/30 transition-all duration-500 transform hover:-translate-y-2 group text-center relative overflow-hidden backdrop-blur-sm"
-                        onMouseEnter={() => setHoveredCard(`process-${index}`)}
+                        onMouseEnter={() => setHoveredCard(`teacher-${index}`)}
                         onMouseLeave={() => setHoveredCard(null)}
                       >
-                        {/* Background effect */}
                         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
                         
                         <div className="relative z-10">
-                          <div className={`text-5xl mb-4 transition-transform duration-500 ${
-                            hoveredCard === `process-${index}` ? 'scale-110 rotate-6' : 'group-hover:scale-105'
-                          }`}>
-                            {step.icon}
+                          <div className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                            {teacher.avatar}
                           </div>
-                          <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center text-white font-bold text-lg mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                            {step.step}
-                          </div>
-                          <h4 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors duration-300">{step.title}</h4>
-                          <p className="text-blue-100 text-lg mb-4 leading-relaxed">{step.description}</p>
-                          <div className="flex items-center justify-center text-cyan-400 text-lg font-medium">
-                            <span className="mr-2">⏱️</span>
-                            {step.duration}
+                          <h4 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors duration-300">{teacher.name}</h4>
+                          <p className="text-cyan-400 text-lg mb-2">{teacher.position}</p>
+                          <p className="text-blue-100 text-lg mb-4">{teacher.qualification}</p>
+                          <div className="flex flex-wrap justify-center gap-2">
+                            {teacher.specializations?.map((spec, i) => (
+                              <motion.span 
+                                key={i} 
+                                className="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-xl text-sm font-medium hover:bg-cyan-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-cyan-400/30"
+                                whileHover={{ scale: 1.05 }}
+                              >
+                                {spec}
+                              </motion.span>
+                            ))}
                           </div>
                         </div>
                       </motion.div>
