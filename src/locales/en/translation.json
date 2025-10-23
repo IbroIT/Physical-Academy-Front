@@ -6176,6 +6176,7 @@
       ]
     },
     "programs": {
+      "years": "years",
       "title": "Doctoral Programs",
       "list": [
         {
@@ -6781,6 +6782,19 @@
     ]
   },
   "doctorateProgram": {
+    "downloadBrochure": "Download Brochure",
+    "scheduleConsultation": "Schedule Consultation",
+    "benefitsTitle": "Program Benefits",
+    "applyForFunding": "Apply Now",
+    "september": "September 2024",
+    "places": "Places available",
+    "startDate": "Start Date",
+    "fullTime": "Full-time",
+    "years": "years",
+    "format": "Educational Format",
+    "tuitionFee": "Tuition Fee",
+    "perYear": "per year",
+    "tuitionRequired": "Tuition Required",
     "title": "Doctoral Studies",
     "subtitle": "Advanced research in physical culture and sports under guidance of leading scientists",
     "stats": {
