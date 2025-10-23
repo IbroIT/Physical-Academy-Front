@@ -7856,5 +7856,32 @@
   "flatView": "Flat view",
   "active": "Active",
   "all": "All"
-}
+},
+"scopus": {
+    "title": "Scopus Publications",
+    "subtitle": "Scientific publications and research metrics in Scopus database",
+    "researchMetrics": "Research Metrics",
+    "citations": "Citations",
+    "hIndex": "H-Index",
+    "year": "Year",
+    "doi": "DOI",
+    "authors": "Authors",
+    "journal": "Journal",
+    "abstract": "Abstract",
+    "viewPublication": "View Publication",
+    "viewDOI": "View DOI",
+    "view": "View",
+    "filterByYear": "Filter by Year",
+    "filterByType": "Filter by Document Type",
+    "filterByJournal": "Filter by Journal",
+    "allYears": "All Years",
+    "allTypes": "All Document Types",
+    "allJournals": "All Journals",
+    "showMore": "Show Details",
+    "showLess": "Hide Details",
+    "noPublications": "No publications found",
+    "noPublicationsDescription": "There are no publications matching the selected filters",
+    "errorTitle": "Failed to load data",
+    "retry": "Try Again"
+  }
 }

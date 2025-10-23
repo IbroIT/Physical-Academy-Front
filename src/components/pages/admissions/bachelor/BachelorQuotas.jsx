@@ -363,7 +363,9 @@ const BachelorQuotas = () => {
                         <div className="mb-6">
                           <h4 className="font-bold text-white mb-3">{t('bachelorQuotas.benefits')}</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            {filteredQuotas[activeQuota]?.benefits.map((benefit, index) => (
+                            {filteredQuotas[activeQuota]?.benefits
+                              .sort((a, b) => a.order - b.order)
+                              .map((benefit, index) => (
                               <div key={benefit.id} className="flex items-center space-x-2 text-blue-200">
                                 <span className="text-emerald-400">✓</span>
                                 <span className="text-sm">{benefit.benefit}</span>
@@ -379,7 +381,9 @@ const BachelorQuotas = () => {
                       <div className="w-full lg:w-96 bg-white/5 rounded-2xl p-6 border border-white/10">
                         <h4 className="font-bold text-white mb-4">{t('bachelorQuotas.requirements')}</h4>
                         <div className="space-y-3">
-                          {filteredQuotas[activeQuota]?.requirements.map((requirement, index) => (
+                          {filteredQuotas[activeQuota]?.requirements
+                            .sort((a, b) => a.order - b.order)
+                            .map((requirement, index) => (
                             <div key={requirement.id} className="flex items-start space-x-3">
                               <span className="flex-shrink-0 w-6 h-6 bg-blue-500/20 text-blue-300 rounded-full text-xs flex items-center justify-center mt-0.5">
                                 {index + 1}
@@ -458,7 +462,10 @@ const BachelorQuotas = () => {
                               {t('bachelorQuotas.keyRequirements')}
                             </h5>
                             <div className="space-y-1">
-                              {quota.requirements.slice(0, 2).map((req, idx) => (
+                              {quota.requirements
+                                .sort((a, b) => a.order - b.order)
+                                .slice(0, 2)
+                                .map((req, idx) => (
                                 <div key={req.id} className="flex items-center space-x-2 text-blue-200 text-xs">
                                   <span className="text-emerald-400 text-xs">•</span>
                                   <span className="line-clamp-1">{req.requirement}</span>
@@ -517,7 +524,9 @@ const BachelorQuotas = () => {
                                       {t('bachelorQuotas.fullRequirements')}
                                     </h5>
                                     <div className="space-y-2">
-                                      {quota.requirements.map((requirement, reqIndex) => (
+                                      {quota.requirements
+                                        .sort((a, b) => a.order - b.order)
+                                        .map((requirement, reqIndex) => (
                                         <div key={requirement.id} className="flex items-start space-x-3">
                                           <span className="flex-shrink-0 w-5 h-5 bg-blue-500/20 text-blue-300 rounded-full text-xs flex items-center justify-center mt-0.5">
                                             {reqIndex + 1}
@@ -536,7 +545,9 @@ const BachelorQuotas = () => {
                                       {t('bachelorQuotas.benefits')}
                                     </h5>
                                     <div className="grid grid-cols-1 gap-2">
-                                      {quota.benefits.map((benefit) => (
+                                      {quota.benefits
+                                        .sort((a, b) => a.order - b.order)
+                                        .map((benefit) => (
                                         <div key={benefit.id} className="flex items-center space-x-2 text-blue-200 text-sm">
                                           <span className="text-emerald-400">✓</span>
                                           <span>{benefit.benefit}</span>
@@ -581,15 +592,17 @@ const BachelorQuotas = () => {
                   {t('bachelorQuotas.applicationProcess')}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {backendData.process_steps.map((step, index) => (
+                  {backendData.process_steps
+                    .sort((a, b) => a.step_number - b.step_number)
+                    .map((step, index) => (
                     <motion.div
                       key={step.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.9 + index * 0.1 }}
-                      className="bg-white/5 rounded-3xl p-6 backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+                      className="bg-white/5 rounded-3xl p-6 backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group text-center"
                     >
-                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-r ${step.color_scheme || 'from-blue-500 to-emerald-500'} flex items-center justify-center text-white font-bold text-lg mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-r ${step.color_scheme || 'from-blue-500 to-emerald-500'} flex items-center justify-center text-white font-bold text-lg mb-4 mx-auto group-hover:scale-110 transition-transform duration-300`}>
                         {step.step_number}
                       </div>
                       <h3 className="font-bold text-white text-lg mb-3">
@@ -617,7 +630,9 @@ const BachelorQuotas = () => {
                     {t('bachelorQuotas.additionalSupport')}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {backendData.additional_support.map((support, index) => (
+                    {backendData.additional_support
+                      .sort((a, b) => a.order - b.order)
+                      .map((support, index) => (
                       <div key={support.id} className="flex items-center space-x-3 p-4 bg-white/5 rounded-2xl border border-white/10">
                         <span className="text-emerald-400 text-lg">💡</span>
                         <span className="text-blue-200 text-sm">{support.support}</span>

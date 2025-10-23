@@ -10,7 +10,6 @@ const StudentScientificSociety = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [expandedFeature, setExpandedFeature] = useState(null);
   
-  // Состояния для данных с бэкенда
   const [backendData, setBackendData] = useState({
     info: [],
     stats: [],
@@ -106,7 +105,7 @@ const StudentScientificSociety = () => {
       });
 
     } catch (error) {
-      console.error('Error fetching Student Scientific Society data:', error);
+      console.error('Error fetching data:', error);
       setBackendData(prev => ({
         ...prev,
         loading: false,
@@ -143,6 +142,7 @@ const StudentScientificSociety = () => {
     };
   }, [i18n, fetchBackendData]);
 
+  // Остальные useEffect
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
@@ -156,7 +156,6 @@ const StudentScientificSociety = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Автопереключение проектов
   useEffect(() => {
     if (backendData.projects.length > 0) {
       const interval = setInterval(() => {
@@ -302,6 +301,7 @@ const StudentScientificSociety = () => {
   const upcomingEvents = useMemo(() => {
     return safeArray(backendData.events)
       .filter(event => event.status === 'upcoming')
+      .slice(0, 3)
       .slice(0, 3)
       .map(event => ({
         name: safeString(event.name, 'Event'),
