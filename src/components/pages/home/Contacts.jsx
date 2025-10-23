@@ -82,7 +82,6 @@ const Contacts = () => {
     }))
   : [];
 
-
   const contactInfo = [
     {
       icon: <PhoneIcon />,
@@ -103,6 +102,19 @@ const Contacts = () => {
       link: contacts.contactInfo.location.link
     }
   ];
+
+  // Функция для нормализации URL
+  const normalizeUrl = (url) => {
+    if (!url) return '#';
+    
+    // Если URL уже абсолютный (начинается с http или /), возвращаем как есть
+    if (url.startsWith('http') || url.startsWith('/')) {
+      return url;
+    }
+    
+    // Если URL относительный, добавляем / в начало
+    return `/${url}`;
+  };
 
   return (
     <footer className="bg-gradient-to-r from-blue-600 via-teal-500 to-emerald-500 text-white relative overflow-hidden">
@@ -136,10 +148,12 @@ const Contacts = () => {
                 {socialLinks.map((social, index) => (
                   <motion.a
                     key={index}
-                    href={social.url}
+                    href={normalizeUrl(social.url)}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     className={`w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center text-white transition-all duration-300 ${social.color} border border-white/30`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     {social.icon}
                   </motion.a>
@@ -161,7 +175,7 @@ const Contacts = () => {
                 {contactInfo.map((contact, index) => (
                   <motion.a
                     key={index}
-                    href={contact.link}
+                    href={normalizeUrl(contact.link)}
                     whileHover={{ x: 5 }}
                     className="flex items-center space-x-3 text-white/90 hover:text-white transition-colors duration-300 group"
                   >
@@ -191,7 +205,7 @@ const Contacts = () => {
                 {contacts.links.items.map((link, index) => (
                   <motion.a
                     key={index}
-                    href={link.url}
+                    href={normalizeUrl(link.url)}
                     whileHover={{ x: 5 }}
                     className="block text-white/90 hover:text-white transition-colors duration-300 text-sm"
                   >
@@ -241,10 +255,10 @@ const Contacts = () => {
               {contacts.footer.copyright}
             </p>
             <div className="flex space-x-6 text-sm">
-              <a href={contacts.footer.privacy.url} className="text-white/80 hover:text-white transition-colors duration-300">
+              <a href={normalizeUrl(contacts.footer.privacy.url)} className="text-white/80 hover:text-white transition-colors duration-300">
                 {contacts.footer.privacy.name}
               </a>
-              <a href={contacts.footer.terms.url} className="text-white/80 hover:text-white transition-colors duration-300">
+              <a href={normalizeUrl(contacts.footer.terms.url)} className="text-white/80 hover:text-white transition-colors duration-300">
                 {contacts.footer.terms.name}
               </a>
             </div>

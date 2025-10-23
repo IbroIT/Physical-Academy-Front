@@ -44,68 +44,102 @@ const MilitaryTraining = () => {
       },
       programs: Array.isArray(data.programs) ? data.programs : [
         {
+          id: 1,
           name: 'Офицерская подготовка',
           description: 'Комплексная программа подготовки младших офицеров',
           level: 'Лейтенант',
           duration: '4 года',
           format: 'Очная',
           icon: '🎖️',
-          subjects: ['Тактическая подготовка', 'Огневая подготовка', 'Строевая подготовка']
+          tuitionFee: 'Бесплатно'
         },
         {
+          id: 2,
           name: 'Специальная подготовка',
           description: 'Углубленная подготовка по специальным военным дисциплинам',
           level: 'Специалист',
           duration: '2 года',
           format: 'Очная',
           icon: '⚔️',
-          subjects: ['Разведка', 'Связь', 'Инженерная подготовка']
-        }
-      ],
-      specialties: Array.isArray(data.specialties) ? data.specialties : [
-        {
-          name: 'Командная тактика',
-          description: 'Подготовка командиров подразделений',
-          icon: '🎯',
-          skills: ['Тактическое планирование', 'Управление подразделением', 'Боевое применение']
+          tuitionFee: 'Бесплатно'
         },
         {
+          id: 3,
+          name: 'Командирская подготовка',
+          description: 'Подготовка командиров подразделений',
+          level: 'Капитан',
+          duration: '3 года',
+          format: 'Очная',
+          icon: '👨‍✈️',
+          tuitionFee: 'Бесплатно'
+        }
+      ],
+      specializations: Array.isArray(data.specializations) ? data.specializations : [
+        {
+          id: 1,
+          name: 'Командная тактика',
+          description: 'Подготовка командиров подразделений для эффективного управления в боевых условиях',
+          icon: '🎯',
+          competencies: ['Тактическое планирование', 'Управление подразделением', 'Боевое применение', 'Стратегическое мышление']
+        },
+        {
+          id: 2,
           name: 'Огневая подготовка',
           description: 'Специализация по стрелковому оружию и артиллерии',
           icon: '🔫',
-          skills: ['Меткая стрельба', 'Тактика огня', 'Техническое обслуживание']
-        }
-      ],
-      facilities: Array.isArray(data.facilities) ? data.facilities : [
-        {
-          name: 'Стрелковый тир',
-          description: 'Современный тир для огневой подготовки',
-          equipment: '20 стрелковых мест',
-          icon: '🎯'
+          competencies: ['Меткая стрельба', 'Тактика огня', 'Техническое обслуживание', 'Боеприпасы']
         },
         {
-          name: 'Тактический полигон',
-          description: 'Полигон для отработки тактических действий',
-          equipment: '5 га площадей',
-          icon: '🏹'
+          id: 3,
+          name: 'Разведывательная деятельность',
+          description: 'Подготовка специалистов по сбору и анализу разведданных',
+          icon: '🕵️',
+          competencies: ['Работа с картами', 'Наблюдение', 'Анализ данных', 'Скрытное перемещение']
+        },
+        {
+          id: 4,
+          name: 'Инженерная подготовка',
+          description: 'Специализация по военно-инженерному делу',
+          icon: '⚙️',
+          competencies: ['Саперное дело', 'Фортификация', 'Взрывные работы', 'Инженерные сооружения']
         }
       ],
-      command: Array.isArray(data.command) ? data.command : [
+      teachers: Array.isArray(data.teachers) ? data.teachers : [
         {
+          id: 1,
           name: 'Иван Сидоров',
           position: 'Начальник факультета',
-          rank: 'Полковник',
-          education: 'Высшее военное образование',
+          qualification: 'Доктор военных наук, профессор',
           avatar: '👨‍✈️',
-          specializations: ['Тактическая подготовка', 'Огневая подготовка']
+          specializations: ['Тактическая подготовка', 'Огневая подготовка'],
+          experience: '25 лет'
         },
         {
+          id: 2,
           name: 'Петр Васильев',
           position: 'Заместитель начальника',
-          rank: 'Подполковник',
-          education: 'Высшее военное образование',
+          qualification: 'Кандидат военных наук, доцент',
           avatar: '👨‍💼',
-          specializations: ['Строевая подготовка', 'Физическая подготовка']
+          specializations: ['Строевая подготовка', 'Физическая подготовка'],
+          experience: '20 лет'
+        },
+        {
+          id: 3,
+          name: 'Алексей Козлов',
+          position: 'Старший преподаватель',
+          qualification: 'Мастер военного дела',
+          avatar: '🎖️',
+          specializations: ['Разведывательная деятельность', 'Тактическая медицина'],
+          experience: '15 лет'
+        },
+        {
+          id: 4,
+          name: 'Михаил Орлов',
+          position: 'Преподаватель',
+          qualification: 'Специалист по вооружению',
+          avatar: '🔫',
+          specializations: ['Огневая подготовка', 'Военная техника'],
+          experience: '12 лет'
         }
       ],
       contacts: {
@@ -116,10 +150,10 @@ const MilitaryTraining = () => {
         dean: {
           name: data.contacts?.dean?.name || 'Алексей Иванов',
           position: data.contacts?.dean?.position || 'Начальник факультета',
-          rank: data.contacts?.dean?.rank || 'Полковник',
-          education: data.contacts?.dean?.education || 'Высшее военное образование',
+          qualification: data.contacts?.dean?.qualification || 'Доктор военных наук, профессор',
           email: data.contacts?.dean?.email || 'dean@academy.edu',
-          avatar: data.contacts?.dean?.avatar || '👨‍✈️'
+          avatar: data.contacts?.dean?.avatar || '👨‍✈️',
+          experience: '30 лет'
         }
       }
     };
@@ -175,10 +209,9 @@ const MilitaryTraining = () => {
   const tabs = [
     { id: 'about', label: t('militaryTraining.tabs.about', 'О факультете'), icon: '🎖️', color: 'from-blue-500 to-cyan-500' },
     { id: 'programs', label: t('militaryTraining.tabs.programs', 'Программы'), icon: '⚔️', color: 'from-green-500 to-emerald-500' },
-    { id: 'specialties', label: t('militaryTraining.tabs.specialties', 'Специальности'), icon: '🎯', color: 'from-blue-500 to-green-500' },
-    { id: 'facilities', label: t('militaryTraining.tabs.facilities', 'Объекты'), icon: '🏹', color: 'from-cyan-500 to-blue-500' },
-    { id: 'command', label: t('militaryTraining.tabs.command', 'Командование'), icon: '👨‍✈️', color: 'from-emerald-500 to-green-500' },
-    { id: 'contacts', label: t('militaryTraining.tabs.contacts', 'Контакты'), icon: '📞', color: 'from-purple-500 to-pink-500' }
+    { id: 'specializations', label: t('militaryTraining.tabs.specializations', 'Специализации'), icon: '🎯', color: 'from-blue-500 to-green-500' },
+    { id: 'teachers', label: t('militaryTraining.tabs.teachers', 'Преподаватели'), icon: '👨‍✈️', color: 'from-cyan-500 to-blue-500' },
+    { id: 'contacts', label: t('militaryTraining.tabs.contacts', 'Контакты'), icon: '📞', color: 'from-emerald-500 to-green-500' }
   ];
 
   const containerVariants = {
@@ -419,10 +452,10 @@ const MilitaryTraining = () => {
                   transition={{ duration: 0.5 }}
                   className="space-y-8"
                 >
-                  <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {facultyData.programs.map((program, index) => (
                       <motion.div 
-                        key={index}
+                        key={program.id || index}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.1 }}
@@ -454,20 +487,12 @@ const MilitaryTraining = () => {
                               <span className="text-blue-200">Форма:</span>
                               <span className="text-white font-semibold">{program.format}</span>
                             </div>
-                          </div>
-                          <div className="mt-6">
-                            <h5 className="text-white font-semibold mb-3">Дисциплины:</h5>
-                            <div className="flex flex-wrap gap-2">
-                              {program.subjects?.map((subject, i) => (
-                                <motion.span 
-                                  key={i} 
-                                  className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-xl text-sm font-medium hover:bg-blue-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-blue-400/30"
-                                  whileHover={{ scale: 1.05 }}
-                                >
-                                  {subject}
-                                </motion.span>
-                              ))}
-                            </div>
+                            {program.tuitionFee && (
+                              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
+                                <span className="text-blue-200">Стоимость:</span>
+                                <span className="text-white font-semibold">{program.tuitionFee}</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </motion.div>
@@ -476,10 +501,10 @@ const MilitaryTraining = () => {
                 </motion.div>
               )}
 
-              {/* Specialties Tab */}
-              {activeTab === 'specialties' && (
+              {/* Specializations Tab */}
+              {activeTab === 'specializations' && (
                 <motion.div
-                  key="specialties"
+                  key="specializations"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -487,32 +512,30 @@ const MilitaryTraining = () => {
                   className="space-y-8"
                 >
                   <div className="grid gap-6">
-                    {facultyData.specialties.map((specialty, index) => (
+                    {facultyData.specializations.map((specialization, index) => (
                       <motion.div 
-                        key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        key={specialization.id || index}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
+                        className="flex items-start space-x-6 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
                       >
-                        <div className="flex items-start space-x-6">
-                          <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
-                            {specialty.icon}
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-bold text-white text-2xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">{specialty.name}</h4>
-                            <p className="text-blue-100 text-lg mb-4 leading-relaxed">{specialty.description}</p>
-                            <div className="flex flex-wrap gap-2">
-                              {specialty.skills?.map((skill, i) => (
-                                <motion.span 
-                                  key={i} 
-                                  className="px-4 py-2 bg-emerald-500/20 text-emerald-300 rounded-2xl text-base font-medium hover:bg-emerald-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-emerald-400/30"
-                                  whileHover={{ scale: 1.05 }}
-                                >
-                                  {skill}
-                                </motion.span>
-                              ))}
-                            </div>
+                        <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
+                          {specialization.icon}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-white text-2xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">{specialization.name}</h4>
+                          <p className="text-blue-100 text-lg mb-4 leading-relaxed">{specialization.description}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {specialization.competencies?.map((competency, i) => (
+                              <motion.span 
+                                key={i} 
+                                className="px-4 py-2 bg-emerald-500/20 text-emerald-300 rounded-2xl text-base font-medium hover:bg-emerald-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-emerald-400/30"
+                                whileHover={{ scale: 1.05 }}
+                              >
+                                {competency}
+                              </motion.span>
+                            ))}
                           </div>
                         </div>
                       </motion.div>
@@ -521,76 +544,34 @@ const MilitaryTraining = () => {
                 </motion.div>
               )}
 
-              {/* Facilities Tab */}
-              {activeTab === 'facilities' && (
+              {/* Teachers Tab */}
+              {activeTab === 'teachers' && (
                 <motion.div
-                  key="facilities"
+                  key="teachers"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5 }}
                   className="space-y-8"
                 >
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {facultyData.facilities.map((facility, index) => (
-                      <motion.div 
-                        key={index}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden backdrop-blur-sm"
-                        onMouseEnter={() => setHoveredCard(`facility-${index}`)}
-                        onMouseLeave={() => setHoveredCard(null)}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
-                        
-                        <div className="relative z-10">
-                          <div className={`text-5xl mb-6 transition-transform duration-500 ${
-                            hoveredCard === `facility-${index}` ? 'scale-110 rotate-6' : 'group-hover:scale-105'
-                          }`}>
-                            {facility.icon}
-                          </div>
-                          <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-emerald-300 transition-colors duration-300">{facility.name}</h4>
-                          <p className="text-blue-100 text-lg mb-4 leading-relaxed">{facility.description}</p>
-                          <div className="flex items-center justify-between p-3 bg-white/5 rounded-2xl">
-                            <span className="text-blue-200">Оборудование:</span>
-                            <span className="text-white font-semibold">{facility.equipment}</span>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Command Tab */}
-              {activeTab === 'command' && (
-                <motion.div
-                  key="command"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  className="space-y-8"
-                >
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {facultyData.command.map((officer, index) => (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {facultyData.teachers.map((teacher, index) => (
                       <motion.div
-                        key={index}
+                        key={teacher.id || index}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
                         className="bg-white/5 rounded-2xl p-6 text-center border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group backdrop-blur-sm"
                       >
                         <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                          {officer.avatar}
+                          {teacher.avatar}
                         </div>
-                        <h4 className="font-bold text-white text-xl mb-2 group-hover:text-emerald-300 transition-colors duration-300">{officer.name}</h4>
-                        <p className="text-emerald-400 text-lg font-medium mb-2">{officer.rank}</p>
-                        <p className="text-blue-200 text-base mb-3">{officer.position}</p>
-                        <p className="text-blue-100 text-sm mb-4">{officer.education}</p>
+                        <h4 className="font-bold text-white text-xl mb-2 group-hover:text-emerald-300 transition-colors duration-300">{teacher.name}</h4>
+                        <p className="text-emerald-400 text-lg font-medium mb-2">{teacher.position}</p>
+                        <p className="text-blue-200 text-sm mb-3">{teacher.qualification}</p>
+                        <p className="text-blue-100 text-xs mb-4">Опыт: {teacher.experience}</p>
                         <div className="flex flex-wrap gap-2 justify-center">
-                          {officer.specializations.map((spec, i) => (
+                          {teacher.specializations.map((spec, i) => (
                             <span key={i} className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-xl text-sm font-medium border border-blue-400/30">
                               {spec}
                             </span>
@@ -643,16 +624,16 @@ const MilitaryTraining = () => {
                   <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl p-6 border border-purple-500/20 backdrop-blur-sm">
                     <h3 className="text-2xl font-bold text-white mb-4 flex items-center">
                       <span className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white mr-3 text-sm">👨‍✈️</span>
-                      Начальник факультета
+                      {t('militaryTraining.contacts.dean', 'Начальник факультета')}
                     </h3>
                     <div className="text-center">
                       <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
                         {facultyData.contacts.dean.avatar}
                       </div>
                       <h4 className="text-2xl font-bold text-white mb-2">{facultyData.contacts.dean.name}</h4>
-                      <p className="text-emerald-400 text-lg mb-2 font-medium">{facultyData.contacts.dean.rank}</p>
-                      <p className="text-blue-200 text-base mb-2">{facultyData.contacts.dean.position}</p>
-                      <p className="text-blue-100 text-sm mb-3">{facultyData.contacts.dean.education}</p>
+                      <p className="text-emerald-400 text-lg mb-2 font-medium">{facultyData.contacts.dean.position}</p>
+                      <p className="text-blue-200 text-base mb-2">{facultyData.contacts.dean.qualification}</p>
+                      <p className="text-blue-100 text-sm mb-3">Опыт: {facultyData.contacts.dean.experience}</p>
                       <p className="text-white font-medium">{facultyData.contacts.dean.email}</p>
                     </div>
                   </div>

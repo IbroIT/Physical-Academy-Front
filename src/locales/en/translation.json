@@ -206,6 +206,10 @@
       }
     },
     "about": {
+      "subtitle2": "Our Academy",
+      "badge3": "Modern Education in Physical Culture and Sports",
+      "intro2": "Today we continue to develop, implementing modern technologies in educational process and expanding international cooperation. Our mission is to educate new generation of sports industry leaders.",
+      "intro": "Our academy was founded to train highly qualified specialists in physical culture and sports. Over the years, we have created a unique educational ecosystem combining traditions and innovations.",
       "badge": "About Academy",
       "title": "ABOUT ACADEMY",
       "subtitle": "Leading center for training specialists in physical culture and sports with rich history and innovative approach",
@@ -664,6 +668,95 @@
     }
   },
   "bachelor": {
+    "admission": {
+      "steps": {
+        "consultation": {
+          "title": "Consultation",
+          "description": "Free consultation with the admission committee"
+        },
+        "documents": {
+          "title": "Document Submission",
+          "description": "Preparation and submission of required documents"
+        },
+        "exams": {
+          "title": "Entrance Exams",
+          "description": "Passing tests and interviews"
+        },
+        "enrollment": {
+          "title": "Enrollment",
+          "description": "Processing of enrollment order"
+        }
+      },
+      "badge": "Admission 2024",
+      "title": "Bachelor's Degree Admission",
+      "subtitle": "Complete information about admission to the academy",
+      "requirementsTitle": "Admission Requirements",
+      "deadlinesTitle": "Document Submission Deadlines",
+      "process": {
+        "title": "Admission Process",
+        "steps": {
+          "consultation": {
+            "title": "Consultation",
+            "description": "Free consultation with the admission committee"
+          },
+          "documents": {
+            "title": "Document Submission",
+            "description": "Preparation and submission of required documents"
+          },
+          "exams": {
+            "title": "Entrance Exams",
+            "description": "Passing tests and interviews"
+          },
+          "enrollment": {
+            "title": "Enrollment",
+            "description": "Processing of enrollment order"
+          }
+        }
+      },
+      "programs": {
+        "title": "Study Programs",
+        "sports_science": "Sports Science",
+        "physical_education": "Physical Education",
+        "sports_management": "Sports Management",
+        "rehabilitation": "Sports Rehabilitation",
+        "coaching": "Coaching",
+        "duration": "Study Duration",
+        "details": "Learn More"
+      },
+      "deadlines": {
+        "main": {
+          "period": "Main Admission",
+          "date": "June 20 - July 25"
+        },
+        "additional": {
+          "period": "Additional Admission",
+          "date": "August 1-15"
+        },
+        "active": "Active"
+      },
+      "requirements": {
+        "age": "Age from 17 to 25 years",
+        "education": "High school diploma",
+        "exams": "Entrance exam results",
+        "language": "English proficiency (for international programs)",
+        "health": "Medical certificate"
+      },
+      "documents": {
+        "title": "Required Documents",
+        "passport": "Passport copy",
+        "diploma": "Diploma or certificate",
+        "photos": "3x4 photos",
+        "medical": "Medical certificate",
+        "military": "Military ID (for male applicants)"
+      },
+      "contacts": {
+        "title": "Admission Committee Contacts",
+        "email": "admission@academy.ru",
+        "phone": "+7 (495) 123-45-67",
+        "address": "Main building, room 101",
+        "button": "Schedule a Consultation"
+      }
+    },
     "title": "Bachelor's Degree",
     "subtitle": "Start your successful IT career with our bachelor's programs",
     "tabs": {
@@ -5292,19 +5385,19 @@
       "items": [
         {
           "name": "About Us",
-          "url": "#about"
+          "url": "academy/about"
         },
         {
-          "name": "Services",
-          "url": "#services"
+          "name": "Mission",
+          "url": "academy/mission"
         },
         {
-          "name": "News",
-          "url": "#news"
+          "name": "History",
+          "url": "academy/history"
         },
         {
           "name": "Contacts",
-          "url": "#contacts"
+          "url": "contacts/address"
         }
       ]
     },
@@ -7704,82 +7797,6 @@
       "students": "Graduated Students",
       "programs": "Educational Programs",
       "champions": "Trained Champions"
-    }
-  },
-  "students": {
-    "disabilities": {
-      "headerIcon": "♿",
-      "title": "Support for Students with Disabilities",
-      "subtitle": "Creating an inclusive learning environment for all students",
-      "tabs": {
-        "support": "Support Services",
-        "contacts": "Contacts",
-        "resources": "Resources"
-      },
-      "uiTexts": {
-        "supportServices": "Support Services",
-        "contactUs": "Contact Us",
-        "resources": "Helpful Resources",
-        "emergencyTitle": "Emergency Contacts",
-        "call": "Call",
-        "emailUs": "Email us",
-        "visitOffice": "Visit our office",
-        "workingHours": "Working hours",
-        "downloadResource": "Download Resource",
-        "visit": "Visit Website",
-        "featuresTitle": "Services Included"
-      }
-    },
-    "council": {
-      "headerIcon": "🏅",
-      "title": "Student Council",
-      "subtitle": "Student leadership promoting academic excellence and community engagement",
-      "labels": {
-        "tabs": {
-          "members": "Council Members",
-          "initiatives": "Initiatives",
-          "events": "Events"
-        },
-        "goals": {
-          "title": "Our Goals"
-        },
-        "contact": {
-          "title": "Contact Us",
-          "email": "Email",
-          "office": "Office",
-          "hours": "Office Hours",
-          "social": "Social Media"
-        },
-        "member": {
-          "role": "Role",
-          "department": "Department",
-          "contact": "Contact",
-          "achievements": "Achievements",
-          "bio": "Biography"
-        },
-        "initiative": {
-          "status": "Status",
-          "started": "Started",
-          "ends": "Ends",
-          "leads": "Initiative Leads",
-          "goals": "Initiative Goals"
-        },
-        "event": {
-          "date": "Date",
-          "time": "Time",
-          "location": "Location",
-          "status": "Status",
-          "description": "Description",
-          "organizers": "Organizers"
-        },
-        "status": {
-          "planned": "Planned",
-          "in_progress": "In Progress",
-          "completed": "Completed",
-          "cancelled": "Cancelled",
-          "postponed": "Postponed"
-        }
-      }
     }
   },
   "studentCouncil": {
