@@ -7,6 +7,7 @@ const AddressMap = () => {
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
+  const mapInitializedRef = useRef(false);
 
   const mapData = t('contact.map', { returnObjects: true }) || {};
   
@@ -30,8 +31,15 @@ const AddressMap = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Корректные координаты для улицы Жукеева-Пудовкина 114, Бишкек
+  const academyLocation = {
+    lat: 42.8539,
+    lng: 74.5829,
+    address: 'ул. Жукеева-Пудовкина 114, Бишкек, Кыргызстан'
+  };
+
   const handleGetDirections = () => {
-    const address = encodeURIComponent('улица Исы Ахунбаева, 97, город Бишкек');
+    const address = encodeURIComponent(academyLocation.address);
     window.open(`https://maps.google.com/?q=${address}`, '_blank');
   };
 
@@ -46,6 +54,19 @@ const AddressMap = () => {
       navigator.clipboard.writeText(window.location.href);
       alert(t('contact.map.linkCopied', 'Ссылка скопирована в буфер обмена'));
     }
+  };
+
+  // Исправленная функция для получения корректного iframe src
+  const getMapSrc = () => {
+    const { lat, lng, address } = academyLocation;
+    // Корректный формат для Google Maps Embed API
+    return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(address)}&center=${lat},${lng}&zoom=16&language=ru`;
+  };
+
+  // Альтернативный вариант - использовать поиск по адресу
+  const getMapSrcAlternative = () => {
+    const { address } = academyLocation;
+    return `https://www.google.com/maps/embed/v1/search?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(address)}&zoom=16&language=ru`;
   };
 
   return (
@@ -121,42 +142,30 @@ const AddressMap = () => {
               </div>
               
               {/* Real Map Container */}
-              <div className="aspect-video relative bg-gradient-to-br from-slate-800 to-blue-900/50">
+              <div className="aspect-video relative bg-gradient-to-br from-slate-800 to-blue-900/50 rounded-lg overflow-hidden">
                 {/* Google Maps Iframe */}
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2923.9499999999994!2d74.59000000000001!3d42.870000000000005!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x389ec9c0d8f4f4f5%3A0x1c9e1d1b1d1b1d1b!2z0KPQu9C40YbQsCDQmNGB0LvRg9C20LHRg9GA0LMsIDk3LCDQkdC40YjQutC10Lkg0J_QvtC00L7Qu9GM!5e0!3m2!1sru!2skg!4v1234567890"
+                  src={getMapSrc()}
                   width="100%"
                   height="100%"
-                  style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) contrast(85%)' }}
-                  allowFullScreen=""
+                  style={{ border: 0 }}
+                  allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
+                  title="Местоположение академии на карте"
                   className="rounded-lg"
                 ></iframe>
                 
-                {/* Custom Location Marker */}
-                <motion.div 
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                  whileHover={{ scale: 1.3 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="relative">
-                    <div className="w-6 h-6 bg-red-500 rounded-full animate-ping opacity-75"></div>
-                    <div className="absolute top-0 left-0 w-6 h-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-full border-2 border-white shadow-2xl flex items-center justify-center">
-                      <span className="text-white text-xs">🏛️</span>
-                    </div>
-                  </div>
-                </motion.div>
-                
                 {/* Map Overlay Info */}
-                <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm rounded-xl p-4 text-white max-w-xs border border-white/20">
+                <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-xl p-4 text-white max-w-xs border border-white/20">
                   <h4 className="font-bold text-lg mb-2 flex items-center">
                     <span className="text-red-400 mr-2">📍</span>
                     {t('contact.map.currentLocation', 'Наша академия')}
                   </h4>
                   <p className="text-blue-100 text-sm leading-relaxed">
-                    ул. Исы Ахунбаева, 97<br/>
-                    г. Бишкек, Кыргызстан
+                    {t('contact.map.address')}
+                    <br/>
+                    {t('contact.map.bishkekKyrgyzstan')}
                   </p>
                 </div>
               </div>
@@ -258,7 +267,7 @@ const AddressMap = () => {
             {
               icon: '📍',
               title: t('contact.map.visitUs', 'Посетите нас'),
-              description: 'ул. Исы Ахунбаева, 97, г. Бишкек',
+              description: academyLocation.address,
               color: 'from-blue-500 to-cyan-500'
             },
             {
@@ -270,7 +279,7 @@ const AddressMap = () => {
             {
               icon: '📞',
               title: t('contact.map.contactPhone', 'Телефон'),
-              description: t('contact.map.phoneNumber', '+7 (999) 123-45-67'),
+              description: t('contact.map.phoneNumber', '+996 (312) 54-19-41'),
               color: 'from-purple-500 to-indigo-500'
             }
           ].map((item, index) => (

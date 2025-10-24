@@ -20,11 +20,11 @@ const AcademyLeadership = () => {
 
   const categories = [
     { key: 'all', icon: '👥', apiFilter: '', color: 'from-blue-500 to-blue-600' },
-    { key: 'rector', icon: '👑', apiFilter: 'rector', color: 'from-green-500 to-green-600' },
-    { key: 'vice_rector', icon: '🌟', apiFilter: 'vice_rector', color: 'from-blue-500 to-green-500' },
-    { key: 'director', icon: '🏛️', apiFilter: 'director', color: 'from-green-500 to-blue-500' },
-    { key: 'dean', icon: '📚', apiFilter: 'dean', color: 'from-blue-500 to-blue-600' },
-    { key: 'department_head', icon: '🎓', apiFilter: 'department_head', color: 'from-green-500 to-green-600' },
+    { key: 'rector', icon: '👑', apiFilter: '', color: 'from-green-500 to-green-600' },
+    { key: 'vice_rector', icon: '🌟', apiFilter: '', color: 'from-blue-500 to-green-500' },
+    { key: 'director', icon: '🏛️', apiFilter: '', color: 'from-green-500 to-blue-500' },
+    { key: 'dean', icon: '📚', apiFilter: '', color: 'from-blue-500 to-blue-600' },
+    { key: 'department_head', icon: '🎓', apiFilter: '', color: 'from-green-500 to-green-600' },
   ];
 
   useEffect(() => {

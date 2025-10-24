@@ -12,45 +12,106 @@ const GeneralDepartments = () => {
   const sectionRef = useRef(null);
 
   // Получаем данные с проверками
-  const departmentsData = t('departments', { returnObjects: true }) || {};
+  const departmentsData = t('generalDepartments', { returnObjects: true }) || {};
   
   // Функция для нормализации данных
   const normalizeData = (data) => {
     const defaultData = {
-      name: t('departments.name', 'Отделы и структуры'),
-      fullDescription: t('departments.fullDescription', 'Организационная структура академии и все подразделения'),
-      badge: t('departments.badge', 'Организационная структура'),
+      name: t('generalDepartments.name', 'Отделы и структуры'),
+      fullDescription: t('generalDepartments.fullDescription', 'Организационная структура академии и все подразделения'),
+      badge: t('generalDepartments.badge', 'Организационная структура'),
       stats: Array.isArray(data.stats) ? data.stats : [
-        { label: 'Отделов', value: '25+', icon: '🏢' },
-        { label: 'Сотрудников', value: '150+', icon: '👨‍🏫' },
-        { label: 'Факультетов', value: '15', icon: '🎓' },
-        { label: 'Кампусов', value: '5', icon: '🏛️' }
+        { 
+          label: t('generalDepartments.stats.departments.label', 'Отделов'), 
+          value: '25+', 
+          icon: '🏢' 
+        },
+        { 
+          label: t('generalDepartments.stats.employees.label', 'Сотрудников'), 
+          value: '150+', 
+          icon: '👨‍🏫' 
+        },
+        { 
+          label: t('generalDepartments.stats.faculties.label', 'Факультетов'), 
+          value: '15', 
+          icon: '🎓' 
+        },
+        { 
+          label: t('generalDepartments.stats.campuses.label', 'Кампусов'), 
+          value: '5', 
+          icon: '🏛️' 
+        }
       ],
       categories: Array.isArray(data.categories) ? data.categories : [
-        { id: 'academic', label: 'Академические', icon: '🎓', color: 'blue' },
-        { id: 'administrative', label: 'Административные', icon: '🏢', color: 'green' },
-        { id: 'research', label: 'Научные', icon: '🔬', color: 'purple' },
-        { id: 'student', label: 'Студенческие', icon: '👥', color: 'orange' },
-        { id: 'technical', label: 'Технические', icon: '⚙️', color: 'red' }
+        { 
+          id: 'academic', 
+          label: t('generalDepartments.categories.academic', 'Академические'), 
+          icon: '🎓', 
+          color: 'blue' 
+        },
+        { 
+          id: 'administrative', 
+          label: t('generalDepartments.categories.administrative', 'Административные'), 
+          icon: '🏢', 
+          color: 'green' 
+        },
+        { 
+          id: 'research', 
+          label: t('generalDepartments.categories.research', 'Научные'), 
+          icon: '🔬', 
+          color: 'purple' 
+        },
+        { 
+          id: 'student', 
+          label: t('generalDepartments.categories.student', 'Студенческие'), 
+          icon: '👥', 
+          color: 'orange' 
+        },
+        { 
+          id: 'technical', 
+          label: t('generalDepartments.categories.technical', 'Технические'), 
+          icon: '⚙️', 
+          color: 'red' 
+        }
       ],
       departments: Array.isArray(data.departments) ? data.departments : [
         {
           id: 1,
-          name: 'Учебный отдел',
-          description: 'Организация учебного процесса',
+          name: t('generalDepartments.departments.academic.name', 'Учебный отдел'),
+          description: t('generalDepartments.departments.academic.description', 'Организация учебного процесса'),
           category: 'academic',
-          head: 'Иван Петров',
+          head: t('generalDepartments.departments.academic.head', 'Иван Петров'),
           phone: '+7 (495) 123-45-67',
-          location: 'Главный корпус, каб. 101',
+          location: t('generalDepartments.departments.academic.location', 'Главный корпус, каб. 101'),
           icon: '📚',
-          functions: ['Планирование учебного процесса', 'Контроль успеваемости', 'Организация сессий']
+          functions: [
+            t('generalDepartments.departments.academic.functions.0', 'Планирование учебного процесса'),
+            t('generalDepartments.departments.academic.functions.1', 'Контроль успеваемости'),
+            t('generalDepartments.departments.academic.functions.2', 'Организация сессий')
+          ]
         }
       ],
       functions: Array.isArray(data.functions) ? data.functions : [
-        { icon: '📚', title: 'Образование', description: 'Организация учебного процесса и программ' },
-        { icon: '🔬', title: 'Исследования', description: 'Научная деятельность и разработки' },
-        { icon: '🤝', title: 'Сообщество', description: 'Развитие студенческого сообщества' },
-        { icon: '💼', title: 'Управление', description: 'Административное управление академией' }
+        { 
+          icon: '📚', 
+          title: t('generalDepartments.functions.education.title', 'Образование'), 
+          description: t('generalDepartments.functions.education.description', 'Организация учебного процесса и программ') 
+        },
+        { 
+          icon: '🔬', 
+          title: t('generalDepartments.functions.research.title', 'Исследования'), 
+          description: t('generalDepartments.functions.research.description', 'Научная деятельность и разработки') 
+        },
+        { 
+          icon: '🤝', 
+          title: t('generalDepartments.functions.community.title', 'Сообщество'), 
+          description: t('generalDepartments.functions.community.description', 'Развитие студенческого сообщества') 
+        },
+        { 
+          icon: '💼', 
+          title: t('generalDepartments.functions.management.title', 'Управление'), 
+          description: t('generalDepartments.functions.management.description', 'Административное управление академией') 
+        }
       ]
     };
 
@@ -306,7 +367,7 @@ const GeneralDepartments = () => {
             >
               <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
                 <span className="text-2xl">📂</span>
-                <span>Категории</span>
+                <span>{t('generalDepartments.sidebar.categories', 'Категории')}</span>
               </h3>
               
               <div className="space-y-2">
@@ -349,7 +410,7 @@ const GeneralDepartments = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Поиск отделов..."
+                    placeholder={t('generalDepartments.search.placeholder', 'Поиск отделов...')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full bg-white/5 border border-white/20 rounded-2xl px-4 py-3 text-white placeholder-blue-300 focus:outline-none focus:border-emerald-400/50 transition-all duration-300 backdrop-blur-sm"
@@ -381,12 +442,16 @@ const GeneralDepartments = () => {
                       {currentCategory?.label}
                     </h2>
                     <p className="text-blue-200">
-                      Отделы {currentCategory?.label.toLowerCase()} направлений
+                      {t('generalDepartments.category.subtitle', 'Отделы {{category}} направлений', { 
+                        category: currentCategory?.label.toLowerCase() 
+                      })}
                     </p>
                   </div>
                 </div>
                 <div className="text-sm text-emerald-400 bg-emerald-500/20 px-3 py-2 rounded-lg backdrop-blur-sm">
-                  {filteredDepartments.length} найдено
+                  {t('generalDepartments.search.results', '{{count}} найдено', { 
+                    count: filteredDepartments.length 
+                  })}
                 </div>
               </div>
             </motion.div>
@@ -439,7 +504,7 @@ const GeneralDepartments = () => {
                           <div>
                             <div className="text-sm font-medium">{department.head}</div>
                             <div className="text-xs text-blue-300">
-                              Руководитель отдела
+                              {t('generalDepartments.department.head.title', 'Руководитель отдела')}
                             </div>
                           </div>
                         </div>
@@ -479,10 +544,10 @@ const GeneralDepartments = () => {
               >
                 <div className="text-6xl mb-4 text-blue-300">🔍</div>
                 <h3 className="text-xl font-semibold text-white mb-2">
-                  Отделы не найдены
+                  {t('generalDepartments.search.noResults.title', 'Отделы не найдены')}
                 </h3>
                 <p className="text-blue-200 mb-6">
-                  Попробуйте изменить поисковый запрос или выбрать другую категорию
+                  {t('generalDepartments.search.noResults.description', 'Попробуйте изменить поисковый запрос или выбрать другую категорию')}
                 </p>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -490,7 +555,7 @@ const GeneralDepartments = () => {
                   onClick={() => setSearchTerm('')}
                   className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-emerald-600 transition-all duration-300 shadow-lg"
                 >
-                  Очистить поиск
+                  {t('generalDepartments.search.clear', 'Очистить поиск')}
                 </motion.button>
               </motion.div>
             )}
@@ -523,7 +588,7 @@ const GeneralDepartments = () => {
                     <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl p-4 border border-blue-400/30">
                       <h4 className="font-semibold text-blue-400 mb-2 flex items-center gap-2">
                         <span>👤</span>
-                        <span>Руководитель</span>
+                        <span>{t('generalDepartments.details.head.title', 'Руководитель')}</span>
                       </h4>
                       <p className="text-white font-medium">{selectedDepartment.head}</p>
                       {selectedDepartment.position && (
@@ -534,7 +599,7 @@ const GeneralDepartments = () => {
                     <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 rounded-2xl p-4 border border-emerald-400/30">
                       <h4 className="font-semibold text-emerald-400 mb-2 flex items-center gap-2">
                         <span>📞</span>
-                        <span>Телефон</span>
+                        <span>{t('generalDepartments.details.phone.title', 'Телефон')}</span>
                       </h4>
                       <a 
                         href={`tel:${selectedDepartment.phone}`}
@@ -547,7 +612,7 @@ const GeneralDepartments = () => {
                     <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl p-4 border border-purple-400/30">
                       <h4 className="font-semibold text-purple-400 mb-2 flex items-center gap-2">
                         <span>📍</span>
-                        <span>Местоположение</span>
+                        <span>{t('generalDepartments.details.location.title', 'Местоположение')}</span>
                       </h4>
                       <p className="text-white font-medium">{selectedDepartment.location}</p>
                     </div>
@@ -558,7 +623,7 @@ const GeneralDepartments = () => {
                     <div>
                       <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
                         <span className="text-2xl">🎯</span>
-                        <span>Основные функции</span>
+                        <span>{t('generalDepartments.details.functions.title', 'Основные функции')}</span>
                       </h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         {selectedDepartment.functions.map((func, index) => (
@@ -588,7 +653,7 @@ const GeneralDepartments = () => {
               className="bg-white/5 rounded-3xl border border-white/20 p-6 backdrop-blur-lg shadow-2xl"
             >
               <h3 className="text-2xl font-bold text-white mb-8 text-center">
-                Основные направления деятельности
+                {t('generalDepartments.overview.title', 'Основные направления деятельности')}
               </h3>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {normalizedData.functions.map((func, index) => (

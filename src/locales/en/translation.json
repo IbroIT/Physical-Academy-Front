@@ -609,11 +609,13 @@
     },
     "categories": {
       "all": "All",
-      "directors": "Directors",
-      "deputy_directors": "Deputy Directors",
-      "department_heads": "Department Heads",
-      "deans": "Deans",
-      "vice_deans": "Vice Deans"
+      "rector": "Rectors",
+      "vice_rector": "Vice-Rectors",
+      "director": "Directors",
+      "deputy_director": "Deputy Directors",
+      "department_head": "Department Heads",
+      "dean": "Deans",
+      "vice_dean": "Vice Deans"
     },
     "contactInfo": {
       "title": "Need more information?",
@@ -623,6 +625,9 @@
     }
   },
   "documents": {
+    "number": "Number",
+    "date": "Date",
+    "size": "Size",
     "title": "Academy Documents",
     "subtitle": "Official documents, regulations and materials for students and staff",
     "loading": "Loading documents...",
@@ -770,6 +775,7 @@
       "applyNow": "Apply Now"
     },
     "info": {
+      "years": "years",
       "badge": "Bachelor's Degree",
       "title": "BACHELOR'S DEGREE",
       "subtitle": "Modern educational programs meeting international standards and industry requirements",
@@ -1125,6 +1131,178 @@
     "actions": {
       "call": "Call",
       "email": "Email"
+    }
+  },
+  "bachelorQuotas": {
+    "title": "Educational Quotas",
+    "subtitle": "Special support programs for talented athletes and applicants",
+    "loading": {
+      "text": "Loading quota data..."
+    },
+    "error": {
+      "title": "Error loading data"
+    },
+    "noData": {
+      "title": "No quota data",
+      "description": "Data is temporarily unavailable. Please refresh the page."
+    },
+    "stats": {
+      "totalQuotas": "Quotas",
+      "totalQuotasDesc": "available programs",
+      "sportsQuotas": "Sports",
+      "sportsQuotasDesc": "for athletes",
+      "specialQuotas": "Special",
+      "specialQuotasDesc": "special conditions",
+      "successRate": "Success",
+      "successRateDesc": "admission rate via quotas"
+    },
+    "spots": "spots",
+    "deadline": "deadline",
+    "requirements": {
+      "button": "📋 Requirements",
+      "title": "📋 Requirements"
+    },
+    "benefits": {
+      "button": "🎁 Benefits",
+      "title": "🎁 Benefits"
+    },
+    "additionalSupport": {
+      "title": "🤝 Additional Support",
+      "subtitle": "Support programs for athletes and students",
+      "mentoring": "Mentoring programs",
+      "scholarships": "Special scholarships",
+      "housing": "Housing assistance",
+      "career": "Career support"
+    },
+    "process": {
+      "title": "📝 Application Process",
+      "subtitle": "Step-by-step guide for application submission",
+      "steps": {
+        "step1": {
+          "title": "Application Submission",
+          "description": "Fill out the online application to participate in the program"
+        },
+        "step2": {
+          "title": "Document Preparation",
+          "description": "Gather necessary documents and certificates"
+        },
+        "step3": {
+          "title": "Application Review",
+          "description": "The commission reviews your application"
+        },
+        "step4": {
+          "title": "Results",
+          "description": "Receive notification of the decision"
+        }
+      }
+    },
+    "quotas": {
+      "sports": "Sports Quota",
+      "sportsDesc": "For high-level athletes",
+      "talent": "Talented Youth",
+      "talentDesc": "For gifted applicants",
+      "social": "Social Quota",
+      "socialDesc": "For socially vulnerable groups",
+      "international": "International Quota",
+      "internationalDesc": "For international students"
+    }
+  },
+  "generalDepartments": {
+    "name": "Departments and Structures",
+    "fullDescription": "Organizational structure of the academy and all subdivisions",
+    "badge": "Organizational Structure",
+    "stats": {
+      "departments": {
+        "label": "Departments",
+        "description": "various departments"
+      },
+      "employees": {
+        "label": "Employees",
+        "description": "professional staff"
+      },
+      "faculties": {
+        "label": "Faculties",
+        "description": "academic faculties"
+      },
+      "campuses": {
+        "label": "Campuses",
+        "description": "educational campuses"
+      }
+    },
+    "categories": {
+      "academic": "Academic",
+      "administrative": "Administrative",
+      "research": "Research",
+      "student": "Student",
+      "technical": "Technical"
+    },
+    "departments": {
+      "academic": {
+        "name": "Academic Department",
+        "description": "Organization of educational process",
+        "head": "Ivan Petrov",
+        "location": "Main Building, Room 101",
+        "functions": [
+          "Curriculum planning",
+          "Academic performance monitoring",
+          "Examination session organization"
+        ]
+      }
+    },
+    "functions": {
+      "education": {
+        "title": "Education",
+        "description": "Organization of educational process and programs"
+      },
+      "research": {
+        "title": "Research",
+        "description": "Scientific activities and developments"
+      },
+      "community": {
+        "title": "Community",
+        "description": "Student community development"
+      },
+      "management": {
+        "title": "Management",
+        "description": "Administrative management of the academy"
+      }
+    },
+    "sidebar": {
+      "categories": "Categories"
+    },
+    "search": {
+      "placeholder": "Search departments...",
+      "results": "{{count}} found",
+      "clear": "Clear search",
+      "noResults": {
+        "title": "No departments found",
+        "description": "Try modifying your search query or select another category"
+      }
+    },
+    "category": {
+      "subtitle": "{{category}} direction departments"
+    },
+    "department": {
+      "head": {
+        "title": "Department Head"
+      }
+    },
+    "details": {
+      "head": {
+        "title": "Head"
+      },
+      "phone": {
+        "title": "Phone"
+      },
+      "location": {
+        "title": "Location"
+      },
+      "functions": {
+        "title": "Main Functions"
+      }
+    },
+    "overview": {
+      "title": "Main Activity Directions"
     }
   },
   "bachelorInternational": {
@@ -1557,7 +1735,8 @@
       "submit": "Submit Request"
     }
   },
-  "events": {"actions": {
+  "events": {
+    "actions": {
     "details": "Details",
     "register": "Register",
     "addToCalendar": "Add to Calendar",
@@ -1567,7 +1746,8 @@
     "aboutEvent": "About the Event",
     "basicInfo": "Basic Information",
     "registrationInfo": "Registration",
-    "organizer": "Organizer"
+    "organizer": "Organizer",
+    "additionalInfo": "Additional Information"
   },
     "title": "University Events",
     "subtitle": "Participate in conferences, workshops, sports and cultural events of our university",
@@ -4426,6 +4606,8 @@
       }
     },
     "map": {
+      "bishkekKyrgyzstan": "Bishkek, Kyrgyzstan",
+      "address": "Akhunbaeva St., 97",
       "title": "How to Find Us",
       "subtitle": "Academy address and directions",
       "interactiveMap": "Interactive Map",

@@ -8,7 +8,7 @@ const BachelorQuotas = () => {
   const { t } = useTranslation();
   const [selectedQuota, setSelectedQuota] = useState(0);
   const [expandedSection, setExpandedSection] = useState('requirements');
-  const [isVisible, setIsVisible] = useState(true); // Изначально true для избежания проблем с анимациями
+  const [isVisible, setIsVisible] = useState(true);
   const sectionRef = useRef(null);
 
   // Получаем данные из API
@@ -26,7 +26,7 @@ const BachelorQuotas = () => {
     console.log('BachelorQuotas - Quotas count:', quotas.length, 'Stats count:', quotaStats.length, 'Support count:', additionalSupport.length, 'Steps count:', processSteps.length);
   }
 
-  // Intersection Observer для анимаций (с задержкой чтобы не блокировать рендер)
+  // Intersection Observer для анимаций
   useEffect(() => {
     const timer = setTimeout(() => {
       const observer = new IntersectionObserver(
@@ -64,7 +64,7 @@ const BachelorQuotas = () => {
               <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl animate-pulse">
                 🎓
               </div>
-              <div className="text-white text-xl">Загрузка данных о квотах...</div>
+              <div className="text-white text-xl">{t('bachelorQuotas.loading.text', 'Загрузка данных о квотах...')}</div>
               <div className="mt-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
               </div>
@@ -85,7 +85,7 @@ const BachelorQuotas = () => {
               <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center text-white text-2xl shadow-2xl">
                 ⚠️
               </div>
-              <div className="text-white text-xl mb-4">Ошибка загрузки данных</div>
+              <div className="text-white text-xl mb-4">{t('bachelorQuotas.error.title', 'Ошибка загрузки данных')}</div>
               <div className="text-blue-200">{error}</div>
             </div>
           </div>
@@ -104,8 +104,8 @@ const BachelorQuotas = () => {
               <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-gray-500 to-gray-600 flex items-center justify-center text-white text-2xl shadow-2xl">
                 📋
               </div>
-              <div className="text-white text-xl mb-4">Нет данных о квотах</div>
-              <div className="text-blue-200">Данные временно недоступны. Попробуйте обновить страницу.</div>
+              <div className="text-white text-xl mb-4">{t('bachelorQuotas.noData.title', 'Нет данных о квотах')}</div>
+              <div className="text-blue-200">{t('bachelorQuotas.noData.description', 'Данные временно недоступны. Попробуйте обновить страницу.')}</div>
             </div>
           </div>
         </div>
@@ -190,20 +190,20 @@ const BachelorQuotas = () => {
         {/* Заголовок */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }} // Упрощенная анимация
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-center mb-12 lg:mb-20"
         >
           <motion.div
             initial={{ scale: 0 }}
-            animate={{ scale: 1 }} // Упрощенная анимация
+            animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
           >
             🎓
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-            {t('bachelor.quotas.title', 'Образовательные квоты')}
+            {t('bachelorQuotas.title', 'Образовательные квоты')}
             {/* Индикатор источника данных */}
             {quotasData ? (
               <span className="text-green-400 text-sm ml-2">🟢 API</span>
@@ -213,7 +213,7 @@ const BachelorQuotas = () => {
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {t('bachelor.quotas.subtitle', 'Специальные программы поддержки для талантливых спортсменов и абитуриентов')}
+            {t('bachelorQuotas.subtitle', 'Специальные программы поддержки для талантливых спортсменов и абитуриентов')}
           </p>
         </motion.div>
 
@@ -221,7 +221,7 @@ const BachelorQuotas = () => {
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          animate="visible" // Упрощенная анимация
+          animate="visible"
           className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 lg:mb-16"
         >
           {quotaStats.map((stat, index) => (
@@ -231,8 +231,12 @@ const BachelorQuotas = () => {
               className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-300"
             >
               <div className="text-3xl font-bold text-white mb-2">{stat.number}</div>
-              <div className="text-blue-200 text-sm uppercase tracking-wide mb-1">{stat.label}</div>
-              <div className="text-blue-300/70 text-xs">{stat.description}</div>
+              <div className="text-blue-200 text-sm uppercase tracking-wide mb-1">
+                {t(`bachelorQuotas.stats.${stat.labelKey}`, stat.label)}
+              </div>
+              <div className="text-blue-300/70 text-xs">
+                {t(`bachelorQuotas.stats.${stat.descriptionKey}`, stat.description)}
+              </div>
             </motion.div>
           ))}
         </motion.div>
@@ -248,7 +252,7 @@ const BachelorQuotas = () => {
                   : 'bg-white/10 text-blue-200 hover:bg-white/20'
                 }`}
             >
-              {quota.icon} {quota.title}
+              {quota.icon} {t(`bachelorQuotas.quotas.${quota.titleKey}`, quota.title)}
             </button>
           ))}
         </div>
@@ -273,19 +277,27 @@ const BachelorQuotas = () => {
                         {quotas[selectedQuota].icon}
                       </div>
                       <div>
-                        <h2 className="text-3xl font-bold text-white mb-2">{quotas[selectedQuota].title}</h2>
-                        <p className="text-blue-200">{quotas[selectedQuota].description}</p>
+                        <h2 className="text-3xl font-bold text-white mb-2">
+                          {t(`bachelorQuotas.quotas.${quotas[selectedQuota].titleKey}`, quotas[selectedQuota].title)}
+                        </h2>
+                        <p className="text-blue-200">
+                          {t(`bachelorQuotas.quotas.${quotas[selectedQuota].descriptionKey}`, quotas[selectedQuota].description)}
+                        </p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mb-8">
                       <div className={`p-4 rounded-xl ${getColorClasses(quotas[selectedQuota].color).light} border ${getColorClasses(quotas[selectedQuota].color).border}`}>
                         <div className="text-white text-2xl font-bold">{quotas[selectedQuota].spots}</div>
-                        <div className="text-blue-200 text-sm">мест</div>
+                        <div className="text-blue-200 text-sm">
+                          {t('bachelorQuotas.spots', 'мест')}
+                        </div>
                       </div>
                       <div className={`p-4 rounded-xl ${getColorClasses(quotas[selectedQuota].color).light} border ${getColorClasses(quotas[selectedQuota].color).border}`}>
                         <div className="text-white text-lg font-bold">{quotas[selectedQuota].deadline}</div>
-                        <div className="text-blue-200 text-sm">дедлайн</div>
+                        <div className="text-blue-200 text-sm">
+                          {t('bachelorQuotas.deadline', 'дедлайн')}
+                        </div>
                       </div>
                     </div>
 
@@ -300,7 +312,10 @@ const BachelorQuotas = () => {
                               : 'bg-white/10 text-blue-200 hover:bg-white/20'
                             }`}
                         >
-                          {section === 'requirements' ? '📋 Требования' : '🎁 Преимущества'}
+                          {section === 'requirements' 
+                            ? t('bachelorQuotas.requirements.button', '📋 Требования')
+                            : t('bachelorQuotas.benefits.button', '🎁 Преимущества')
+                          }
                         </button>
                       ))}
                     </div>
@@ -317,14 +332,18 @@ const BachelorQuotas = () => {
                           exit={{ opacity: 0, y: -20 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <h3 className="text-xl font-bold text-white mb-4">📋 Требования</h3>
+                          <h3 className="text-xl font-bold text-white mb-4">
+                            {t('bachelorQuotas.requirements.title', '📋 Требования')}
+                          </h3>
                           <div className="space-y-3">
                             {quotas[selectedQuota].requirements.map((req, index) => (
                               <div key={index} className="flex items-start">
                                 <div className={`w-6 h-6 rounded-full bg-gradient-to-r ${getColorClasses(quotas[selectedQuota].color).gradient} flex items-center justify-center mr-3 mt-0.5 flex-shrink-0`}>
                                   <span className="text-white text-xs font-bold">{index + 1}</span>
                                 </div>
-                                <p className="text-blue-100">{req.requirement}</p>
+                                <p className="text-blue-100">
+                                  {t(`bachelorQuotas.requirements.${req.key}`, req.requirement)}
+                                </p>
                               </div>
                             ))}
                           </div>
@@ -339,12 +358,16 @@ const BachelorQuotas = () => {
                           exit={{ opacity: 0, y: -20 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <h3 className="text-xl font-bold text-white mb-4">🎁 Преимущества</h3>
+                          <h3 className="text-xl font-bold text-white mb-4">
+                            {t('bachelorQuotas.benefits.title', '🎁 Преимущества')}
+                          </h3>
                           <div className="space-y-3">
                             {quotas[selectedQuota].benefits.map((benefit, index) => (
                               <div key={index} className="flex items-start">
                                 <div className="text-lg mr-3">🌟</div>
-                                <p className="text-blue-100">{benefit.benefit}</p>
+                                <p className="text-blue-100">
+                                  {t(`bachelorQuotas.benefits.${benefit.key}`, benefit.benefit)}
+                                </p>
                               </div>
                             ))}
                           </div>
@@ -367,8 +390,12 @@ const BachelorQuotas = () => {
             className="mt-16 lg:mt-24"
           >
             <div className="text-center mb-12">
-              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">🤝 Дополнительная поддержка</h2>
-              <p className="text-blue-200 max-w-2xl mx-auto">Программы поддержки для спортсменов и студентов</p>
+              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                {t('bachelorQuotas.additionalSupport.title', '🤝 Дополнительная поддержка')}
+              </h2>
+              <p className="text-blue-200 max-w-2xl mx-auto">
+                {t('bachelorQuotas.additionalSupport.subtitle', 'Программы поддержки для спортсменов и студентов')}
+              </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {additionalSupport.map((support, index) => (
@@ -380,7 +407,9 @@ const BachelorQuotas = () => {
                   className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-300"
                 >
                   <div className="text-3xl mb-4">🎯</div>
-                  <p className="text-blue-100">{support.support}</p>
+                  <p className="text-blue-100">
+                    {t(`bachelorQuotas.additionalSupport.${support.key}`, support.support)}
+                  </p>
                 </motion.div>
               ))}
             </div>
@@ -396,8 +425,12 @@ const BachelorQuotas = () => {
             className="mt-16 lg:mt-24"
           >
             <div className="text-center mb-12">
-              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">📝 Процесс подачи документов</h2>
-              <p className="text-blue-200 max-w-2xl mx-auto">Пошаговое руководство для подачи заявления</p>
+              <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                {t('bachelorQuotas.process.title', '📝 Процесс подачи документов')}
+              </h2>
+              <p className="text-blue-200 max-w-2xl mx-auto">
+                {t('bachelorQuotas.process.subtitle', 'Пошаговое руководство для подачи заявления')}
+              </p>
             </div>
             <div className="space-y-6">
               {processSteps.map((step, index) => (
@@ -412,26 +445,18 @@ const BachelorQuotas = () => {
                     {step.step_number}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-                    <p className="text-blue-200">{step.description}</p>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      {t(`bachelorQuotas.process.steps.${step.key}.title`, step.title)}
+                    </h3>
+                    <p className="text-blue-200">
+                      {t(`bachelorQuotas.process.steps.${step.key}.description`, step.description)}
+                    </p>
                   </div>
                 </motion.div>
               ))}
             </div>
           </motion.div>
         )}
-
-        {/* CTA кнопка */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-center mt-16 lg:mt-24"
-        >
-          <button className="bg-gradient-to-r from-blue-500 to-emerald-500 hover:from-blue-600 hover:to-emerald-600 text-white font-bold py-4 px-8 rounded-2xl text-lg shadow-2xl transform hover:scale-105 transition-all duration-300">
-            🚀 Подать заявление
-          </button>
-        </motion.div>
       </div>
     </section>
   );

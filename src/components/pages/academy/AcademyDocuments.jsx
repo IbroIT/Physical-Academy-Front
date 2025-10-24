@@ -249,7 +249,7 @@ const AcademyDocuments = () => {
                   <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
                     <span className="text-sm">📅</span>
                   </div>
-                  {t('documents.date', 'Дата документа')}
+                  {t('documents.date')}
                 </span>
                 <span className="font-semibold text-white">
                   {new Date(doc.document_date).toLocaleDateString('ru-RU')}
@@ -263,7 +263,7 @@ const AcademyDocuments = () => {
                   <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
                     <span className="text-sm">🔢</span>
                   </div>
-                  {t('documents.number', 'Номер')}
+                  {t('documents.number')}
                 </span>
                 <span className="font-semibold text-white">
                   {doc.document_number}
@@ -277,7 +277,7 @@ const AcademyDocuments = () => {
                   <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
                     <span className="text-sm">📄</span>
                   </div>
-                  {t('documents.type', 'Тип')}
+                  {t('documents.type')}
                 </span>
                 <span className="font-semibold text-white">
                   {getFileExtension(doc)}
@@ -291,7 +291,7 @@ const AcademyDocuments = () => {
                   <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
                     <span className="text-sm">💾</span>
                   </div>
-                  {t('documents.size', 'Размер')}
+                  {t('documents.size')}
                 </span>
                 <span className="font-semibold text-white">
                   {formatFileSize(doc)}
