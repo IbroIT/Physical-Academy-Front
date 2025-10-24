@@ -1,17 +1,50 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
+// Хелпер функция для получения текста на текущем языке
+const getLocalizedText = (textObject, language) => {
+  if (!textObject) return '';
+  
+  if (typeof textObject === 'string') {
+    return textObject; // для обратной совместимости
+  }
+  
+  if (typeof textObject === 'object') {
+    return textObject[language] || textObject.ru || textObject.en || textObject.kg || '';
+  }
+  
+  return '';
+};
+
 // Компонент для детального просмотра мероприятия
 const EventDetailsModal = ({ event, isOpen, onClose }) => {
   const { t, i18n } = useTranslation();
 
   if (!isOpen || !event) return null;
 
+  // Получаем локализованные данные
+  const localizedTitle = getLocalizedText(event.title, i18n.language);
+  const localizedDescription = getLocalizedText(event.description, i18n.language);
+  const localizedFullDescription = getLocalizedText(event.full_description, i18n.language);
+  const localizedLocation = getLocalizedText(event.location, i18n.language);
+  const localizedAudience = getLocalizedText(event.audience, i18n.language);
+  const localizedFormat = getLocalizedText(event.format, i18n.language);
+  const localizedDuration = getLocalizedText(event.duration, i18n.language);
+
+  // Организатор
+  let localizedOrganizer = null;
+  if (event.organizer && typeof event.organizer === 'object') {
+    localizedOrganizer = {
+      name: getLocalizedText(event.organizer.name, i18n.language),
+      contact: getLocalizedText(event.organizer.contact, i18n.language)
+    };
+  }
+
   // Функция для поделиться
   const handleShare = async () => {
     const shareData = {
-      title: event.title,
-      text: event.description,
+      title: localizedTitle,
+      text: localizedDescription,
       url: window.location.href,
     };
 
@@ -61,7 +94,7 @@ const EventDetailsModal = ({ event, isOpen, onClose }) => {
             {/* Event Title */}
             <div className="absolute bottom-6 left-6 right-6">
               <h1 className="text-3xl font-bold text-white mb-2">
-                {event.title}
+                {localizedTitle}
               </h1>
               <div className="flex items-center text-white/90">
                 <span className="text-sm bg-white/20 backdrop-blur-sm px-3 py-1 rounded-lg">
@@ -80,7 +113,7 @@ const EventDetailsModal = ({ event, isOpen, onClose }) => {
               {t('events.details.aboutEvent')}
             </h2>
             <p className="text-gray-600 leading-relaxed">
-              {event.full_description || event.description}
+              {localizedFullDescription || localizedDescription}
             </p>
           </div>
 
@@ -119,7 +152,7 @@ const EventDetailsModal = ({ event, isOpen, onClose }) => {
                   </svg>
                   <div>
                     <div className="font-medium">{t('events.labels.location')}</div>
-                    <div>{event.location}</div>
+                    <div>{localizedLocation}</div>
                   </div>
                 </div>
               </div>
@@ -132,38 +165,38 @@ const EventDetailsModal = ({ event, isOpen, onClose }) => {
               </h3>
               
               <div className="space-y-3">
-                {event.audience && (
+                {localizedAudience && (
                   <div className="flex items-center text-gray-600">
                     <svg className="w-5 h-5 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                     <div>
                       <div className="font-medium">{t('events.labels.audience')}</div>
-                      <div>{event.audience}</div>
+                      <div>{localizedAudience}</div>
                     </div>
                   </div>
                 )}
 
-                {event.format && (
+                {localizedFormat && (
                   <div className="flex items-center text-gray-600">
                     <svg className="w-5 h-5 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <div>
                       <div className="font-medium">{t('events.labels.format')}</div>
-                      <div>{event.format}</div>
+                      <div>{localizedFormat}</div>
                     </div>
                   </div>
                 )}
 
-                {event.duration && (
+                {localizedDuration && (
                   <div className="flex items-center text-gray-600">
                     <svg className="w-5 h-5 mr-3 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <div>
                       <div className="font-medium">{t('events.labels.duration')}</div>
-                      <div>{event.duration}</div>
+                      <div>{localizedDuration}</div>
                     </div>
                   </div>
                 )}
@@ -172,22 +205,24 @@ const EventDetailsModal = ({ event, isOpen, onClose }) => {
           </div>
 
           {/* Organizer Information */}
-          {event.organizer && (
+          {localizedOrganizer && (localizedOrganizer.name || localizedOrganizer.contact) && (
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 {t('events.details.organizer')}
               </h3>
               <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
-                  {event.organizer.name?.charAt(0) || 'O'}
+                  {localizedOrganizer.name?.charAt(0) || 'O'}
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-800">
-                    {event.organizer.name}
-                  </div>
-                  {event.organizer.contact && (
+                  {localizedOrganizer.name && (
+                    <div className="font-semibold text-gray-800">
+                      {localizedOrganizer.name}
+                    </div>
+                  )}
+                  {localizedOrganizer.contact && (
                     <div className="text-sm text-gray-600">
-                      {event.organizer.contact}
+                      {localizedOrganizer.contact}
                     </div>
                   )}
                 </div>
@@ -242,16 +277,12 @@ const UniversityEventsPage = () => {
         // Обработка разных форматов ответа
         let eventsArray = [];
         if (Array.isArray(data)) {
-          // Если API возвращает просто массив
           eventsArray = data;
         } else if (data.results && Array.isArray(data.results)) {
-          // Если API возвращает объект с пагинацией (results)
           eventsArray = data.results;
         } else if (data.data && Array.isArray(data.data)) {
-          // Если API возвращает объект с data
           eventsArray = data.data;
         } else {
-          // Если формат неизвестен, используем сам объект как массив
           console.warn('Unknown API response format:', data);
           eventsArray = Object.values(data).filter(item => typeof item === 'object');
         }
@@ -285,7 +316,7 @@ const UniversityEventsPage = () => {
   const filteredEvents = (selectedCategory === 'all' 
     ? eventsData 
     : eventsData.filter(event => event && event.category === selectedCategory)
-  ).filter(event => event != null); // Фильтруем null/undefined
+  ).filter(event => event != null);
 
   const navigateEvents = useCallback((direction) => {
     if (!Array.isArray(filteredEvents) || filteredEvents.length === 0) return;
@@ -317,6 +348,19 @@ const UniversityEventsPage = () => {
   const currentEvent = Array.isArray(filteredEvents) && filteredEvents.length > 0 
     ? filteredEvents[currentEventIndex] 
     : null;
+
+  // Получаем локализованные данные для текущего мероприятия
+  const getCurrentEventLocalizedData = () => {
+    if (!currentEvent) return { title: '', description: '', location: '' };
+    
+    return {
+      title: getLocalizedText(currentEvent.title, i18n.language),
+      description: getLocalizedText(currentEvent.description, i18n.language),
+      location: getLocalizedText(currentEvent.location, i18n.language)
+    };
+  };
+
+  const currentEventLocalized = getCurrentEventLocalizedData();
 
   // Функция для открытия деталей мероприятия
   const handleEventDetails = (event) => {
@@ -404,7 +448,7 @@ const UniversityEventsPage = () => {
                   : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
               }`}
             >
-              {category[`name_${i18n.language}`] || category.name || category.id}
+              {getLocalizedText(category.name, i18n.language) || category.id}
             </button>
           ))}
         </div>
@@ -481,12 +525,12 @@ const UniversityEventsPage = () => {
                   
                   {/* Title */}
                   <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4 leading-tight">
-                    {currentEvent?.title || 'Event Title'}
+                    {currentEventLocalized.title || 'Event Title'}
                   </h2>
                   
                   {/* Description */}
                   <p className="text-gray-600 leading-relaxed mb-6">
-                    {currentEvent?.description || 'Event description'}
+                    {currentEventLocalized.description || 'Event description'}
                   </p>
                   
                   {/* Event Details */}
@@ -510,7 +554,7 @@ const UniversityEventsPage = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       </svg>
                       <span className="font-medium w-16">{t('events.labels.location')}</span>
-                      <span>{currentEvent?.location || 'Location'}</span>
+                      <span>{currentEventLocalized.location || 'Location'}</span>
                     </div>
                   </div>
 
@@ -566,94 +610,100 @@ const UniversityEventsPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.isArray(filteredEvents) && filteredEvents.map((event, index) => (
-              <div
-                key={event.id || index}
-                className={`group bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer ${
-                  index === currentEventIndex ? 'ring-2 ring-blue-500 scale-105' : 'hover:scale-105'
-                }`}
-                onClick={() => {
-                  setIsVisible(false);
-                  setTimeout(() => {
-                    setCurrentEventIndex(index);
-                    setIsVisible(true);
-                  }, 300);
-                }}
-              >
-                {/* Event Image */}
-                <div className="relative h-40 overflow-hidden">
-                  <div 
-                    className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
-                    style={{ backgroundImage: `url(${event.image})` }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  
-                  {/* Event Badges */}
-                  <div className="absolute top-3 left-3 flex gap-2">
-                    <span className="px-2 py-1 bg-blue-600 text-white rounded text-xs font-semibold">
-                      {event.category_display || event.category}
-                    </span>
-                  </div>
-                  
-                  {/* Date Badge */}
-                  <div className="absolute bottom-3 left-3">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
-                      <div className="text-sm font-bold text-gray-800">{event.date}</div>
+            {Array.isArray(filteredEvents) && filteredEvents.map((event, index) => {
+              const localizedTitle = getLocalizedText(event.title, i18n.language);
+              const localizedDescription = getLocalizedText(event.description, i18n.language);
+              const localizedLocation = getLocalizedText(event.location, i18n.language);
+              
+              return (
+                <div
+                  key={event.id || index}
+                  className={`group bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 cursor-pointer ${
+                    index === currentEventIndex ? 'ring-2 ring-blue-500 scale-105' : 'hover:scale-105'
+                  }`}
+                  onClick={() => {
+                    setIsVisible(false);
+                    setTimeout(() => {
+                      setCurrentEventIndex(index);
+                      setIsVisible(true);
+                    }, 300);
+                  }}
+                >
+                  {/* Event Image */}
+                  <div className="relative h-40 overflow-hidden">
+                    <div 
+                      className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
+                      style={{ backgroundImage: `url(${event.image})` }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    
+                    {/* Event Badges */}
+                    <div className="absolute top-3 left-3 flex gap-2">
+                      <span className="px-2 py-1 bg-blue-600 text-white rounded text-xs font-semibold">
+                        {event.category_display || event.category}
+                      </span>
+                    </div>
+                    
+                    {/* Date Badge */}
+                    <div className="absolute bottom-3 left-3">
+                      <div className="bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
+                        <div className="text-sm font-bold text-gray-800">{event.date}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <div className="p-4">
-                  {/* Department */}
-                  <div className="mb-2">
-                    <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                      {event.department_display || event.department}
-                    </span>
-                  </div>
                   
-                  {/* Title */}
-                  <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                    {event.title}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                    {event.description}
-                  </p>
-                  
-                  {/* Event Details */}
-                  <div className="space-y-1 text-xs text-gray-500 mb-3">
-                    <div className="flex items-center">
-                      <svg className="w-3 h-3 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {event.time}
+                  <div className="p-4">
+                    {/* Department */}
+                    <div className="mb-2">
+                      <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                        {event.department_display || event.department}
+                      </span>
                     </div>
-                    <div className="flex items-center">
-                      <svg className="w-3 h-3 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      </svg>
-                      {event.location}
+                    
+                    {/* Title */}
+                    <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      {localizedTitle}
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                      {localizedDescription}
+                    </p>
+                    
+                    {/* Event Details */}
+                    <div className="space-y-1 text-xs text-gray-500 mb-3">
+                      <div className="flex items-center">
+                        <svg className="w-3 h-3 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {event.time}
+                      </div>
+                      <div className="flex items-center">
+                        <svg className="w-3 h-3 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        </svg>
+                        {localizedLocation}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Кнопка Подробнее в карточке */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEventDetails(event);
-                    }}
-                    className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                  >
-                    {t('events.actions.details')}
-                  </button>
+                    {/* Кнопка Подробнее в карточке */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEventDetails(event);
+                      }}
+                      className="w-full bg-gradient-to-r from-blue-600 to-emerald-600 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                    >
+                      {t('events.actions.details')}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
-
+      
       {/* Модальное окно с деталями мероприятия */}
       <EventDetailsModal
         event={selectedEvent}

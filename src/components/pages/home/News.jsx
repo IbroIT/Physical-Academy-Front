@@ -91,7 +91,7 @@ const NewsHomePage = () => {
   const currentNews = newsData[currentNewsIndex];
 
   const handleReadMore = (newsId) => {
-    navigate(`/details/${newsId}`);
+    navigate(`/news/${newsId}`);
   };
 
   return (
