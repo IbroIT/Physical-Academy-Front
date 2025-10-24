@@ -90,7 +90,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/details/:id" element={<DetailPage />} />
+            <Route path="/news/:id" element={<DetailPage />} />
             <Route
               path="/announcement/:id"
               element={<AnnouncementDetailPage />}

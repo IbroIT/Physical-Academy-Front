@@ -2,21 +2,51 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 const AnnouncementDetailPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(false);
+  const [announcementData, setAnnouncementData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const sectionRef = useRef(null);
 
-  // Получаем все данные через i18n
-  const announcementsData = t('announcements.items', { returnObjects: true });
-  const detailData = t('announcements.detail', { returnObjects: true });
-  const infoLabels = t('announcements.detail.infoLabels', { returnObjects: true });
+  // Загрузка конкретного объявления с бэкенда
+  useEffect(() => {
+    const fetchAnnouncementDetail = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        console.log('Fetching announcement with ID:', id);
+        const currentLanguage = i18n.language;
+        const response = await axios.get(`http://localhost:8000/api/announcements/${id}/?lang=${currentLanguage}`);
+        console.log('Announcement API Response:', response.data);
+        
+        if (response.data.success) {
+          setAnnouncementData(response.data.announcement);
+        } else {
+          setError('Объявление не найдено на сервере');
+        }
+      } catch (err) {
+        console.error('API Error:', err);
+        setError(`Ошибка загрузки: ${err.response?.data?.message || err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const currentAnnouncement = announcementsData.find(announcement => announcement.id === parseInt(id)) || announcementsData[0];
+    if (id) {
+      fetchAnnouncementDetail();
+    } else {
+      setError('ID объявления не указан');
+      setLoading(false);
+    }
+  }, [id, i18n.language]);
 
   // Прокрутка к верху при загрузке
   useEffect(() => {
@@ -33,7 +63,6 @@ const AnnouncementDetailPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Прокрутка к верху
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -41,11 +70,12 @@ const AnnouncementDetailPage = () => {
     });
   };
 
-  // Функция для поделиться
   const handleShare = async () => {
+    if (!announcementData) return;
+
     const shareData = {
-      title: currentAnnouncement.title,
-      text: currentAnnouncement.description,
+      title: announcementData.title,
+      text: announcementData.description,
       url: window.location.href,
     };
 
@@ -53,306 +83,308 @@ const AnnouncementDetailPage = () => {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        // Fallback - копирование ссылки в буфер обмена
         await navigator.clipboard.writeText(window.location.href);
-        alert(t('announcements.detail.shareCopied'));
+        alert('Ссылка скопирована в буфер обмена!');
       }
-    } catch (error) {
-      console.log(t('announcements.detail.shareError'), error);
+    } catch (err) {
+      console.log('Ошибка при попытке поделиться:', err);
     }
   };
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   const getUrgencyBadge = (urgency) => {
     const styles = {
       high: 'bg-red-100 text-red-700 border-red-200',
       medium: 'bg-orange-100 text-orange-700 border-orange-200',
-      low: 'bg-cyan-100 text-cyan-700 border-cyan-200'
+      low: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+      urgent: 'bg-red-100 text-red-700 border-red-200',
+      important: 'bg-orange-100 text-orange-700 border-orange-200',
+      info: 'bg-cyan-100 text-cyan-700 border-cyan-200'
     };
-    return styles[urgency] || styles.low;
+    return styles[urgency] || styles.info;
   };
 
-  if (!currentAnnouncement) {
+  const getUrgencyText = (urgency) => {
+    const texts = {
+      high: t('announcements.urgency.high', 'Срочно'),
+      medium: t('announcements.urgency.medium', 'Важно'),
+      low: t('announcements.urgency.low', 'Информация'),
+      urgent: t('announcements.urgency.high', 'Срочно'),
+      important: t('announcements.urgency.medium', 'Важно'),
+      info: t('announcements.urgency.low', 'Информация')
+    };
+    return texts[urgency] || texts.info;
+  };
+
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return 'https://images.unsplash.com/photo-1562813733-b31f71025d54?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80';
+    
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    
+    return `http://localhost:8000${imagePath}`;
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  // Резервные данные на случай ошибки API
+  const getFallbackData = () => ({
+    id: parseInt(id),
+    title: "Объявление университета",
+    description: "Важная информация от администрации университета.",
+    full_content: "Это резервный контент, который показывается когда данные с сервера недоступны. Пожалуйста, проверьте подключение к интернету и попробуйте снова.",
+    image_url: 'https://images.unsplash.com/photo-1562813733-b31f71025d54?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80',
+    category: 'Общее',
+    department: 'Администрация',
+    author: 'Администрация университета',
+    urgency: 'info',
+    created_at: new Date().toISOString(),
+    tags: ['университет', 'объявление']
+  });
+
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            {detailData.notFound}
-          </h1>
-          <button 
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-emerald-600 text-white rounded-lg hover:from-cyan-700 hover:to-emerald-700 transition-all duration-300"
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <motion.p
+            initial={{ y: 10 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-cyan-600 text-lg font-medium"
           >
-            {detailData.backToAnnouncements}
-          </button>
-        </div>
+            Загружаем объявление...
+          </motion.p>
+        </motion.div>
       </div>
     );
   }
 
+  if (error || !announcementData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md mx-4"
+        >
+          <div className="text-6xl mb-4">😕</div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Что-то пошло не так</h1>
+          <p className="text-gray-600 mb-6">{error || 'Объявление не найдено'}</p>
+          <div className="flex gap-3 justify-center">
+            <button 
+              onClick={() => navigate('/announcements')}
+              className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 font-semibold"
+            >
+              К объявлениям
+            </button>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl hover:border-cyan-400 hover:text-cyan-600 transition-all duration-300 font-semibold"
+            >
+              Попробовать снова
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Используем данные с бэкенда или резервные данные
+  const data = announcementData || getFallbackData();
+
   return (
-    <section 
-      ref={sectionRef}
-      className="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 py-8 lg:py-12 overflow-hidden"
-    >
-      {/* Кнопка "Наверх" */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+      {/* Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-200"
+      >
+        <div className="container mx-auto px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between">
+            <button 
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 text-gray-600 hover:text-cyan-600 transition-colors duration-300 group"
+            >
+              <motion.svg 
+                whileHover={{ x: -2 }}
+                className="w-5 h-5" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </motion.svg>
+              Назад к объявлениям
+            </button>
+            
+            <div className="flex items-center gap-4">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleShare}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:border-cyan-400 hover:text-cyan-600 transition-all duration-300"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                Поделиться
+              </motion.button>
+            </div>
+          </div>
+        </div>
+      </motion.header>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 sm:px-6 py-8">
+        <motion.article
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-4xl mx-auto"
+          ref={sectionRef}
+        >
+          {/* Hero Image */}
+          <motion.div
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
+            className="relative rounded-3xl overflow-hidden mb-8 shadow-2xl"
+          >
+            <div className="aspect-w-16 aspect-h-9 bg-gray-200">
+              <img
+                src={getImageUrl(data.image_url)}
+                alt={data.title}
+                className={`w-full h-64 sm:h-80 md:h-96 object-cover transition-opacity duration-500 ${
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                onLoad={() => setImageLoaded(true)}
+                onError={(e) => {
+                  console.error('Image failed to load:', e);
+                  e.target.src = 'https://images.unsplash.com/photo-1562813733-b31f71025d54?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80';
+                }}
+              />
+            </div>
+            {!imageLoaded && (
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-200 to-gray-300 animate-pulse" />
+            )}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-white"
+              >
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <span className="inline-block px-3 py-1 bg-cyan-500 rounded-full text-sm font-semibold">
+                    {data.category || 'Общее'}
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${getUrgencyBadge(data.urgency)}`}>
+                    {getUrgencyText(data.urgency)}
+                  </span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
+                  {data.title}
+                </h1>
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Article Meta */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="flex flex-wrap items-center gap-4 mb-8 text-gray-600"
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                {(data.department || 'У')[0]}
+              </div>
+              <span className="font-medium">{data.department || 'Университет'}</span>
+            </div>
+            <div className="w-px h-4 bg-gray-300" />
+            <span>{formatDate(data.created_at || data.date)}</span>
+            {data.author && (
+              <>
+                <div className="w-px h-4 bg-gray-300" />
+                <span>Автор: {data.author}</span>
+              </>
+            )}
+          </motion.div>
+
+          {/* Article Content */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="prose prose-lg max-w-none"
+          >
+            <p className="text-xl text-gray-700 leading-relaxed mb-6 font-medium">
+              {data.description}
+            </p>
+            
+            <div className="space-y-6 text-gray-600 leading-8">
+              {data.full_content ? (
+                data.full_content.split('\n\n').map((paragraph, index) => (
+                  <motion.p
+                    key={index}
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.7 + index * 0.1 }}
+                    className="text-lg"
+                  >
+                    {paragraph}
+                  </motion.p>
+                ))
+              ) : (
+                <motion.p
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  className="text-lg"
+                >
+                  {data.content || 'Полное содержание объявления...'}
+                </motion.p>
+              )}
+            </div>
+          </motion.div>
+        </motion.article>
+      </div>
+
+      {/* Floating Action Button */}
       <AnimatePresence>
         {showScrollTop && (
           <motion.button
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={scrollToTop}
-            className="fixed bottom-8 right-8 z-50 w-12 h-12 bg-gradient-to-r from-cyan-600 to-emerald-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:from-cyan-700 hover:to-emerald-700 transition-all duration-300 transform hover:scale-110"
+            className="fixed bottom-8 right-8 z-50 w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-full shadow-2xl flex items-center justify-center hover:shadow-3xl transition-all duration-300"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
             </svg>
           </motion.button>
         )}
       </AnimatePresence>
-
-      {/* Анимированный фон */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
-        <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-        <div className="absolute bottom-20 right-1/4 w-40 h-40 bg-green-500/10 rounded-full blur-3xl animate-bounce delay-1500"></div>
-      </div>
-
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        {/* Хлебные крошки */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="flex items-center gap-2 text-sm text-gray-600 mb-8"
-        >
-          <button 
-            onClick={() => navigate('/')}
-            className="hover:text-cyan-600 transition-colors duration-300"
-          >
-            {t('announcements.title')}
-          </button>
-          <span className="text-gray-400">/</span>
-          <span className="text-gray-800 font-medium">{currentAnnouncement.title}</span>
-        </motion.div>
-
-        <div className="grid lg:grid-cols-4 gap-8 lg:gap-12">
-          {/* Основной контент */}
-          <div className="lg:col-span-3">
-            <motion.article
-              initial={{ opacity: 0, y: 30 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8 }}
-              className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
-            >
-              {/* Заголовочное изображение */}
-              <div className="relative h-64 md:h-80 lg:h-96 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10"></div>
-                <motion.img
-                  initial={{ scale: 1.1 }}
-                  animate={isVisible ? { scale: 1 } : {}}
-                  transition={{ duration: 1.2 }}
-                  src={currentAnnouncement.image}
-                  alt={currentAnnouncement.title}
-                  className="w-full h-full object-cover"
-                />
-                
-                {/* Категория и дата */}
-                <div className="absolute top-6 left-6 z-20 flex flex-wrap gap-2">
-                  <span className="px-4 py-2 bg-white/90 backdrop-blur-sm text-cyan-700 rounded-full text-sm font-semibold">
-                    {currentAnnouncement.category}
-                  </span>
-                  <span className="px-3 py-2 bg-black/50 backdrop-blur-sm text-white rounded-lg text-sm">
-                    {currentAnnouncement.date}
-                  </span>
-                  <span className={`px-4 py-2 rounded-full text-sm font-semibold border ${getUrgencyBadge(currentAnnouncement.urgency)}`}>
-                    {t(`announcements.urgency.${currentAnnouncement.urgency}`)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Контент объявления */}
-              <div className="p-6 lg:p-8">
-                <motion.h1
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  className="text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-800 mb-6 leading-tight"
-                >
-                  {currentAnnouncement.title}
-                </motion.h1>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="prose prose-lg max-w-none text-gray-600 mb-8"
-                >
-                  <p className="text-xl leading-relaxed mb-6">
-                    {currentAnnouncement.description}
-                  </p>
-                  
-                  {/* Полный текст объявления */}
-                  <div className="space-y-4 text-gray-700">
-                    {detailData.content.map((paragraph, index) => (
-                      <p key={index}>{paragraph}</p>
-                    ))}
-                    
-                    <blockquote className="border-l-4 border-cyan-500 pl-6 italic text-gray-600 my-6">
-                      {detailData.quote}
-                    </blockquote>
-                  </div>
-                </motion.div>
-
-                {/* Дополнительные детали */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  className="grid md:grid-cols-2 gap-6 mb-8"
-                >
-                  {detailData.features.map((feature, index) => (
-                    <div 
-                      key={index}
-                      className="bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-2xl p-6 border border-cyan-100"
-                    >
-                      <h3 className="font-semibold text-cyan-800 mb-3 flex items-center gap-2">
-                        <span>{feature.icon}</span>
-                        {feature.title}
-                      </h3>
-                      <p className="text-cyan-700">
-                        {feature.description}
-                      </p>
-                    </div>
-                  ))}
-                </motion.div>
-
-                {/* Кнопки действий */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                  className="flex flex-wrap gap-4 pt-6 border-t border-gray-200"
-                >
-                  <button 
-                    onClick={handleShare}
-                    className="px-8 py-4 bg-gradient-to-r from-cyan-600 to-emerald-600 text-white rounded-xl hover:from-cyan-700 hover:to-emerald-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-2"
-                  >
-                    <span>📤</span>
-                    {t('announcements.share')}
-                  </button>
-                  
-                  <button 
-                    onClick={() => navigate('/')}
-                    className="px-8 py-4 border border-gray-300 text-gray-600 rounded-xl hover:border-cyan-400 hover:text-cyan-600 transition-all duration-300 font-semibold flex items-center gap-2"
-                  >
-                    <span>←</span>
-                    {detailData.backToAnnouncements}
-                  </button>
-                </motion.div>
-              </div>
-            </motion.article>
-          </div>
-
-          {/* Боковая панель */}
-          <div className="space-y-8">
-            {/* Статистика */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={isVisible ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
-            >
-              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span>📈</span>
-                {detailData.stats.title}
-              </h3>
-              
-              <div className="space-y-3">
-                {detailData.stats.items.map((stat, index) => (
-                  <div key={index} className="flex justify-between items-center">
-                    <span className="text-gray-600">{stat.label}:</span>
-                    <span className="font-semibold text-cyan-600">{stat.value}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Информация о объявлении */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={isVisible ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
-            >
-              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span>ℹ️</span>
-                {detailData.info.title}
-              </h3>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">{infoLabels.department}:</span>
-                  <span className="font-medium text-gray-800">{currentAnnouncement.department}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">{infoLabels.category}:</span>
-                  <span className="font-medium text-gray-800">{currentAnnouncement.category}</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">{infoLabels.urgency}:</span>
-                  <span className="font-medium text-gray-800">
-                    {t(`announcements.urgency.${currentAnnouncement.urgency}`)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">{infoLabels.publicationDate}:</span>
-                  <span className="font-medium text-gray-800">{currentAnnouncement.date}</span>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Теги */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={isVisible ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
-            >
-              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span>🏷️</span>
-                {detailData.tags.title}
-              </h3>
-              
-              <div className="flex flex-wrap gap-2">
-                {detailData.tags.items.map((tag, index) => (
-                  <span 
-                    key={index}
-                    className="px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-sm font-medium hover:bg-cyan-200 transition-colors duration-300 cursor-pointer"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-    </section>
+    </div>
   );
 };
 

@@ -165,7 +165,7 @@ const AnimatedFactsSection = () => {
     return (
       <section className="py-20 bg-gradient-to-br from-blue-50 via-white to-green-50">
         <div className="container mx-auto px-4">
-          <div className="text-center text-blue-600 text-xl">Загрузка фактов...</div>
+          <div className="text-center text-blue-600 text-xl">...</div>
         </div>
       </section>
     );
@@ -217,16 +217,6 @@ const AnimatedFactsSection = () => {
               color={fact.color}
             />
           ))}
-        </div>
-
-        {/* Дополнительная информация */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center bg-white rounded-full px-6 py-3 shadow-lg border border-gray-100">
-            <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></div>
-            <span className="text-gray-700 font-medium">
-              {t("facts.liveUpdate")}
-            </span>
-          </div>
         </div>
       </div>
     </section>
