@@ -531,21 +531,6 @@ const AcademyAbout = () => {
                           {mediaItems[activeMedia].description}
                         </p>
                       </div>
-
-                      {/* Индикатор прогресса */}
-                      {mediaItems.length > 1 && (
-                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                          {mediaItems.map((_, index) => (
-                            <button
-                              key={index}
-                              onClick={() => goToMedia(index)}
-                              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                                activeMedia === index ? 'bg-green-400' : 'bg-white/40 hover:bg-white/60'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      )}
                     </div>
 
                     {/* Миниатюры */}
