@@ -243,6 +243,11 @@ const MilitaryTraining = () => {
   }, []);
 
   const startCounters = () => {
+    // Проверяем что facultyData и stats существуют
+    if (!facultyData || !facultyData.stats || facultyData.stats.length === 0) {
+      return;
+    }
+
     const targetValues = facultyData.stats.map(
       (stat) => parseInt(stat.value.replace(/\D/g, "")) || 0
     );
@@ -400,7 +405,7 @@ const MilitaryTraining = () => {
           animate={isVisible ? "visible" : "hidden"}
           className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16 lg:mb-20"
         >
-          {facultyData.stats.map((stat, index) => (
+          {(facultyData?.stats || []).map((stat, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
@@ -504,7 +509,7 @@ const MilitaryTraining = () => {
                           {facultyData.about.advantagesTitle}
                         </h4>
                         <ul className="space-y-4">
-                          {facultyData.about.advantages.map(
+                          {(facultyData?.about?.advantages || []).map(
                             (advantage, index) => (
                               <motion.li
                                 key={index}
@@ -531,7 +536,7 @@ const MilitaryTraining = () => {
                           {facultyData.about.achievementsTitle}
                         </h4>
                         <div className="space-y-4">
-                          {facultyData.about.achievements.map(
+                          {(facultyData?.about?.achievements || []).map(
                             (achievement, index) => (
                               <motion.div
                                 key={index}

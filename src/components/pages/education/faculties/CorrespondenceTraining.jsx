@@ -628,89 +628,100 @@ const CorrespondenceTraining = () => {
                   className="space-y-8"
                 >
                   <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {(facultyData.programs && facultyData.programs.length > 0) ? facultyData.programs.map((program, index) => (
-                      <motion.div
-                        key={program.id || index}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden backdrop-blur-sm"
-                        onMouseEnter={() => setHoveredCard(`program-${index}`)}
-                        onMouseLeave={() => setHoveredCard(null)}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+                    {facultyData.programs && facultyData.programs.length > 0 ? (
+                      facultyData.programs.map((program, index) => (
+                        <motion.div
+                          key={program.id || index}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden backdrop-blur-sm"
+                          onMouseEnter={() =>
+                            setHoveredCard(`program-${index}`)
+                          }
+                          onMouseLeave={() => setHoveredCard(null)}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
 
-                        <div className="relative z-10">
-                          <div
-                            className={`text-5xl mb-6 transition-transform duration-500 ${
-                              hoveredCard === `program-${index}`
-                                ? "scale-110 rotate-6"
-                                : "group-hover:scale-105"
-                            }`}
-                          >
-                            {program.icon}
-                          </div>
-                          <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-emerald-300 transition-colors duration-300">
-                            {program.name}
-                          </h4>
-                          <p className="text-blue-100 text-lg mb-6 leading-relaxed">
-                            {program.description}
-                          </p>
-                          <div className="space-y-4 text-lg">
-                            <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
-                              <span className="text-blue-200">
-                                {t(
-                                  "correspondenceTraining.programs.level",
-                                  "Уровень"
-                                )}
-                                :
-                              </span>
-                              <span className="text-white font-semibold">
-                                {program.level}
-                              </span>
+                          <div className="relative z-10">
+                            <div
+                              className={`text-5xl mb-6 transition-transform duration-500 ${
+                                hoveredCard === `program-${index}`
+                                  ? "scale-110 rotate-6"
+                                  : "group-hover:scale-105"
+                              }`}
+                            >
+                              {program.icon}
                             </div>
-                            <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
-                              <span className="text-blue-200">
-                                {t(
-                                  "correspondenceTraining.programs.duration",
-                                  "Длительность"
-                                )}
-                                :
-                              </span>
-                              <span className="text-white font-semibold">
-                                {program.duration}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
-                              <span className="text-blue-200">
-                                {t(
-                                  "correspondenceTraining.programs.format",
-                                  "Форма"
-                                )}
-                                :
-                              </span>
-                              <span className="text-white font-semibold">
-                                {program.format}
-                              </span>
-                            </div>
-                            {program.tuitionFee && (
-                              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
+                            <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-emerald-300 transition-colors duration-300">
+                              {program.name}
+                            </h4>
+                            <p className="text-blue-100 text-lg mb-6 leading-relaxed">
+                              {program.description}
+                            </p>
+                            <div className="space-y-4 text-lg">
+                              <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
                                 <span className="text-blue-200">
                                   {t(
-                                    "correspondenceTraining.programs.tuition",
-                                    "Стоимость"
+                                    "correspondenceTraining.programs.level",
+                                    "Уровень"
                                   )}
                                   :
                                 </span>
                                 <span className="text-white font-semibold">
-                                  {program.tuitionFee} ₽
+                                  {program.level}
                                 </span>
                               </div>
-                            )}
+                              <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
+                                <span className="text-blue-200">
+                                  {t(
+                                    "correspondenceTraining.programs.duration",
+                                    "Длительность"
+                                  )}
+                                  :
+                                </span>
+                                <span className="text-white font-semibold">
+                                  {program.duration}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
+                                <span className="text-blue-200">
+                                  {t(
+                                    "correspondenceTraining.programs.format",
+                                    "Форма"
+                                  )}
+                                  :
+                                </span>
+                                <span className="text-white font-semibold">
+                                  {program.format}
+                                </span>
+                              </div>
+                              {program.tuitionFee && (
+                                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
+                                  <span className="text-blue-200">
+                                    {t(
+                                      "correspondenceTraining.programs.tuition",
+                                      "Стоимость"
+                                    )}
+                                    :
+                                  </span>
+                                  <span className="text-white font-semibold">
+                                    {program.tuitionFee} ₽
+                                  </span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
+                        </motion.div>
+                      ))
+                    ) : (
+                      <div className="col-span-full text-center text-blue-200 text-lg py-8">
+                        {t(
+                          "correspondenceTraining.noPrograms",
+                          "Программы пока не добавлены"
+                        )}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
