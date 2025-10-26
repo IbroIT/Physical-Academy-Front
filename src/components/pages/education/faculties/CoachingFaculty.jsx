@@ -332,7 +332,6 @@ const CoachingFaculty = () => {
     }, duration / steps);
   };
 
-  // Проверяем есть ли контактные данные (нужно до определения tabs, чтобы не использовать const до инициализации)
   const hasContactData =
     facultyData.contacts &&
     (facultyData.contacts.dean ||
