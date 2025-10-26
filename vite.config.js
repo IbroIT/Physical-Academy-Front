@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'https://physical-academy-backend-3dccb860f75a.herokuapp.com',
         changeOrigin: true,
       },
     },

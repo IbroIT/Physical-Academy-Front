@@ -20,7 +20,7 @@ const NewsDetailPage = () => {
         
         console.log('Fetching news with ID:', id);
         
-        const response = await axios.get(`http://localhost:8000/api/news/${id}/`);
+        const response = await axios.get(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/news/${id}/`);
         console.log('API Response:', response.data);
         
         if (response.data.success) {
@@ -81,7 +81,7 @@ const NewsDetailPage = () => {
       return imagePath;
     }
     
-    return `http://localhost:8000${imagePath}`;
+    return `https://physical-academy-backend-3dccb860f75a.herokuapp.com${imagePath}`;
   };
 
   // Резервные данные на случай ошибки API

@@ -1,7 +1,7 @@
 // API service for Academy Management System
 class ApiService {
   constructor() {
-    this.baseURL = "http://localhost:8000/api";
+    this.baseURL = "https://physical-academy-backend-3dccb860f75a.herokuapp.com/api";
   }
 
   // Helper method to get language parameter

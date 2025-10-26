@@ -11,7 +11,7 @@ const Banner = () => {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/banner/slides/');
+        const response = await axios.get('https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/banner/slides/');
         if (response.data.success) {
           setSlides(response.data.slides);
         }
@@ -88,7 +88,7 @@ const Banner = () => {
             }`}
           >
             <img
-              src={`http://localhost:8000${slide.image_url}`}
+              src={`https://physical-academy-backend-3dccb860f75a.herokuapp.com${slide.image_url}`}
               alt={slide.alt_text || slide.title}
               className="w-full h-full object-cover"
             />

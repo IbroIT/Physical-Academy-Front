@@ -15,7 +15,7 @@ const QuotesBanner = () => {
     const fetchQuotes = async () => {
       try {
         const currentLanguage = i18n.language;
-        const response = await axios.get(`http://localhost:8000/api/quotes/?lang=${currentLanguage}`);
+        const response = await axios.get(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/quotes/?lang=${currentLanguage}`);
         if (response.data.success) {
           setQuotes(response.data.quotes);
         }
@@ -112,7 +112,7 @@ const QuotesBanner = () => {
                 {currentQuote.image_url ? (
                   <div className="mb-4">
                     <img 
-                      src={`http://localhost:8000${currentQuote.image_url}`}
+                      src={`https://physical-academy-backend-3dccb860f75a.herokuapp.com${currentQuote.image_url}`}
                       alt={currentQuote.author}
                       className="w-20 h-20 rounded-full object-cover border-4 border-cyan-100 shadow-md"
                     />

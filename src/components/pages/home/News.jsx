@@ -19,7 +19,7 @@ const NewsHomePage = () => {
     const fetchNews = async () => {
       try {
         const currentLanguage = i18n.language;
-        const response = await axios.get(`http://localhost:8000/api/news/?lang=${currentLanguage}`);
+        const response = await axios.get(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/news/?lang=${currentLanguage}`);
         if (response.data.success) {
           setNewsData(response.data.news);
         }
@@ -172,7 +172,7 @@ const NewsHomePage = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-emerald-500/10 z-10" />
               <motion.div
                 className={`absolute inset-0 bg-cover bg-center transition-transform duration-700 ${isVisible ? 'scale-110' : 'scale-100'}`}
-                style={{ backgroundImage: `url(http://localhost:8000${currentNews.image_url})` }}
+                style={{ backgroundImage: `url(https://physical-academy-backend-3dccb860f75a.herokuapp.com${currentNews.image_url})` }}
                 key={currentNews.id}
               />
             </div>
@@ -268,7 +268,7 @@ const NewsHomePage = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 z-10 group-hover:scale-110 transition-transform duration-700" />
                   <div
                     className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
-                    style={{ backgroundImage: `url(http://localhost:8000${news.image_url})` }}
+                    style={{ backgroundImage: `url(https://physical-academy-backend-3dccb860f75a.herokuapp.com${news.image_url})` }}
                   />
                 </div>
 

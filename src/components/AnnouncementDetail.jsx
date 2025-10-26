@@ -24,7 +24,7 @@ const AnnouncementDetailPage = () => {
         
         console.log('Fetching announcement with ID:', id);
         const currentLanguage = i18n.language;
-        const response = await axios.get(`http://localhost:8000/api/announcements/${id}/?lang=${currentLanguage}`);
+        const response = await axios.get(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/announcements/${id}/?lang=${currentLanguage}`);
         console.log('Announcement API Response:', response.data);
         
         if (response.data.success) {
@@ -122,7 +122,7 @@ const AnnouncementDetailPage = () => {
       return imagePath;
     }
     
-    return `http://localhost:8000${imagePath}`;
+    return `https://physical-academy-backend-3dccb860f75a.herokuapp.com${imagePath}`;
   };
 
   const formatDate = (dateString) => {

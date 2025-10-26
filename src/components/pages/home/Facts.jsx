@@ -146,7 +146,7 @@ const AnimatedFactsSection = () => {
     const fetchFacts = async () => {
       try {
         const currentLanguage = i18n.language;
-        const response = await axios.get(`http://localhost:8000/api/facts/?lang=${currentLanguage}`);
+        const response = await axios.get(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/facts/?lang=${currentLanguage}`);
         if (response.data.success) {
           setFacts(response.data.facts);
         }
