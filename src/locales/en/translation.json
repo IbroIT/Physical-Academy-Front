@@ -648,8 +648,12 @@
       "nameDesc": "By Name (Z-A)"
     },
     "filters": {
-      "all": "All",
-      "active": "Active"
+      "all": "All Commissions",
+      "active": "Active",
+      "methodical": "Methodical",
+      "academic": "Academic",
+      "quality": "Quality of Education",
+      "student": "Student"
     },
     "stats": {
       "found": "Documents found",
