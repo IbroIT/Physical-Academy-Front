@@ -212,19 +212,6 @@ const Commissions = () => {
                                 </span>
                               ))}
                             </div>
-
-                            <div className="flex items-center justify-between pt-3 border-t border-white/10">
-                              <div className="flex items-center space-x-4 text-sm text-blue-200">
-                                <span className="flex items-center">
-                                  <span className="w-2 h-2 bg-emerald-400 rounded-full mr-2"></span>
-                                  {commission.members?.length || 0} {t('commissions.members', 'участников')}
-                                </span>
-                                <span className="flex items-center">
-                                  <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-                                  {commission.responsibilities?.length || 0} {t('commissions.responsibilities', 'обязанностей')}
-                                </span>
-                              </div>
-                            </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -284,15 +271,13 @@ const Commissions = () => {
                     )}
 
                   {/* Контактная информация */}
-
-                  {/* Контактная информация */}
                   {(filteredCommissions[activeCommission].email ||
                     filteredCommissions[activeCommission].phone ||
                     filteredCommissions[activeCommission].chairman) && (
                       <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
                         <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
                           <span className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
-                          {t('commissions.contact', 'Контактная информация')}
+                          {t('commissions.contactInfo', 'Контактная информация')}
                         </h4>
                         <div className="space-y-3 text-blue-200">
                           {filteredCommissions[activeCommission].chairman && (
