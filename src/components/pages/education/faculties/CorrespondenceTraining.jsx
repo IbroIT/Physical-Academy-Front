@@ -379,21 +379,7 @@ const CorrespondenceTraining = () => {
     },
   };
 
-  if (apiData.loading) {
-    return (
-      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-500 mb-4"></div>
-          <p className="text-blue-100 text-xl">
-            {t("common.loading", "Загрузка...")}
-          </p>
-        </div>
-      </section>
-    );
-  }
-
-  // Error state - показываем fallback данные вместо ошибки
-  // API может вернуть 404, но мы покажем дефолтные данные из normalizeData
+  // Логируем ошибки, но не блокируем рендер - страница показывается с пустыми данными
   if (apiData.error) {
     console.warn("Faculty API error, using fallback data:", apiData.error);
   }
@@ -642,7 +628,7 @@ const CorrespondenceTraining = () => {
                   className="space-y-8"
                 >
                   <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {facultyData.programs.map((program, index) => (
+                    {(facultyData.programs && facultyData.programs.length > 0) ? facultyData.programs.map((program, index) => (
                       <motion.div
                         key={program.id || index}
                         initial={{ opacity: 0, scale: 0.9 }}

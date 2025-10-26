@@ -90,6 +90,8 @@ const MilitaryTraining = () => {
         badge: t("militaryTraining.badge", "Военное образование"),
         sections: [],
         stats: defaultStats,
+        programs: [],
+        specializations: [],
         about: {
           missionTitle: t(
             "militaryTraining.about.missionTitle",
@@ -320,20 +322,7 @@ const MilitaryTraining = () => {
     },
   };
 
-  // Loading state
-  if (apiData.loading) {
-    return (
-      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-xl">{t("loading", "Загрузка...")}</p>
-        </div>
-      </section>
-    );
-  }
-
-  // Error state - показываем fallback данные вместо ошибки
-  // API может вернуть 404, но мы покажем дефолтные данные из normalizeData
+  // Логируем ошибки, но не блокируем рендер - страница показывается с пустыми данными
   if (apiData.error) {
     console.warn("Faculty API error, using fallback data:", apiData.error);
   }
@@ -581,70 +570,81 @@ const MilitaryTraining = () => {
                   className="space-y-8"
                 >
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {facultyData.programs.map((program, index) => (
-                      <motion.div
-                        key={program.id || index}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden backdrop-blur-sm"
-                        onMouseEnter={() => setHoveredCard(`program-${index}`)}
-                        onMouseLeave={() => setHoveredCard(null)}
-                      >
-                        {/* Background effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+                    {facultyData.programs?.length > 0 ? (
+                      facultyData.programs.map((program, index) => (
+                        <motion.div
+                          key={program.id || index}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden backdrop-blur-sm"
+                          onMouseEnter={() =>
+                            setHoveredCard(`program-${index}`)
+                          }
+                          onMouseLeave={() => setHoveredCard(null)}
+                        >
+                          {/* Background effect */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
 
-                        <div className="relative z-10">
-                          <div
-                            className={`text-5xl mb-6 transition-transform duration-500 ${
-                              hoveredCard === `program-${index}`
-                                ? "scale-110 rotate-6"
-                                : "group-hover:scale-105"
-                            }`}
-                          >
-                            {program.icon}
-                          </div>
-                          <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-emerald-300 transition-colors duration-300">
-                            {program.name}
-                          </h4>
-                          <p className="text-blue-100 text-lg mb-6 leading-relaxed">
-                            {program.description}
-                          </p>
-                          <div className="space-y-4 text-lg">
-                            <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
-                              <span className="text-blue-200">Уровень:</span>
-                              <span className="text-white font-semibold">
-                                {program.level}
-                              </span>
+                          <div className="relative z-10">
+                            <div
+                              className={`text-5xl mb-6 transition-transform duration-500 ${
+                                hoveredCard === `program-${index}`
+                                  ? "scale-110 rotate-6"
+                                  : "group-hover:scale-105"
+                              }`}
+                            >
+                              {program.icon}
                             </div>
-                            <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
-                              <span className="text-blue-200">
-                                Длительность:
-                              </span>
-                              <span className="text-white font-semibold">
-                                {program.duration}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
-                              <span className="text-blue-200">Форма:</span>
-                              <span className="text-white font-semibold">
-                                {program.format}
-                              </span>
-                            </div>
-                            {program.tuitionFee && (
-                              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
-                                <span className="text-blue-200">
-                                  Стоимость:
-                                </span>
+                            <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-emerald-300 transition-colors duration-300">
+                              {program.name}
+                            </h4>
+                            <p className="text-blue-100 text-lg mb-6 leading-relaxed">
+                              {program.description}
+                            </p>
+                            <div className="space-y-4 text-lg">
+                              <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
+                                <span className="text-blue-200">Уровень:</span>
                                 <span className="text-white font-semibold">
-                                  {program.tuitionFee}
+                                  {program.level}
                                 </span>
                               </div>
-                            )}
+                              <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
+                                <span className="text-blue-200">
+                                  Длительность:
+                                </span>
+                                <span className="text-white font-semibold">
+                                  {program.duration}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
+                                <span className="text-blue-200">Форма:</span>
+                                <span className="text-white font-semibold">
+                                  {program.format}
+                                </span>
+                              </div>
+                              {program.tuitionFee && (
+                                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
+                                  <span className="text-blue-200">
+                                    Стоимость:
+                                  </span>
+                                  <span className="text-white font-semibold">
+                                    {program.tuitionFee}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
+                        </motion.div>
+                      ))
+                    ) : (
+                      <div className="col-span-full text-center text-blue-200 text-lg py-8">
+                        {t(
+                          "militaryTraining.noPrograms",
+                          "Программы пока не добавлены"
+                        )}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -660,41 +660,50 @@ const MilitaryTraining = () => {
                   className="space-y-8"
                 >
                   <div className="grid gap-6">
-                    {facultyData.specializations.map(
-                      (specialization, index) => (
-                        <motion.div
-                          key={specialization.id || index}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="flex items-start space-x-6 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
-                        >
-                          <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
-                            {specialization.icon}
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-bold text-white text-2xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">
-                              {specialization.name}
-                            </h4>
-                            <p className="text-blue-100 text-lg mb-4 leading-relaxed">
-                              {specialization.description}
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {specialization.competencies?.map(
-                                (competency, i) => (
-                                  <motion.span
-                                    key={i}
-                                    className="px-4 py-2 bg-emerald-500/20 text-emerald-300 rounded-2xl text-base font-medium hover:bg-emerald-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-emerald-400/30"
-                                    whileHover={{ scale: 1.05 }}
-                                  >
-                                    {competency}
-                                  </motion.span>
-                                )
-                              )}
+                    {facultyData.specializations?.length > 0 ? (
+                      facultyData.specializations.map(
+                        (specialization, index) => (
+                          <motion.div
+                            key={specialization.id || index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-start space-x-6 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
+                          >
+                            <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
+                              {specialization.icon}
                             </div>
-                          </div>
-                        </motion.div>
+                            <div className="flex-1">
+                              <h4 className="font-bold text-white text-2xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">
+                                {specialization.name}
+                              </h4>
+                              <p className="text-blue-100 text-lg mb-4 leading-relaxed">
+                                {specialization.description}
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {specialization.competencies?.map(
+                                  (competency, i) => (
+                                    <motion.span
+                                      key={i}
+                                      className="px-4 py-2 bg-emerald-500/20 text-emerald-300 rounded-2xl text-base font-medium hover:bg-emerald-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-emerald-400/30"
+                                      whileHover={{ scale: 1.05 }}
+                                    >
+                                      {competency}
+                                    </motion.span>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )
                       )
+                    ) : (
+                      <div className="col-span-full text-center text-blue-200 text-lg py-8">
+                        {t(
+                          "militaryTraining.noSpecializations",
+                          "Специализации пока не добавлены"
+                        )}
+                      </div>
                     )}
                   </div>
                 </motion.div>
@@ -711,41 +720,50 @@ const MilitaryTraining = () => {
                   className="space-y-8"
                 >
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {facultyData.teachers.map((teacher, index) => (
-                      <motion.div
-                        key={teacher.id || index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="bg-white/5 rounded-2xl p-6 text-center border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group backdrop-blur-sm"
-                      >
-                        <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                          {teacher.avatar}
-                        </div>
-                        <h4 className="font-bold text-white text-xl mb-2 group-hover:text-emerald-300 transition-colors duration-300">
-                          {teacher.name}
-                        </h4>
-                        <p className="text-emerald-400 text-lg font-medium mb-2">
-                          {teacher.position}
-                        </p>
-                        <p className="text-blue-200 text-sm mb-3">
-                          {teacher.qualification}
-                        </p>
-                        <p className="text-blue-100 text-xs mb-4">
-                          Опыт: {teacher.experience}
-                        </p>
-                        <div className="flex flex-wrap gap-2 justify-center">
-                          {teacher.specializations.map((spec, i) => (
-                            <span
-                              key={i}
-                              className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-xl text-sm font-medium border border-blue-400/30"
-                            >
-                              {spec}
-                            </span>
-                          ))}
-                        </div>
-                      </motion.div>
-                    ))}
+                    {facultyData.teachers?.length > 0 ? (
+                      facultyData.teachers.map((teacher, index) => (
+                        <motion.div
+                          key={teacher.id || index}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="bg-white/5 rounded-2xl p-6 text-center border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group backdrop-blur-sm"
+                        >
+                          <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                            {teacher.avatar}
+                          </div>
+                          <h4 className="font-bold text-white text-xl mb-2 group-hover:text-emerald-300 transition-colors duration-300">
+                            {teacher.name}
+                          </h4>
+                          <p className="text-emerald-400 text-lg font-medium mb-2">
+                            {teacher.position}
+                          </p>
+                          <p className="text-blue-200 text-sm mb-3">
+                            {teacher.qualification}
+                          </p>
+                          <p className="text-blue-100 text-xs mb-4">
+                            Опыт: {teacher.experience}
+                          </p>
+                          <div className="flex flex-wrap gap-2 justify-center">
+                            {teacher.specializations.map((spec, i) => (
+                              <span
+                                key={i}
+                                className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-xl text-sm font-medium border border-blue-400/30"
+                              >
+                                {spec}
+                              </span>
+                            ))}
+                          </div>
+                        </motion.div>
+                      ))
+                    ) : (
+                      <div className="col-span-full text-center text-blue-200 text-lg py-8">
+                        {t(
+                          "militaryTraining.noTeachers",
+                          "Преподаватели пока не добавлены"
+                        )}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -768,28 +786,37 @@ const MilitaryTraining = () => {
                       Контакты
                     </h3>
                     <div className="space-y-4">
-                      {facultyData.contacts.items.map((item, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group backdrop-blur-sm"
-                          whileHover={{ scale: 1.02 }}
-                        >
-                          <span className="text-2xl text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                            {item.icon}
-                          </span>
-                          <div>
-                            <div className="text-white font-medium text-lg">
-                              {item.value}
+                      {facultyData.contacts?.items?.length > 0 ? (
+                        facultyData.contacts.items.map((item, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group backdrop-blur-sm"
+                            whileHover={{ scale: 1.02 }}
+                          >
+                            <span className="text-2xl text-emerald-400 group-hover:scale-110 transition-transform duration-300">
+                              {item.icon}
+                            </span>
+                            <div>
+                              <div className="text-white font-medium text-lg">
+                                {item.value}
+                              </div>
                             </div>
-                          </div>
-                        </motion.div>
-                      ))}
+                          </motion.div>
+                        ))
+                      ) : (
+                        <div className="text-center text-blue-200 text-lg py-4">
+                          {t(
+                            "militaryTraining.noContacts",
+                            "Контактная информация пока не добавлена"
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
-                  {facultyData.contacts.dean && (
+                  {facultyData.contacts?.dean && (
                     <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl p-6 border border-purple-500/20 backdrop-blur-sm">
                       <h3 className="text-2xl font-bold text-white mb-4 flex items-center">
                         <span className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white mr-3 text-sm">

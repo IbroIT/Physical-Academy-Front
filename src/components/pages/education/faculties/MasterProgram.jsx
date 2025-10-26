@@ -107,6 +107,9 @@ const MasterProgram = () => {
 
   // Преобразование данных с бэкенда в формат компонента
   const getFormattedPrograms = useCallback(() => {
+    if (!backendData.programs || backendData.programs.length === 0) {
+      return [];
+    }
     return backendData.programs.map((program, index) => ({
       id: program.id || index,
       title: program.name,
@@ -214,20 +217,7 @@ const MasterProgram = () => {
     );
   }
 
-  // Loading state
-  if (apiData.loading) {
-    return (
-      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-16 lg:py-24 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-xl">{t("loading", "Загрузка...")}</p>
-        </div>
-      </section>
-    );
-  }
-
-  // Error state - показываем fallback данные вместо ошибки
-  // API может вернуть 404, но мы покажем дефолтные данные из normalizeData
+  // Логируем ошибки, но не блокируем рендер - страница показывается с пустыми данными
   if (apiData.error) {
     console.warn("Faculty API error, using fallback data:", apiData.error);
   }
