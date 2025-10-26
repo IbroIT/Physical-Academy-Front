@@ -80,96 +80,106 @@ import TermsOfService from './components/Terms';
 import { SearchProvider } from './search/SearchContext';
 import { SearchBar } from './search/components/SearchBar';
 import { SearchResults } from './search/components/SearchResults';
+import { SeoProvider } from './providers/SeoProvider';
+import { I18nextProvider } from 'react-i18next';
+import i18n from "./i18n";
+import SeoRouteWrapper from './components/SeoRouteWrapper';
 
 function App() {
   return (
-    <SearchProvider>
-      <Router>
-        <div className="App">
-          <Navbar />
-          <main className="main-content">
-            <Routes>
-              {/* Basic routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<TermsOfService />} />
-              <Route path="/news/:id" element={<DetailPage />} />
-              <Route path="/announcement/:id" element={<AnnouncementDetailPage />} />
+     <I18nextProvider i18n={i18n}>
+      <SeoProvider>
+        <SearchProvider>
+          <Router>
+            <SeoRouteWrapper>
+            <div className="App">
+              <Navbar />
+              <main className="main-content">
+                <Routes>
+                  {/* Basic routes */}
+                  <Route path="/" element={<Home />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/news/:id" element={<DetailPage />} />
+                  <Route path="/announcement/:id" element={<AnnouncementDetailPage />} />
 
-              {/* Academy routes */}
-              <Route path="/academy/about" element={<AcademyAbout />} />
-              <Route path="/academy/history" element={<AcademyHistory />} />
-              <Route path="/academy/mission" element={<AcademyMission />} />
-              <Route path="/academy/accreditation" element={<AcademyAccreditation />} />
-              <Route path="/academy/numbers" element={<AcademyNumbers />} />
-              <Route path="/academy/documents" element={<AcademyDocuments />} />
-              <Route path="/academy/leadership/rectorate" element={<AcademyLeadership />} />
-              <Route path="/academy/structure/academic" element={<AcademyStructure />} />
-              <Route path="/academy/leadership/board-of-trustees" element={<BoardOfTrustees />} />
-              <Route path="/academy/leadership/audit-commission" element={<AuditCommission />} />
-              <Route path="/academy/leadership/academic-council" element={<AcademicCouncil />} />
-              <Route path="/academy/leadership/trade-union" element={<TradeUnion />} />
-              <Route path="/academy/leadership/commissions" element={<Commissions />} />
-              <Route path="/academy/structure/administrative" element={<AdministrativeStructure />} />
-              <Route path="/academy/structure/units" element={<AdministrativeUnits />} />
+                  {/* Academy routes */}
+                  <Route path="/academy/about" element={<AcademyAbout />} />
+                  <Route path="/academy/history" element={<AcademyHistory />} />
+                  <Route path="/academy/mission" element={<AcademyMission />} />
+                  <Route path="/academy/accreditation" element={<AcademyAccreditation />} />
+                  <Route path="/academy/numbers" element={<AcademyNumbers />} />
+                  <Route path="/academy/documents" element={<AcademyDocuments />} />
+                  <Route path="/academy/leadership/rectorate" element={<AcademyLeadership />} />
+                  <Route path="/academy/structure/academic" element={<AcademyStructure />} />
+                  <Route path="/academy/leadership/board-of-trustees" element={<BoardOfTrustees />} />
+                  <Route path="/academy/leadership/audit-commission" element={<AuditCommission />} />
+                  <Route path="/academy/leadership/academic-council" element={<AcademicCouncil />} />
+                  <Route path="/academy/leadership/trade-union" element={<TradeUnion />} />
+                  <Route path="/academy/leadership/commissions" element={<Commissions />} />
+                  <Route path="/academy/structure/administrative" element={<AdministrativeStructure />} />
+                  <Route path="/academy/structure/units" element={<AdministrativeUnits />} />
 
-              {/* Admissions routes */}
-              <Route path="/admissions/bachelor/info" element={<BachelorInfo />} />
-              <Route path="/admissions/bachelor/registration" element={<BachelorRegistration />} />
-              <Route path="/admissions/bachelor/international" element={<BachelorInternational />} />
-              <Route path="/admissions/bachelor/quotas" element={<BachelorQuotasFull />} />
-              <Route path="/admissions/bachelor/contacts" element={<BachelorContacts />} />
-              <Route path="/admissions/master/info" element={<MasterInfo />} />
-              <Route path="/admissions/college/info" element={<CollegeInfo />} />
-              <Route path="/admissions/doctorate/info" element={<DoctorateInfo />} />
+                  {/* Admissions routes */}
+                  <Route path="/admissions/bachelor/info" element={<BachelorInfo />} />
+                  <Route path="/admissions/bachelor/registration" element={<BachelorRegistration />} />
+                  <Route path="/admissions/bachelor/international" element={<BachelorInternational />} />
+                  <Route path="/admissions/bachelor/quotas" element={<BachelorQuotasFull />} />
+                  <Route path="/admissions/bachelor/contacts" element={<BachelorContacts />} />
+                  <Route path="/admissions/master/info" element={<MasterInfo />} />
+                  <Route path="/admissions/college/info" element={<CollegeInfo />} />
+                  <Route path="/admissions/doctorate/info" element={<DoctorateInfo />} />
 
-              {/* Education routes */}
-              <Route path="/education/faculties/pedagogical" element={<PedagogicalSports />} />
-              <Route path="/education/faculties/coaching" element={<CoachingFaculty />} />
-              <Route path="/education/faculties/military-training" element={<MilitaryTraining />} />
-              <Route path="/education/faculties/correspondence" element={<CorrespondenceTraining />} />
-              <Route path="/education/departments" element={<GeneralDepartments />} />
-              <Route path="/education/college/sports" element={<CollegeSports />} />
-              <Route path="/education/faculties/master" element={<MasterProgram />} />
-              <Route path="/education/faculties/doctorate" element={<DoctorateProgram />} />
+                  {/* Education routes */}
+                  <Route path="/education/faculties/pedagogical" element={<PedagogicalSports />} />
+                  <Route path="/education/faculties/coaching" element={<CoachingFaculty />} />
+                  <Route path="/education/faculties/military-training" element={<MilitaryTraining />} />
+                  <Route path="/education/faculties/correspondence" element={<CorrespondenceTraining />} />
+                  <Route path="/education/departments" element={<GeneralDepartments />} />
+                  <Route path="/education/college/sports" element={<CollegeSports />} />
+                  <Route path="/education/faculties/master" element={<MasterProgram />} />
+                  <Route path="/education/faculties/doctorate" element={<DoctorateProgram />} />
 
-              {/* Science routes */}
-              <Route path="/science/publications" element={<ScientificPublications />} />
-              <Route path="/science/vestnik" element={<Vestnik />} />
-              <Route path="/science/web-of-science" element={<WebOfScience />} />
-              <Route path="/science/scopus" element={<Scopus />} />
-              <Route path="/science/ipchain" element={<Ipchain />} />
-              <Route path="/science/nts" element={<ScientificCouncil />} />
-              <Route path="/science/nts-committee" element={<NTSCommittee />} />
-              <Route path="/science/ssu" element={<StudentScientificSociety />} />
+                  {/* Science routes */}
+                  <Route path="/science/publications" element={<ScientificPublications />} />
+                  <Route path="/science/vestnik" element={<Vestnik />} />
+                  <Route path="/science/web-of-science" element={<WebOfScience />} />
+                  <Route path="/science/scopus" element={<Scopus />} />
+                  <Route path="/science/ipchain" element={<Ipchain />} />
+                  <Route path="/science/nts" element={<ScientificCouncil />} />
+                  <Route path="/science/nts-committee" element={<NTSCommittee />} />
+                  <Route path="/science/ssu" element={<StudentScientificSociety />} />
 
-              {/* Students routes */}
-              <Route path="/students/info" element={<UsefulInfo />} />
-              <Route path="/students/disabilities" element={<StudentsDisabilities />} />
-              <Route path="/students/council" element={<StudentCouncil />} />
-              <Route path="/students/clubs" element={<StudentClubs />} />
-              <Route path="/students/exchange" element={<ExchangePrograms />} />
-              <Route path="/students/instructions" element={<Instructions />} />
-              <Route path="/students/scholarship" element={<Scholarship />} />
-              <Route path="/students/links" element={<UsefulLinks />} />
-              <Route path="/students/ebilim" element={<EbilimLogin />} />
-              <Route path="/students/visa-support" element={<VisaSupport />} />
-              <Route path="/students/contact-info" element={<StudentContactInfo />} />
-              <Route path="/students/social" element={<StudentSocial />} />
+                  {/* Students routes */}
+                  <Route path="/students/info" element={<UsefulInfo />} />
+                  <Route path="/students/disabilities" element={<StudentsDisabilities />} />
+                  <Route path="/students/council" element={<StudentCouncil />} />
+                  <Route path="/students/clubs" element={<StudentClubs />} />
+                  <Route path="/students/exchange" element={<ExchangePrograms />} />
+                  <Route path="/students/instructions" element={<Instructions />} />
+                  <Route path="/students/scholarship" element={<Scholarship />} />
+                  <Route path="/students/links" element={<UsefulLinks />} />
+                  <Route path="/students/ebilim" element={<EbilimLogin />} />
+                  <Route path="/students/visa-support" element={<VisaSupport />} />
+                  <Route path="/students/contact-info" element={<StudentContactInfo />} />
+                  <Route path="/students/social" element={<StudentSocial />} />
 
-              {/* Contacts routes */}
-              <Route path="/contacts/address" element={<AddressMap />} />
-              <Route path="/contacts/contact-info" element={<ContactInfo />} />
-              <Route path="/contacts/social" element={<SocialNetworks />} />
+                  {/* Contacts routes */}
+                  <Route path="/contacts/address" element={<AddressMap />} />
+                  <Route path="/contacts/contact-info" element={<ContactInfo />} />
+                  <Route path="/contacts/social" element={<SocialNetworks />} />
 
-              {/* Fallback route */}
-              <Route path="*" element={<Home />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </Router>
-    </SearchProvider>
+                  {/* Fallback route */}
+                  <Route path="*" element={<Home />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+            </SeoRouteWrapper>
+          </Router>
+        </SearchProvider>
+      </SeoProvider>
+      </I18nextProvider>
   );
 }
 
