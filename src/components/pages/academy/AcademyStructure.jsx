@@ -1,20 +1,27 @@
 // AcademicStructure.jsx
-import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useOrganizationStructure } from '../../../hooks/useApi';
-import { PageLoading, ErrorDisplay, EmptyState, CardSkeleton } from '../../common/Loading';
+import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
+import { useOrganizationStructure } from "../../../hooks/useApi";
+import {
+  PageLoading,
+  ErrorDisplay,
+  EmptyState,
+  CardSkeleton,
+} from "../../common/Loading";
 
 const AcademicStructure = () => {
   const { t } = useTranslation();
-  const [viewType, setViewType] = useState('hierarchical');
-  const [selectedType, setSelectedType] = useState('all');
+  const [viewType, setViewType] = useState("hierarchical");
+  const [selectedType, setSelectedType] = useState("all");
   const [expandedDepartments, setExpandedDepartments] = useState(new Set());
   const [isVisible, setIsVisible] = useState(false);
   const [activeDepartment, setActiveDepartment] = useState(null);
   const sectionRef = useRef(null);
 
-  const { structure, loading, error, refetch } = useOrganizationStructure(viewType === 'hierarchical');
+  const { structure, loading, error, refetch } = useOrganizationStructure(
+    viewType === "hierarchical"
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -47,36 +54,66 @@ const AcademicStructure = () => {
   };
 
   const getFilteredData = () => {
-    if (viewType === 'hierarchical') {
+    if (viewType === "hierarchical") {
       // Возвращаем только корневые элементы для иерархического представления
       if (Array.isArray(structure)) {
-        return structure.filter(item => !item.parent);
+        return structure.filter((item) => !item.parent);
       }
       return [];
     }
 
     if (!structure || !Array.isArray(structure)) return [];
 
-    if (selectedType === 'all') {
+    if (selectedType === "all") {
       return structure;
     }
 
-    return structure.filter(item => item.structure_type === selectedType);
+    return structure.filter((item) => item.structure_type === selectedType);
   };
 
   const filteredData = getFilteredData();
 
   const structureTypes = [
-    { key: 'all', label: t('structure.types.all', 'Все'), icon: '🏛️', gradient: 'from-blue-500 to-emerald-500' },
-    { key: 'faculty', label: t('structure.types.faculty', 'Факультеты'), icon: '🎓', gradient: 'from-emerald-500 to-blue-600' },
-    { key: 'department', label: t('structure.types.department', 'Кафедры'), icon: '📚', gradient: 'from-blue-600 to-emerald-600' },
-    { key: 'unit', label: t('structure.types.unit', 'Подразделения'), icon: '🏢', gradient: 'from-emerald-400 to-blue-500' },
-    { key: 'service', label: t('structure.types.service', 'Службы'), icon: '🔧', gradient: 'from-blue-500 to-emerald-400' },
-    { key: 'center', label: t('structure.types.center', 'Центры'), icon: '�', gradient: 'from-emerald-600 to-blue-500' }
+    {
+      key: "all",
+      label: t("structure.types.all", "Все"),
+      icon: "🏛️",
+      gradient: "from-blue-500 to-emerald-500",
+    },
+    {
+      key: "faculty",
+      label: t("structure.types.faculty", "Факультеты"),
+      icon: "🎓",
+      gradient: "from-emerald-500 to-blue-600",
+    },
+    {
+      key: "department",
+      label: t("structure.types.department", "Кафедры"),
+      icon: "📚",
+      gradient: "from-blue-600 to-emerald-600",
+    },
+    {
+      key: "unit",
+      label: t("structure.types.unit", "Подразделения"),
+      icon: "🏢",
+      gradient: "from-emerald-400 to-blue-500",
+    },
+    {
+      key: "service",
+      label: t("structure.types.service", "Службы"),
+      icon: "🔧",
+      gradient: "from-blue-500 to-emerald-400",
+    },
+    {
+      key: "center",
+      label: t("structure.types.center", "Центры"),
+      icon: "�",
+      gradient: "from-emerald-600 to-blue-500",
+    },
   ];
 
   if (loading) {
-    return <PageLoading message={t('structure.loading')} />;
+    return <PageLoading message={t("structure.loading")} />;
   }
 
   if (error) {
@@ -94,8 +131,8 @@ const AcademicStructure = () => {
   }
 
   const getTypeGradient = (type) => {
-    const typeConfig = structureTypes.find(t => t.key === type);
-    if (!typeConfig) return 'from-gray-500 to-gray-600';
+    const typeConfig = structureTypes.find((t) => t.key === type);
+    if (!typeConfig) return "from-gray-500 to-gray-600";
     return typeConfig.gradient;
   };
 
@@ -109,11 +146,14 @@ const AcademicStructure = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: level * 0.1 }}
-        className={`${level > 0 ? 'ml-4 lg:ml-8 mt-4' : ''}`}
+        className={`${level > 0 ? "ml-4 lg:ml-8 mt-4" : ""}`}
       >
         <motion.div
-          className={`bg-white/5 backdrop-blur-lg rounded-3xl border border-white/20 hover:border-emerald-400/50 transition-all duration-500 overflow-hidden group cursor-pointer ${activeDepartment === department.id ? 'ring-2 ring-emerald-400 scale-105' : ''
-            }`}
+          className={`bg-white/5 backdrop-blur-lg rounded-3xl border border-white/20 hover:border-emerald-400/50 transition-all duration-500 overflow-hidden group cursor-pointer ${
+            activeDepartment === department.id
+              ? "ring-2 ring-emerald-400 scale-105"
+              : ""
+          }`}
           onClick={() => {
             if (hasChildren) toggleDepartment(department.id);
             setActiveDepartment(department.id);
@@ -129,8 +169,10 @@ const AcademicStructure = () => {
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   className="flex-shrink-0"
                 >
-                  <div className={`w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-r ${gradient} rounded-2xl flex items-center justify-center text-white text-xl lg:text-2xl shadow-2xl`}>
-                    {department.icon || '🏛️'}
+                  <div
+                    className={`w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-r ${gradient} rounded-2xl flex items-center justify-center text-white text-xl lg:text-2xl shadow-2xl`}
+                  >
+                    {department.icon || "🏛️"}
                   </div>
                 </motion.div>
 
@@ -153,8 +195,15 @@ const AcademicStructure = () => {
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.2 }}
                         >
-                          <span className="mr-2">{structureTypes.find(t => t.key === department.structure_type)?.icon || '🏗️'}</span>
-                          {structureTypes.find(t => t.key === department.structure_type)?.label}
+                          <span className="mr-2">
+                            {structureTypes.find(
+                              (t) => t.key === department.structure_type
+                            )?.icon || "🏗️"}
+                          </span>
+                          {department.structure_type_display ||
+                            structureTypes.find(
+                              (t) => t.key === department.structure_type
+                            )?.label}
                         </motion.span>
                       )}
                     </div>
@@ -173,7 +222,12 @@ const AcademicStructure = () => {
                           animate={{ rotate: isExpanded ? 180 : 0 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
                         </motion.svg>
                       </motion.button>
                     )}
@@ -192,10 +246,12 @@ const AcademicStructure = () => {
                           👤
                         </div>
                         <span className="text-sm font-semibold text-white">
-                          {t('structure.head', 'Руководитель')}
+                          {t("structure.head", "Руководитель")}
                         </span>
                       </div>
-                      <p className="text-blue-100 text-lg font-medium">{department.head}</p>
+                      <p className="text-blue-100 text-lg font-medium">
+                        {department.head}
+                      </p>
                     </motion.div>
                   )}
 
@@ -212,7 +268,10 @@ const AcademicStructure = () => {
                           <div className="w-6 h-6 bg-blue-500/20 rounded-lg flex items-center justify-center">
                             <span className="text-sm">📱</span>
                           </div>
-                          <a href={`tel:${department.phone}`} className="hover:text-emerald-300 hover:underline transition-colors">
+                          <a
+                            href={`tel:${department.phone}`}
+                            className="hover:text-emerald-300 hover:underline transition-colors"
+                          >
                             {department.phone}
                           </a>
                         </div>
@@ -222,7 +281,10 @@ const AcademicStructure = () => {
                           <div className="w-6 h-6 bg-emerald-500/20 rounded-lg flex items-center justify-center">
                             <span className="text-sm">📧</span>
                           </div>
-                          <a href={`mailto:${department.email}`} className="hover:text-emerald-300 hover:underline transition-colors">
+                          <a
+                            href={`mailto:${department.email}`}
+                            className="hover:text-emerald-300 hover:underline transition-colors"
+                          >
                             {department.email}
                           </a>
                         </div>
@@ -237,13 +299,23 @@ const AcademicStructure = () => {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
                   >
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${department.is_active
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
-                      : 'bg-red-500/20 text-red-300 border-red-400/30'
-                      }`}>
-                      <div className={`w-2 h-2 rounded-full mr-2 ${department.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'
-                        }`}></div>
-                      {department.is_active ? '✅ ' + t('structure.active') : '❌ ' + t('structure.inactive')}
+                    <span
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${
+                        department.is_active
+                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/30"
+                          : "bg-red-500/20 text-red-300 border-red-400/30"
+                      }`}
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full mr-2 ${
+                          department.is_active
+                            ? "bg-emerald-400 animate-pulse"
+                            : "bg-red-400"
+                        }`}
+                      ></div>
+                      {department.is_active
+                        ? "✅ " + t("structure.active")
+                        : "❌ " + t("structure.inactive")}
                     </span>
                   </motion.div>
                 </div>
@@ -258,7 +330,11 @@ const AcademicStructure = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <span>{isExpanded ? t('structure.showLess') : t('structure.showMore')}</span>
+                  <span>
+                    {isExpanded
+                      ? t("structure.showLess")
+                      : t("structure.showMore")}
+                  </span>
                   <motion.svg
                     className="w-4 h-4"
                     fill="none"
@@ -267,7 +343,12 @@ const AcademicStructure = () => {
                     animate={{ rotate: isExpanded ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </motion.svg>
                 </motion.button>
               </div>
@@ -279,7 +360,7 @@ const AcademicStructure = () => {
             {isExpanded && hasChildren && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.5 }}
                 className="border-t border-white/10 bg-white/5 p-6 lg:p-8"
@@ -288,7 +369,7 @@ const AcademicStructure = () => {
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center text-white">
                     🏢
                   </div>
-                  {t('structure.subdepartments')} ({department.children.length})
+                  {t("structure.subdepartments")} ({department.children.length})
                 </h4>
                 <div className="grid gap-4">
                   {department.children.map((child, index) => (
@@ -301,7 +382,9 @@ const AcademicStructure = () => {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h5 className="font-bold text-white text-lg">{child.name}</h5>
+                          <h5 className="font-bold text-white text-lg">
+                            {child.name}
+                          </h5>
                           {child.head_name && (
                             <p className="text-blue-100 text-sm mt-2 flex items-center gap-2">
                               <span>👤</span>
@@ -321,11 +404,16 @@ const AcademicStructure = () => {
                             )}
                           </div>
                         </div>
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${child.is_active
-                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
-                          : 'bg-red-500/20 text-red-300 border-red-400/30'
-                          }`}>
-                          {child.is_active ? t('structure.active') : t('structure.inactive')}
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm border ${
+                            child.is_active
+                              ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/30"
+                              : "bg-red-500/20 text-red-300 border-red-400/30"
+                          }`}
+                        >
+                          {child.is_active
+                            ? t("structure.active")
+                            : t("structure.inactive")}
                         </span>
                       </div>
                     </motion.div>
@@ -338,10 +426,10 @@ const AcademicStructure = () => {
 
         {/* Recursive children rendering for hierarchical view */}
         <AnimatePresence>
-          {viewType === 'hierarchical' && isExpanded && hasChildren && (
+          {viewType === "hierarchical" && isExpanded && hasChildren && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.5 }}
               className="space-y-4 mt-6"
@@ -365,11 +453,15 @@ const AcademicStructure = () => {
 
     return {
       total: structure.length,
-      faculties: structure.filter(d => d.structure_type === 'faculties').length,
-      administrative: structure.filter(d => d.structure_type === 'administrative').length,
-      leadership: structure.filter(d => d.structure_type === 'leadership').length,
-      support: structure.filter(d => d.structure_type === 'support').length,
-      active: structure.filter(d => d.is_active).length
+      faculties: structure.filter((d) => d.structure_type === "faculties")
+        .length,
+      administrative: structure.filter(
+        (d) => d.structure_type === "administrative"
+      ).length,
+      leadership: structure.filter((d) => d.structure_type === "leadership")
+        .length,
+      support: structure.filter((d) => d.structure_type === "support").length,
+      active: structure.filter((d) => d.is_active).length,
     };
   };
 
@@ -391,7 +483,9 @@ const AcademicStructure = () => {
 
         {/* Академические символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🏛️</div>
-        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">🎓</div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">
+          🎓
+        </div>
         <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">👑</div>
       </div>
 
@@ -412,18 +506,16 @@ const AcademicStructure = () => {
             🏛️
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-            {t('academicStructure.title')}
+            {t("academicStructure.title")}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {t('academicStructure.subtitle')}
+            {t("academicStructure.subtitle")}
           </p>
         </motion.div>
 
-       
-
         {/* Content */}
-        {viewType === 'hierarchical' ? (
+        {viewType === "hierarchical" ? (
           // Hierarchical view
           <motion.div
             initial={{ opacity: 0 }}
@@ -437,7 +529,7 @@ const AcademicStructure = () => {
               ))
             ) : (
               <EmptyState
-                message={t('structure.noData')}
+                message={t("structure.noData")}
                 icon={<div className="text-6xl mb-4">🏛️</div>}
               />
             )}
@@ -457,15 +549,13 @@ const AcademicStructure = () => {
             ) : (
               <div className="col-span-full">
                 <EmptyState
-                  message={t('structure.noDepartments')}
+                  message={t("structure.noDepartments")}
                   icon={<div className="text-6xl mb-4">🏛️</div>}
                 />
               </div>
             )}
           </motion.div>
         )}
-
-        
       </div>
     </motion.section>
   );

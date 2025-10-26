@@ -1,12 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLeadership, useDirectors } from '../../../hooks/useApi';
-import { PageLoading, ErrorDisplay, EmptyState, CardSkeleton } from '../../common/Loading';
+import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { useLeadership, useDirectors } from "../../../hooks/useApi";
+import {
+  PageLoading,
+  ErrorDisplay,
+  EmptyState,
+  CardSkeleton,
+} from "../../common/Loading";
 
 const AcademyLeadership = () => {
   const { t } = useTranslation();
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [selectedType, setSelectedType] = useState('');
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [selectedType, setSelectedType] = useState("");
   const [expandedCard, setExpandedCard] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [counterValues, setCounterValues] = useState([0, 0, 0, 0]);
@@ -19,12 +24,42 @@ const AcademyLeadership = () => {
   const { data: directors, loading: directorsLoading } = useDirectors();
 
   const categories = [
-    { key: 'all', icon: '👥', apiFilter: '', color: 'from-blue-500 to-blue-600' },
-    { key: 'rector', icon: '👑', apiFilter: '', color: 'from-green-500 to-green-600' },
-    { key: 'vice_rector', icon: '🌟', apiFilter: '', color: 'from-blue-500 to-green-500' },
-    { key: 'director', icon: '🏛️', apiFilter: '', color: 'from-green-500 to-blue-500' },
-    { key: 'dean', icon: '📚', apiFilter: '', color: 'from-blue-500 to-blue-600' },
-    { key: 'department_head', icon: '🎓', apiFilter: '', color: 'from-green-500 to-green-600' },
+    {
+      key: "all",
+      icon: "👥",
+      apiFilter: "",
+      color: "from-blue-500 to-blue-600",
+    },
+    {
+      key: "rector",
+      icon: "👑",
+      apiFilter: "",
+      color: "from-green-500 to-green-600",
+    },
+    {
+      key: "vice_rector",
+      icon: "🌟",
+      apiFilter: "",
+      color: "from-blue-500 to-green-500",
+    },
+    {
+      key: "director",
+      icon: "🏛️",
+      apiFilter: "",
+      color: "from-green-500 to-blue-500",
+    },
+    {
+      key: "dean",
+      icon: "📚",
+      apiFilter: "",
+      color: "from-blue-500 to-blue-600",
+    },
+    {
+      key: "department_head",
+      icon: "🎓",
+      apiFilter: "",
+      color: "from-green-500 to-green-600",
+    },
   ];
 
   useEffect(() => {
@@ -57,9 +92,12 @@ const AcademyLeadership = () => {
     const currentData = getCurrentData();
     const targetValues = [
       currentData.length,
-      currentData.filter(p => p.leadership_type === 'rector' || p.leadership_type === 'director').length,
-      currentData.filter(p => p.department).length,
-      categories.length
+      currentData.filter(
+        (p) =>
+          p.leadership_type === "rector" || p.leadership_type === "director"
+      ).length,
+      currentData.filter((p) => p.department).length,
+      categories.length,
     ];
 
     const duration = 2000;
@@ -73,7 +111,7 @@ const AcademyLeadership = () => {
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         const currentValue = Math.floor(easeOutQuart * target);
 
-        setCounterValues(prev => {
+        setCounterValues((prev) => {
           const newValues = [...prev];
           newValues[index] = currentValue;
           return newValues;
@@ -100,9 +138,9 @@ const AcademyLeadership = () => {
   // Функция для генерации placeholder фото на основе имени
   const generateInitials = (name) => {
     return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
       .toUpperCase();
   };
 
@@ -117,7 +155,9 @@ const AcademyLeadership = () => {
   if (isLoading && currentData.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 flex items-center justify-center">
-        <PageLoading message={t('leadership.loading', 'Загрузка руководства...')} />
+        <PageLoading
+          message={t("leadership.loading", "Загрузка руководства...")}
+        />
       </div>
     );
   }
@@ -139,28 +179,28 @@ const AcademyLeadership = () => {
   const stats = [
     {
       value: counterValues[0],
-      label: t('leadership.stats.total', 'Всего'),
-      color: 'from-blue-500 to-blue-600',
-      icon: '👥'
+      label: t("leadership.stats.total", "Всего"),
+      color: "from-blue-500 to-blue-600",
+      icon: "👥",
     },
     {
       value: counterValues[1],
-      label: t('leadership.stats.directors', 'Директоров'),
-      color: 'from-green-500 to-green-600',
-      icon: '👑'
+      label: t("leadership.stats.directors", "Директоров"),
+      color: "from-green-500 to-green-600",
+      icon: "👑",
     },
     {
       value: counterValues[2],
-      label: t('leadership.stats.departments', 'Отделов'),
-      color: 'from-blue-500 to-green-500',
-      icon: '🏢'
+      label: t("leadership.stats.departments", "Отделов"),
+      color: "from-blue-500 to-green-500",
+      icon: "🏢",
     },
     {
       value: counterValues[3],
-      label: t('leadership.stats.categories', 'Категорий'),
-      color: 'from-green-500 to-blue-500',
-      icon: '📊'
-    }
+      label: t("leadership.stats.categories", "Категорий"),
+      color: "from-green-500 to-blue-500",
+      icon: "📊",
+    },
   ];
 
   return (
@@ -178,33 +218,44 @@ const AcademyLeadership = () => {
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Заголовок */}
-        <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
+        <div
+          className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
           <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300">
             <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
             <span className="text-green-300 font-medium text-sm md:text-base">
-              {t('leadership.badge', 'Руководство')}
+              {t("leadership.badge", "Руководство")}
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-            {t('leadership.title', 'РУКОВОДСТВО АКАДЕМИИ')}
+            {t("leadership.title", "РУКОВОДСТВО АКАДЕМИИ")}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-green-400 mx-auto mb-6 md:mb-8"></div>
           <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto px-4 leading-relaxed">
-            {t('leadership.subtitle', 'Профессиональная команда опытных руководителей и преподавателей')}
+            {t(
+              "leadership.subtitle",
+              "Профессиональная команда опытных руководителей и преподавателей"
+            )}
           </p>
         </div>
 
         {/* Статистика */}
-        <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
+        <div
+          className={`grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 transition-all duration-1000 delay-300 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
           {stats.map((stat, index) => (
             <div
               key={index}
               className="group relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl transition-all duration-500 hover:scale-105 hover:border-green-400/30 text-center"
             >
               {/* Иконка */}
-              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center text-2xl mb-4 mx-auto group-hover:scale-110 transition-transform duration-300`}>
+              <div
+                className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center text-2xl mb-4 mx-auto group-hover:scale-110 transition-transform duration-300`}
+              >
                 {stat.icon}
               </div>
 
@@ -214,7 +265,9 @@ const AcademyLeadership = () => {
               </div>
 
               {/* Описание */}
-              <div className="text-blue-100 font-medium text-sm md:text-base">{stat.label}</div>
+              <div className="text-blue-100 font-medium text-sm md:text-base">
+                {stat.label}
+              </div>
 
               {/* Декоративные элементы */}
               <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-ping"></div>
@@ -223,8 +276,11 @@ const AcademyLeadership = () => {
         </div>
 
         {/* Навигация по категориям */}
-        <div className={`flex flex-wrap justify-center gap-3 mb-12 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
+        <div
+          className={`flex flex-wrap justify-center gap-3 mb-12 transition-all duration-1000 delay-500 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-2 border border-white/20 shadow-lg">
             <div className="flex flex-wrap justify-center gap-2">
               {categories.map((category) => {
@@ -234,14 +290,18 @@ const AcademyLeadership = () => {
                   <button
                     key={category.key}
                     onClick={() => handleCategoryChange(category)}
-                    className={`flex items-center px-5 py-3 rounded-xl transition-all duration-300 font-medium ${isActive
-                      ? `bg-gradient-to-r ${category.color} text-white shadow-lg transform scale-105`
-                      : `text-blue-100 hover:text-white hover:bg-white/10`
-                      }`}
+                    className={`flex items-center px-5 py-3 rounded-xl transition-all duration-300 font-medium ${
+                      isActive
+                        ? `bg-gradient-to-r ${category.color} text-white shadow-lg transform scale-105`
+                        : `text-blue-100 hover:text-white hover:bg-white/10`
+                    }`}
                   >
                     <span className="text-lg mr-2">{category.icon}</span>
                     <span>
-                      {t(`leadership.categories.${category.key}`, category.key.replace('_', ' '))}
+                      {t(
+                        `leadership.categories.${category.key}`,
+                        category.key.replace("_", " ")
+                      )}
                     </span>
                   </button>
                 );
@@ -251,19 +311,28 @@ const AcademyLeadership = () => {
         </div>
 
         {/* Содержимое категории */}
-        <div className={`mb-16 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}>
+        <div
+          className={`mb-16 transition-all duration-1000 delay-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20">
             <div className="flex items-center mb-4 sm:mb-0">
               <span className="text-4xl mr-4">
-                {categories.find(cat => cat.key === activeCategory)?.icon}
+                {categories.find((cat) => cat.key === activeCategory)?.icon}
               </span>
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-white">
-                  {t(`leadership.categories.${activeCategory}`, activeCategory.replace('_', ' '))}
+                  {t(
+                    `leadership.categories.${activeCategory}`,
+                    activeCategory.replace("_", " ")
+                  )}
                 </h2>
                 <p className="text-blue-100 mt-1">
-                  {t('leadership.categoryDescription', 'Профессиональные руководители и преподаватели')}
+                  {t(
+                    "leadership.categoryDescription",
+                    "Профессиональные руководители и преподаватели"
+                  )}
                 </p>
               </div>
             </div>
@@ -271,10 +340,13 @@ const AcademyLeadership = () => {
               {isLoading ? (
                 <span className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-400 mr-2"></div>
-                  {t('leadership.loading', 'Загрузка...')}
+                  {t("leadership.loading", "Загрузка...")}
                 </span>
               ) : (
-                `${currentData.length} ${t('leadership.employees', 'сотрудников')}`
+                `${currentData.length} ${t(
+                  "leadership.employees",
+                  "сотрудников"
+                )}`
               )}
             </div>
           </div>
@@ -306,13 +378,17 @@ const AcademyLeadership = () => {
                               alt={person.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
+                                e.target.style.display = "none";
+                                e.target.nextSibling.style.display = "flex";
                               }}
                             />
                           ) : null}
                           <div
-                            className={`w-full h-full bg-gradient-to-br from-blue-500/30 to-green-500/30 flex items-center justify-center ${(person.image_url || person.image) ? 'hidden' : 'flex'}`}
+                            className={`w-full h-full bg-gradient-to-br from-blue-500/30 to-green-500/30 flex items-center justify-center ${
+                              person.image_url || person.image
+                                ? "hidden"
+                                : "flex"
+                            }`}
                           >
                             <span className="text-lg font-bold text-white">
                               {generateInitials(person.name)}
@@ -359,7 +435,11 @@ const AcademyLeadership = () => {
                       {person.experience_years && (
                         <div className="flex items-center gap-2 text-sm text-blue-100 group-hover:text-white transition-colors">
                           <span className="text-green-300">⏱️</span>
-                          <span>{t('leadership.experience', 'Опыт')}: {person.experience_years} {t('leadership.years', 'лет')}</span>
+                          <span>
+                            {t("leadership.experience", "Опыт")}:{" "}
+                            {person.experience_years}{" "}
+                            {t("leadership.years", "лет")}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -368,12 +448,15 @@ const AcademyLeadership = () => {
                     <div className="flex flex-wrap gap-2 mt-4">
                       {person.leadership_type && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                          {person.icon || '📊'} {t(`leadership.types.${person.leadership_type}`, person.leadership_type)}
+                          {person.icon || "📊"}{" "}
+                          {person.leadership_type_display ||
+                            person.leadership_type}
                         </span>
                       )}
-                      {(person.leadership_type === 'rector' || person.leadership_type === 'director') && (
+                      {(person.leadership_type === "rector" ||
+                        person.leadership_type === "director") && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-400/30">
-                          👑 {t('leadership.director', 'Руководитель')}
+                          👑 {t("leadership.director", "Руководитель")}
                         </span>
                       )}
                     </div>
@@ -381,15 +464,27 @@ const AcademyLeadership = () => {
                     {/* Кнопка раскрытия */}
                     <div className="flex justify-center mt-4">
                       <button className="flex items-center gap-1 text-green-300 text-sm font-medium hover:text-green-400 transition-colors group">
-                        <span>{expandedCard === (person.id || index) ? t('leadership.showLess', 'Свернуть') : t('leadership.showMore', 'Подробнее')}</span>
+                        <span>
+                          {expandedCard === (person.id || index)
+                            ? t("leadership.showLess", "Свернуть")
+                            : t("leadership.showMore", "Подробнее")}
+                        </span>
                         <svg
-                          className={`w-4 h-4 transform transition-transform group-hover:scale-110 ${expandedCard === (person.id || index) ? 'rotate-180' : ''
-                            }`}
+                          className={`w-4 h-4 transform transition-transform group-hover:scale-110 ${
+                            expandedCard === (person.id || index)
+                              ? "rotate-180"
+                              : ""
+                          }`}
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -406,9 +501,11 @@ const AcademyLeadership = () => {
                           </div>
                           <div>
                             <div className="text-sm font-medium text-white">
-                              {t('leadership.education', 'Образование')}
+                              {t("leadership.education", "Образование")}
                             </div>
-                            <div className="text-sm text-blue-100 group-hover:text-white transition-colors">{person.education}</div>
+                            <div className="text-sm text-blue-100 group-hover:text-white transition-colors">
+                              {person.education}
+                            </div>
                           </div>
                         </div>
                       )}
@@ -421,34 +518,42 @@ const AcademyLeadership = () => {
                           </div>
                           <div>
                             <div className="text-sm font-medium text-white mb-1">
-                              {t('leadership.bio', 'Биография')}
+                              {t("leadership.bio", "Биография")}
                             </div>
-                            <div className="text-sm text-blue-100 leading-relaxed group-hover:text-white transition-colors">{person.bio}</div>
+                            <div className="text-sm text-blue-100 leading-relaxed group-hover:text-white transition-colors">
+                              {person.bio}
+                            </div>
                           </div>
                         </div>
                       )}
 
                       {/* Achievements */}
-                      {person.achievements && person.achievements.length > 0 && (
-                        <div className="flex items-start gap-3 group">
-                          <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-500/30 transition-colors">
-                            <span className="text-yellow-300">🏆</span>
-                          </div>
-                          <div className="flex-1">
-                            <div className="text-sm font-medium text-white mb-2">
-                              {t('leadership.achievements', 'Достижения')}
+                      {person.achievements &&
+                        person.achievements.length > 0 && (
+                          <div className="flex items-start gap-3 group">
+                            <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-500/30 transition-colors">
+                              <span className="text-yellow-300">🏆</span>
                             </div>
-                            <ul className="text-sm text-blue-100 space-y-1 group-hover:text-white transition-colors">
-                              {person.achievements.map((achievement, idx) => (
-                                <li key={idx} className="flex items-start group/item">
-                                  <span className="mr-2 text-green-400 group-hover/item:text-green-300 transition-colors">•</span>
-                                  <span>{achievement}</span>
-                                </li>
-                              ))}
-                            </ul>
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-white mb-2">
+                                {t("leadership.achievements", "Достижения")}
+                              </div>
+                              <ul className="text-sm text-blue-100 space-y-1 group-hover:text-white transition-colors">
+                                {person.achievements.map((achievement, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="flex items-start group/item"
+                                  >
+                                    <span className="mr-2 text-green-400 group-hover/item:text-green-300 transition-colors">
+                                      •
+                                    </span>
+                                    <span>{achievement}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       {/* Contact Information */}
                       {(person.email || person.phone) && (
@@ -458,7 +563,7 @@ const AcademyLeadership = () => {
                           </div>
                           <div>
                             <div className="text-sm font-medium text-white mb-2">
-                              {t('leadership.contacts', 'Контакты')}
+                              {t("leadership.contacts", "Контакты")}
                             </div>
                             <div className="space-y-1">
                               {person.email && (
@@ -494,20 +599,19 @@ const AcademyLeadership = () => {
             </div>
           ) : (
             <EmptyState
-              message={t('leadership.noData', 'Данные не найдены')}
+              message={t("leadership.noData", "Данные не найдены")}
               icon={<div className="text-6xl mb-4">👥</div>}
               action={
                 <button
-                  onClick={() => setActiveCategory('all')}
+                  onClick={() => setActiveCategory("all")}
                   className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105"
                 >
-                  {t('leadership.viewAll', 'Посмотреть всех сотрудников')}
+                  {t("leadership.viewAll", "Посмотреть всех сотрудников")}
                 </button>
               }
             />
           )}
         </div>
-
       </div>
 
       {/* Плавающие элементы для десктопа */}
