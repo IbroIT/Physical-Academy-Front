@@ -8,7 +8,8 @@ const Accreditation = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [expandedAccreditation, setExpandedAccreditation] = useState(null);
   const [selectedType, setSelectedType] = useState('all');
-  
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // Состояния для данных с бэкенда
   const [backendData, setBackendData] = useState({
     accreditations: [],
@@ -38,7 +39,8 @@ const Accreditation = () => {
       }));
       
       const lang = getApiLanguage();
-      const response = await fetch(`/api/academy/accreditations/?lang=${lang}`);
+      const response = await fetch(`${API_URL}/api/academy/accreditations/?lang=${lang}`);
+
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

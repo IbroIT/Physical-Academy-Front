@@ -13,6 +13,9 @@ const AcademyHistory = () => {
   const sectionRef = useRef(null);
   const hasAnimated = useRef(false);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
+
   // Состояния для данных с бэкенда
   const [backendData, setBackendData] = useState({
     steps: [],
@@ -40,7 +43,8 @@ const AcademyHistory = () => {
       }));
       
       const lang = getApiLanguage();
-      const response = await fetch(`/api/academy/history-steps/?lang=${lang}`);
+      const response = await fetch(`${API_URL}/api/academy/history-steps/?lang=${lang}`);
+
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
