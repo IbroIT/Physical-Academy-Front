@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import DefaultLogo from "../assets/Logo.png";
 import ScrolledLogo from "../assets/Logo.png";
-
+import SearchButton from './SearchButton';
 const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
   const { t, i18n } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -372,7 +372,10 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
           </div>
 
           {/* Правая часть: язык и мобильное меню */}
-          <div className="flex items-center space-x-3">
+           <div className="flex items-center space-x-3">
+            {/* Кнопка поиска - добавляем эту строку */}
+            <SearchButton isScrolled={isScrolled} />
+
             {/* Переключатель языка */}
             <div className="relative" ref={langRef}>
               <LanguageSwitcher

@@ -8173,5 +8173,40 @@
         "content": "We reserve the right to terminate access for violations of these terms or inappropriate behavior."
       }
     }
+  }, 
+  "search": {
+    "title": "Academy Search",
+    "subtitle": "Find the information you need quickly and easily",
+    "placeholder": "Search the academy...",
+    "close": "Close search",
+    "clear": "Clear search",
+    "searching": "Searching...",
+    "results_count": "Found results: {{count}}",
+    "no_results": "No results found",
+    "try_again": "Try changing your query or using different keywords",
+    "go_to_page": "Go to section",
+    "categories": {
+      "home": "Home",
+      "academy": "Academy",
+      "admissions": "Admissions",
+      "education": "Education",
+      "science": "Science",
+      "students": "Students",
+      "contacts": "Contacts"
+    },
+    "help": {
+      "academy": {
+        "title": "About Academy",
+        "description": "History, leadership, documents"
+      },
+      "admissions": {
+        "title": "Admissions",
+        "description": "Bachelor, master, college"
+      },
+      "faculties": {
+        "title": "Faculties",
+        "description": "All directions and departments"
+      }
+    }
   }
 }
