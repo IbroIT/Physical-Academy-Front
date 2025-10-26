@@ -1,5 +1,5 @@
 export const seoConfig = {
-  baseUrl: "https://ksapcs.kg",
+  baseUrl: "https://www.ksapcs.kg",
   siteName: "Кыргызская государственная академия физической культуры и спорта имени Б.Т. Турусбекова",
   
   // Главные страницы
