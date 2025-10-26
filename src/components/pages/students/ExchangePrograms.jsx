@@ -1,151 +1,110 @@
 // ExchangePrograms.jsx
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ExchangePrograms = () => {
   const { t, i18n } = useTranslation();
-  const [selectedRegion, setSelectedRegion] = useState('all');
-  const [selectedDuration, setSelectedDuration] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState("all");
+  const [selectedDuration, setSelectedDuration] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [activeProgram, setActiveProgram] = useState(0);
   const [counterValues, setCounterValues] = useState([0, 0, 0, 0]);
   const [expandedProgram, setExpandedProgram] = useState(null);
   const [isApplying, setIsApplying] = useState(null);
-  
+
   // Состояния для данных с бэкенда
   const [backendData, setBackendData] = useState({
-    title: '',
-    subtitle: '',
+    title: "",
+    subtitle: "",
     stats: [],
     programs: [],
     filters: {
       regions: [],
-      durations: []
+      durations: [],
     },
     deadlines: {
-      title: '',
-      list: []
+      title: "",
+      list: [],
     },
     loading: false,
-    error: null
+    error: null,
   });
-  
+
   const sectionRef = useRef(null);
 
   // Получение текущего языка для API
   const getApiLanguage = useCallback(() => {
     const langMap = {
-      'en': 'en',
-      'ru': 'ru',
-      'kg': 'kg'
+      en: "en",
+      ru: "ru",
+      kg: "kg",
     };
-    return langMap[i18n.language] || 'en';
+    return langMap[i18n.language] || "en";
   }, [i18n.language]);
 
   // Функция для загрузки данных с бэкенда
   const fetchBackendData = useCallback(async () => {
     try {
-      setBackendData(prev => ({ 
-        ...prev, 
-        loading: true, 
-        error: null 
+      setBackendData((prev) => ({
+        ...prev,
+        loading: true,
+        error: null,
       }));
-      
+
       const lang = getApiLanguage();
-      
-      // Пробуем разные эндпоинты
+
       const API_URL = import.meta.env.VITE_API_URL;
 
-        const endpoints = [
-          `${API_URL}/api/student-clubs/exchange-page/?lang=${lang}`,
-          `${API_URL}/api/exchange-page/?lang=${lang}`,
-          `${API_URL}/api/student-clubs/exchange/programs/?lang=${lang}`
-        ];
+      // Правильный endpoint
+      const endpoint = `${API_URL}/api/student-clubs/exchange-page/?lang=${lang}`;
 
-      
-      let response = null;
-      let data = null;
-      
-      // Пробуем последовательно разные эндпоинты
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`Trying endpoint: ${endpoint}`);
-          response = await fetch(endpoint);
-          
-          if (response.ok) {
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-              data = await response.json();
-              console.log('Successfully fetched data from:', endpoint, data);
-              break;
-            }
-          }
-        } catch (error) {
-          console.warn(`Failed to fetch from ${endpoint}:`, error);
-          continue;
-        }
+      console.log(`Fetching exchange data from: ${endpoint}`);
+
+      const response = await fetch(endpoint);
+
+      // Проверяем content-type
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.warn(
+          "Non-JSON response from exchange page:",
+          text.substring(0, 200)
+        );
+        throw new Error("Invalid response format");
       }
-      
-      if (!data) {
-        // Если данные не пришли, создаем mock данные для тестирования
-        console.warn('No data received from any endpoint, using mock data');
-        data = getMockData(lang);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      // Обрабатываем разные форматы ответа
-      let processedData = data;
-      
-      // Если ответ содержит results (пагинация)
-      if (data.results) {
-        processedData = data.results;
-      }
-      
-      // Если это отдельные массивы, объединяем их
-      if (data.programs && data.stats) {
-        processedData = data;
-      }
-      
+
+      const data = await response.json();
+      console.log("Exchange data received:", data);
+
       setBackendData({
-        title: processedData.title || t('students.exchange.title'),
-        subtitle: processedData.subtitle || t('students.exchange.subtitle'),
-        stats: processedData.stats || [],
-        programs: processedData.programs || processedData || [],
-        filters: {
-          regions: processedData.filters?.regions || getMockRegions(lang),
-          durations: processedData.filters?.durations || getMockDurations(lang)
+        title: data.title || t("students.exchange.title"),
+        subtitle: data.subtitle || t("students.exchange.subtitle"),
+        stats: data.stats || [],
+        programs: data.programs || [],
+        filters: data.filters || {
+          regions: [],
+          durations: [],
         },
-        deadlines: {
-          title: processedData.deadlines?.title || t('students.exchange.deadlines.title'),
-          list: processedData.deadlines?.list || []
+        deadlines: data.deadlines || {
+          title: t("students.exchange.deadlines.title"),
+          list: [],
         },
         loading: false,
-        error: null
+        error: null,
       });
-
     } catch (error) {
-      console.error('Error fetching exchange data:', error);
-      // Используем mock данные в случае ошибки
-      const lang = getApiLanguage();
-      const mockData = getMockData(lang);
-      
-      setBackendData({
-        title: mockData.title,
-        subtitle: mockData.subtitle,
-        stats: mockData.stats,
-        programs: mockData.programs,
-        filters: {
-          regions: getMockRegions(lang),
-          durations: getMockDurations(lang)
-        },
-        deadlines: {
-          title: t('students.exchange.deadlines.title'),
-          list: []
-        },
+      console.error("Error fetching exchange data:", error);
+      setBackendData((prev) => ({
+        ...prev,
         loading: false,
-        error: null
-      });
+        error: "Failed to load data",
+      }));
     }
   }, [getApiLanguage, t]);
 
@@ -154,19 +113,21 @@ const ExchangePrograms = () => {
     const mockData = {
       en: {
         title: "International Exchange Programs",
-        subtitle: "Expand your horizons with our partner universities worldwide",
+        subtitle:
+          "Expand your horizons with our partner universities worldwide",
         stats: [
           { id: 1, icon: "🌍", value: "25+", label: "Partner Countries" },
           { id: 2, icon: "🎓", value: "50+", label: "Partner Universities" },
           { id: 3, icon: "✈️", value: "200+", label: "Students Exchanged" },
-          { id: 4, icon: "💰", value: "80%", label: "Receive Funding" }
+          { id: 4, icon: "💰", value: "80%", label: "Receive Funding" },
         ],
         programs: [
           {
             id: 1,
             university: "University of California",
             country: "USA",
-            description: "Study at one of the world's top universities in beautiful California",
+            description:
+              "Study at one of the world's top universities in beautiful California",
             duration: "4-6 months",
             cost: "$5000",
             language: "English",
@@ -181,22 +142,23 @@ const ExchangePrograms = () => {
             duration_type: 1,
             requirements: [
               { id: 1, text: "GPA of 3.5 or higher" },
-              { id: 2, text: "English proficiency certificate" }
+              { id: 2, text: "English proficiency certificate" },
             ],
             benefits: [
               { id: 1, text: "Course credit transfer" },
-              { id: 2, text: "Cultural immersion program" }
+              { id: 2, text: "Cultural immersion program" },
             ],
             available_courses: [
               { id: 1, name: "Computer Science" },
-              { id: 2, name: "Business Administration" }
-            ]
+              { id: 2, name: "Business Administration" },
+            ],
           },
           {
             id: 2,
             university: "University of Tokyo",
             country: "Japan",
-            description: "Experience cutting-edge technology and rich culture in Tokyo",
+            description:
+              "Experience cutting-edge technology and rich culture in Tokyo",
             duration: "1 year",
             cost: "$7000",
             language: "Japanese/English",
@@ -211,34 +173,36 @@ const ExchangePrograms = () => {
             duration_type: 2,
             requirements: [
               { id: 1, text: "GPA of 3.7 or higher" },
-              { id: 2, text: "Japanese language basic knowledge" }
+              { id: 2, text: "Japanese language basic knowledge" },
             ],
             benefits: [
               { id: 1, text: "Research opportunities" },
-              { id: 2, text: "Japanese culture courses" }
+              { id: 2, text: "Japanese culture courses" },
             ],
             available_courses: [
               { id: 1, name: "Engineering" },
-              { id: 2, name: "Asian Studies" }
-            ]
-          }
-        ]
+              { id: 2, name: "Asian Studies" },
+            ],
+          },
+        ],
       },
       ru: {
         title: "Международные Программы Обмена",
-        subtitle: "Расширьте свои горизонты с нашими университетами-партнерами по всему миру",
+        subtitle:
+          "Расширьте свои горизонты с нашими университетами-партнерами по всему миру",
         stats: [
           { id: 1, icon: "🌍", value: "25+", label: "Стран-партнеров" },
           { id: 2, icon: "🎓", value: "50+", label: "Университетов-партнеров" },
           { id: 3, icon: "✈️", value: "200+", label: "Студентов по обмену" },
-          { id: 4, icon: "💰", value: "80%", label: "Получают финансирование" }
+          { id: 4, icon: "💰", value: "80%", label: "Получают финансирование" },
         ],
         programs: [
           {
             id: 1,
             university: "Университет Калифорнии",
             country: "США",
-            description: "Учитесь в одном из лучших университетов мира в прекрасной Калифорнии",
+            description:
+              "Учитесь в одном из лучших университетов мира в прекрасной Калифорнии",
             duration: "4-6 месяцев",
             cost: "$5000",
             language: "Английский",
@@ -250,25 +214,27 @@ const ExchangePrograms = () => {
             difficulty: "medium",
             difficulty_label: "Средняя",
             region: 1,
-            duration_type: 1
-          }
-        ]
+            duration_type: 1,
+          },
+        ],
       },
       kg: {
         title: "Эл аралык Алмашуу Программалары",
-        subtitle: "Бүткүл дүйнө жүзүндөгү өнөктөш университеттерибиз менен көз караңызды кеңейтиңиз",
+        subtitle:
+          "Бүткүл дүйнө жүзүндөгү өнөктөш университеттерибиз менен көз караңызды кеңейтиңиз",
         stats: [
           { id: 1, icon: "🌍", value: "25+", label: "Өнөктөш өлкөлөр" },
           { id: 2, icon: "🎓", value: "50+", label: "Өнөктөш университеттер" },
           { id: 3, icon: "✈️", value: "200+", label: "Алмашылган студенттер" },
-          { id: 4, icon: "💰", value: "80%", label: "Каржылоо алышат" }
+          { id: 4, icon: "💰", value: "80%", label: "Каржылоо алышат" },
         ],
         programs: [
           {
             id: 1,
             university: "Калифорния Университети",
             country: "АКШ",
-            description: "Калифорниянын коозунда дүйнөдөгү эң мыкты университеттердин биринде окуңуз",
+            description:
+              "Калифорниянын коозунда дүйнөдөгү эң мыкты университеттердин биринде окуңуз",
             duration: "4-6 ай",
             cost: "$5000",
             language: "Англисче",
@@ -280,12 +246,12 @@ const ExchangePrograms = () => {
             difficulty: "medium",
             difficulty_label: "Орточо",
             region: 1,
-            duration_type: 1
-          }
-        ]
-      }
+            duration_type: 1,
+          },
+        ],
+      },
     };
-    
+
     return mockData[lang] || mockData.en;
   };
 
@@ -294,18 +260,18 @@ const ExchangePrograms = () => {
       en: [
         { id: 1, name: "North America", code: "north-america" },
         { id: 2, name: "Europe", code: "europe" },
-        { id: 3, name: "Asia", code: "asia" }
+        { id: 3, name: "Asia", code: "asia" },
       ],
       ru: [
         { id: 1, name: "Северная Америка", code: "north-america" },
         { id: 2, name: "Европа", code: "europe" },
-        { id: 3, name: "Азия", code: "asia" }
+        { id: 3, name: "Азия", code: "asia" },
       ],
       kg: [
         { id: 1, name: "Түндүк Америка", code: "north-america" },
         { id: 2, name: "Европа", code: "europe" },
-        { id: 3, name: "Азия", code: "asia" }
-      ]
+        { id: 3, name: "Азия", code: "asia" },
+      ],
     };
     return regions[lang] || regions.en;
   };
@@ -315,18 +281,18 @@ const ExchangePrograms = () => {
       en: [
         { id: 1, name: "Semester", code: "semester" },
         { id: 2, name: "1 Year", code: "1-year" },
-        { id: 3, name: "Short-term", code: "short-term" }
+        { id: 3, name: "Short-term", code: "short-term" },
       ],
       ru: [
         { id: 1, name: "Семестр", code: "semester" },
         { id: 2, name: "1 Год", code: "1-year" },
-        { id: 3, name: "Краткосрочный", code: "short-term" }
+        { id: 3, name: "Краткосрочный", code: "short-term" },
       ],
       kg: [
         { id: 1, name: "Семестр", code: "semester" },
         { id: 2, name: "1 Жыл", code: "1-year" },
-        { id: 3, name: "Кыска мөөнөт", code: "short-term" }
-      ]
+        { id: 3, name: "Кыска мөөнөт", code: "short-term" },
+      ],
     };
     return durations[lang] || durations.en;
   };
@@ -358,7 +324,7 @@ const ExchangePrograms = () => {
   useEffect(() => {
     if (backendData.programs.length > 0) {
       const interval = setInterval(() => {
-        setActiveProgram(prev => (prev + 1) % backendData.programs.length);
+        setActiveProgram((prev) => (prev + 1) % backendData.programs.length);
       }, 5000);
       return () => clearInterval(interval);
     }
@@ -367,19 +333,19 @@ const ExchangePrograms = () => {
   // Анимация счетчиков
   useEffect(() => {
     if (isVisible && backendData.stats.length > 0) {
-      const targetValues = backendData.stats.map(stat => {
-        const value = stat.value || '0';
-        return parseInt(value.replace(/\D/g, '')) || 0;
+      const targetValues = backendData.stats.map((stat) => {
+        const value = stat.value || "0";
+        return parseInt(value.replace(/\D/g, "")) || 0;
       });
-      
+
       const duration = 2000;
       const steps = 60;
-      const stepValues = targetValues.map(target => target / steps);
+      const stepValues = targetValues.map((target) => target / steps);
 
       let currentStep = 0;
       const counterInterval = setInterval(() => {
         currentStep++;
-        setCounterValues(prev => 
+        setCounterValues((prev) =>
           prev.map((value, index) => {
             if (currentStep <= steps) {
               return Math.min(value + stepValues[index], targetValues[index]);
@@ -397,18 +363,21 @@ const ExchangePrograms = () => {
     }
   }, [isVisible, backendData.stats]);
 
-  const filteredPrograms = backendData.programs.filter(program => {
-    const matchesRegion = selectedRegion === 'all' || program.region == selectedRegion;
-    const matchesDuration = selectedDuration === 'all' || program.duration_type == selectedDuration;
-    
-    const university = program.university || '';
-    const country = program.country || '';
-    const description = program.description || '';
-    
-    const matchesSearch = university.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         country.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         description.toLowerCase().includes(searchTerm.toLowerCase());
-    
+  const filteredPrograms = backendData.programs.filter((program) => {
+    const matchesRegion =
+      selectedRegion === "all" || program.region == selectedRegion;
+    const matchesDuration =
+      selectedDuration === "all" || program.duration_type == selectedDuration;
+
+    const university = program.university || "";
+    const country = program.country || "";
+    const description = program.description || "";
+
+    const matchesSearch =
+      university.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      description.toLowerCase().includes(searchTerm.toLowerCase());
+
     return matchesRegion && matchesDuration && matchesSearch;
   });
 
@@ -420,20 +389,24 @@ const ExchangePrograms = () => {
     setIsApplying(programId);
     try {
       // Имитация подачи заявки
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      alert(t('students.exchange.alerts.applicationSent', { university: programName }));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      alert(
+        t("students.exchange.alerts.applicationSent", {
+          university: programName,
+        })
+      );
     } catch (error) {
-      console.error('Application error:', error);
-      alert(t('students.exchange.alerts.applicationError'));
+      console.error("Application error:", error);
+      alert(t("students.exchange.alerts.applicationError"));
     } finally {
       setIsApplying(null);
     }
   };
 
   const handleFilterChange = (type, value) => {
-    if (type === 'region') {
+    if (type === "region") {
       setSelectedRegion(value);
-    } else if (type === 'duration') {
+    } else if (type === "duration") {
       setSelectedDuration(value);
     }
     setExpandedProgram(null);
@@ -457,44 +430,49 @@ const ExchangePrograms = () => {
     <div className="text-center py-8">
       <div className="text-red-400 text-6xl mb-4">⚠️</div>
       <h2 className="text-2xl text-white mb-4">
-        {t('students.exchange.errorTitle')}
+        {t("students.exchange.errorTitle")}
       </h2>
-      <p className="text-blue-200 mb-6">
-        {backendData.error}
-      </p>
+      <p className="text-blue-200 mb-6">{backendData.error}</p>
       <button
         onClick={onRetry}
         className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
       >
-        {t('students.exchange.retry')}
+        {t("students.exchange.retry")}
       </button>
     </div>
   );
 
   // Получение переведенного текста
   const getTranslatedText = (item, field) => {
+    if (!item) return "";
+
+    // Сначала пробуем получить уже локализованное поле из бэкенда
+    if (item[field] !== undefined && item[field] !== null) {
+      return item[field];
+    }
+
+    // Если нет, пробуем поля с суффиксом языка (fallback для старых данных)
     const lang = getApiLanguage();
     const translatedField = `${field}_${lang}`;
-    
-    // Сначала пробуем получить переведенное поле
+
     if (item[translatedField]) {
       return item[translatedField];
     }
-    
-    // Затем пробуем общее поле
-    if (item[field]) {
-      return item[field];
+
+    // Fallback на английский
+    if (item[`${field}_en`]) {
+      return item[`${field}_en`];
     }
-    
-    // Если ничего нет, возвращаем пустую строку
-    return '';
+
+    // Последний fallback
+    return "";
   };
 
-  console.log('Backend Data:', backendData);
-  console.log('Filtered Programs:', filteredPrograms);
+  console.log("Backend Data:", backendData);
+  console.log("Filtered Programs:", filteredPrograms);
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
     >
@@ -503,10 +481,12 @@ const ExchangePrograms = () => {
         <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
         <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-        
+
         {/* Международные символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🌍</div>
-        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">✈️</div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">
+          ✈️
+        </div>
         <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">🎓</div>
         <div className="absolute top-1/3 left-1/3 text-5xl opacity-5">🤝</div>
       </div>
@@ -540,7 +520,7 @@ const ExchangePrograms = () => {
           <div className="text-center py-8">
             <div className="text-blue-400 text-6xl mb-4">⏳</div>
             <h2 className="text-2xl text-white mb-4">
-              {t('students.exchange.loading')}
+              {t("students.exchange.loading")}
             </h2>
           </div>
         ) : (
@@ -562,18 +542,17 @@ const ExchangePrograms = () => {
                     className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
                   >
                     <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                      {stat.icon || '📊'}
+                      {stat.icon || "📊"}
                     </div>
                     <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-2 group-hover:scale-110 transition-transform duration-300 font-mono">
-                      {stat.value?.includes('%') 
+                      {stat.value?.includes("%")
                         ? `${Math.round(counterValues[index])}%`
-                        : stat.value?.includes('+')
+                        : stat.value?.includes("+")
                         ? `${Math.round(counterValues[index])}+`
-                        : Math.round(counterValues[index])
-                      }
+                        : Math.round(counterValues[index])}
                     </div>
                     <div className="text-blue-200 text-sm lg:text-base">
-                      {getTranslatedText(stat, 'label')}
+                      {stat.label}
                     </div>
                   </motion.div>
                 ))}
@@ -586,8 +565,7 @@ const ExchangePrograms = () => {
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl mb-8"
-            >
-            </motion.div>
+            ></motion.div>
 
             {/* Активная программа */}
             {filteredPrograms.length > 0 && filteredPrograms[activeProgram] && (
@@ -600,17 +578,18 @@ const ExchangePrograms = () => {
               >
                 <div className="flex flex-col lg:flex-row gap-8 items-center">
                   <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg">
-                    {filteredPrograms[activeProgram].icon || '🎓'}
+                    {filteredPrograms[activeProgram].icon || "🎓"}
                   </div>
                   <div className="flex-1 text-center lg:text-left">
                     <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">
-                      {getTranslatedText(filteredPrograms[activeProgram], 'university')}
+                      {filteredPrograms[activeProgram].university}
                     </h3>
                     <p className="text-emerald-400 text-lg mb-3">
-                      {getTranslatedText(filteredPrograms[activeProgram], 'country')} • {getTranslatedText(filteredPrograms[activeProgram], 'duration')}
+                      {filteredPrograms[activeProgram].country} •{" "}
+                      {filteredPrograms[activeProgram].duration}
                     </p>
                     <p className="text-blue-100 text-lg leading-relaxed">
-                      {getTranslatedText(filteredPrograms[activeProgram], 'description')}
+                      {filteredPrograms[activeProgram].description}
                     </p>
                   </div>
                 </div>
@@ -623,18 +602,45 @@ const ExchangePrograms = () => {
   );
 };
 
-// Компонент ProgramCard остается без изменений, как в предыдущем коде
-const ProgramCard = ({ program, index, isExpanded, isApplying, onToggle, onApply, getTranslatedText }) => {
+// Компонент ProgramCard - обновленная версия с прямыми полями
+const ProgramCard = ({
+  program,
+  index,
+  isExpanded,
+  isApplying,
+  onToggle,
+  onApply,
+}) => {
   const { t } = useTranslation();
-  
-  const common = t('students.exchange.common', { returnObjects: true });
+
+  const common = t("students.exchange.common", { returnObjects: true });
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
-      case 'high': return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-400/30' };
-      case 'medium': return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-400/30' };
-      case 'low': return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-400/30' };
-      default: return { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-400/30' };
+      case "high":
+        return {
+          bg: "bg-red-500/20",
+          text: "text-red-400",
+          border: "border-red-400/30",
+        };
+      case "medium":
+        return {
+          bg: "bg-yellow-500/20",
+          text: "text-yellow-400",
+          border: "border-yellow-400/30",
+        };
+      case "low":
+        return {
+          bg: "bg-green-500/20",
+          text: "text-green-400",
+          border: "border-green-400/30",
+        };
+      default:
+        return {
+          bg: "bg-gray-500/20",
+          text: "text-gray-400",
+          border: "border-gray-400/30",
+        };
     }
   };
 
@@ -656,19 +662,21 @@ const ProgramCard = ({ program, index, isExpanded, isApplying, onToggle, onApply
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
                 <h3 className="text-2xl font-bold text-white mb-3">
-                  {getTranslatedText(program, 'university')}
+                  {program.university}
                 </h3>
                 <div className="flex flex-wrap items-center gap-4 text-blue-200 mb-4">
                   <span className="flex items-center gap-2">
                     <span className="text-lg">🌍</span>
-                    <span>{getTranslatedText(program, 'country')}</span>
+                    <span>{program.country}</span>
                   </span>
                   <span className="flex items-center gap-2">
                     <span className="text-lg">⏱️</span>
-                    <span>{getTranslatedText(program, 'duration')}</span>
+                    <span>{program.duration}</span>
                   </span>
-                  <span className={`px-4 py-2 rounded-2xl text-sm font-medium backdrop-blur-sm border ${difficultyColors.bg} ${difficultyColors.text} ${difficultyColors.border}`}>
-                    {getTranslatedText(program, 'difficulty_label') || program.difficulty}
+                  <span
+                    className={`px-4 py-2 rounded-2xl text-sm font-medium backdrop-blur-sm border ${difficultyColors.bg} ${difficultyColors.text} ${difficultyColors.border}`}
+                  >
+                    {program.difficulty_label || program.difficulty}
                   </span>
                 </div>
               </div>
@@ -681,20 +689,20 @@ const ProgramCard = ({ program, index, isExpanded, isApplying, onToggle, onApply
             </div>
 
             <p className="text-blue-100 mb-6 leading-relaxed text-lg">
-              {getTranslatedText(program, 'description')}
+              {program.description}
             </p>
 
             {/* Быстрая информация */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="text-center bg-white/5 rounded-2xl p-4 border border-white/10">
                 <div className="text-lg font-bold text-white">
-                  {getTranslatedText(program, 'language') || common.defaultLanguage}
+                  {program.language || common.defaultLanguage}
                 </div>
                 <div className="text-blue-300 text-sm">{common.language}</div>
               </div>
               <div className="text-center bg-white/5 rounded-2xl p-4 border border-white/10">
                 <div className="text-lg font-bold text-white">
-                  {getTranslatedText(program, 'grants_available') || common.grantsAvailable}
+                  {program.grants_available || common.grantsAvailable}
                 </div>
                 <div className="text-blue-300 text-sm">{common.grants}</div>
               </div>
@@ -722,8 +730,8 @@ const ProgramCard = ({ program, index, isExpanded, isApplying, onToggle, onApply
               disabled={isApplying || program.available_spots === 0}
               className={`w-full py-4 px-6 rounded-2xl font-medium transition-all duration-300 flex items-center justify-center backdrop-blur-sm ${
                 program.available_spots > 0 && !isApplying
-                  ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white hover:from-blue-600 hover:to-emerald-600 shadow-lg'
-                  : 'bg-white/10 text-blue-300 cursor-not-allowed border border-white/10'
+                  ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white hover:from-blue-600 hover:to-emerald-600 shadow-lg"
+                  : "bg-white/10 text-blue-300 cursor-not-allowed border border-white/10"
               }`}
             >
               {isApplying ? (
@@ -745,7 +753,7 @@ const ProgramCard = ({ program, index, isExpanded, isApplying, onToggle, onApply
               onClick={onToggle}
               className="w-full py-4 px-6 bg-white/10 border border-white/10 text-white rounded-2xl hover:border-emerald-400/30 transition-all duration-300 font-medium flex items-center justify-center backdrop-blur-sm"
             >
-              <span className="text-xl mr-3">{isExpanded ? '📋' : '🔍'}</span>
+              <span className="text-xl mr-3">{isExpanded ? "📋" : "🔍"}</span>
               {isExpanded ? common.collapse : common.more}
             </motion.button>
 
@@ -770,7 +778,7 @@ const ProgramCard = ({ program, index, isExpanded, isApplying, onToggle, onApply
           {isExpanded && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
               className="mt-8 pt-8 border-t border-white/20 space-y-8"
@@ -784,9 +792,14 @@ const ProgramCard = ({ program, index, isExpanded, isApplying, onToggle, onApply
                   </h4>
                   <ul className="space-y-3">
                     {(program.requirements || []).map((req, reqIndex) => (
-                      <li key={reqIndex} className="flex items-start text-blue-200">
-                        <span className="text-emerald-400 mr-3 mt-1 text-lg">•</span>
-                        {getTranslatedText(req, 'text')}
+                      <li
+                        key={reqIndex}
+                        className="flex items-start text-blue-200"
+                      >
+                        <span className="text-emerald-400 mr-3 mt-1 text-lg">
+                          •
+                        </span>
+                        {req.text}
                       </li>
                     ))}
                   </ul>
@@ -800,9 +813,14 @@ const ProgramCard = ({ program, index, isExpanded, isApplying, onToggle, onApply
                   </h4>
                   <ul className="space-y-3">
                     {(program.benefits || []).map((benefit, benefitIndex) => (
-                      <li key={benefitIndex} className="flex items-start text-blue-200">
-                        <span className="text-emerald-400 mr-3 mt-1 text-lg">✓</span>
-                        {getTranslatedText(benefit, 'text')}
+                      <li
+                        key={benefitIndex}
+                        className="flex items-start text-blue-200"
+                      >
+                        <span className="text-emerald-400 mr-3 mt-1 text-lg">
+                          ✓
+                        </span>
+                        {benefit.text}
                       </li>
                     ))}
                   </ul>
@@ -810,21 +828,25 @@ const ProgramCard = ({ program, index, isExpanded, isApplying, onToggle, onApply
               </div>
 
               {/* Доступные курсы */}
-              {program.available_courses && program.available_courses.length > 0 && (
-                <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl p-6 border border-purple-400/30 backdrop-blur-sm">
-                  <h4 className="font-semibold text-white mb-4 flex items-center gap-3 text-lg">
-                    <span className="text-xl">📚</span>
-                    <span>{common.availableCourses}</span>
-                  </h4>
-                  <div className="flex flex-wrap gap-3">
-                    {program.available_courses.map((course, courseIndex) => (
-                      <span key={courseIndex} className="px-4 py-2 bg-white/10 text-blue-200 rounded-2xl text-sm font-medium backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300">
-                        {getTranslatedText(course, 'name')}
-                      </span>
-                    ))}
+              {program.available_courses &&
+                program.available_courses.length > 0 && (
+                  <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl p-6 border border-purple-400/30 backdrop-blur-sm">
+                    <h4 className="font-semibold text-white mb-4 flex items-center gap-3 text-lg">
+                      <span className="text-xl">📚</span>
+                      <span>{common.availableCourses}</span>
+                    </h4>
+                    <div className="flex flex-wrap gap-3">
+                      {program.available_courses.map((course, courseIndex) => (
+                        <span
+                          key={courseIndex}
+                          className="px-4 py-2 bg-white/10 text-blue-200 rounded-2xl text-sm font-medium backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300"
+                        >
+                          {course.name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </motion.div>
           )}
         </AnimatePresence>

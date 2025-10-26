@@ -6133,6 +6133,9 @@
   "commissions": {
     "title": "Academy Commissions",
     "subtitle": "Professional communities ensuring development and improvement of educational, scientific and sports processes",
+    "chairman": "Chairman",
+    "responsibilities": "Responsibilities",
+    "contactInfo": "Contact information",
     "filters": [
       { "id": "all", "name": "All Commissions" },
       { "id": "education", "name": "Educational" },
@@ -6895,6 +6898,10 @@
           "description": "Participation in SSS projects and events"
         }
       ]
+      ,
+      "readyTitle": "📝 Ready to join?",
+      "applyButton": "Apply Now",
+      "askButton": "Ask a Question"
     },
     "leadership": {
       "title": "SSS Leadership",
