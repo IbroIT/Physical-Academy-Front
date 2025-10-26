@@ -81,6 +81,9 @@ const ExchangePrograms = () => {
 
       const data = await response.json();
       console.log("Exchange data received:", data);
+      console.log("Programs count:", data.programs?.length);
+      console.log("Stats count:", data.stats?.length);
+      console.log("Filters:", data.filters);
 
       setBackendData({
         title: data.title || t("students.exchange.title"),
@@ -98,235 +101,20 @@ const ExchangePrograms = () => {
         loading: false,
         error: null,
       });
+
+      console.log("Backend data state updated");
     } catch (error) {
       console.error("Error fetching exchange data:", error);
 
-      // Временный fallback на mock данные если API не отвечает
-      const mockData = getMockData(lang);
-      const mockRegions = getMockRegions(lang);
-      const mockDurations = getMockDurations(lang);
-
-      console.warn("Using mock data as fallback");
-
-      setBackendData({
-        title: mockData.title,
-        subtitle: mockData.subtitle,
-        stats: mockData.stats,
-        programs: mockData.programs,
-        filters: {
-          regions: mockRegions,
-          durations: mockDurations,
-        },
-        deadlines: {
-          title:
-            lang === "en"
-              ? "Upcoming Deadlines"
-              : lang === "ru"
-              ? "Предстоящие дедлайны"
-              : "Алдыдагы дедлайндар",
-          list: [],
-        },
+      setBackendData((prev) => ({
+        ...prev,
         loading: false,
-        error: null, // Не показываем ошибку, если есть mock данные
-      });
+        error: error.message || "Failed to load exchange programs",
+      }));
     }
   }, [getApiLanguage, t]);
 
-  // Mock данные для тестирования
-  const getMockData = (lang) => {
-    const mockData = {
-      en: {
-        title: "International Exchange Programs",
-        subtitle:
-          "Expand your horizons with our partner universities worldwide",
-        stats: [
-          { id: 1, icon: "🌍", value: "25+", label: "Partner Countries" },
-          { id: 2, icon: "🎓", value: "50+", label: "Partner Universities" },
-          { id: 3, icon: "✈️", value: "200+", label: "Students Exchanged" },
-          { id: 4, icon: "💰", value: "80%", label: "Receive Funding" },
-        ],
-        programs: [
-          {
-            id: 1,
-            university: "University of California",
-            country: "USA",
-            description:
-              "Study at one of the world's top universities in beautiful California",
-            duration: "4-6 months",
-            cost: "$5000",
-            language: "English",
-            grants_available: "Available",
-            deadline: "October 15, 2024",
-            available_spots: 5,
-            icon: "🎓",
-            website: "https://www.uc.edu",
-            difficulty: "medium",
-            difficulty_label: "Moderate",
-            region: 1,
-            duration_type: 1,
-            requirements: [
-              { id: 1, text: "GPA of 3.5 or higher" },
-              { id: 2, text: "English proficiency certificate" },
-            ],
-            benefits: [
-              { id: 1, text: "Course credit transfer" },
-              { id: 2, text: "Cultural immersion program" },
-            ],
-            available_courses: [
-              { id: 1, name: "Computer Science" },
-              { id: 2, name: "Business Administration" },
-            ],
-          },
-          {
-            id: 2,
-            university: "University of Tokyo",
-            country: "Japan",
-            description:
-              "Experience cutting-edge technology and rich culture in Tokyo",
-            duration: "1 year",
-            cost: "$7000",
-            language: "Japanese/English",
-            grants_available: "Limited",
-            deadline: "December 1, 2024",
-            available_spots: 3,
-            icon: "🏯",
-            website: "https://www.u-tokyo.ac.jp",
-            difficulty: "high",
-            difficulty_label: "Competitive",
-            region: 2,
-            duration_type: 2,
-            requirements: [
-              { id: 1, text: "GPA of 3.7 or higher" },
-              { id: 2, text: "Japanese language basic knowledge" },
-            ],
-            benefits: [
-              { id: 1, text: "Research opportunities" },
-              { id: 2, text: "Japanese culture courses" },
-            ],
-            available_courses: [
-              { id: 1, name: "Engineering" },
-              { id: 2, name: "Asian Studies" },
-            ],
-          },
-        ],
-      },
-      ru: {
-        title: "Международные Программы Обмена",
-        subtitle:
-          "Расширьте свои горизонты с нашими университетами-партнерами по всему миру",
-        stats: [
-          { id: 1, icon: "🌍", value: "25+", label: "Стран-партнеров" },
-          { id: 2, icon: "🎓", value: "50+", label: "Университетов-партнеров" },
-          { id: 3, icon: "✈️", value: "200+", label: "Студентов по обмену" },
-          { id: 4, icon: "💰", value: "80%", label: "Получают финансирование" },
-        ],
-        programs: [
-          {
-            id: 1,
-            university: "Университет Калифорнии",
-            country: "США",
-            description:
-              "Учитесь в одном из лучших университетов мира в прекрасной Калифорнии",
-            duration: "4-6 месяцев",
-            cost: "$5000",
-            language: "Английский",
-            grants_available: "Доступны",
-            deadline: "15 октября 2024",
-            available_spots: 5,
-            icon: "🎓",
-            website: "https://www.uc.edu",
-            difficulty: "medium",
-            difficulty_label: "Средняя",
-            region: 1,
-            duration_type: 1,
-          },
-        ],
-      },
-      kg: {
-        title: "Эл аралык Алмашуу Программалары",
-        subtitle:
-          "Бүткүл дүйнө жүзүндөгү өнөктөш университеттерибиз менен көз караңызды кеңейтиңиз",
-        stats: [
-          { id: 1, icon: "🌍", value: "25+", label: "Өнөктөш өлкөлөр" },
-          { id: 2, icon: "🎓", value: "50+", label: "Өнөктөш университеттер" },
-          { id: 3, icon: "✈️", value: "200+", label: "Алмашылган студенттер" },
-          { id: 4, icon: "💰", value: "80%", label: "Каржылоо алышат" },
-        ],
-        programs: [
-          {
-            id: 1,
-            university: "Калифорния Университети",
-            country: "АКШ",
-            description:
-              "Калифорниянын коозунда дүйнөдөгү эң мыкты университеттердин биринде окуңуз",
-            duration: "4-6 ай",
-            cost: "$5000",
-            language: "Англисче",
-            grants_available: "Жеткиликтүү",
-            deadline: "15-октябрь 2024",
-            available_spots: 5,
-            icon: "🎓",
-            website: "https://www.uc.edu",
-            difficulty: "medium",
-            difficulty_label: "Орточо",
-            region: 1,
-            duration_type: 1,
-          },
-        ],
-      },
-    };
-
-    return mockData[lang] || mockData.en;
-  };
-
-  const getMockRegions = (lang) => {
-    const regions = {
-      en: [
-        { id: 1, name: "North America", code: "north-america" },
-        { id: 2, name: "Europe", code: "europe" },
-        { id: 3, name: "Asia", code: "asia" },
-      ],
-      ru: [
-        { id: 1, name: "Северная Америка", code: "north-america" },
-        { id: 2, name: "Европа", code: "europe" },
-        { id: 3, name: "Азия", code: "asia" },
-      ],
-      kg: [
-        { id: 1, name: "Түндүк Америка", code: "north-america" },
-        { id: 2, name: "Европа", code: "europe" },
-        { id: 3, name: "Азия", code: "asia" },
-      ],
-    };
-    return regions[lang] || regions.en;
-  };
-
-  const getMockDurations = (lang) => {
-    const durations = {
-      en: [
-        { id: 1, name: "Semester", code: "semester" },
-        { id: 2, name: "1 Year", code: "1-year" },
-        { id: 3, name: "Short-term", code: "short-term" },
-      ],
-      ru: [
-        { id: 1, name: "Семестр", code: "semester" },
-        { id: 2, name: "1 Год", code: "1-year" },
-        { id: 3, name: "Краткосрочный", code: "short-term" },
-      ],
-      kg: [
-        { id: 1, name: "Семестр", code: "semester" },
-        { id: 2, name: "1 Жыл", code: "1-year" },
-        { id: 3, name: "Кыска мөөнөт", code: "short-term" },
-      ],
-    };
-    return durations[lang] || durations.en;
-  };
-
-  // Загрузка данных при монтировании
-  useEffect(() => {
-    fetchBackendData();
-  }, [fetchBackendData]);
-
-  // Перезагрузка данных при изменении языка
+  // Загрузка данных при монтировании и перезагрузка при изменении языка
   useEffect(() => {
     fetchBackendData();
   }, [i18n.language, fetchBackendData]);
@@ -492,9 +280,6 @@ const ExchangePrograms = () => {
     return "";
   };
 
-  console.log("Backend Data:", backendData);
-  console.log("Filtered Programs:", filteredPrograms);
-
   return (
     <section
       ref={sectionRef}
@@ -547,6 +332,26 @@ const ExchangePrograms = () => {
               {t("students.exchange.loading")}
             </h2>
           </div>
+        ) : backendData.error ? (
+          <div className="text-center py-8">
+            <div className="text-red-400 text-6xl mb-4">⚠️</div>
+            <h2 className="text-2xl text-white mb-4">
+              {t("common.error") || "Error"}
+            </h2>
+            <p className="text-blue-200">{backendData.error}</p>
+          </div>
+        ) : backendData.programs.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-blue-400 text-6xl mb-4">📭</div>
+            <h2 className="text-2xl text-white mb-4">
+              {t("students.exchange.noPrograms") ||
+                "No exchange programs available"}
+            </h2>
+            <p className="text-blue-200">
+              {t("students.exchange.noProgramsDesc") ||
+                "Please check back later for available programs"}
+            </p>
+          </div>
         ) : (
           <>
             {/* Статистика */}
@@ -589,36 +394,92 @@ const ExchangePrograms = () => {
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl mb-8"
-            ></motion.div>
-
-            {/* Активная программа */}
-            {filteredPrograms.length > 0 && filteredPrograms[activeProgram] && (
-              <motion.div
-                key={activeProgram}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-8 backdrop-blur-lg border border-white/20 shadow-2xl mb-8"
-              >
-                <div className="flex flex-col lg:flex-row gap-8 items-center">
-                  <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg">
-                    {filteredPrograms[activeProgram].icon || "🎓"}
-                  </div>
-                  <div className="flex-1 text-center lg:text-left">
-                    <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">
-                      {filteredPrograms[activeProgram].university}
-                    </h3>
-                    <p className="text-emerald-400 text-lg mb-3">
-                      {filteredPrograms[activeProgram].country} •{" "}
-                      {filteredPrograms[activeProgram].duration}
-                    </p>
-                    <p className="text-blue-100 text-lg leading-relaxed">
-                      {filteredPrograms[activeProgram].description}
-                    </p>
-                  </div>
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Поиск */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder={t("students.exchange.search") || "Search..."}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-blue-300 rounded-2xl focus:outline-none focus:border-emerald-400 transition-all duration-300 backdrop-blur-sm"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl">
+                    🔍
+                  </span>
                 </div>
-              </motion.div>
-            )}
+
+                {/* Фильтр по региону */}
+                <div className="relative">
+                  <select
+                    value={selectedRegion}
+                    onChange={(e) =>
+                      handleFilterChange("region", e.target.value)
+                    }
+                    className="w-full px-6 py-4 bg-white/10 border border-white/20 text-white rounded-2xl focus:outline-none focus:border-emerald-400 transition-all duration-300 backdrop-blur-sm appearance-none cursor-pointer"
+                  >
+                    <option value="all" className="bg-slate-800">
+                      {t("students.exchange.allRegions") || "All Regions"}
+                    </option>
+                    {backendData.filters.regions.map((region) => (
+                      <option
+                        key={region.id}
+                        value={region.id}
+                        className="bg-slate-800"
+                      >
+                        {region.name}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl pointer-events-none">
+                    🌍
+                  </span>
+                </div>
+
+                {/* Фильтр по длительности */}
+                <div className="relative">
+                  <select
+                    value={selectedDuration}
+                    onChange={(e) =>
+                      handleFilterChange("duration", e.target.value)
+                    }
+                    className="w-full px-6 py-4 bg-white/10 border border-white/20 text-white rounded-2xl focus:outline-none focus:border-emerald-400 transition-all duration-300 backdrop-blur-sm appearance-none cursor-pointer"
+                  >
+                    <option value="all" className="bg-slate-800">
+                      {t("students.exchange.allDurations") || "All Durations"}
+                    </option>
+                    {backendData.filters.durations.map((duration) => (
+                      <option
+                        key={duration.id}
+                        value={duration.id}
+                        className="bg-slate-800"
+                      >
+                        {duration.name}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl pointer-events-none">
+                    ⏱️
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Список всех программ */}
+            <div className="space-y-6">
+              {filteredPrograms.map((program, index) => (
+                <ProgramCard
+                  key={program.id}
+                  program={program}
+                  index={index}
+                  isExpanded={expandedProgram === index}
+                  isApplying={isApplying === program.id}
+                  onToggle={() => toggleProgram(index)}
+                  onApply={() => handleApply(program.id, program.university)}
+                />
+              ))}
+            </div>
           </>
         )}
       </div>
