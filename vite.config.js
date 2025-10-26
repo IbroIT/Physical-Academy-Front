@@ -6,11 +6,11 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: '/',
   server: {
-    proxy: {
-      '/api': {
-        target: 'https://physical-academy-backend-3dccb860f75a.herokuapp.com',
-        changeOrigin: true,
-      },
+  proxy: {
+    '/api': {
+      target: 'https://physical-academy-backend-3dccb860f75a.herokuapp.com',
+      changeOrigin: true,
     },
   },
+}
 })

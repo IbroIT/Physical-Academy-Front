@@ -266,8 +266,7 @@ const UniversityEventsPage = () => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/events/events/`);
-        
+        const response = await fetch('https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/events/events/');
         if (!response.ok) {
           throw new Error('Failed to fetch events');
         }
@@ -290,7 +289,7 @@ const UniversityEventsPage = () => {
         setEventsData(eventsArray);
         
         // Загрузка категорий
-        const categoriesResponse = await fetch('/api/events/events/categories/');
+        const categoriesResponse = await fetch('https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/events/events/categories/');
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json();
           setCategories(categoriesData);
