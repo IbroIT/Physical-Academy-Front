@@ -20,7 +20,9 @@ const CorrespondenceTraining = () => {
     try {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
       const API_URL = import.meta.env.VITE_API_URL;
-      const response = await fetch(`${API_URL}/api/education/faculties/correspondence-training/?lang=${i18n.language}`);
+      const response = await fetch(
+        `${API_URL}/api/education/faculties/correspondence-training/?lang=${i18n.language}`
+      );
 
       const data = await response.json();
 
@@ -390,23 +392,10 @@ const CorrespondenceTraining = () => {
     );
   }
 
+  // Error state - показываем fallback данные вместо ошибки
+  // API может вернуть 404, но мы покажем дефолтные данные из normalizeData
   if (apiData.error) {
-    return (
-      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">😕</div>
-          <p className="text-blue-100 text-xl mb-4">
-            {t("common.error", "Ошибка загрузки данных")}
-          </p>
-          <button
-            onClick={fetchFacultyData}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 text-white rounded-2xl hover:scale-105 transition-transform duration-300"
-          >
-            {t("common.retry", "Попробовать снова")}
-          </button>
-        </div>
-      </section>
-    );
+    console.warn("Faculty API error, using fallback data:", apiData.error);
   }
 
   return (

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 const DoctorateProgram = () => {
   const { t, i18n } = useTranslation();
@@ -13,52 +13,52 @@ const DoctorateProgram = () => {
   const [backendData, setBackendData] = useState({
     programs: [],
     loading: false,
-    error: null
+    error: null,
   });
 
   // Получение текущего языка для API
   const getApiLanguage = useCallback(() => {
     const langMap = {
-      'en': 'en',
-      'ru': 'ru',
-      'kg': 'kg'
+      en: "en",
+      ru: "ru",
+      kg: "kg",
     };
-    return langMap[i18n.language] || 'ru';
+    return langMap[i18n.language] || "ru";
   }, [i18n.language]);
 
   // Функция для загрузки данных с бэкенда
   const fetchBackendData = useCallback(async () => {
     try {
-      setBackendData(prev => ({ 
-        ...prev, 
-        loading: true, 
-        error: null 
+      setBackendData((prev) => ({
+        ...prev,
+        loading: true,
+        error: null,
       }));
-      
+
       const lang = getApiLanguage();
       const API_URL = import.meta.env.VITE_API_URL;
 
-      const response = await fetch(`${API_URL}/api/education/phd-programs/?lang=${i18n.language}`);
+      const response = await fetch(
+        `${API_URL}/api/education/phd-programs/?lang=${i18n.language}`
+      );
 
-      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       setBackendData({
         programs: data.results || [],
         loading: false,
-        error: null
+        error: null,
       });
-
     } catch (error) {
-      console.error('Error fetching PhD programs data:', error);
-      setBackendData(prev => ({
+      console.error("Error fetching PhD programs data:", error);
+      setBackendData((prev) => ({
         ...prev,
         loading: false,
-        error: 'Failed to load PhD programs data'
+        error: "Failed to load PhD programs data",
       }));
     }
   }, [getApiLanguage]);
@@ -78,28 +78,42 @@ const DoctorateProgram = () => {
     if (!backendData.programs.length) return [];
 
     const colors = [
-      { color: 'from-blue-500 to-blue-600', hoverColor: 'from-blue-600 to-blue-700' },
-      { color: 'from-green-500 to-green-600', hoverColor: 'from-green-600 to-green-700' },
-      { color: 'from-blue-500 to-green-500', hoverColor: 'from-blue-600 to-green-600' },
-      { color: 'from-green-500 to-blue-500', hoverColor: 'from-green-600 to-blue-600' }
+      {
+        color: "from-blue-500 to-blue-600",
+        hoverColor: "from-blue-600 to-blue-700",
+      },
+      {
+        color: "from-green-500 to-green-600",
+        hoverColor: "from-green-600 to-green-700",
+      },
+      {
+        color: "from-blue-500 to-green-500",
+        hoverColor: "from-blue-600 to-green-600",
+      },
+      {
+        color: "from-green-500 to-blue-500",
+        hoverColor: "from-green-600 to-blue-600",
+      },
     ];
 
     return backendData.programs.map((program, index) => {
       const colorSet = colors[index % colors.length];
-      
+
       return {
         id: program.id,
         title: program.name,
-        duration: `${program.duration_years} ${t('doctorateProgram.years')}`,
-        format: program.offline ? t('doctorateProgram.fullTime') : t('doctorateProgram.online'),
+        duration: `${program.duration_years} ${t("doctorateProgram.years")}`,
+        format: program.offline
+          ? t("doctorateProgram.fullTime")
+          : t("doctorateProgram.online"),
         description: program.description,
-        supervisor: t('doctorateProgram.defaultSupervisor'),
+        supervisor: t("doctorateProgram.defaultSupervisor"),
         requirements: program.features || [],
-        icon: program.emoji || '🎓',
+        icon: program.emoji || "🎓",
         color: colorSet.color,
         hoverColor: colorSet.hoverColor,
         tuition_fee: program.tuition_fee,
-        offline: program.offline
+        offline: program.offline,
       };
     });
   }, [backendData.programs, t]);
@@ -107,25 +121,27 @@ const DoctorateProgram = () => {
   // Преимущества программы
   const benefits = [
     {
-      title: t('doctorateProgram.benefits.researchFunding.title'),
-      description: t('doctorateProgram.benefits.researchFunding.description'),
-      icon: '💰'
+      title: t("doctorateProgram.benefits.researchFunding.title"),
+      description: t("doctorateProgram.benefits.researchFunding.description"),
+      icon: "💰",
     },
     {
-      title: t('doctorateProgram.benefits.internationalOpportunities.title'),
-      description: t('doctorateProgram.benefits.internationalOpportunities.description'),
-      icon: '🌍'
+      title: t("doctorateProgram.benefits.internationalOpportunities.title"),
+      description: t(
+        "doctorateProgram.benefits.internationalOpportunities.description"
+      ),
+      icon: "🌍",
     },
     {
-      title: t('doctorateProgram.benefits.modernLabs.title'),
-      description: t('doctorateProgram.benefits.modernLabs.description'),
-      icon: '🔬'
+      title: t("doctorateProgram.benefits.modernLabs.title"),
+      description: t("doctorateProgram.benefits.modernLabs.description"),
+      icon: "🔬",
     },
     {
-      title: t('doctorateProgram.benefits.careerSupport.title'),
-      description: t('doctorateProgram.benefits.careerSupport.description'),
-      icon: '🎯'
-    }
+      title: t("doctorateProgram.benefits.careerSupport.title"),
+      description: t("doctorateProgram.benefits.careerSupport.description"),
+      icon: "🎯",
+    },
   ];
 
   const researchDirections = getResearchDirections();
@@ -140,11 +156,11 @@ const DoctorateProgram = () => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const handleDirectionClick = (index) => {
@@ -163,7 +179,7 @@ const DoctorateProgram = () => {
 
   const handleApplyNow = () => {
     // В реальном приложении здесь будет логика открытия формы заявки
-    alert(t('doctorateProgram.applicationSuccess'));
+    alert(t("doctorateProgram.applicationSuccess"));
   };
 
   // Компонент загрузки
@@ -196,16 +212,14 @@ const DoctorateProgram = () => {
     <div className="text-center py-16">
       <div className="text-red-400 text-6xl mb-6">⚠️</div>
       <h3 className="text-2xl text-white mb-4">
-        {t('doctorateProgram.errorTitle')}
+        {t("doctorateProgram.errorTitle")}
       </h3>
-      <p className="text-blue-200 mb-6">
-        {backendData.error}
-      </p>
+      <p className="text-blue-200 mb-6">{backendData.error}</p>
       <button
         onClick={fetchBackendData}
         className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
       >
-        {t('doctorateProgram.retry')}
+        {t("doctorateProgram.retry")}
       </button>
     </div>
   );
@@ -230,6 +244,24 @@ const DoctorateProgram = () => {
     );
   }
 
+  // Loading state
+  if (apiData.loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">{t("loading", "Загрузка...")}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state - показываем fallback данные вместо ошибки
+  // API может вернуть 404, но мы покажем дефолтные данные из normalizeData
+  if (apiData.error) {
+    console.warn("Faculty API error, using fallback data:", apiData.error);
+  }
+
   return (
     <>
       <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-12 md:py-20 overflow-hidden">
@@ -243,13 +275,19 @@ const DoctorateProgram = () => {
 
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Заголовок */}
-          <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div
+            className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-10"
+            }`}
+          >
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-6">
-              {t('doctorateProgram.title')}
+              {t("doctorateProgram.title")}
             </h1>
             <div className="w-20 h-1 bg-emerald-400 mx-auto mb-3 md:mb-4"></div>
             <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto px-4">
-              {t('doctorateProgram.subtitle')}
+              {t("doctorateProgram.subtitle")}
             </p>
           </div>
 
@@ -260,23 +298,49 @@ const DoctorateProgram = () => {
           )}
 
           {/* Ключевые показатели */}
-          <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div
+            className={`grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 transition-all duration-1000 delay-200 ${
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-10"
+            }`}
+          >
             {[
-              { value: '25+', label: t('doctorateProgram.stats.years'), color: 'blue' },
-              { value: '150+', label: t('doctorateProgram.stats.graduates'), color: 'green' },
-              { value: '12', label: t('doctorateProgram.stats.professors'), color: 'blue' },
-              { value: '85%', label: t('doctorateProgram.stats.successRate'), color: 'green' }
+              {
+                value: "25+",
+                label: t("doctorateProgram.stats.years"),
+                color: "blue",
+              },
+              {
+                value: "150+",
+                label: t("doctorateProgram.stats.graduates"),
+                color: "green",
+              },
+              {
+                value: "12",
+                label: t("doctorateProgram.stats.professors"),
+                color: "blue",
+              },
+              {
+                value: "85%",
+                label: t("doctorateProgram.stats.successRate"),
+                color: "green",
+              },
             ].map((stat, index) => (
-              <div 
+              <div
                 key={index}
                 className="relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl transition-all duration-500 transform hover:scale-105 text-center group"
               >
-                <div className={`text-3xl md:text-4xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300 ${
-                  stat.color === 'blue' ? 'text-blue-400' : 'text-emerald-400'
-                }`}>
+                <div
+                  className={`text-3xl md:text-4xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300 ${
+                    stat.color === "blue" ? "text-blue-400" : "text-emerald-400"
+                  }`}
+                >
                   {stat.value}
                 </div>
-                <div className="text-blue-100 font-medium text-sm md:text-base">{stat.label}</div>
+                <div className="text-blue-100 font-medium text-sm md:text-base">
+                  {stat.label}
+                </div>
                 <div className="absolute -top-2 -right-2 w-4 h-4 bg-emerald-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-ping"></div>
               </div>
             ))}
@@ -285,18 +349,28 @@ const DoctorateProgram = () => {
           {/* Научные направления */}
           {researchDirections.length > 0 ? (
             <>
-              <div className={`mb-12 md:mb-16 transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+              <div
+                className={`mb-12 md:mb-16 transition-all duration-1000 delay-400 ${
+                  isVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                   {researchDirections.map((direction, index) => (
                     <div
                       key={direction.id}
                       className={`relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl transition-all duration-500 transform hover:scale-105 cursor-pointer ${
-                        activeDirection === index ? 'ring-2 ring-emerald-400 ring-opacity-50' : ''
+                        activeDirection === index
+                          ? "ring-2 ring-emerald-400 ring-opacity-50"
+                          : ""
                       }`}
                       onClick={() => handleDirectionClick(index)}
                     >
                       {/* Иконка направления */}
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${direction.color} flex items-center justify-center text-2xl mb-4 mx-auto`}>
+                      <div
+                        className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${direction.color} flex items-center justify-center text-2xl mb-4 mx-auto`}
+                      >
                         {direction.icon}
                       </div>
 
@@ -321,14 +395,18 @@ const DoctorateProgram = () => {
                       </p>
 
                       {/* Стоимость (если есть) */}
-                      {direction.tuition_fee && direction.tuition_fee !== "0.00" && (
-                        <div className="text-center mb-4">
-                          <span className="text-blue-200 text-sm">{t('doctorateProgram.tuitionFee')}</span>
-                          <div className="text-white font-semibold text-sm mt-1">
-                            {direction.tuition_fee} ₽/{t('doctorateProgram.perYear')}
+                      {direction.tuition_fee &&
+                        direction.tuition_fee !== "0.00" && (
+                          <div className="text-center mb-4">
+                            <span className="text-blue-200 text-sm">
+                              {t("doctorateProgram.tuitionFee")}
+                            </span>
+                            <div className="text-white font-semibold text-sm mt-1">
+                              {direction.tuition_fee} ₽/
+                              {t("doctorateProgram.perYear")}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       {/* Кнопка */}
                       <button
@@ -338,7 +416,7 @@ const DoctorateProgram = () => {
                         }}
                         className={`w-full bg-gradient-to-r ${direction.color} hover:${direction.hoverColor} text-white font-bold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg`}
                       >
-                        {t('doctorateProgram.learnMore')}
+                        {t("doctorateProgram.learnMore")}
                       </button>
 
                       {/* Индикатор активного направления */}
@@ -351,13 +429,21 @@ const DoctorateProgram = () => {
               </div>
 
               {/* Детали активного направления */}
-              <div className={`transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+              <div
+                className={`transition-all duration-1000 delay-600 ${
+                  isVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+              >
                 <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl">
                   <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
                     {/* Основная информация */}
                     <div className="lg:w-2/3">
                       <div className="flex items-start mb-6">
-                        <div className={`w-20 h-20 rounded-2xl bg-gradient-to-r ${researchDirections[activeDirection].color} flex items-center justify-center text-3xl mr-4 md:mr-6`}>
+                        <div
+                          className={`w-20 h-20 rounded-2xl bg-gradient-to-r ${researchDirections[activeDirection].color} flex items-center justify-center text-3xl mr-4 md:mr-6`}
+                        >
                           {researchDirections[activeDirection].icon}
                         </div>
                         <div>
@@ -381,19 +467,21 @@ const DoctorateProgram = () => {
 
                       {/* Требования */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {researchDirections[activeDirection].requirements.map((requirement, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center bg-white/5 rounded-xl p-4 border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
-                          >
-                            <div className="w-8 h-8 bg-emerald-400/20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-emerald-400/30 transition-colors">
-                              <span className="text-emerald-300">✓</span>
+                        {researchDirections[activeDirection].requirements.map(
+                          (requirement, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center bg-white/5 rounded-xl p-4 border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+                            >
+                              <div className="w-8 h-8 bg-emerald-400/20 rounded-lg flex items-center justify-center mr-3 group-hover:bg-emerald-400/30 transition-colors">
+                                <span className="text-emerald-300">✓</span>
+                              </div>
+                              <span className="text-white group-hover:text-emerald-300 transition-colors">
+                                {requirement}
+                              </span>
                             </div>
-                            <span className="text-white group-hover:text-emerald-300 transition-colors">
-                              {requirement}
-                            </span>
-                          </div>
-                        ))}
+                          )
+                        )}
                       </div>
                     </div>
 
@@ -402,37 +490,52 @@ const DoctorateProgram = () => {
                       <div className="bg-white/5 rounded-2xl p-6 border border-white/10 sticky top-6">
                         <div className="text-center mb-6">
                           <div className="text-2xl font-bold text-white mb-2">
-                            {researchDirections[activeDirection].tuition_fee && researchDirections[activeDirection].tuition_fee !== "0.00" 
-                              ? `${researchDirections[activeDirection].tuition_fee} ₽/${t('doctorateProgram.perYear')}`
-                              : t('doctorateProgram.freeTuition')
-                            }
+                            {researchDirections[activeDirection].tuition_fee &&
+                            researchDirections[activeDirection].tuition_fee !==
+                              "0.00"
+                              ? `${
+                                  researchDirections[activeDirection]
+                                    .tuition_fee
+                                } ₽/${t("doctorateProgram.perYear")}`
+                              : t("doctorateProgram.freeTuition")}
                           </div>
                           <div className="text-emerald-300 font-semibold">
-                            {researchDirections[activeDirection].tuition_fee && researchDirections[activeDirection].tuition_fee !== "0.00" 
-                              ? t('doctorateProgram.tuitionRequired')
-                              : t('doctorateProgram.fundingAvailable')
-                            }
+                            {researchDirections[activeDirection].tuition_fee &&
+                            researchDirections[activeDirection].tuition_fee !==
+                              "0.00"
+                              ? t("doctorateProgram.tuitionRequired")
+                              : t("doctorateProgram.fundingAvailable")}
                           </div>
                         </div>
 
                         <div className="space-y-4">
                           <button className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-xl transition-all duration-300 border border-white/20">
-                            {t('doctorateProgram.downloadBrochure')}
+                            {t("doctorateProgram.downloadBrochure")}
                           </button>
                         </div>
 
                         {/* Дополнительная информация */}
                         <div className="mt-6 pt-6 border-t border-white/10">
                           <div className="flex justify-between items-center mb-2">
-                            <span className="text-blue-200">{t('doctorateProgram.startDate')}</span>
-                            <span className="text-white font-semibold">{t('doctorateProgram.september')}</span>
+                            <span className="text-blue-200">
+                              {t("doctorateProgram.startDate")}
+                            </span>
+                            <span className="text-white font-semibold">
+                              {t("doctorateProgram.september")}
+                            </span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-blue-200">{t('doctorateProgram.places')}</span>
-                            <span className="text-emerald-300 font-semibold">8-10</span>
+                            <span className="text-blue-200">
+                              {t("doctorateProgram.places")}
+                            </span>
+                            <span className="text-emerald-300 font-semibold">
+                              8-10
+                            </span>
                           </div>
                           <div className="flex justify-between items-center mt-2">
-                            <span className="text-blue-200">{t('doctorateProgram.format')}</span>
+                            <span className="text-blue-200">
+                              {t("doctorateProgram.format")}
+                            </span>
                             <span className="text-white font-semibold text-sm text-right">
                               {researchDirections[activeDirection].format}
                             </span>
@@ -449,19 +552,25 @@ const DoctorateProgram = () => {
               <div className="text-center py-16">
                 <div className="text-6xl mb-6">🎓</div>
                 <h3 className="text-2xl text-white mb-4">
-                  {t('doctorateProgram.noPrograms')}
+                  {t("doctorateProgram.noPrograms")}
                 </h3>
                 <p className="text-blue-200">
-                  {t('doctorateProgram.noProgramsDescription')}
+                  {t("doctorateProgram.noProgramsDescription")}
                 </p>
               </div>
             )
           )}
 
           {/* Преимущества программы */}
-          <div className={`mt-12 md:mt-16 transition-all duration-1000 delay-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <div
+            className={`mt-12 md:mt-16 transition-all duration-1000 delay-800 ${
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-10"
+            }`}
+          >
             <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8 md:mb-12">
-              {t('doctorateProgram.benefitsTitle')}
+              {t("doctorateProgram.benefitsTitle")}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {benefits.map((benefit, index) => (
@@ -501,14 +610,18 @@ const DoctorateProgram = () => {
               {/* Заголовок */}
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${selectedDirection.color} flex items-center justify-center text-2xl mr-4`}>
+                  <div
+                    className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${selectedDirection.color} flex items-center justify-center text-2xl mr-4`}
+                  >
                     {selectedDirection.icon}
                   </div>
                   <div>
                     <h2 className="text-2xl md:text-3xl font-bold text-white">
                       {selectedDirection.title}
                     </h2>
-                    <p className="text-emerald-300">{selectedDirection.duration}</p>
+                    <p className="text-emerald-300">
+                      {selectedDirection.duration}
+                    </p>
                   </div>
                 </div>
                 <button
@@ -527,36 +640,44 @@ const DoctorateProgram = () => {
 
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">
-                    {t('doctorateProgram.requirements')}
+                    {t("doctorateProgram.requirements")}
                   </h3>
                   <div className="grid grid-cols-1 gap-3">
-                    {selectedDirection.requirements.map((requirement, index) => (
-                      <div key={index} className="flex items-center">
-                        <div className="w-6 h-6 bg-emerald-400/20 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-emerald-300 text-sm">✓</span>
+                    {selectedDirection.requirements.map(
+                      (requirement, index) => (
+                        <div key={index} className="flex items-center">
+                          <div className="w-6 h-6 bg-emerald-400/20 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-emerald-300 text-sm">✓</span>
+                          </div>
+                          <span className="text-white">{requirement}</span>
                         </div>
-                        <span className="text-white">{requirement}</span>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </div>
 
                 {/* Информация о стоимости */}
-                {selectedDirection.tuition_fee && selectedDirection.tuition_fee !== "0.00" && (
-                  <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <h4 className="font-semibold text-white mb-2">{t('doctorateProgram.tuitionInformation')}</h4>
-                    <p className="text-emerald-300 font-bold text-lg">
-                      {selectedDirection.tuition_fee} ₽/{t('doctorateProgram.perYear')}
-                    </p>
-                    <p className="text-blue-200 text-sm mt-1">{selectedDirection.format}</p>
-                  </div>
-                )}
+                {selectedDirection.tuition_fee &&
+                  selectedDirection.tuition_fee !== "0.00" && (
+                    <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                      <h4 className="font-semibold text-white mb-2">
+                        {t("doctorateProgram.tuitionInformation")}
+                      </h4>
+                      <p className="text-emerald-300 font-bold text-lg">
+                        {selectedDirection.tuition_fee} ₽/
+                        {t("doctorateProgram.perYear")}
+                      </p>
+                      <p className="text-blue-200 text-sm mt-1">
+                        {selectedDirection.format}
+                      </p>
+                    </div>
+                  )}
 
                 <button
                   onClick={handleApplyNow}
                   className={`w-full bg-gradient-to-r ${selectedDirection.color} hover:${selectedDirection.hoverColor} text-white font-bold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg`}
                 >
-                  {t('doctorateProgram.applyForDirection')}
+                  {t("doctorateProgram.applyForDirection")}
                 </button>
               </div>
             </div>

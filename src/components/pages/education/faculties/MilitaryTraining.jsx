@@ -21,7 +21,9 @@ const MilitaryTraining = () => {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
       const API_URL = import.meta.env.VITE_API_URL;
 
-      const response = await fetch(`${API_URL}/api/education/faculties/military-training/?lang=${i18n.language}`);
+      const response = await fetch(
+        `${API_URL}/api/education/faculties/military-training/?lang=${i18n.language}`
+      );
 
       const data = await response.json();
 
@@ -317,6 +319,24 @@ const MilitaryTraining = () => {
       },
     },
   };
+
+  // Loading state
+  if (apiData.loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">{t("loading", "Загрузка...")}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state - показываем fallback данные вместо ошибки
+  // API может вернуть 404, но мы покажем дефолтные данные из normalizeData
+  if (apiData.error) {
+    console.warn("Faculty API error, using fallback data:", apiData.error);
+  }
 
   return (
     <section

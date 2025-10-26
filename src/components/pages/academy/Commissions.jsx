@@ -1,27 +1,30 @@
 // Commissions.jsx - Integrated with API
-import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
-import apiService from '../../../services/api';
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
+import apiService from "../../../services/api";
 
 const Commissions = () => {
   const { t, i18n } = useTranslation();
   const [activeCommission, setActiveCommission] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState("all");
   const [commissions, setCommissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const sectionRef = useRef(null);
 
-  // Filter options
-  const filters = [
-    { id: 'all', label: t('filters.all', 'Все комиссии') },
-    { id: 'methodical', label: t('filters.methodical', 'Методические') },
-    { id: 'academic', label: t('filters.academic', 'Академические') },
-    { id: 'quality', label: t('filters.quality', 'Качество') },
-    { id: 'student', label: t('filters.student', 'Студенческие') }
-  ];
+  // Filter options - recreate when language changes
+  const filters = useMemo(
+    () => [
+      { id: "all", label: t("filters.all", "Все комиссии") },
+      { id: "methodical", label: t("filters.methodical", "Методические") },
+      { id: "academic", label: t("filters.academic", "Академические") },
+      { id: "quality", label: t("filters.quality", "Качество") },
+      { id: "student", label: t("filters.student", "Студенческие") },
+    ],
+    [t, i18n.language]
+  );
 
   // Fetch data from API
   useEffect(() => {
@@ -29,7 +32,7 @@ const Commissions = () => {
       try {
         setLoading(true);
         const lang = i18n.language;
-        const category = filter === 'all' ? null : filter;
+        const category = filter === "all" ? null : filter;
 
         const commissionsData = await apiService.getCommissions(lang, category);
         setCommissions(commissionsData);
@@ -37,8 +40,8 @@ const Commissions = () => {
         // Set visible immediately after data loads
         setIsVisible(true);
       } catch (err) {
-        console.error('Error fetching Commissions data:', err);
-        setError(t('error.loadingData', 'Ошибка загрузки данных'));
+        console.error("Error fetching Commissions data:", err);
+        setError(t("error.loadingData", "Ошибка загрузки данных"));
       } finally {
         setLoading(false);
       }
@@ -78,7 +81,7 @@ const Commissions = () => {
       <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-xl">{t('loading', 'Загрузка...')}</p>
+          <p className="text-white text-xl">{t("loading", "Загрузка...")}</p>
         </div>
       </section>
     );
@@ -124,11 +127,11 @@ const Commissions = () => {
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            {t('commissions.title')}
+            {t("commissions.title")}
           </motion.h2>
           <div className="w-20 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {t('commissions.subtitle')}
+            {t("commissions.subtitle")}
           </p>
         </motion.div>
 
@@ -143,10 +146,11 @@ const Commissions = () => {
             <button
               key={filterItem.id}
               onClick={() => setFilter(filterItem.id)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${filter === filterItem.id
-                ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-2xl shadow-blue-500/30'
-                : 'bg-white/10 text-blue-100 backdrop-blur-sm border border-white/20 hover:bg-white/20'
-                }`}
+              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
+                filter === filterItem.id
+                  ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-2xl shadow-blue-500/30"
+                  : "bg-white/10 text-blue-100 backdrop-blur-sm border border-white/20 hover:bg-white/20"
+              }`}
             >
               {filterItem.label}
             </button>
@@ -165,18 +169,22 @@ const Commissions = () => {
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 50, scale: 0.9 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className={`p-6 rounded-2xl backdrop-blur-lg border-2 transition-all duration-500 cursor-pointer group ${activeCommission === index
-                    ? 'bg-white/20 border-emerald-400 shadow-2xl scale-105'
-                    : 'bg-white/10 border-white/20 hover:bg-white/15 hover:border-blue-300'
-                    }`}
+                  className={`p-6 rounded-2xl backdrop-blur-lg border-2 transition-all duration-500 cursor-pointer group ${
+                    activeCommission === index
+                      ? "bg-white/20 border-emerald-400 shadow-2xl scale-105"
+                      : "bg-white/10 border-white/20 hover:bg-white/15 hover:border-blue-300"
+                  }`}
                   onMouseEnter={() => setActiveCommission(index)}
                   onClick={() => setActiveCommission(index)}
                 >
                   <div className="flex items-start space-x-4">
-                    <div className={`flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold transition-all duration-300 group-hover:scale-110 ${activeCommission === index
-                      ? 'bg-gradient-to-r from-emerald-500 to-blue-500 shadow-lg'
-                      : 'bg-gradient-to-r from-blue-600 to-emerald-600'
-                      }`}>
+                    <div
+                      className={`flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold transition-all duration-300 group-hover:scale-110 ${
+                        activeCommission === index
+                          ? "bg-gradient-to-r from-emerald-500 to-blue-500 shadow-lg"
+                          : "bg-gradient-to-r from-blue-600 to-emerald-600"
+                      }`}
+                    >
                       {commission.icon}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -197,20 +205,22 @@ const Commissions = () => {
                         {activeCommission === index && (
                           <motion.div
                             initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
+                            animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.3 }}
                             className="mt-4 space-y-3"
                           >
                             <div className="flex flex-wrap gap-2">
-                              {commission.responsibilities?.map((responsibility, responsibilityIndex) => (
-                                <span
-                                  key={responsibilityIndex}
-                                  className="px-3 py-1 bg-white/10 rounded-full text-sm text-blue-200 backdrop-blur-sm border border-white/10"
-                                >
-                                  {responsibility}
-                                </span>
-                              ))}
+                              {commission.responsibilities?.map(
+                                (responsibility, responsibilityIndex) => (
+                                  <span
+                                    key={responsibilityIndex}
+                                    className="px-3 py-1 bg-white/10 rounded-full text-sm text-blue-200 backdrop-blur-sm border border-white/10"
+                                  >
+                                    {responsibility}
+                                  </span>
+                                )
+                              )}
                             </div>
                           </motion.div>
                         )}
@@ -241,20 +251,24 @@ const Commissions = () => {
                       {filteredCommissions[activeCommission].name}
                     </h3>
                     <p className="text-emerald-300 text-lg">
-                      {t('commissions.chairman', 'Председатель')}: {filteredCommissions[activeCommission].chairman}
+                      {t("commissions.chairman", "Председатель")}:{" "}
+                      {filteredCommissions[activeCommission].chairman}
                     </p>
                   </div>
 
                   {/* Обязанности комиссии */}
                   {filteredCommissions[activeCommission].responsibilities &&
-                    filteredCommissions[activeCommission].responsibilities.length > 0 && (
+                    filteredCommissions[activeCommission].responsibilities
+                      .length > 0 && (
                       <div className="space-y-4 mb-8">
                         <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
                           <span className="w-2 h-2 bg-blue-400 rounded-full mr-3"></span>
-                          {t('commissions.responsibilities', 'Обязанности')}
+                          {t("commissions.responsibilities", "Обязанности")}
                         </h4>
                         <div className="grid gap-3">
-                          {filteredCommissions[activeCommission].responsibilities.map((responsibility, index) => (
+                          {filteredCommissions[
+                            activeCommission
+                          ].responsibilities.map((responsibility, index) => (
                             <motion.div
                               key={index}
                               initial={{ opacity: 0, x: -20 }}
@@ -262,8 +276,12 @@ const Commissions = () => {
                               transition={{ delay: index * 0.1 }}
                               className="flex items-start bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10"
                             >
-                              <span className="text-emerald-400 mr-3 text-lg">✓</span>
-                              <span className="text-blue-100">{responsibility}</span>
+                              <span className="text-emerald-400 mr-3 text-lg">
+                                ✓
+                              </span>
+                              <span className="text-blue-100">
+                                {responsibility}
+                              </span>
                             </motion.div>
                           ))}
                         </div>
@@ -274,24 +292,31 @@ const Commissions = () => {
                   {(filteredCommissions[activeCommission].email ||
                     filteredCommissions[activeCommission].phone ||
                     filteredCommissions[activeCommission].chairman) && (
-                      <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                        <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-                          <span className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
-                          {t('commissions.contactInfo', 'Контактная информация')}
-                        </h4>
-                        <div className="space-y-3 text-blue-200">
-                          {filteredCommissions[activeCommission].chairman && (
-                            <p>👥 {t('commissions.chairman', 'Председатель')}: {filteredCommissions[activeCommission].chairman}</p>
-                          )}
-                          {filteredCommissions[activeCommission].email && (
-                            <p>📧 {filteredCommissions[activeCommission].email}</p>
-                          )}
-                          {filteredCommissions[activeCommission].phone && (
-                            <p>📞 {filteredCommissions[activeCommission].phone}</p>
-                          )}
-                        </div>
+                    <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                      <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+                        <span className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
+                        {t("commissions.contactInfo", "Контактная информация")}
+                      </h4>
+                      <div className="space-y-3 text-blue-200">
+                        {filteredCommissions[activeCommission].chairman && (
+                          <p>
+                            👥 {t("commissions.chairman", "Председатель")}:{" "}
+                            {filteredCommissions[activeCommission].chairman}
+                          </p>
+                        )}
+                        {filteredCommissions[activeCommission].email && (
+                          <p>
+                            📧 {filteredCommissions[activeCommission].email}
+                          </p>
+                        )}
+                        {filteredCommissions[activeCommission].phone && (
+                          <p>
+                            📞 {filteredCommissions[activeCommission].phone}
+                          </p>
+                        )}
                       </div>
-                    )}
+                    </div>
+                  )}
                 </>
               )}
             </div>
