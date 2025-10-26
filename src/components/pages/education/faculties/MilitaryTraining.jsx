@@ -575,8 +575,8 @@ const MilitaryTraining = () => {
                   className="space-y-8"
                 >
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {facultyData.programs?.length > 0 ? (
-                      facultyData.programs.map((program, index) => (
+                    {(facultyData.programs || []).length > 0 ? (
+                      (facultyData.programs || []).map((program, index) => (
                         <motion.div
                           key={program.id || index}
                           initial={{ opacity: 0, scale: 0.9 }}
@@ -665,8 +665,8 @@ const MilitaryTraining = () => {
                   className="space-y-8"
                 >
                   <div className="grid gap-6">
-                    {facultyData.specializations?.length > 0 ? (
-                      facultyData.specializations.map(
+                    {(facultyData.specializations || []).length > 0 ? (
+                      (facultyData.specializations || []).map(
                         (specialization, index) => (
                           <motion.div
                             key={specialization.id || index}
@@ -725,8 +725,8 @@ const MilitaryTraining = () => {
                   className="space-y-8"
                 >
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {facultyData.teachers?.length > 0 ? (
-                      facultyData.teachers.map((teacher, index) => (
+                    {(facultyData.teachers || []).length > 0 ? (
+                      (facultyData.teachers || []).map((teacher, index) => (
                         <motion.div
                           key={teacher.id || index}
                           initial={{ opacity: 0, y: 20 }}
@@ -750,7 +750,7 @@ const MilitaryTraining = () => {
                             Опыт: {teacher.experience}
                           </p>
                           <div className="flex flex-wrap gap-2 justify-center">
-                            {teacher.specializations.map((spec, i) => (
+                            {(teacher.specializations || []).map((spec, i) => (
                               <span
                                 key={i}
                                 className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-xl text-sm font-medium border border-blue-400/30"
@@ -791,26 +791,28 @@ const MilitaryTraining = () => {
                       Контакты
                     </h3>
                     <div className="space-y-4">
-                      {facultyData.contacts?.items?.length > 0 ? (
-                        facultyData.contacts.items.map((item, index) => (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group backdrop-blur-sm"
-                            whileHover={{ scale: 1.02 }}
-                          >
-                            <span className="text-2xl text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                              {item.icon}
-                            </span>
-                            <div>
-                              <div className="text-white font-medium text-lg">
-                                {item.value}
+                      {(facultyData.contacts?.items || []).length > 0 ? (
+                        (facultyData.contacts?.items || []).map(
+                          (item, index) => (
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group backdrop-blur-sm"
+                              whileHover={{ scale: 1.02 }}
+                            >
+                              <span className="text-2xl text-emerald-400 group-hover:scale-110 transition-transform duration-300">
+                                {item.icon}
+                              </span>
+                              <div>
+                                <div className="text-white font-medium text-lg">
+                                  {item.value}
+                                </div>
                               </div>
-                            </div>
-                          </motion.div>
-                        ))
+                            </motion.div>
+                          )
+                        )
                       ) : (
                         <div className="text-center text-blue-200 text-lg py-4">
                           {t(
