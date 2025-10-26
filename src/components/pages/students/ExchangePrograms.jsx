@@ -56,11 +56,14 @@ const ExchangePrograms = () => {
       const lang = getApiLanguage();
       
       // Пробуем разные эндпоинты
-      const endpoints = [
-        `/api/student-clubs/exchange-page/?lang=${lang}`,
-        `/api/exchange-page/?lang=${lang}`,
-        `/api/student-clubs/exchange/programs/?lang=${lang}`
-      ];
+      const API_URL = import.meta.env.VITE_API_URL;
+
+        const endpoints = [
+          `${API_URL}/api/student-clubs/exchange-page/?lang=${lang}`,
+          `${API_URL}/api/exchange-page/?lang=${lang}`,
+          `${API_URL}/api/student-clubs/exchange/programs/?lang=${lang}`
+        ];
+
       
       let response = null;
       let data = null;

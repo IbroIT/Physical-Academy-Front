@@ -19,9 +19,10 @@ const MilitaryTraining = () => {
   const fetchFacultyData = async () => {
     try {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
-      const response = await fetch(
-        `/api/education/faculties/military-training/?lang=${i18n.language}`
-      );
+      const API_URL = import.meta.env.VITE_API_URL;
+
+      const response = await fetch(`${API_URL}/api/education/faculties/military-training/?lang=${i18n.language}`);
+
       const data = await response.json();
 
       if (data && data.name) {

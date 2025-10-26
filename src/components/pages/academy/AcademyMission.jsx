@@ -37,7 +37,9 @@ const AcademyMission = () => {
       }));
       
       const lang = getApiLanguage();
-      const url = `/api/academy/missions/?lang=${lang}`;
+      const API_URL = import.meta.env.VITE_API_URL;
+      const url = `${API_URL}/api/academy/missions/?lang=${lang}`;
+
       
       const response = await fetch(url);
       

@@ -38,66 +38,69 @@ const AcademyNumbers = () => {
     return langMap[i18n.language] || 'ru';
   }, [i18n.language]);
 
-  // Функция для загрузки данных с бэкенда
-  const fetchBackendData = useCallback(async () => {
-    try {
-      setBackendData(prev => ({ 
-        ...prev, 
-        loading: true, 
-        error: null 
-      }));
-      
-      const lang = getApiLanguage();
-      
-      const endpoints = [
-        `/api/academy/achievements/?lang=${lang}`,
-        `/api/academy/statistics/?lang=${lang}`,
-        `/api/academy/infrastructure/?lang=${lang}`
-      ];
+// Функция для загрузки данных с бэкенда
+const fetchBackendData = useCallback(async () => {
+  try {
+    setBackendData(prev => ({ 
+      ...prev, 
+      loading: true, 
+      error: null 
+    }));
+    
+    const lang = getApiLanguage();
+    const API_URL = import.meta.env.VITE_API_URL; // ✅ добавляем базовый URL из env
+    
+    const endpoints = [
+      `${API_URL}/api/academy/achievements/?lang=${lang}`,
+      `${API_URL}/api/academy/statistics/?lang=${lang}`,
+      `${API_URL}/api/academy/infrastructure/?lang=${lang}`
+    ];
 
-      const responses = await Promise.all(
-        endpoints.map(async (url) => {
-          try {
-            const response = await fetch(url);
-            
-            // Проверяем content-type
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-              const text = await response.text();
-              console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
-              return { results: [] };
-            }
-            
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            return await response.json();
-          } catch (error) {
-            console.error(`Error fetching ${url}:`, error);
+    const responses = await Promise.all(
+      endpoints.map(async (url) => {
+        try {
+          const response = await fetch(url);
+          
+          // Проверяем content-type
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
             return { results: [] };
           }
-        })
-      );
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          return await response.json();
+        } catch (error) {
+          console.error(`Error fetching ${url}:`, error);
+          return { results: [] };
+        }
+      })
+    );
 
-      setBackendData(prev => ({
-        ...prev,
-        achievements: responses[0].results || [],
-        statistics: responses[1].results || [],
-        infrastructure: responses[2].results || [],
-        loading: false,
-        error: null
-      }));
+    setBackendData(prev => ({
+      ...prev,
+      achievements: responses[0].results || [],
+      statistics: responses[1].results || [],
+      infrastructure: responses[2].results || [],
+      loading: false,
+      error: null
+    }));
 
-    } catch (error) {
-      console.error('Error fetching academy numbers data:', error);
-      setBackendData(prev => ({
-        ...prev,
-        loading: false,
-        error: 'Failed to load data'
-      }));
-    }
-  }, [getApiLanguage]);
+  } catch (error) {
+    console.error('Error fetching academy numbers data:', error);
+    setBackendData(prev => ({
+      ...prev,
+      loading: false,
+      error: 'Failed to load data'
+    }));
+  }
+}, [getApiLanguage]);
+
+
 
   // Загрузка данных при монтировании
   useEffect(() => {

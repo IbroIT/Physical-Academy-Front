@@ -38,16 +38,19 @@ const StudentScientificSociety = () => {
       const lang = getApiLanguage();
       console.log('🔄 Fetching data for language:', lang);
       
+      const API_URL = import.meta.env.VITE_API_URL;
+
       const endpoints = [
-        '/api/science/sss-info/',
-        '/api/science/sss-stats/',
-        '/api/science/sss-features/',
-        '/api/science/sss-projects/',
-        '/api/science/sss-events/',
-        '/api/science/sss-join-steps/',
-        '/api/science/sss-leadership/',
-        '/api/science/sss-contacts/'
+        `${API_URL}/api/science/sss-info/`,
+        `${API_URL}/api/science/sss-stats/`,
+        `${API_URL}/api/science/sss-features/`,
+        `${API_URL}/api/science/sss-projects/`,
+        `${API_URL}/api/science/sss-events/`,
+        `${API_URL}/api/science/sss-join-steps/`,
+        `${API_URL}/api/science/sss-leadership/`,
+        `${API_URL}/api/science/sss-contacts/`
       ];
+
 
       const responses = await Promise.all(
         endpoints.map(async (url) => {

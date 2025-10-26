@@ -45,7 +45,9 @@ const AcademyAbout = () => {
       // Попытка загрузки фото с бэкенда
       let photosData = { results: [] };
       try {
-        const photosResponse = await fetch(`/api/about/about-photos/?lang=${lang}`);
+        const API_URL = import.meta.env.VITE_API_URL;
+        const photosResponse = await fetch(`${API_URL}/api/about/about-photos/?lang=${lang}`);
+
         if (photosResponse.ok) {
           photosData = await photosResponse.json();
         }
@@ -56,7 +58,7 @@ const AcademyAbout = () => {
       // Попытка загрузки статистики
       let statsData = { results: [] };
       try {
-        const statsResponse = await fetch(`/api/about/stats/?lang=${lang}`);
+          const statsResponse = await fetch(`${API_URL}/api/about/stats/?lang=${lang}`);
         if (statsResponse.ok) {
           statsData = await statsResponse.json();
         }
@@ -67,7 +69,8 @@ const AcademyAbout = () => {
       // Попытка загрузки особенностей
       let featuresData = { results: [] };
       try {
-        const featuresResponse = await fetch(`/api/about/features/?lang=${lang}`);
+        const featuresResponse = await fetch(`${API_URL}/api/about/features/?lang=${lang}`);
+
         if (featuresResponse.ok) {
           featuresData = await featuresResponse.json();
         }

@@ -37,12 +37,15 @@ const Vestnik = () => {
       
       const lang = getApiLanguage();
       
+      const API_URL = import.meta.env.VITE_API_URL;
+
       const endpoints = [
-        `/api/science/vestnik-stats/?lang=${lang}`,
-        `/api/science/vestnik-issues/?lang=${lang}&is_featured=true`,
-        `/api/science/vestnik-issues/?lang=${lang}&ordering=-publication_date`,
-        `/api/science/vestnik-articles/?lang=${lang}&ordering=-id`
+        `${API_URL}/api/science/vestnik-stats/?lang=${lang}`,
+        `${API_URL}/api/science/vestnik-issues/?lang=${lang}&is_featured=true`,
+        `${API_URL}/api/science/vestnik-issues/?lang=${lang}&ordering=-publication_date`,
+        `${API_URL}/api/science/vestnik-articles/?lang=${lang}&ordering=-id`
       ];
+
 
       const responses = await Promise.all(
         endpoints.map(async (url) => {

@@ -72,14 +72,17 @@ const WebOfScience = () => {
       }));
 
       // Определяем все эндпоинты
+      const API_URL = import.meta.env.VITE_API_URL;
+
       const endpoints = [
-        `/api/science/wos-metrics/?lang=${lang}`,
-        `/api/science/wos-categories/?lang=${lang}`,
-        `/api/science/wos-collaborations/?lang=${lang}`,
-        `/api/science/wos-journal-quartiles/?lang=${lang}`,
-        `/api/science/wos-additional-metrics/?lang=${lang}`,
-        `/api/science/wos-sections/?lang=${lang}`
+        `${API_URL}/api/science/wos-metrics/?lang=${lang}`,
+        `${API_URL}/api/science/wos-categories/?lang=${lang}`,
+        `${API_URL}/api/science/wos-collaborations/?lang=${lang}`,
+        `${API_URL}/api/science/wos-journal-quartiles/?lang=${lang}`,
+        `${API_URL}/api/science/wos-additional-metrics/?lang=${lang}`,
+        `${API_URL}/api/science/wos-sections/?lang=${lang}`
       ];
+
 
       const responses = await Promise.all(
         endpoints.map(async (url) => {

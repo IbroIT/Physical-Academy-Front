@@ -20,9 +20,9 @@ const CoachingFaculty = () => {
     try {
       const lang =
         i18n.language === "ru" ? "ru" : i18n.language === "en" ? "en" : "kg";
-      const response = await fetch(
-        `/api/education/faculties/coaching-faculty/?lang=${lang}`
-      );
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/api/education/faculties/coaching-faculty/?lang=${lang}`);
+
 
       if (!response.ok) throw new Error("Failed to fetch faculty data");
 

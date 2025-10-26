@@ -40,7 +40,9 @@ const BachelorInfo = () => {
       }));
       
       const lang = getApiLanguage();
-      const url = `/api/admission/bachelor-programs/?lang=${lang}`;
+      const API_URL = import.meta.env.VITE_API_URL;
+      const url = `${API_URL}/api/admission/bachelor-programs/?lang=${lang}`;
+
       
       const response = await fetch(url);
       

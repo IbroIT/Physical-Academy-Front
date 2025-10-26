@@ -36,7 +36,10 @@ const DoctorateProgram = () => {
       }));
       
       const lang = getApiLanguage();
-      const response = await fetch(`/api/education/phd-programs/?lang=${lang}`);
+      const API_URL = import.meta.env.VITE_API_URL;
+
+      const response = await fetch(`${API_URL}/api/education/phd-programs/?lang=${i18n.language}`);
+
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

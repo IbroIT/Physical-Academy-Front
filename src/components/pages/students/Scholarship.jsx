@@ -40,11 +40,14 @@ const Scholarship = () => {
       
       const lang = getApiLanguage();
       
+      const API_URL = import.meta.env.VITE_API_URL;
+
       const endpoints = [
-        `/api/student-clubs/scholarship/documents/?lang=${lang}`,
-        `/api/student-clubs/scholarship/programs/?lang=${lang}`,
-        `/api/student-clubs/scholarship-page/?lang=${lang}`
+        `${API_URL}/api/student-clubs/scholarship/documents/?lang=${lang}`,
+        `${API_URL}/api/student-clubs/scholarship/programs/?lang=${lang}`,
+        `${API_URL}/api/student-clubs/scholarship-page/?lang=${lang}`
       ];
+
 
       const responses = await Promise.all(
         endpoints.map(async (url) => {

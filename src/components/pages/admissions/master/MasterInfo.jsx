@@ -58,20 +58,23 @@ const fetchBackendData = useCallback(async (type) => {
     
     const lang = getApiLanguage();
     
-    const endpoints = {
-      master: [
-        `/api/admission/master-documents/?lang=${lang}`,
-        `/api/admission/master-programs/?lang=${lang}`,
-        `/api/admission/master-main-dates/?lang=${lang}`,
-        `/api/admission/master-requirements/?lang=${lang}`
-      ],
-      aspirant: [
-        `/api/admission/aspirant-documents/?lang=${lang}`,
-        `/api/admission/aspirant-programs/?lang=${lang}`,
-        `/api/admission/aspirant-main-dates/?lang=${lang}`,
-        `/api/admission/aspirant-requirements/?lang=${lang}`
-      ]
-    };
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const endpoints = {
+    master: [
+      `${API_URL}/api/admission/master-documents/?lang=${lang}`,
+      `${API_URL}/api/admission/master-programs/?lang=${lang}`,
+      `${API_URL}/api/admission/master-main-dates/?lang=${lang}`,
+      `${API_URL}/api/admission/master-requirements/?lang=${lang}`
+    ],
+    aspirant: [
+      `${API_URL}/api/admission/aspirant-documents/?lang=${lang}`,
+      `${API_URL}/api/admission/aspirant-programs/?lang=${lang}`,
+      `${API_URL}/api/admission/aspirant-main-dates/?lang=${lang}`,
+      `${API_URL}/api/admission/aspirant-requirements/?lang=${lang}`
+    ]
+  };
+
 
     const responses = await Promise.all(
       endpoints[type].map(async (url) => {

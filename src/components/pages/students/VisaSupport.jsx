@@ -39,10 +39,13 @@ const VisaSupport = () => {
       
       const lang = getApiLanguage();
       
+      const API_URL = import.meta.env.VITE_API_URL;
+
       const endpoints = [
-        `/api/student-clubs/visa/services/?lang=${lang}`,
-        `/api/student-clubs/visa/contacts/?lang=${lang}`
+        `${API_URL}/api/student-clubs/visa/services/?lang=${lang}`,
+        `${API_URL}/api/student-clubs/visa/contacts/?lang=${lang}`
       ];
+
 
       const responses = await Promise.all(
         endpoints.map(async (url) => {

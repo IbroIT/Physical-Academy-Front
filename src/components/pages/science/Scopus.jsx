@@ -49,17 +49,20 @@ const Scopus = () => {
       
       const lang = getApiLanguage();
       
+      const API_URL = import.meta.env.VITE_API_URL;
+
       const endpoints = [
-        `/api/science/scopus-stats/?lang=${lang}`,
-        `/api/science/scopus-publications/?lang=${lang}`,
-        `/api/science/scopus-document-types/?lang=${lang}`,
-        `/api/science/scopus-metrics/?lang=${lang}`,
-        `/api/science/scopus-authors/?lang=${lang}`,
-        `/api/science/scopus-journals/?lang=${lang}`,
-        `/api/science/scopus-publishers/?lang=${lang}`,
-        `/api/science/scopus-publication-authors/?lang=${lang}`,
-        `/api/science/scopus-sections/?lang=${lang}`
+        `${API_URL}/api/science/scopus-stats/?lang=${lang}`,
+        `${API_URL}/api/science/scopus-publications/?lang=${lang}`,
+        `${API_URL}/api/science/scopus-document-types/?lang=${lang}`,
+        `${API_URL}/api/science/scopus-metrics/?lang=${lang}`,
+        `${API_URL}/api/science/scopus-authors/?lang=${lang}`,
+        `${API_URL}/api/science/scopus-journals/?lang=${lang}`,
+        `${API_URL}/api/science/scopus-publishers/?lang=${lang}`,
+        `${API_URL}/api/science/scopus-publication-authors/?lang=${lang}`,
+        `${API_URL}/api/science/scopus-sections/?lang=${lang}`
       ];
+
 
       const responses = await Promise.all(
         endpoints.map(async (url) => {

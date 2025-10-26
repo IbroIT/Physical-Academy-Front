@@ -43,11 +43,14 @@ const Instructions = () => {
       const lang = getApiLanguage();
       
       // Пробуем разные эндпоинты
+      const API_URL = import.meta.env.VITE_API_URL;
+
       const endpoints = [
-        `/api/student-clubs/instructions-page/?lang=${lang}`,
-        `/api/instructions-page/?lang=${lang}`,
-        `/api/student-clubs/instructions/documents/?lang=${lang}`
+        `${API_URL}/api/student-clubs/instructions-page/?lang=${lang}`,
+        `${API_URL}/api/instructions-page/?lang=${lang}`,
+        `${API_URL}/api/student-clubs/instructions/documents/?lang=${lang}`
       ];
+
       
       let response = null;
       let data = null;

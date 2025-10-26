@@ -41,7 +41,9 @@ const BachelorQuotas = () => {
       }));
       
       const lang = getApiLanguage();
-      const response = await fetch(`/api/admission/bachelor-quotas/?lang=${lang}`);
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/api/admission/bachelor-quotas/?lang=${lang}`);
+
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

@@ -43,7 +43,9 @@ const StudentCouncil = () => {
       
       const lang = getApiLanguage();
       
-      const response = await fetch(`/api/student-clubs/council-page/?lang=${lang}`);
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API_URL}/api/student-clubs/council-page/?lang=${lang}`);
+
       
       // Проверяем content-type
       const contentType = response.headers.get('content-type');

@@ -32,80 +32,75 @@ const CollegeInfo = () => {
   }, [i18n.language]);
 
   // Функция для загрузки программ
-  const fetchPrograms = useCallback(async (lang) => {
-    try {
-      const response = await fetch(`/api/admission/doctor-programs/?lang=${lang}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log('Programs data:', data);
-      
-      // Если данные приходят как объект, преобразуем в массив
-      if (data && typeof data === 'object' && !Array.isArray(data)) {
-        return [data];
-      }
-      
-      return data || [];
-    } catch (error) {
-      console.error('Error fetching programs:', error);
-      return [];
-    }
-  }, []);
+  const API_URL = import.meta.env.VITE_API_URL; // ✅ один раз вынесли в начало
 
-  // Функция для загрузки требований
-  const fetchRequirements = useCallback(async (lang) => {
-    try {
-      const response = await fetch(`/api/admission/college-admission-requirements/?lang=${lang}`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const data = await response.json();
-      return data?.results || [];
-    } catch (error) {
-      console.error('Error fetching requirements:', error);
-      return [];
-    }
-  }, []);
+// Функция для загрузки программ
+const fetchPrograms = useCallback(async (lang) => {
+  try {
+    const response = await fetch(`${API_URL}/api/admission/doctor-programs/?lang=${lang}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    console.log('Programs data:', data);
+    if (data && typeof data === 'object' && !Array.isArray(data)) return [data];
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching programs:', error);
+    return [];
+  }
+}, []);
 
-  // Функция для загрузки шагов поступления
-  const fetchSteps = useCallback(async (lang) => {
-    try {
-      const response = await fetch(`/api/admission/college-admission-steps/?lang=${lang}`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const data = await response.json();
-      return data?.results || [];
-    } catch (error) {
-      console.error('Error fetching steps:', error);
-      return [];
-    }
-  }, []);
+// Функция для загрузки требований
+const fetchRequirements = useCallback(async (lang) => {
+  try {
+    const response = await fetch(`${API_URL}/api/admission/college-admission-requirements/?lang=${lang}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    return data?.results || [];
+  } catch (error) {
+    console.error('Error fetching requirements:', error);
+    return [];
+  }
+}, []);
 
-  // Функция для загрузки статистики
-  const fetchStatistics = useCallback(async (lang) => {
-    try {
-      const response = await fetch(`/api/admission/college-statistics/?lang=${lang}`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const data = await response.json();
-      return data?.results || [];
-    } catch (error) {
-      console.error('Error fetching statistics:', error);
-      return [];
-    }
-  }, []);
+// Функция для загрузки шагов поступления
+const fetchSteps = useCallback(async (lang) => {
+  try {
+    const response = await fetch(`${API_URL}/api/admission/college-admission-steps/?lang=${lang}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    return data?.results || [];
+  } catch (error) {
+    console.error('Error fetching steps:', error);
+    return [];
+  }
+}, []);
 
-  // Функция для загрузки событий
-  const fetchEvents = useCallback(async (lang) => {
-    try {
-      const response = await fetch(`/api/admission/college-soon-events/?lang=${lang}`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const data = await response.json();
-      return data?.results || [];
-    } catch (error) {
-      console.error('Error fetching events:', error);
-      return [];
-    }
-  }, []);
+// Функция для загрузки статистики
+const fetchStatistics = useCallback(async (lang) => {
+  try {
+    const response = await fetch(`${API_URL}/api/admission/college-statistics/?lang=${lang}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    return data?.results || [];
+  } catch (error) {
+    console.error('Error fetching statistics:', error);
+    return [];
+  }
+}, []);
+
+// Функция для загрузки событий
+const fetchEvents = useCallback(async (lang) => {
+  try {
+    const response = await fetch(`${API_URL}/api/admission/college-soon-events/?lang=${lang}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    return data?.results || [];
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    return [];
+  }
+}, []);
+
 
   // Функция для загрузки всех данных с бэкенда
   const fetchBackendData = useCallback(async () => {

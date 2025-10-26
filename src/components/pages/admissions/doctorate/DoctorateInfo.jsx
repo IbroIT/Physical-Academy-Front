@@ -28,34 +28,40 @@ const DoctorateInfo = () => {
   const deadlines = t('doctorate.deadlines', { returnObjects: true });
 
   // Функции для загрузки данных с API
-  const fetchAdmissionSteps = async () => {
-    try {
-      const response = await fetch(`/api/admission/doctor-admission-steps/?lang=${i18n.language}`);
-      const data = await response.json();
-      setApiData(prev => ({ ...prev, admissionSteps: data.results }));
-    } catch (error) {
-      console.error('Error fetching admission steps:', error);
-    } finally {
-      setLoading(prev => ({ ...prev, admissionSteps: false }));
-    }
-  };
+  const API_URL = import.meta.env.VITE_API_URL;
 
-  const fetchStatistics = async () => {
-    try {
-      const response = await fetch(`/api/admission/doctor-statistics/?lang=${i18n.language}`);
-      const data = await response.json();
-      setApiData(prev => ({ ...prev, statistics: data.results }));
-    } catch (error) {
-      console.error('Error fetching statistics:', error);
-    } finally {
-      setLoading(prev => ({ ...prev, statistics: false }));
-    }
-  };
-
-  const fetchPrograms = async () => {
+// Шаги поступления
+const fetchAdmissionSteps = async () => {
   try {
-    const response = await fetch(`/api/admission/doctor-programs/?lang=${i18n.language}`);
+    const response = await fetch(`${API_URL}/api/admission/doctor-admission-steps/?lang=${i18n.language}`);
     const data = await response.json();
+    setApiData(prev => ({ ...prev, admissionSteps: data.results }));
+  } catch (error) {
+    console.error('Error fetching admission steps:', error);
+  } finally {
+    setLoading(prev => ({ ...prev, admissionSteps: false }));
+  }
+};
+
+// Статистика
+const fetchStatistics = async () => {
+  try {
+    const response = await fetch(`${API_URL}/api/admission/doctor-statistics/?lang=${i18n.language}`);
+    const data = await response.json();
+    setApiData(prev => ({ ...prev, statistics: data.results }));
+  } catch (error) {
+    console.error('Error fetching statistics:', error);
+  } finally {
+    setLoading(prev => ({ ...prev, statistics: false }));
+  }
+};
+
+// Программы
+const fetchPrograms = async () => {
+  try {
+    const response = await fetch(`${API_URL}/api/admission/doctor-programs/?lang=${i18n.language}`);
+    const data = await response.json();
+
     const fixedData = data.map(program => ({
       ...program,
       features: Array.isArray(program.features)
@@ -64,6 +70,7 @@ const DoctorateInfo = () => {
         ? program.features.split(",").map(f => f.trim())
         : []
     }));
+
     setApiData(prev => ({ ...prev, programs: fixedData }));
   } catch (error) {
     console.error('Error fetching programs:', error);
@@ -72,16 +79,17 @@ const DoctorateInfo = () => {
   }
 };
 
+// Детали программы
+const fetchProgramDetails = async (programId) => {
+  try {
+    const response = await fetch(`${API_URL}/api/admission/doctor-programs/?lang=${i18n.language}&id=${programId}`);
+    const data = await response.json();
+    setApiData(prev => ({ ...prev, programDetails: data }));
+  } catch (error) {
+    console.error('Error fetching program details:', error);
+  }
+};
 
-  const fetchProgramDetails = async (programId) => {
-    try {
-      const response = await fetch(`/api/admission/doctor-programs/?lang=${i18n.language}&id=${programId}`);
-      const data = await response.json();
-      setApiData(prev => ({ ...prev, programDetails: data }));
-    } catch (error) {
-      console.error('Error fetching program details:', error);
-    }
-  };
 
   // Загрузка данных при монтировании и смене языка
   useEffect(() => {

@@ -40,12 +40,15 @@ const NTSCommittee = () => {
       
       const lang = getApiLanguage();
       
+      const API_URL = import.meta.env.VITE_API_URL;
+
       const endpoints = {
-        members: `/api/science/nts-committee-members/?lang=${lang}`,
-        directions: `/api/science/nts-research-directions/?lang=${lang}`,
-        roles: `/api/science/nts-committee-roles/?lang=${lang}`,
-        sections: `/api/science/nts-committee-sections/?lang=${lang}`
+        members: `${API_URL}/api/science/nts-committee-members/?lang=${lang}`,
+        directions: `${API_URL}/api/science/nts-research-directions/?lang=${lang}`,
+        roles: `${API_URL}/api/science/nts-committee-roles/?lang=${lang}`,
+        sections: `${API_URL}/api/science/nts-committee-sections/?lang=${lang}`
       };
+
 
       const response = await fetch(endpoints[type]);
       

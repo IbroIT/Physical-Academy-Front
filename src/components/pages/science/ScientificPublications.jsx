@@ -39,10 +39,13 @@ const ScientificPublications = () => {
       
       const lang = getApiLanguage();
       
+      const API_URL = import.meta.env.VITE_API_URL;
+
       const endpoints = {
-        stats: `/api/science/publication-stats/?lang=${lang}`,
-        publications: `/api/science/publications/?lang=${lang}`
+        stats: `${API_URL}/api/science/publication-stats/?lang=${lang}`,
+        publications: `${API_URL}/api/science/publications/?lang=${lang}`
       };
+
 
       const response = await fetch(endpoints[type]);
       
