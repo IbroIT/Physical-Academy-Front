@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import { getImageUrl } from '../../../utils/imageUtils';
 
 const QuotesBanner = () => {
   const { t, i18n } = useTranslation();
@@ -112,7 +113,7 @@ const QuotesBanner = () => {
                 {currentQuote.image_url ? (
                   <div className="mb-4">
                     <img 
-                      src={`https://physical-academy-backend-3dccb860f75a.herokuapp.com${currentQuote.image_url}`}
+                      src={getImageUrl(currentQuote.image_url)}
                       alt={currentQuote.author}
                       className="w-20 h-20 rounded-full object-cover border-4 border-cyan-100 shadow-md"
                     />
