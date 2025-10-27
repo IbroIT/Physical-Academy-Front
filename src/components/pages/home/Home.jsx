@@ -24,10 +24,12 @@ const Home = () => {
       <OrganizationSchema />
       <BreadcrumbSchema />
         <Banner />  
-        <News />
-        <AdsPage />
-        <QuotesBanner />
         <AboutAcademy />
+
+        <News />
+        <QuotesBanner />
+        <AdsPage />
+
         <UniversityEventsPage />
         <Facts />
     </div>
