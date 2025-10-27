@@ -91,43 +91,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
         }
       ]
     },
-    admissions: {
-      title: t('nav.admissions', 'Поступление'),
-      submenu: [
-        { 
-          title: t('nav.bachelor', 'Бакалавриат'),
-          hasNested: true,
-          nestedItems: [
-            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/bachelor/info' },
-            { title: t('nav.registration', 'Регистрация'), link: '/admissions/bachelor/registration' },
-            { title: t('nav.international_applicants', 'Иностранные абитуриенты'), link: '/admissions/bachelor/international' },
-            { title: t('nav.quotas', 'Квоты'), link: '/admissions/bachelor/quotas' },
-            { title: t('nav.contacts', 'Контакты'), link: '/admissions/bachelor/contacts' },
-          ]
-        },
-        { 
-          title: t('nav.master_phd', 'Магистратура'),
-          hasNested: true,
-          nestedItems: [
-            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/master/info' },
-          ]
-        },
-        {
-          title: t('nav.doctorate', 'Докторантура'),
-          hasNested: true,
-          nestedItems: [
-            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/doctorate/info' },
-          ]
-        },
-        { 
-          title: t('nav.college', 'Колледж'),
-          hasNested: true,
-          nestedItems: [
-            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/college/info' },
-          ]
-        },
-      ]
-    },
+    
     education: {
       title: t('nav.education', 'Образование'),
       submenu: [
@@ -177,6 +141,43 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
         { title: t('nav.scopus', 'Scopus'), link: '/science/scopus' },
         { title: t('nav.research_and_technical_council', 'Научно-технический совет'), link: '/science/nts-committee' },
         { title: t('nav.student_scientific_society', 'Студенческое научное общество'), link: '/science/ssu' }
+      ]
+    },
+    admissions: {
+      title: t('nav.admissions', 'Поступление'),
+      submenu: [
+        { 
+          title: t('nav.bachelor', 'Бакалавриат'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/bachelor/info' },
+            { title: t('nav.registration', 'Регистрация'), link: '/admissions/bachelor/registration' },
+            { title: t('nav.international_applicants', 'Иностранные абитуриенты'), link: '/admissions/bachelor/international' },
+            { title: t('nav.quotas', 'Квоты'), link: '/admissions/bachelor/quotas' },
+            { title: t('nav.contacts', 'Контакты'), link: '/admissions/bachelor/contacts' },
+          ]
+        },
+        { 
+          title: t('nav.master_phd', 'Магистратура'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/master/info' },
+          ]
+        },
+        {
+          title: t('nav.doctorate', 'Докторантура'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/doctorate/info' },
+          ]
+        },
+        { 
+          title: t('nav.college', 'Колледж'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/college/info' },
+          ]
+        },
       ]
     },
     students: {

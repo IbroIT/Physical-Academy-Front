@@ -25,11 +25,9 @@ const Home = () => {
       <BreadcrumbSchema />
         <Banner />  
         <AboutAcademy />
-
         <News />
         <QuotesBanner />
         <AdsPage />
-
         <UniversityEventsPage />
         <Facts />
     </div>
