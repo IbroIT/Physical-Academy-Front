@@ -1,11 +1,13 @@
 // search/components/SearchResults.jsx
 import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSearch } from '../SearchContext';
 import { useSearchActions } from '../useSearch';
 import { navigateToResult, getSearchCategories } from '../SearchUtils';
 
 export const SearchResults = () => {
   const { state } = useSearch();
+  const navigate = useNavigate();
   const { closeSearch, setCategory, performSearch } = useSearchActions();
   const categories = getSearchCategories();
   const resultsRef = useRef(null);
@@ -180,6 +182,7 @@ export const SearchResults = () => {
                     result={result} 
                     language={state.language}
                     t={t}
+                    navigate={navigate}
                   />
                 ))}
               </div>
@@ -191,11 +194,11 @@ export const SearchResults = () => {
   );
 };
 
-const SearchResultItem = ({ result, language, t }) => {
+const SearchResultItem = ({ result, language, t, navigate }) => {
   const { closeSearch } = useSearchActions();
 
   const handleClick = () => {
-    navigateToResult(result);
+    navigateToResult(result, navigate);
     closeSearch();
   };
 

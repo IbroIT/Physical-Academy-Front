@@ -437,17 +437,22 @@ export const getTranslation = (key, language) => {
 };
 
 // Функция для навигации к результату
-export const navigateToResult = (result) => {
-  if (result.route) {
-    // Используем History API для навигации
-    window.history.pushState({}, '', result.route);
-    
-    // Диспатчим событие для роутера React
-    window.dispatchEvent(new PopStateEvent('popstate'));
+// Примечание: эта функция требует передачи navigate функции из React Router
+export const navigateToResult = (result, navigate) => {
+  if (result.route && navigate) {
+    // Используем React Router для навигации
+    navigate(result.route);
     
     // Закрываем поиск
     window.dispatchEvent(new CustomEvent('closeSearch'));
     
+    // Прокручиваем наверх страницы
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    return true;
+  } else if (result.route) {
+    // Fallback на стандартную навигацию если navigate не передан
+    window.location.href = result.route;
     return true;
   }
   return false;

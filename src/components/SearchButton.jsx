@@ -1,6 +1,7 @@
 // components/SearchButton.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { SearchProvider, useSearch } from '../search/SearchContext';
 import { useSearchActions } from '../search/useSearch';
 import { searchInLocales, getSearchCategories, navigateToResult } from '../search/SearchUtils';
@@ -67,6 +68,7 @@ const CenteredSearchModal = ({ onClose }) => {
 
 const CenteredSearchContent = ({ onClose }) => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const { state } = useSearch();
   const { setQuery, performSearch, setCategory, setLanguage } = useSearchActions();
   const [localQuery, setLocalQuery] = useState('');
@@ -128,7 +130,7 @@ const CenteredSearchContent = ({ onClose }) => {
   };
 
   const handleResultClick = (result) => {
-    navigateToResult(result);
+    navigateToResult(result, navigate);
     onClose();
   };
 
@@ -259,6 +261,7 @@ const CenteredSearchContent = ({ onClose }) => {
                     result={result} 
                     onClose={onClose}
                     query={localQuery}
+                    navigate={navigate}
                   />
                 ))}
               </div>
@@ -344,11 +347,11 @@ const SearchHelpCard = ({ icon, title, description, color = 'blue' }) => {
   );
 };
 
-const SearchResultItem = ({ result, onClose, query }) => {
+const SearchResultItem = ({ result, onClose, query, navigate }) => {
   const { t, i18n } = useTranslation();
 
   const handleClick = () => {
-    navigateToResult(result);
+    navigateToResult(result, navigate);
     onClose();
   };
 
