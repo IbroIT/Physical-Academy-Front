@@ -249,8 +249,8 @@ const DoctorateProgram = () => {
   }
 
   // Логируем ошибки, но не блокируем рендер - страница показывается с пустыми данными
-  if (apiData.error) {
-    console.warn("Faculty API error, using fallback data:", apiData.error);
+  if (backendData.error) {
+    console.warn("Faculty API error, using fallback data:", backendData.error);
   }
 
   return (
