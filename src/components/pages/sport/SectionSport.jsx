@@ -24,8 +24,9 @@ const SectionSport = () => {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
 
       // API endpoint для спортивных секций
+      const API_URL = import.meta.env.VITE_API_URL || "";
       const response = await fetch(
-        `/api/sports/sections/?language=${i18n.language}`
+        `${API_URL}/api/sports/sections/?language=${i18n.language}`
       );
 
       if (!response.ok) {
@@ -87,8 +88,10 @@ const SectionSport = () => {
         id: section.id,
         slug: section.slug || section.id,
         name: section.name || section.title,
-        coach: section.coach || section.trainer,
-        schedule: section.schedule || section.training_schedule,
+        // Ensure coach is always a string to avoid .toLowerCase() errors
+        coach: section.coach || section.trainer || "",
+        // Top-level schedule (string) if present
+        schedule: section.schedule || section.training_schedule || "",
         image:
           section.image ||
           section.photo ||
@@ -102,8 +105,21 @@ const SectionSport = () => {
               contacts: section.coach_info.contacts || section.coach_info.phone,
             }
           : null,
-        trainingSchedule:
-          section.training_schedule_details || section.schedule_details || [],
+        // Normalize training schedule items so they include `day` and `time`
+        trainingSchedule: (
+          section.training_schedule_details ||
+          section.schedule_details ||
+          []
+        ).map((s) => ({
+          day: s.day || s.get_day_of_week_display || "",
+          // Provide a unified `time` field expected by the component
+          time:
+            s.time ||
+            (s.time_start && s.time_end
+              ? `${s.time_start} - ${s.time_end}`
+              : s.time_start || s.time_end || ""),
+          location: s.location || "",
+        })),
         contactInfo: section.contact_info || section.contacts || "",
       }));
     }

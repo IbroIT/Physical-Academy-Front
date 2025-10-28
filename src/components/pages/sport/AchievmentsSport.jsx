@@ -22,8 +22,9 @@ const AchievementsSport = () => {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
 
       // API endpoint для спортивных достижений
+      const API_URL = import.meta.env.VITE_API_URL || "";
       const response = await fetch(
-        `/api/sports/achievements/?language=${i18n.language}`
+        `${API_URL}/api/sports/achievements/?language=${i18n.language}`
       );
 
       if (!response.ok) {
@@ -58,125 +59,22 @@ const AchievementsSport = () => {
     ) {
       return apiAchievements.map((ach) => ({
         id: ach.id,
-        name: ach.name || ach.athlete_name || ach.title,
-        sport: ach.sport || ach.sport_type,
-        competition: ach.competition || ach.event,
-        result: ach.result || ach.place || ach.achievement,
-        date: ach.date || ach.event_date,
+        name: String(ach.name || ach.athlete_name || ach.title || ""),
+        sport: String(ach.sport || ach.sport_type || ""),
+        competition: String(ach.competition || ach.event || ""),
+        // Ensure result is a string to avoid .toLowerCase errors
+        result: String(ach.result || ach.place || ach.achievement || ""),
+        // Keep date as-is (ISO) but coerce to string or empty
+        date: ach.date || ach.event_date || "",
         image: ach.image || ach.photo || "/api/placeholder/300/200",
-        description: ach.description || "",
+        description: String(ach.description || ""),
         category: ach.category || "individual",
         details: ach.details || {},
       }));
     }
 
-    // Fallback - демо данные
-    return [
-      {
-        id: 1,
-        name: "Иванов Алексей",
-        sport: "Плавание",
-        competition: "Чемпионат России 2024",
-        result: "1 место",
-        date: "2024-03-15",
-        image: "/api/placeholder/300/200",
-        description:
-          "Установил новый рекорд России на дистанции 200м баттерфляем",
-        category: "individual",
-        details: {
-          distance: "200 метров",
-          style: "Баттерфляй",
-          time: "1:54.32",
-          coach: "Петров Сергей",
-          venue: "Москва, Водный стадион",
-        },
-      },
-      {
-        id: 2,
-        name: "Смирнова Мария",
-        sport: "Легкая атлетика",
-        competition: "Кубок Европы 2024",
-        result: "2 место",
-        date: "2024-02-20",
-        image: "/api/placeholder/300/200",
-        description: "Серебряная медаль в беге на 1500 метров",
-        category: "individual",
-        details: {
-          distance: "1500 метров",
-          time: "4:05.18",
-          coach: "Козлова Анна",
-          venue: "Берлин, Олимпийский стадион",
-        },
-      },
-      {
-        id: 3,
-        name: "Сборная по баскетболу",
-        sport: "Баскетбол",
-        competition: "Универсиада 2024",
-        result: "Золото",
-        date: "2024-04-10",
-        image: "/api/placeholder/300/200",
-        description: "Победа в финале против команды СПбГУ",
-        category: "team",
-        details: {
-          score: "85:78",
-          captain: "Соколов Дмитрий",
-          coach: "Васильев Игорь",
-          tournament: "Всероссийская универсиада",
-        },
-      },
-      {
-        id: 4,
-        name: "Петрова Елена",
-        sport: "Художественная гимнастика",
-        competition: "Чемпионат Азии 2024",
-        result: "Золото",
-        date: "2024-01-25",
-        image: "/api/placeholder/300/200",
-        description: "Победа в многоборье",
-        category: "international",
-        details: {
-          apparatus: "Многоборье",
-          totalScore: "78.450",
-          coach: "Орлова Светлана",
-          venue: "Сеул, Gymnastics Arena",
-        },
-      },
-      {
-        id: 5,
-        name: "Кузнецов Артем",
-        sport: "Прыжки в воду",
-        competition: "Олимпийские игры 2024",
-        result: "Участник",
-        date: "2024-07-30",
-        image: "/api/placeholder/300/200",
-        description: "Участие в финале олимпийских игр",
-        category: "olympic",
-        details: {
-          discipline: "Вышка 10м",
-          finalPlace: "6 место",
-          coach: "Морозов Виктор",
-          venue: "Париж, Aquatics Centre",
-        },
-      },
-      {
-        id: 6,
-        name: "Николаев Павел",
-        sport: "Тяжелая атлетика",
-        competition: "Лучший тренер года",
-        result: "Золото",
-        date: "2024-05-18",
-        image: "/api/placeholder/300/200",
-        description: "Награда за подготовку чемпионов мира",
-        category: "coaching",
-        details: {
-          award: "Тренер года",
-          students: "3 чемпиона мира",
-          federation: "Федерация тяжелой атлетики России",
-          years: "15 лет тренерской работы",
-        },
-      },
-    ];
+    // Fallback - пустой массив, если нет данных
+    return [];
   };
 
   // Получаем нормализованные данные
@@ -306,26 +204,24 @@ const AchievementsSport = () => {
   };
 
   const getResultColor = (result) => {
-    if (
-      result.toLowerCase().includes("1") ||
-      result.toLowerCase().includes("золот") ||
-      result.toLowerCase().includes("золото")
-    ) {
+    const r = String(result || "").toLowerCase();
+    if (r.includes("1") || r.includes("золот") || r.includes("золото")) {
       return "from-yellow-400 to-yellow-600";
     }
-    if (
-      result.toLowerCase().includes("2") ||
-      result.toLowerCase().includes("серебр")
-    ) {
+    if (r.includes("2") || r.includes("серебр")) {
       return "from-gray-400 to-gray-600";
     }
-    if (
-      result.toLowerCase().includes("3") ||
-      result.toLowerCase().includes("бронз")
-    ) {
+    if (r.includes("3") || r.includes("бронз")) {
       return "from-orange-400 to-orange-700";
     }
     return "from-blue-400 to-cyan-600";
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("ru-RU");
   };
 
   return (
@@ -489,7 +385,7 @@ const AchievementsSport = () => {
                       {achievement.competition}
                     </div>
                     <div className="text-emerald-300 text-sm font-medium">
-                      {new Date(achievement.date).toLocaleDateString("ru-RU")}
+                      {formatDate(achievement.date)}
                     </div>
                   </div>
 
@@ -590,9 +486,7 @@ const AchievementsSport = () => {
                       {t("achievementsSport.modal.date", "Дата")}
                     </div>
                     <div className="text-white font-semibold text-lg">
-                      {new Date(selectedAchievement.date).toLocaleDateString(
-                        "ru-RU"
-                      )}
+                      {formatDate(selectedAchievement.date)}
                     </div>
                   </div>
                 </div>

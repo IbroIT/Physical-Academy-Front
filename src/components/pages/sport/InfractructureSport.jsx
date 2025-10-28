@@ -21,8 +21,9 @@ const InfrastructureSport = () => {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
 
       // API endpoint для спортивной инфраструктуры
+      const API_URL = import.meta.env.VITE_API_URL || "";
       const response = await fetch(
-        `/api/sports/infrastructure/?language=${i18n.language}`
+        `${API_URL}/api/sports/infrastructure/?language=${i18n.language}`
       );
 
       if (!response.ok) {
@@ -51,7 +52,19 @@ const InfrastructureSport = () => {
     if (!v) return [];
     if (Array.isArray(v)) return v;
     if (typeof v === "string") return [v];
-    if (typeof v === "object") return Object.values(v);
+    if (v && typeof v === "object") {
+      // If v looks like a dictionary where values are meaningful items,
+      // return the values array. Otherwise return empty — avoid surprising shapes.
+      const vals = Object.values(v);
+      // Accept arrays of strings or objects; otherwise fallback to []
+      if (
+        vals.length > 0 &&
+        vals.every((it) => typeof it === "string" || typeof it === "object")
+      ) {
+        return vals;
+      }
+      return [];
+    }
     return [];
   };
 
@@ -143,320 +156,13 @@ const InfrastructureSport = () => {
       };
     }
 
-    // Fallback - полные демо-данные, если API вернул null
+    // Fallback - пустой объект, если нет данных
     return {
-      name: t(
-        "infrastructureSport.name",
-        "Современная спортивная инфраструктура КГАФКиС"
-      ),
-      description: t(
-        "infrastructureSport.description",
-        "Наши спортивные комплексы соответствуют международным стандартам и обеспечивают комфортные условия для тренировок и соревнований."
-      ),
-      badge: t("infrastructureSport.badge", "Спортивная инфраструктура"),
-      stats: [
-        {
-          label: t("infrastructureSport.stats.objects", "спортивных объектов"),
-          value: "25+",
-          icon: "🏟️",
-        },
-        {
-          label: t("infrastructureSport.stats.area", "м² общая площадь"),
-          value: "8000+",
-          icon: "📐",
-        },
-        {
-          label: t("infrastructureSport.stats.sports", "видов спорта"),
-          value: "15+",
-          icon: "⚽",
-        },
-        {
-          label: t(
-            "infrastructureSport.stats.equipment",
-            "единиц оборудования"
-          ),
-          value: "500+",
-          icon: "🏋️",
-        },
-      ],
-      categories: [
-        {
-          id: "stadiums",
-          name: t("infrastructureSport.categories.stadiums", "Стадионы"),
-          icon: "⚽",
-          color: "from-green-500 to-emerald-500",
-          objects: [
-            {
-              id: 1,
-              name: t(
-                "infrastructureSport.objects.mainStadium",
-                "Главный стадион"
-              ),
-              description: t(
-                "infrastructureSport.objects.mainStadiumDesc",
-                "Современный стадион с беговыми дорожками и футбольным полем международного стандарта"
-              ),
-              image:
-                "https://images.unsplash.com/photo-1518604666860-9ed391f76460?w=400&h=300&fit=crop",
-              features: [
-                t(
-                  "infrastructureSport.features.capacity",
-                  "Вместимость: 1500 зрителей"
-                ),
-                t(
-                  "infrastructureSport.features.track",
-                  "Синтетическое покрытие"
-                ),
-                t(
-                  "infrastructureSport.features.lighting",
-                  "Прожекторное освещение"
-                ),
-                t("infrastructureSport.features.tribunes", "Трибуны с навесом"),
-              ],
-            },
-            {
-              id: 2,
-              name: t(
-                "infrastructureSport.objects.miniStadium",
-                "Мини-стадион"
-              ),
-              description: t(
-                "infrastructureSport.objects.miniStadiumDesc",
-                "Универсальная спортивная площадка для тренировок и соревнований"
-              ),
-              image:
-                "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=400&h=300&fit=crop",
-              features: [
-                t(
-                  "infrastructureSport.features.multisport",
-                  "Многофункциональная площадка"
-                ),
-                t(
-                  "infrastructureSport.features.artificial",
-                  "Искусственное покрытие"
-                ),
-                t(
-                  "infrastructureSport.features.allWeather",
-                  "Всепогодное использование"
-                ),
-              ],
-            },
-          ],
-        },
-        {
-          id: "pools",
-          name: t(
-            "infrastructureSport.categories.pools",
-            "Плавательные бассейны"
-          ),
-          icon: "🏊",
-          color: "from-cyan-500 to-blue-500",
-          objects: [
-            {
-              id: 3,
-              name: t(
-                "infrastructureSport.objects.olympicPool",
-                "Олимпийский бассейн"
-              ),
-              description: t(
-                "infrastructureSport.objects.olympicPoolDesc",
-                "50-метровый бассейн с 8 дорожками для профессиональных тренировок"
-              ),
-              image:
-                "https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?w=400&h=300&fit=crop",
-              features: [
-                t("infrastructureSport.features.length", "Длина: 50 метров"),
-                t("infrastructureSport.features.lanes", "8 дорожек"),
-                t("infrastructureSport.features.depth", "Глубина: 2-3 метра"),
-                t("infrastructureSport.features.water", "Система очистки воды"),
-              ],
-            },
-            {
-              id: 4,
-              name: t(
-                "infrastructureSport.objects.trainingPool",
-                "Тренировочный бассейн"
-              ),
-              description: t(
-                "infrastructureSport.objects.trainingPoolDesc",
-                "25-метровый бассейн для учебно-тренировочных занятий"
-              ),
-              image:
-                "https://images.unsplash.com/photo-1584467735871-8db9ac8d0288?w=400&h=300&fit=crop",
-              features: [
-                t("infrastructureSport.features.length", "Длина: 25 метров"),
-                t("infrastructureSport.features.temperature", "Подогрев воды"),
-                t("infrastructureSport.features.safety", "Спасательная служба"),
-              ],
-            },
-          ],
-        },
-        {
-          id: "gyms",
-          name: t("infrastructureSport.categories.gyms", "Тренажёрные залы"),
-          icon: "🏋️",
-          color: "from-orange-500 to-red-500",
-          objects: [
-            {
-              id: 5,
-              name: t("infrastructureSport.objects.powerGym", "Силовой зал"),
-              description: t(
-                "infrastructureSport.objects.powerGymDesc",
-                "Современный зал с профессиональным силовым оборудованием"
-              ),
-              image:
-                "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=300&fit=crop",
-              features: [
-                t(
-                  "infrastructureSport.features.equipment",
-                  "Профессиональные тренажеры"
-                ),
-                t("infrastructureSport.features.freeWeights", "Свободные веса"),
-                t("infrastructureSport.features.cardio", "Кардио-зона"),
-                t(
-                  "infrastructureSport.features.conditioning",
-                  "Система кондиционирования"
-                ),
-              ],
-            },
-            {
-              id: 6,
-              name: t("infrastructureSport.objects.fitnessGym", "Фитнес-зал"),
-              description: t(
-                "infrastructureSport.objects.fitnessGymDesc",
-                "Многофункциональный зал для групповых занятий"
-              ),
-              image:
-                "https://images.unsplash.com/photo-1549060279-7e168fce7090?w=400&h=300&fit=crop",
-              features: [
-                t("infrastructureSport.features.group", "Групповые занятия"),
-                t(
-                  "infrastructureSport.features.yoga",
-                  "Зона для йоги и пилатеса"
-                ),
-                t("infrastructureSport.features.mirrors", "Зеркальные стены"),
-                t("infrastructureSport.features.sound", "Аудиосистема"),
-              ],
-            },
-          ],
-        },
-        {
-          id: "martial",
-          name: t("infrastructureSport.categories.martial", "Залы единоборств"),
-          icon: "🥋",
-          color: "from-red-500 to-orange-500",
-          objects: [
-            {
-              id: 7,
-              name: t(
-                "infrastructureSport.objects.judoHall",
-                "Зал дзюдо и самбо"
-              ),
-              description: t(
-                "infrastructureSport.objects.judoHallDesc",
-                "Специализированный зал с татами для борьбы"
-              ),
-              image:
-                "https://images.unsplash.com/photo-1599058917765-a780eda07a3e?w=400&h=300&fit=crop",
-              features: [
-                t(
-                  "infrastructureSport.features.tatami",
-                  "Профессиональное татами"
-                ),
-                t("infrastructureSport.features.mats", "Защитные маты"),
-                t(
-                  "infrastructureSport.features.changing",
-                  "Раздевалки и душевые"
-                ),
-                t(
-                  "infrastructureSport.features.equipment",
-                  "Тренажеры для борьбы"
-                ),
-              ],
-            },
-            {
-              id: 8,
-              name: t(
-                "infrastructureSport.objects.boxingHall",
-                "Боксерский зал"
-              ),
-              description: t(
-                "infrastructureSport.objects.boxingHallDesc",
-                "Зал с рингом и боксерскими мешками"
-              ),
-              image:
-                "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=400&h=300&fit=crop",
-              features: [
-                t("infrastructureSport.features.ring", "Профессиональный ринг"),
-                t("infrastructureSport.features.bags", "Боксерские мешки"),
-                t("infrastructureSport.features.gloves", "Арсенал перчаток"),
-                t(
-                  "infrastructureSport.features.ventilation",
-                  "Система вентиляции"
-                ),
-              ],
-            },
-          ],
-        },
-        {
-          id: "labs",
-          name: t("infrastructureSport.categories.labs", "Лаборатории"),
-          icon: "🔬",
-          color: "from-indigo-500 to-purple-500",
-          objects: [
-            {
-              id: 9,
-              name: t(
-                "infrastructureSport.objects.biomechLab",
-                "Лаборатория биомеханики"
-              ),
-              description: t(
-                "infrastructureSport.objects.biomechLabDesc",
-                "Современное оборудование для анализа движений спортсменов"
-              ),
-              image:
-                "https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=400&h=300&fit=crop",
-              features: [
-                t(
-                  "infrastructureSport.features.motion",
-                  "Система анализа движения"
-                ),
-                t("infrastructureSport.features.force", "Силовые платформы"),
-                t("infrastructureSport.features.emg", "ЭМГ оборудование"),
-                t(
-                  "infrastructureSport.features.software",
-                  "Специализированное ПО"
-                ),
-              ],
-            },
-            {
-              id: 10,
-              name: t(
-                "infrastructureSport.objects.physioLab",
-                "Физиологическая лаборатория"
-              ),
-              description: t(
-                "infrastructureSport.objects.physioLabDesc",
-                "Оборудование для тестирования физического состояния"
-              ),
-              image:
-                "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop",
-              features: [
-                t(
-                  "infrastructureSport.features.ergospirometry",
-                  "Эргоспирометрия"
-                ),
-                t("infrastructureSport.features.lactate", "Анализ лактата"),
-                t("infrastructureSport.features.ecg", "ЭКГ мониторинг"),
-                t(
-                  "infrastructureSport.features.anthropometry",
-                  "Антропометрия"
-                ),
-              ],
-            },
-          ],
-        },
-      ],
+      name: "",
+      description: "",
+      badge: "",
+      stats: [],
+      categories: [],
     };
   };
 
@@ -496,9 +202,14 @@ const InfrastructureSport = () => {
   }, [infrastructureData.stats]);
 
   const startCounters = () => {
-    const targetValues = infrastructureData.stats.map(
-      (stat) => parseInt(stat.value.replace(/\D/g, "")) || 0
-    );
+    if (!infrastructureData.stats || infrastructureData.stats.length === 0)
+      return;
+    const targetValues = infrastructureData.stats.map((stat) => {
+      // Safely coerce stat.value to string before stripping non-digits
+      const raw = String(stat?.value ?? "");
+      const digits = raw.replace(/\D/g, "");
+      return parseInt(digits || "0", 10) || 0;
+    });
     const duration = 2000;
     const steps = 60;
     const stepValues = targetValues.map((target) => target / steps);
@@ -675,11 +386,14 @@ const InfrastructureSport = () => {
                   {stat.icon}
                 </motion.div>
                 <div className="text-4xl lg:text-5xl font-bold mb-4 font-mono bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                  {stat.value.includes("%")
-                    ? `${Math.round(counterValues[index])}%`
-                    : stat.value.includes("+")
-                    ? `${Math.round(counterValues[index])}+`
-                    : Math.round(counterValues[index])}
+                  {(() => {
+                    const valueStr = String(stat?.value ?? "");
+                    if (valueStr.includes("%"))
+                      return `${Math.round(counterValues[index])}%`;
+                    if (valueStr.includes("+"))
+                      return `${Math.round(counterValues[index])}+`;
+                    return Math.round(counterValues[index]);
+                  })()}
                 </div>
                 <div className="text-blue-100 font-medium text-lg">
                   {stat.label}
