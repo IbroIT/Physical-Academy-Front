@@ -22,7 +22,7 @@ const InfrastructureSport = () => {
 
       // API endpoint для спортивной инфраструктуры
       const response = await fetch(
-        `/api/sports/infrastructure/?language=${i18n.language}`
+        `/api/sports/infrastructure/?lang=${i18n.language}`
       );
 
       if (!response.ok) {

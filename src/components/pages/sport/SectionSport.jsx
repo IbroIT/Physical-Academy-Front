@@ -25,7 +25,7 @@ const SectionSport = () => {
 
       // API endpoint для спортивных секций
       const response = await fetch(
-        `/api/sports/sections/?language=${i18n.language}`
+        `/api/sports/sections/?lang=${i18n.language}`
       );
 
       if (!response.ok) {

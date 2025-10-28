@@ -23,7 +23,7 @@ const AchievementsSport = () => {
 
       // API endpoint для спортивных достижений
       const response = await fetch(
-        `/api/sports/achievements/?language=${i18n.language}`
+        `/api/sports/achievements/?lang=${i18n.language}`
       );
 
       if (!response.ok) {
