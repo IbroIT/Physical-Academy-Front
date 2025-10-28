@@ -23,11 +23,9 @@ const SectionSport = () => {
     try {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
 
-      const API_URL = import.meta.env.VITE_API_URL;
-
       // API endpoint для спортивных секций
       const response = await fetch(
-        `${API_URL}/api/sports/sections/?lang=${i18n.language}`
+        `/api/sports/sections/?language=${i18n.language}`
       );
 
       if (!response.ok) {
@@ -36,11 +34,9 @@ const SectionSport = () => {
 
       const data = await response.json();
 
-      // Если API возвращает paginated response с results, используем results
-      const sectionsArray = data.results || data;
-
+      // API возвращает пагинированный ответ с полем results
       setApiData({
-        sections: sectionsArray,
+        sections: data.results || data, // Берем results или весь data если это массив
         loading: false,
         error: null,
       });
@@ -91,14 +87,8 @@ const SectionSport = () => {
         id: section.id,
         slug: section.slug || section.id,
         name: section.name || section.title,
-        coach:
-          section.coach ||
-          section.trainer ||
-          t("sectionSport.noCoach", "Тренер не указан"),
-        schedule:
-          section.schedule ||
-          section.training_schedule ||
-          t("sectionSport.noSchedule", "Расписание уточняется"),
+        coach: section.coach || section.trainer,
+        schedule: section.schedule || section.training_schedule,
         image:
           section.image ||
           section.photo ||
@@ -114,10 +104,7 @@ const SectionSport = () => {
           : null,
         trainingSchedule:
           section.training_schedule_details || section.schedule_details || [],
-        contactInfo:
-          section.contact_info ||
-          section.contacts ||
-          t("sectionSport.noContacts", "Контакты уточняются"),
+        contactInfo: section.contact_info || section.contacts || "",
       }));
     }
 

@@ -21,11 +21,9 @@ const AchievementsSport = () => {
     try {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
 
-      const API_URL = import.meta.env.VITE_API_URL;
-
       // API endpoint для спортивных достижений
       const response = await fetch(
-        `${API_URL}/api/sports/achievements/?lang=${i18n.language}`
+        `/api/sports/achievements/?language=${i18n.language}`
       );
 
       if (!response.ok) {
@@ -34,11 +32,9 @@ const AchievementsSport = () => {
 
       const data = await response.json();
 
-      // Если API возвращает paginated response с results, используем results
-      const achievementsArray = data.results || data;
-
+      // API возвращает пагинированный ответ с полем results
       setApiData({
-        achievements: achievementsArray,
+        achievements: data.results || data, // Берем results или весь data если это массив
         loading: false,
         error: null,
       });
@@ -74,8 +70,113 @@ const AchievementsSport = () => {
       }));
     }
 
-    // Fallback - пустой массив, если нет данных
-    return [];
+    // Fallback - демо данные
+    return [
+      {
+        id: 1,
+        name: "Иванов Алексей",
+        sport: "Плавание",
+        competition: "Чемпионат России 2024",
+        result: "1 место",
+        date: "2024-03-15",
+        image: "/api/placeholder/300/200",
+        description:
+          "Установил новый рекорд России на дистанции 200м баттерфляем",
+        category: "individual",
+        details: {
+          distance: "200 метров",
+          style: "Баттерфляй",
+          time: "1:54.32",
+          coach: "Петров Сергей",
+          venue: "Москва, Водный стадион",
+        },
+      },
+      {
+        id: 2,
+        name: "Смирнова Мария",
+        sport: "Легкая атлетика",
+        competition: "Кубок Европы 2024",
+        result: "2 место",
+        date: "2024-02-20",
+        image: "/api/placeholder/300/200",
+        description: "Серебряная медаль в беге на 1500 метров",
+        category: "individual",
+        details: {
+          distance: "1500 метров",
+          time: "4:05.18",
+          coach: "Козлова Анна",
+          venue: "Берлин, Олимпийский стадион",
+        },
+      },
+      {
+        id: 3,
+        name: "Сборная по баскетболу",
+        sport: "Баскетбол",
+        competition: "Универсиада 2024",
+        result: "Золото",
+        date: "2024-04-10",
+        image: "/api/placeholder/300/200",
+        description: "Победа в финале против команды СПбГУ",
+        category: "team",
+        details: {
+          score: "85:78",
+          captain: "Соколов Дмитрий",
+          coach: "Васильев Игорь",
+          tournament: "Всероссийская универсиада",
+        },
+      },
+      {
+        id: 4,
+        name: "Петрова Елена",
+        sport: "Художественная гимнастика",
+        competition: "Чемпионат Азии 2024",
+        result: "Золото",
+        date: "2024-01-25",
+        image: "/api/placeholder/300/200",
+        description: "Победа в многоборье",
+        category: "international",
+        details: {
+          apparatus: "Многоборье",
+          totalScore: "78.450",
+          coach: "Орлова Светлана",
+          venue: "Сеул, Gymnastics Arena",
+        },
+      },
+      {
+        id: 5,
+        name: "Кузнецов Артем",
+        sport: "Прыжки в воду",
+        competition: "Олимпийские игры 2024",
+        result: "Участник",
+        date: "2024-07-30",
+        image: "/api/placeholder/300/200",
+        description: "Участие в финале олимпийских игр",
+        category: "olympic",
+        details: {
+          discipline: "Вышка 10м",
+          finalPlace: "6 место",
+          coach: "Морозов Виктор",
+          venue: "Париж, Aquatics Centre",
+        },
+      },
+      {
+        id: 6,
+        name: "Николаев Павел",
+        sport: "Тяжелая атлетика",
+        competition: "Лучший тренер года",
+        result: "Золото",
+        date: "2024-05-18",
+        image: "/api/placeholder/300/200",
+        description: "Награда за подготовку чемпионов мира",
+        category: "coaching",
+        details: {
+          award: "Тренер года",
+          students: "3 чемпиона мира",
+          federation: "Федерация тяжелой атлетики России",
+          years: "15 лет тренерской работы",
+        },
+      },
+    ];
   };
 
   // Получаем нормализованные данные
