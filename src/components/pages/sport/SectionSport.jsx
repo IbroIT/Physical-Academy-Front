@@ -23,9 +23,11 @@ const SectionSport = () => {
     try {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
 
+      const API_URL = import.meta.env.VITE_API_URL;
+
       // API endpoint для спортивных секций
       const response = await fetch(
-        `/api/sports/sections/?lang=${i18n.language}`
+        `${API_URL}/api/sports/sections/?lang=${i18n.language}`
       );
 
       if (!response.ok) {

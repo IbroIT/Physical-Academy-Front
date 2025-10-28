@@ -21,9 +21,11 @@ const AchievementsSport = () => {
     try {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
 
+      const API_URL = import.meta.env.VITE_API_URL;
+
       // API endpoint для спортивных достижений
       const response = await fetch(
-        `/api/sports/achievements/?lang=${i18n.language}`
+        `${API_URL}/api/sports/achievements/?lang=${i18n.language}`
       );
 
       if (!response.ok) {

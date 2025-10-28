@@ -20,9 +20,11 @@ const InfrastructureSport = () => {
     try {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
 
+      const API_URL = import.meta.env.VITE_API_URL;
+
       // API endpoint для спортивной инфраструктуры
       const response = await fetch(
-        `/api/sports/infrastructure/?lang=${i18n.language}`
+        `${API_URL}/api/sports/infrastructure/?lang=${i18n.language}`
       );
 
       if (!response.ok) {
