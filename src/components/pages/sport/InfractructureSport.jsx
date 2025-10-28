@@ -15,6 +15,27 @@ const InfrastructureSport = () => {
   });
   const sectionRef = useRef(null);
 
+  // Helper: safely return a localized string for either a plain string
+  // or an object like { ru: '...', en: '...', kg: '...' }.
+  const getLocalizedString = (val) => {
+    if (val == null) return "";
+    if (typeof val === "string") return val;
+    if (typeof val === "object") {
+      try {
+        return (
+          (i18n && i18n.language && val[i18n.language]) ||
+          val.en ||
+          val.ru ||
+          Object.values(val)[0] ||
+          ""
+        );
+      } catch (e) {
+        return String(Object.values(val)[0] || "");
+      }
+    }
+    return String(val);
+  };
+
   // Загрузка данных с API
   const fetchInfrastructureData = async () => {
     try {
@@ -309,7 +330,7 @@ const InfrastructureSport = () => {
           >
             <span className="w-2 h-2 bg-gradient-to-r from-blue-400 to-emerald-400 rounded-full mr-3 animate-pulse"></span>
             <span className="text-blue-100 font-medium text-lg">
-              {infrastructureData.badge}
+              {getLocalizedString(infrastructureData.badge)}
             </span>
           </motion.div>
 
@@ -319,7 +340,7 @@ const InfrastructureSport = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight"
           >
-            {infrastructureData.name}
+            {getLocalizedString(infrastructureData.name)}
           </motion.h1>
 
           <motion.div
@@ -335,7 +356,7 @@ const InfrastructureSport = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed"
           >
-            {infrastructureData.description}
+            {getLocalizedString(infrastructureData.description)}
           </motion.p>
         </motion.div>
 
@@ -344,17 +365,7 @@ const InfrastructureSport = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border border-blue-400/30 rounded-2xl p-6 mb-8 text-center"
-        >
-          <div className="flex items-center justify-center space-x-3 text-blue-200">
-            <span className="text-2xl">💡</span>
-            <p className="text-lg">
-              {t(
-                "infrastructureSport.demoMessage",
-                "Демонстрация спортивной инфраструктуры академии"
-              )}
-            </p>
-          </div>
-        </motion.div>
+        ></motion.div>
 
         {/* Dynamic Stats */}
         <motion.div
@@ -396,7 +407,7 @@ const InfrastructureSport = () => {
                   })()}
                 </div>
                 <div className="text-blue-100 font-medium text-lg">
-                  {stat.label}
+                  {getLocalizedString(stat.label)}
                 </div>
               </div>
             </motion.div>
@@ -432,7 +443,9 @@ const InfrastructureSport = () => {
                   >
                     {category.icon}
                   </span>
-                  <span className="text-base lg:text-lg">{category.name}</span>
+                  <span className="text-base lg:text-lg">
+                    {getLocalizedString(category.name)}
+                  </span>
                 </motion.button>
               ))}
             </div>
@@ -470,7 +483,7 @@ const InfrastructureSport = () => {
                               {object.image ? (
                                 <img
                                   src={object.image}
-                                  alt={object.name}
+                                  alt={getLocalizedString(object.name)}
                                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                               ) : (
@@ -484,7 +497,7 @@ const InfrastructureSport = () => {
                               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
                               <div className="absolute bottom-4 left-4 right-4">
                                 <h3 className="text-xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors duration-300">
-                                  {object.name}
+                                  {getLocalizedString(object.name)}
                                 </h3>
                               </div>
                             </div>
@@ -492,7 +505,7 @@ const InfrastructureSport = () => {
                             {/* Object Content */}
                             <div className="p-6">
                               <p className="text-blue-100 text-lg mb-4 leading-relaxed">
-                                {object.description}
+                                {getLocalizedString(object.description)}
                               </p>
 
                               {/* Features */}
@@ -506,7 +519,7 @@ const InfrastructureSport = () => {
                                           className="px-3 py-2 bg-gradient-to-r from-blue-500/20 to-emerald-500/20 text-blue-300 rounded-2xl text-sm font-medium hover:bg-blue-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-blue-400/30"
                                           whileHover={{ scale: 1.05 }}
                                         >
-                                          {feature}
+                                          {getLocalizedString(feature)}
                                         </motion.span>
                                       )
                                     )}
