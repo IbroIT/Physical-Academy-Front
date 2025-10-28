@@ -18,20 +18,27 @@ const SectionSport = () => {
   const sectionRef = useRef(null);
   const modalRef = useRef(null);
 
-  // Загрузка данных с API - отключена для демонстрации
+  // Загрузка данных с API
   const fetchSectionsData = async () => {
     try {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
-      
-      // Для демонстрации сразу используем моковые данные
-      setTimeout(() => {
-        setApiData((prev) => ({ 
-          ...prev, 
-          sections: [],
-          loading: false 
-        }));
-      }, 500);
-      
+
+      // API endpoint для спортивных секций
+      const response = await fetch(
+        `/api/sports/sections/?language=${i18n.language}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      setApiData({
+        sections: data,
+        loading: false,
+        error: null,
+      });
     } catch (error) {
       console.error("Error fetching sections data:", error);
       setApiData((prev) => ({ ...prev, error: error.message, loading: false }));
@@ -71,137 +78,46 @@ const SectionSport = () => {
     setSelectedSection(null);
   };
 
-  // Функция для нормализации данных из API - всегда возвращает демо-данные
+  // Функция для нормализации данных из API
   const normalizeSectionData = (apiSections) => {
-    return [
-      {
-        id: 1,
-        slug: "football",
-        name: t("sectionSport.sections.football.name", "Футбол"),
-        coach: t("sectionSport.sections.football.coach", "Иванов А.С."),
-        schedule: t("sectionSport.sections.football.schedule", "Пн, Ср, Пт 18:00-20:00"),
-        image: "https://images.unsplash.com/photo-1553778263-73a83babd9d1?w=400&h=300&fit=crop",
-        sportType: "game",
-        description: t("sectionSport.sections.football.description", "Командный вид спорта с мячом"),
-        coachInfo: {
-          name: t("sectionSport.sections.football.coachInfo.name", "Иванов Алексей Сергеевич"),
-          rank: t("sectionSport.sections.football.coachInfo.rank", "Заслуженный тренер России"),
-          contacts: t("sectionSport.sections.football.coachInfo.contacts", "+7 (999) 123-45-67"),
-        },
-        trainingSchedule: [
-          { day: t("sectionSport.days.monday", "Понедельник"), time: "18:00-20:00" },
-          { day: t("sectionSport.days.wednesday", "Среда"), time: "18:00-20:00" },
-          { day: t("sectionSport.days.friday", "Пятница"), time: "18:00-20:00" },
-        ],
-        contactInfo: t("sectionSport.sections.football.contactInfo", "Запись через спорткомплекс"),
-      },
-      {
-        id: 2,
-        slug: "wrestling",
-        name: t("sectionSport.sections.wrestling.name", "Борьба"),
-        coach: t("sectionSport.sections.wrestling.coach", "Петров В.К."),
-        schedule: t("sectionSport.sections.wrestling.schedule", "Вт, Чт 17:00-19:00"),
-        image: "https://images.unsplash.com/photo-1598366833298-79e96e42f6c9?w=400&h=300&fit=crop",
-        sportType: "combat",
-        description: t("sectionSport.sections.wrestling.description", "Единоборство с богатой историей"),
-        coachInfo: {
-          name: t("sectionSport.sections.wrestling.coachInfo.name", "Петров Владимир Константинович"),
-          rank: t("sectionSport.sections.wrestling.coachInfo.rank", "Мастер спорта международного класса"),
-          contacts: t("sectionSport.sections.wrestling.coachInfo.contacts", "+7 (999) 765-43-21"),
-        },
-        trainingSchedule: [
-          { day: t("sectionSport.days.tuesday", "Вторник"), time: "17:00-19:00" },
-          { day: t("sectionSport.days.thursday", "Четверг"), time: "17:00-19:00" },
-        ],
-        contactInfo: t("sectionSport.sections.wrestling.contactInfo", "Запись у тренера"),
-      },
-      {
-        id: 3,
-        slug: "swimming",
-        name: t("sectionSport.sections.swimming.name", "Плавание"),
-        coach: t("sectionSport.sections.swimming.coach", "Сидорова М.И."),
-        schedule: t("sectionSport.sections.swimming.schedule", "Пн-Пт 07:00-09:00, 19:00-21:00"),
-        image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop",
-        sportType: "water",
-        description: t("sectionSport.sections.swimming.description", "Водный вид спорта для всех возрастов"),
-        coachInfo: {
-          name: t("sectionSport.sections.swimming.coachInfo.name", "Сидорова Мария Ивановна"),
-          rank: t("sectionSport.sections.swimming.coachInfo.rank", "Кандидат в мастера спорта"),
-          contacts: t("sectionSport.sections.swimming.coachInfo.contacts", "+7 (999) 555-44-33"),
-        },
-        trainingSchedule: [
-          { day: t("sectionSport.days.monday", "Понедельник"), time: "07:00-09:00, 19:00-21:00" },
-          { day: t("sectionSport.days.tuesday", "Вторник"), time: "07:00-09:00, 19:00-21:00" },
-          { day: t("sectionSport.days.wednesday", "Среда"), time: "07:00-09:00, 19:00-21:00" },
-          { day: t("sectionSport.days.thursday", "Четверг"), time: "07:00-09:00, 19:00-21:00" },
-          { day: t("sectionSport.days.friday", "Пятница"), time: "07:00-09:00, 19:00-21:00" },
-        ],
-        contactInfo: t("sectionSport.sections.swimming.contactInfo", "Бассейн, 2 этаж"),
-      },
-      {
-        id: 4,
-        slug: "basketball",
-        name: t("sectionSport.sections.basketball.name", "Баскетбол"),
-        coach: t("sectionSport.sections.basketball.coach", "Кузнецов С.П."),
-        schedule: t("sectionSport.sections.basketball.schedule", "Пн, Ср, Пт 19:00-21:00"),
-        image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&h=300&fit=crop",
-        sportType: "game",
-        description: t("sectionSport.sections.basketball.description", "Динамичная командная игра с мячом"),
-        coachInfo: {
-          name: t("sectionSport.sections.basketball.coachInfo.name", "Кузнецов Сергей Петрович"),
-          rank: t("sectionSport.sections.basketball.coachInfo.rank", "Мастер спорта"),
-          contacts: t("sectionSport.sections.basketball.coachInfo.contacts", "+7 (999) 888-77-66"),
-        },
-        trainingSchedule: [
-          { day: t("sectionSport.days.monday", "Понедельник"), time: "19:00-21:00" },
-          { day: t("sectionSport.days.wednesday", "Среда"), time: "19:00-21:00" },
-          { day: t("sectionSport.days.friday", "Пятница"), time: "19:00-21:00" },
-        ],
-        contactInfo: t("sectionSport.sections.basketball.contactInfo", "Спортивный зал №1"),
-      },
-      {
-        id: 5,
-        slug: "athletics",
-        name: t("sectionSport.sections.athletics.name", "Легкая атлетика"),
-        coach: t("sectionSport.sections.athletics.coach", "Орлова Е.В."),
-        schedule: t("sectionSport.sections.athletics.schedule", "Вт, Чт, Сб 08:00-10:00"),
-        image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=400&h=300&fit=crop",
-        sportType: "athletics",
-        description: t("sectionSport.sections.athletics.description", "Королева спорта - бег, прыжки, метания"),
-        coachInfo: {
-          name: t("sectionSport.sections.athletics.coachInfo.name", "Орлова Елена Викторовна"),
-          rank: t("sectionSport.sections.athletics.coachInfo.rank", "Заслуженный тренер"),
-          contacts: t("sectionSport.sections.athletics.coachInfo.contacts", "+7 (999) 444-33-22"),
-        },
-        trainingSchedule: [
-          { day: t("sectionSport.days.tuesday", "Вторник"), time: "08:00-10:00" },
-          { day: t("sectionSport.days.thursday", "Четверг"), time: "08:00-10:00" },
-          { day: t("sectionSport.days.saturday", "Суббота"), time: "08:00-10:00" },
-        ],
-        contactInfo: t("sectionSport.sections.athletics.contactInfo", "Стадион академии"),
-      },
-      {
-        id: 6,
-        slug: "skiing",
-        name: t("sectionSport.sections.skiing.name", "Лыжные гонки"),
-        coach: t("sectionSport.sections.skiing.coach", "Волков Д.Н."),
-        schedule: t("sectionSport.sections.skiing.schedule", "Ср, Пт, Вс 10:00-12:00 (зимой)"),
-        image: "https://images.unsplash.com/photo-1517639493569-0696e9d90a81?w=400&h=300&fit=crop",
-        sportType: "winter",
-        description: t("sectionSport.sections.skiing.description", "Зимний вид спорта на выносливость"),
-        coachInfo: {
-          name: t("sectionSport.sections.skiing.coachInfo.name", "Волков Дмитрий Николаевич"),
-          rank: t("sectionSport.sections.skiing.coachInfo.rank", "Мастер спорта международного класса"),
-          contacts: t("sectionSport.sections.skiing.coachInfo.contacts", "+7 (999) 111-22-33"),
-        },
-        trainingSchedule: [
-          { day: t("sectionSport.days.wednesday", "Среда"), time: "10:00-12:00" },
-          { day: t("sectionSport.days.friday", "Пятница"), time: "10:00-12:00" },
-          { day: t("sectionSport.days.sunday", "Воскресенье"), time: "10:00-12:00" },
-        ],
-        contactInfo: t("sectionSport.sections.skiing.contactInfo", "Лыжная база академии"),
-      }
-    ];
+    // Если API вернул данные, используем их
+    if (apiSections && Array.isArray(apiSections) && apiSections.length > 0) {
+      return apiSections.map((section) => ({
+        id: section.id,
+        slug: section.slug || section.id,
+        name: section.name || section.title,
+        coach:
+          section.coach ||
+          section.trainer ||
+          t("sectionSport.noCoach", "Тренер не указан"),
+        schedule:
+          section.schedule ||
+          section.training_schedule ||
+          t("sectionSport.noSchedule", "Расписание уточняется"),
+        image:
+          section.image ||
+          section.photo ||
+          "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400&h=300&fit=crop",
+        sportType: section.sport_type || section.type || "all",
+        description: section.description || "",
+        coachInfo: section.coach_info
+          ? {
+              name: section.coach_info.name || section.coach_info.full_name,
+              rank: section.coach_info.rank || section.coach_info.title,
+              contacts: section.coach_info.contacts || section.coach_info.phone,
+            }
+          : null,
+        trainingSchedule:
+          section.training_schedule_details || section.schedule_details || [],
+        contactInfo:
+          section.contact_info ||
+          section.contacts ||
+          t("sectionSport.noContacts", "Контакты уточняются"),
+      }));
+    }
+
+    // Fallback - пустой массив, если нет данных
+    return [];
   };
 
   // Получаем нормализованные данные
@@ -226,9 +142,11 @@ const SectionSport = () => {
 
   // Фильтрация секций
   const filteredSections = sectionsData.filter((section) => {
-    const matchesFilter = activeFilter === "all" || section.sportType === activeFilter;
-    const matchesSearch = section.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         section.coach.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      activeFilter === "all" || section.sportType === activeFilter;
+    const matchesSearch =
+      section.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      section.coach.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -260,11 +178,31 @@ const SectionSport = () => {
 
   const filters = [
     { id: "all", label: t("sectionSport.filters.all", "Все"), icon: "🎯" },
-    { id: "game", label: t("sectionSport.filters.game", "Игровые"), icon: "⚽" },
-    { id: "combat", label: t("sectionSport.filters.combat", "Единоборства"), icon: "🥋" },
-    { id: "winter", label: t("sectionSport.filters.winter", "Зимние"), icon: "⛷️" },
-    { id: "water", label: t("sectionSport.filters.water", "Водные"), icon: "🏊" },
-    { id: "athletics", label: t("sectionSport.filters.athletics", "Легкая атлетика"), icon: "🏃" },
+    {
+      id: "game",
+      label: t("sectionSport.filters.game", "Игровые"),
+      icon: "⚽",
+    },
+    {
+      id: "combat",
+      label: t("sectionSport.filters.combat", "Единоборства"),
+      icon: "🥋",
+    },
+    {
+      id: "winter",
+      label: t("sectionSport.filters.winter", "Зимние"),
+      icon: "⛷️",
+    },
+    {
+      id: "water",
+      label: t("sectionSport.filters.water", "Водные"),
+      icon: "🏊",
+    },
+    {
+      id: "athletics",
+      label: t("sectionSport.filters.athletics", "Легкая атлетика"),
+      icon: "🏃",
+    },
   ];
 
   const containerVariants = {
@@ -291,13 +229,15 @@ const SectionSport = () => {
   const modalVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: { opacity: 1, scale: 1 },
-    exit: { opacity: 0, scale: 0.8 }
+    exit: { opacity: 0, scale: 0.8 },
   };
 
   if (apiData.loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 flex items-center justify-center">
-        <div className="text-white text-2xl">{t("common.loading", "Загрузка...")}</div>
+        <div className="text-white text-2xl">
+          {t("common.loading", "Загрузка...")}
+        </div>
       </div>
     );
   }
@@ -315,9 +255,13 @@ const SectionSport = () => {
 
         {/* Спортивные символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">⚽</div>
-        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">🥋</div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">
+          🥋
+        </div>
         <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">🏊</div>
-        <div className="absolute bottom-1/4 right-1/3 text-5xl opacity-5">🏃</div>
+        <div className="absolute bottom-1/4 right-1/3 text-5xl opacity-5">
+          🏃
+        </div>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
@@ -362,7 +306,10 @@ const SectionSport = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed"
           >
-            {t("sectionSport.subtitle", "Академия предоставляет широкие возможности для занятий спортом. Каждый студент может выбрать секцию по интересам — от лёгкой атлетики до борьбы.")}
+            {t(
+              "sectionSport.subtitle",
+              "Академия предоставляет широкие возможности для занятий спортом. Каждый студент может выбрать секцию по интересам — от лёгкой атлетики до борьбы."
+            )}
           </motion.p>
         </motion.div>
 
@@ -378,7 +325,10 @@ const SectionSport = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder={t("sectionSport.search.placeholder", "Поиск по названию или тренеру...")}
+                placeholder={t(
+                  "sectionSport.search.placeholder",
+                  "Поиск по названию или тренеру..."
+                )}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-2xl text-white placeholder-blue-200 focus:outline-none focus:border-emerald-400 transition-all duration-300 text-lg backdrop-blur-sm"
@@ -395,7 +345,9 @@ const SectionSport = () => {
                   onClick={() => setActiveFilter(filter.id)}
                   className={`flex items-center space-x-2 px-6 py-3 font-bold text-lg transition-all duration-500 transform rounded-2xl ${
                     activeFilter === filter.id
-                      ? `bg-gradient-to-r ${getSportColor(filter.id)} text-white shadow-2xl scale-105`
+                      ? `bg-gradient-to-r ${getSportColor(
+                          filter.id
+                        )} text-white shadow-2xl scale-105`
                       : "text-blue-100 hover:text-white hover:bg-white/10 hover:shadow-lg"
                   }`}
                 >
@@ -406,7 +358,7 @@ const SectionSport = () => {
             </div>
           </div>
         </motion.div>
-        
+
         {/* Список секций */}
         <motion.div
           variants={containerVariants}
@@ -436,12 +388,20 @@ const SectionSport = () => {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
-                  
+
                   {/* Бейдж типа спорта */}
                   <div className="absolute top-4 right-4">
-                    <div className={`bg-gradient-to-r ${getSportColor(section.sportType)} text-white px-4 py-2 rounded-2xl font-bold text-sm backdrop-blur-sm flex items-center space-x-2`}>
-                      <span className="text-lg">{getSportIcon(section.sportType)}</span>
-                      <span>{filters.find(f => f.id === section.sportType)?.label}</span>
+                    <div
+                      className={`bg-gradient-to-r ${getSportColor(
+                        section.sportType
+                      )} text-white px-4 py-2 rounded-2xl font-bold text-sm backdrop-blur-sm flex items-center space-x-2`}
+                    >
+                      <span className="text-lg">
+                        {getSportIcon(section.sportType)}
+                      </span>
+                      <span>
+                        {filters.find((f) => f.id === section.sportType)?.label}
+                      </span>
                     </div>
                   </div>
 
@@ -484,10 +444,7 @@ const SectionSport = () => {
                   </div>
 
                   {/* Кнопка подробнее */}
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="mt-6"
-                  >
+                  <motion.div whileHover={{ scale: 1.05 }} className="mt-6">
                     <div className="w-full bg-gradient-to-r from-emerald-500 to-green-500 text-white text-center py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105">
                       {t("sectionSport.card.more", "Подробнее")}
                     </div>
@@ -505,12 +462,15 @@ const SectionSport = () => {
             animate={{ opacity: 1 }}
             className="text-center py-16"
           >
-            <div className="text-6xl mb-6">🔍</div>
+            <div className="text-6xl mb-6">�</div>
             <h3 className="text-2xl font-bold text-white mb-4">
-              {t("sectionSport.noResults.title", "Секции не найдены")}
+              {t("sectionSport.noData.title", "Данных нет")}
             </h3>
             <p className="text-blue-100 text-lg">
-              {t("sectionSport.noResults.message", "Попробуйте изменить параметры поиска или фильтрации")}
+              {t(
+                "sectionSport.noData.message",
+                "В данный момент информация о спортивных секциях отсутствует"
+              )}
             </p>
           </motion.div>
         )}
@@ -546,9 +506,20 @@ const SectionSport = () => {
                   ✕
                 </button>
                 <div className="absolute top-4 left-4">
-                  <div className={`bg-gradient-to-r ${getSportColor(selectedSection.sportType)} text-white px-4 py-2 rounded-2xl font-bold backdrop-blur-sm flex items-center space-x-2`}>
-                    <span className="text-lg">{getSportIcon(selectedSection.sportType)}</span>
-                    <span>{filters.find(f => f.id === selectedSection.sportType)?.label}</span>
+                  <div
+                    className={`bg-gradient-to-r ${getSportColor(
+                      selectedSection.sportType
+                    )} text-white px-4 py-2 rounded-2xl font-bold backdrop-blur-sm flex items-center space-x-2`}
+                  >
+                    <span className="text-lg">
+                      {getSportIcon(selectedSection.sportType)}
+                    </span>
+                    <span>
+                      {
+                        filters.find((f) => f.id === selectedSection.sportType)
+                          ?.label
+                      }
+                    </span>
                   </div>
                 </div>
               </div>
@@ -577,11 +548,16 @@ const SectionSport = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="bg-white/5 rounded-2xl p-6">
                     <h3 className="text-xl font-bold text-white mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm mr-3">📞</span>
-                      {t("sectionSport.modal.contactInfo", "Контактная информация")}
+                      <span className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm mr-3">
+                        📞
+                      </span>
+                      {t(
+                        "sectionSport.modal.contactInfo",
+                        "Контактная информация"
+                      )}
                     </h3>
                     <p className="text-blue-100 text-lg">
                       {selectedSection.contactInfo}
@@ -591,7 +567,9 @@ const SectionSport = () => {
 
                 <div className="bg-white/5 rounded-2xl p-6 mb-6">
                   <h3 className="text-xl font-bold text-white mb-3 flex items-center">
-                    <span className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white text-sm mr-3">📝</span>
+                    <span className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white text-sm mr-3">
+                      📝
+                    </span>
                     {t("sectionSport.modal.description", "Описание")}
                   </h3>
                   <p className="text-blue-100 text-lg leading-relaxed">
@@ -603,47 +581,75 @@ const SectionSport = () => {
                 {selectedSection.coachInfo && (
                   <div className="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl p-6 mb-6 border border-emerald-500/20">
                     <h3 className="text-xl font-bold text-white mb-4 flex items-center">
-                      <span className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm mr-3">👨‍🏫</span>
-                      {t("sectionSport.modal.coachInfo", "Информация о тренере")}
+                      <span className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm mr-3">
+                        👨‍🏫
+                      </span>
+                      {t(
+                        "sectionSport.modal.coachInfo",
+                        "Информация о тренере"
+                      )}
                     </h3>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <div className="text-emerald-300 text-sm mb-1">{t("sectionSport.modal.coachName", "ФИО")}</div>
-                        <div className="text-white font-semibold text-lg">{selectedSection.coachInfo.name}</div>
+                        <div className="text-emerald-300 text-sm mb-1">
+                          {t("sectionSport.modal.coachName", "ФИО")}
+                        </div>
+                        <div className="text-white font-semibold text-lg">
+                          {selectedSection.coachInfo.name}
+                        </div>
                       </div>
                       <div>
-                        <div className="text-emerald-300 text-sm mb-1">{t("sectionSport.modal.coachRank", "Звание")}</div>
-                        <div className="text-white font-semibold text-lg">{selectedSection.coachInfo.rank}</div>
+                        <div className="text-emerald-300 text-sm mb-1">
+                          {t("sectionSport.modal.coachRank", "Звание")}
+                        </div>
+                        <div className="text-white font-semibold text-lg">
+                          {selectedSection.coachInfo.rank}
+                        </div>
                       </div>
                       <div className="md:col-span-2">
-                        <div className="text-emerald-300 text-sm mb-1">{t("sectionSport.modal.coachContacts", "Контакты")}</div>
-                        <div className="text-white font-semibold text-lg">{selectedSection.coachInfo.contacts}</div>
+                        <div className="text-emerald-300 text-sm mb-1">
+                          {t("sectionSport.modal.coachContacts", "Контакты")}
+                        </div>
+                        <div className="text-white font-semibold text-lg">
+                          {selectedSection.coachInfo.contacts}
+                        </div>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Расписание тренировок */}
-                {selectedSection.trainingSchedule && selectedSection.trainingSchedule.length > 0 && (
-                  <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 rounded-2xl p-6 border border-blue-500/20">
-                    <h3 className="text-xl font-bold text-white mb-4 flex items-center">
-                      <span className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center text-white text-sm mr-3">🕒</span>
-                      {t("sectionSport.modal.trainingSchedule", "Расписание тренировок")}
-                    </h3>
-                    <div className="space-y-3">
-                      {selectedSection.trainingSchedule.map((schedule, index) => (
-                        <div key={index} className="flex justify-between items-center py-3 border-b border-white/10">
-                          <span className="text-emerald-300 text-lg font-medium">
-                            {schedule.day}
-                          </span>
-                          <span className="text-white font-semibold text-lg">
-                            {schedule.time}
-                          </span>
-                        </div>
-                      ))}
+                {selectedSection.trainingSchedule &&
+                  selectedSection.trainingSchedule.length > 0 && (
+                    <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 rounded-2xl p-6 border border-blue-500/20">
+                      <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                        <span className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center text-white text-sm mr-3">
+                          🕒
+                        </span>
+                        {t(
+                          "sectionSport.modal.trainingSchedule",
+                          "Расписание тренировок"
+                        )}
+                      </h3>
+                      <div className="space-y-3">
+                        {selectedSection.trainingSchedule.map(
+                          (schedule, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center py-3 border-b border-white/10"
+                            >
+                              <span className="text-emerald-300 text-lg font-medium">
+                                {schedule.day}
+                              </span>
+                              <span className="text-white font-semibold text-lg">
+                                {schedule.time}
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </div>
             </motion.div>
           </motion.div>
