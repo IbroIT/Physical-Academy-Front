@@ -85,6 +85,10 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from "./i18n";
 import SeoRouteWrapper from './components/SeoRouteWrapper';
 
+import SportSections from "./components/pages/sport/SectionSport";
+import SportInfrastructure from "./components/pages/sport/InfractructureSport";
+import SportAchievements from "./components/pages/sport/AchievmentsSport";
+
 function App() {
   return (
      <I18nextProvider i18n={i18n}>
@@ -96,6 +100,9 @@ function App() {
               <Navbar />
               <main className="main-content">
                 <Routes>
+
+
+
                   {/* Basic routes */}
                   <Route path="/" element={<Home />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -139,6 +146,11 @@ function App() {
                   <Route path="/education/college/sports" element={<CollegeSports />} />
                   <Route path="/education/faculties/master" element={<MasterProgram />} />
                   <Route path="/education/faculties/doctorate" element={<DoctorateProgram />} />
+
+                  {/* Sport routes */}
+                  <Route path="/sport/sections" element={<SportSections />} />
+                  <Route path="/sport/infrastructure" element={<SportInfrastructure />} />
+                  <Route path="/sport/achievements" element={<SportAchievements />} />
 
                   {/* Science routes */}
                   <Route path="/science/publications" element={<ScientificPublications />} />

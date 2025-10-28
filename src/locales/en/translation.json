@@ -1,5 +1,9 @@
 {
   "nav": {
+    "sport": "Sport",
+    "sections": "Sections",
+    "infrastructure": "Infrastructure",
+    "achievements": "Sport Achievements",
     "academy": "Academy",
     "about_academy": "About Academy",
     "history": "History",
@@ -8220,5 +8224,147 @@
         "description": "All directions and departments"
       }
     }
+  },
+  "sectionSport": {
+    "title": "Sports Sections of KGAFKiS",
+    "subtitle": "The Academy provides wide opportunities for sports activities. Every student can choose a section according to their interests - from athletics to wrestling.",
+    "badge": "Sports Sections",
+    "search": {
+      "placeholder": "Search by name or coach..."
+    },
+    "filters": {
+      "all": "All",
+      "game": "Game Sports",
+      "combat": "Martial Arts",
+      "winter": "Winter Sports",
+      "water": "Water Sports",
+      "athletics": "Athletics"
+    },
+    "card": {
+      "coach": "Coach",
+      "schedule": "Schedule",
+      "more": "Details"
+    },
+    "noResults": {
+      "title": "No sections found",
+      "message": "Try changing search or filter parameters"
+    },
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "sections": {
+      "football": {
+        "name": "Football",
+        "coach": "Ivanov A.S.",
+        "schedule": "Mon, Wed, Fri 18:00-20:00",
+        "description": "Team sport with a ball",
+        "coachInfo": {
+          "name": "Ivanov Alexey Sergeevich",
+          "rank": "Honored Coach of Russia",
+          "contacts": "+7 (999) 123-45-67"
+        },
+        "contactInfo": "Registration through sports complex"
+      },
+      "wrestling": {
+        "name": "Wrestling",
+        "coach": "Petrov V.K.",
+        "schedule": "Tue, Thu 17:00-19:00",
+        "description": "Martial art with rich history",
+        "coachInfo": {
+          "name": "Petrov Vladimir Konstantinovich",
+          "rank": "Master of Sports of International Class",
+          "contacts": "+7 (999) 765-43-21"
+        },
+        "contactInfo": "Registration with coach"
+      },
+      "swimming": {
+        "name": "Swimming",
+        "coach": "Sidorova M.I.",
+        "schedule": "Mon-Fri 07:00-09:00, 19:00-21:00",
+        "description": "Water sport for all ages",
+        "coachInfo": {
+          "name": "Sidorova Maria Ivanovna",
+          "rank": "Candidate for Master of Sports",
+          "contacts": "+7 (999) 555-44-33"
+        },
+        "contactInfo": "Swimming pool, 2nd floor"
+      }
+    }
+  },
+  "achievementsSport": {
+    "badge": "Pride of the Academy",
+    "title": "Our Achievements",
+    "subtitle": "The pride of KSAPCS is our athletes, coaches and graduates who have glorified the academy at national and international levels.",
+    "categories": {
+      "all": "All",
+      "individual": "Individual",
+      "team": "Team",
+      "international": "International",
+      "olympic": "Olympic",
+      "coaching": "Coaching"
+    },
+    "card": {
+      "button": "Details"
+    },
+    "empty": {
+      "title": "No achievements yet",
+      "subtitle": "New achievements of our athletes will appear here soon!"
+    },
+    "modal": {
+      "sport": "Sport Type",
+      "date": "Date",
+      "competition": "Competition",
+      "description": "Description",
+      "details": "Achievement Details",
+      "distance": "Distance",
+      "style": "Style",
+      "time": "Time",
+      "coach": "Coach",
+      "venue": "Venue",
+      "score": "Score",
+      "captain": "Captain",
+      "tournament": "Tournament",
+      "apparatus": "Apparatus",
+      "totalScore": "Total Score",
+      "discipline": "Discipline",
+      "finalPlace": "Final Place",
+      "award": "Award",
+      "students": "Students",
+      "federation": "Federation",
+      "years": "Work Experience"
+    }
+  },
+  "infrastructureSport": {
+    "name": "Modern Sports Infrastructure of KGAFKiS",
+    "description": "Our sports complexes meet international standards and provide comfortable conditions for training and competitions.",
+    "badge": "Sports Infrastructure",
+    "stats": {
+      "objects": "sports facilities",
+      "area": "m² total area",
+      "sports": "sports types",
+      "equipment": "equipment units"
+    },
+    "categories": {
+      "stadiums": "Stadiums",
+      "arenas": "Indoor Arenas",
+      "pools": "Swimming Pools",
+      "gyms": "Gyms",
+      "martial": "Martial Arts Halls",
+      "labs": "Sports Science Laboratories"
+    },
+    "objects": {
+      "mainGym": {
+        "name": "Main Sports Hall",
+        "description": "Area 800 m², Technogym equipment, stands for 400 seats"
+      }
+    },
+    "noObjects": "Facilities in development",
+    "comingSoon": "Information about facilities in this category will be added soon"
   }
 }

@@ -167,6 +167,14 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
         },
       ]
     },
+    sport: {
+      title: t('nav.sport', 'Спорт'),
+      submenu: [
+        { title: t('nav.sections', 'Секции'), link: '/sport/sections' },
+        { title: t('nav.infrastructure', 'Инфраструктура'), link: '/sport/infrastructure' },
+        { title: t('nav.achievements', 'Спортивные достижения'), link: '/sport/achievements' },
+      ]
+    },
     science: {
       title: t('nav.science', 'Наука'),
       submenu: [
