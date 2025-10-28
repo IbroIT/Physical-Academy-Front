@@ -36,8 +36,11 @@ const SectionSport = () => {
 
       const data = await response.json();
 
+      // Если API возвращает paginated response с results, используем results
+      const sectionsArray = data.results || data;
+
       setApiData({
-        sections: data,
+        sections: sectionsArray,
         loading: false,
         error: null,
       });

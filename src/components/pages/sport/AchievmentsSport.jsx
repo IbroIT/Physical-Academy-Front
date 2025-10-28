@@ -34,8 +34,11 @@ const AchievementsSport = () => {
 
       const data = await response.json();
 
+      // Если API возвращает paginated response с results, используем results
+      const achievementsArray = data.results || data;
+
       setApiData({
-        achievements: data,
+        achievements: achievementsArray,
         loading: false,
         error: null,
       });
