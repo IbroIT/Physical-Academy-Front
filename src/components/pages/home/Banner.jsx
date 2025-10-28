@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { getImageUrl } from '../../../utils/imageUtils';
 
 const Banner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -88,7 +89,7 @@ const Banner = () => {
             }`}
           >
             <img
-              src={`https://physical-academy-backend-3dccb860f75a.herokuapp.com${slide.image_url}`}
+              src={getImageUrl(slide.image_url)}
               alt={slide.alt_text || slide.title}
               className="w-full h-full object-cover"
             />

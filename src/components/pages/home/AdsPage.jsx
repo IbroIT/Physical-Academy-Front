@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { getBackgroundImageUrl } from '../../../utils/imageUtils';
 
 const UniversityAnnouncementsPage = () => {
   const { t, i18n } = useTranslation();
@@ -125,7 +126,7 @@ const UniversityAnnouncementsPage = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 z-10 group-hover:scale-110 transition-transform duration-700" />
                 <div 
                   className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
-                  style={{ backgroundImage: `url(https://physical-academy-backend-3dccb860f75a.herokuapp.com${announcement.image_url})` }}
+                  style={{ backgroundImage: getBackgroundImageUrl(announcement.image_url) }}
                 />
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getUrgencyBadge(announcement.urgency)}`}>

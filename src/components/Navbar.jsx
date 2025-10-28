@@ -4,6 +4,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 import DefaultLogo from "../assets/Logo.png";
 import ScrolledLogo from "../assets/Logo.png";
 import SearchButton from './SearchButton';
+
 const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
   const { t, i18n } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -90,43 +91,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
         }
       ]
     },
-    admissions: {
-      title: t('nav.admissions', 'Поступление'),
-      submenu: [
-        { 
-          title: t('nav.bachelor', 'Бакалавриат'),
-          hasNested: true,
-          nestedItems: [
-            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/bachelor/info' },
-            { title: t('nav.registration', 'Регистрация'), link: '/admissions/bachelor/registration' },
-            { title: t('nav.international_applicants', 'Иностранные абитуриенты'), link: '/admissions/bachelor/international' },
-            { title: t('nav.quotas', 'Квоты'), link: '/admissions/bachelor/quotas' },
-            { title: t('nav.contacts', 'Контакты'), link: '/admissions/bachelor/contacts' },
-          ]
-        },
-        { 
-          title: t('nav.master_phd', 'Магистратура'),
-          hasNested: true,
-          nestedItems: [
-            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/master/info' },
-          ]
-        },
-        {
-          title: t('nav.doctorate', 'Докторантура'),
-          hasNested: true,
-          nestedItems: [
-            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/doctorate/info' },
-          ]
-        },
-        { 
-          title: t('nav.college', 'Колледж'),
-          hasNested: true,
-          nestedItems: [
-            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/college/info' },
-          ]
-        },
-      ]
-    },
+    
     education: {
       title: t('nav.education', 'Образование'),
       submenu: [
@@ -186,6 +151,43 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
         { title: t('nav.student_scientific_society', 'Студенческое научное общество'), link: '/science/ssu' }
       ]
     },
+    admissions: {
+      title: t('nav.admissions', 'Поступление'),
+      submenu: [
+        { 
+          title: t('nav.bachelor', 'Бакалавриат'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/bachelor/info' },
+            { title: t('nav.registration', 'Регистрация'), link: '/admissions/bachelor/registration' },
+            { title: t('nav.international_applicants', 'Иностранные абитуриенты'), link: '/admissions/bachelor/international' },
+            { title: t('nav.quotas', 'Квоты'), link: '/admissions/bachelor/quotas' },
+            { title: t('nav.contacts', 'Контакты'), link: '/admissions/bachelor/contacts' },
+          ]
+        },
+        { 
+          title: t('nav.master_phd', 'Магистратура'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/master/info' },
+          ]
+        },
+        {
+          title: t('nav.doctorate', 'Докторантура'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/doctorate/info' },
+          ]
+        },
+        { 
+          title: t('nav.college', 'Колледж'),
+          hasNested: true,
+          nestedItems: [
+            { title: t('nav.general_info', 'Общая информация'), link: '/admissions/college/info' },
+          ]
+        },
+      ]
+    },
     students: {
       title: t('nav.students', 'Студентам'),
       submenu: [
@@ -222,11 +224,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
 
   return (
     <nav
-      className={`sticky top-0 left-0 w-full z-50 transition-all duration-500 ${
-        isScrolled
-          ? 'bg-white py-2 shadow-lg border-b border-blue-100'
-          : 'bg-gradient-to-r from-blue-600 via-teal-500 to-emerald-500 py-1'
-      }`}
+      className="sticky top-0 left-0 w-full z-50 transition-all duration-500 bg-white py-2 shadow-lg border-b border-blue-100"
       ref={menuRef}
     >
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
@@ -238,7 +236,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                 className="h-14 px-3 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-105"
               >
                 <img
-                  src={isScrolled ? DefaultLogo : ScrolledLogo}
+                  src={DefaultLogo}
                   alt={t('nav.logo_alt', 'Логотип КГАФКиС')}
                   className="h-10 w-auto object-contain transition-opacity duration-300"
                 />
@@ -271,11 +269,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                     // Простая ссылка для главной страницы
                     <a
                       href={item.link}
-                      className={`relative px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 group ${
-                        isScrolled
-                          ? 'text-blue-800 hover:text-teal-600 hover:bg-blue-50'
-                          : 'text-white hover:text-white hover:bg-white/20'
-                      }`}
+                      className="relative px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 group text-blue-800 hover:text-teal-600 hover:bg-blue-50"
                     >
                       <span className="relative z-10">{item.title}</span>
                       <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-teal-400 transition-all duration-300 group-hover:w-3/4`}></div>
@@ -287,9 +281,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                         className={`relative px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 group ${
                           activeMenu === key
                             ? 'text-white bg-gradient-to-r from-teal-500 to-emerald-500 shadow-lg'
-                            : isScrolled
-                              ? 'text-blue-800 hover:text-teal-600 hover:bg-blue-50'
-                              : 'text-white hover:text-white hover:bg-white/20'
+                            : 'text-blue-800 hover:text-teal-600 hover:bg-blue-50'
                         }`}
                       >
                         <span className="relative z-10">{item.title}</span>
@@ -380,14 +372,14 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
           </div>
 
           {/* Правая часть: язык и мобильное меню */}
-           <div className="flex items-center space-x-3">
-            {/* Кнопка поиска - добавляем эту строку */}
-            <SearchButton isScrolled={isScrolled} />
+          <div className="flex items-center space-x-3">
+            {/* Кнопка поиска */}
+            <SearchButton isScrolled={true} />
 
             {/* Переключатель языка */}
             <div className="relative" ref={langRef}>
               <LanguageSwitcher
-                variant={isScrolled ? 'outline' : 'default'}
+                variant="outline"
                 showText={true}
                 onChange={handleLanguageChange}
                 languages={languages}
@@ -399,11 +391,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
             <div className="block min-[1475px]:hidden">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`inline-flex items-center justify-center p-3 rounded-xl transition-all duration-300 hover:scale-110 ${
-                  isScrolled
-                    ? 'text-blue-700 hover:bg-teal-50 border border-blue-200'
-                    : 'text-white hover:bg-white/20 border border-white/30'
-                } focus:outline-none backdrop-blur-sm`}
+                className="inline-flex items-center justify-center p-3 rounded-xl transition-all duration-300 hover:scale-110 text-blue-700 hover:bg-teal-50 border border-blue-200 focus:outline-none backdrop-blur-sm"
                 aria-expanded={isMenuOpen}
               >
                 <span className="sr-only">
@@ -429,7 +417,7 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
 
       {/* Мобильное меню с анимацией */}
       {isMenuOpen && (
-        <div className="block min-[1475px]:hidden bg-gradient-to-b from-white to-blue-50/80 backdrop-blur-md shadow-xl border-t border-blue-100 transform transition-all duration-300 ease-out animate-in slide-in-from-top-2 fade-in">
+        <div className="block min-[1475px]:hidden bg-white backdrop-blur-md shadow-xl border-t border-blue-100 transform transition-all duration-300 ease-out animate-in slide-in-from-top-2 fade-in">
           <div className="px-4 pt-2 pb-6 space-y-1">
             {Object.entries(menuData).map(([key, item]) => (
               <div key={key} className="relative">

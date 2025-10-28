@@ -7,7 +7,6 @@ const AddressMap = () => {
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
-  const mapInitializedRef = useRef(false);
 
   const mapData = t('contact.map', { returnObjects: true }) || {};
   
@@ -58,15 +57,15 @@ const AddressMap = () => {
 
   // Исправленная функция для получения корректного iframe src
   const getMapSrc = () => {
-    const { lat, lng, address } = academyLocation;
-    // Корректный формат для Google Maps Embed API
-    return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(address)}&center=${lat},${lng}&zoom=16&language=ru`;
+    const { lat, lng } = academyLocation;
+    // Используем режим place с координатами
+    return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${lat},${lng}&center=${lat},${lng}&zoom=17&language=ru`;
   };
 
-  // Альтернативный вариант - использовать поиск по адресу
+  // Альтернативный вариант - использовать поиск по адресу (более надежный)
   const getMapSrcAlternative = () => {
     const { address } = academyLocation;
-    return `https://www.google.com/maps/embed/v1/search?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(address)}&zoom=16&language=ru`;
+    return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(address)}&zoom=17&language=ru`;
   };
 
   return (
@@ -138,14 +137,17 @@ const AddressMap = () => {
                     </span>
                     {t('contact.map.interactiveMap', 'Наше местоположение')}
                   </h3>
+                  <div className="flex items-center space-x-2 text-blue-100">
+                    <span className="text-sm">📍 {academyLocation.address}</span>
+                  </div>
                 </div>
               </div>
               
               {/* Real Map Container */}
-              <div className="aspect-video relative bg-gradient-to-br from-slate-800 to-blue-900/50 rounded-lg overflow-hidden">
+              <div className="aspect-video relative bg-gradient-to-br from-slate-800 to-blue-900/50 rounded-lg overflow-hidden m-4">
                 {/* Google Maps Iframe */}
                 <iframe
-                  src={getMapSrc()}
+                  src={getMapSrcAlternative()}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
@@ -160,12 +162,10 @@ const AddressMap = () => {
                 <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-xl p-4 text-white max-w-xs border border-white/20">
                   <h4 className="font-bold text-lg mb-2 flex items-center">
                     <span className="text-red-400 mr-2">📍</span>
-                    {t('contact.map.currentLocation', 'Наша академия')}
+                    {t('contact.map.currentLocation', 'КГАФКиС')}
                   </h4>
                   <p className="text-blue-100 text-sm leading-relaxed">
-                    {t('contact.map.address')}
-                    <br/>
-                    {t('contact.map.bishkekKyrgyzstan')}
+                    {academyLocation.address}
                   </p>
                 </div>
               </div>
