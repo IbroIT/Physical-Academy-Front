@@ -1,51 +1,33 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 
 const SectionSport = () => {
   const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("all");
   const [hoveredCard, setHoveredCard] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSection, setSelectedSection] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [apiData, setApiData] = useState({
     sections: [],
-    loading: false, // Изменено на false для демонстрации
+    loading: false,
     error: null,
   });
   const sectionRef = useRef(null);
+  const modalRef = useRef(null);
 
   // Загрузка данных с API - отключена для демонстрации
   const fetchSectionsData = async () => {
     try {
       setApiData((prev) => ({ ...prev, loading: true, error: null }));
-      const API_URL = import.meta.env.VITE_API_URL;
-
-      // Для демонстрации сразу переходим к моковым данным
-      // В реальном проекте раскомментировать:
-      /*
-      const response = await fetch(
-        `${API_URL}/api/sport/sections/?lang=${i18n.language}`
-      );
-      const data = await response.json();
-      if (data && Array.isArray(data)) {
-        setApiData((prev) => ({ ...prev, sections: data, loading: false }));
-      } else {
-        setApiData((prev) => ({
-          ...prev,
-          error: "No data found",
-          loading: false,
-        }));
-      }
-      */
       
       // Для демонстрации сразу используем моковые данные
       setTimeout(() => {
         setApiData((prev) => ({ 
           ...prev, 
-          sections: [], // Пустой массив для демонстрации нормализации
+          sections: [],
           loading: false 
         }));
       }, 500);
@@ -60,9 +42,37 @@ const SectionSport = () => {
     fetchSectionsData();
   }, [i18n.language]);
 
+  // Закрытие модального окна по клику вне его области
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "unset";
+    };
+  }, [isModalOpen]);
+
+  const openModal = (section) => {
+    setSelectedSection(section);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedSection(null);
+  };
+
   // Функция для нормализации данных из API - всегда возвращает демо-данные
   const normalizeSectionData = (apiSections) => {
-    // Всегда возвращаем демонстрационные данные
     return [
       {
         id: 1,
@@ -278,8 +288,10 @@ const SectionSport = () => {
     },
   };
 
-  const handleCardClick = (sectionSlug) => {
-    navigate(`/sport/sections/${sectionSlug}`);
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.8 }
   };
 
   if (apiData.loading) {
@@ -371,7 +383,6 @@ const SectionSport = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-6 py-4 bg-white/5 border border-white/20 rounded-2xl text-white placeholder-blue-200 focus:outline-none focus:border-emerald-400 transition-all duration-300 text-lg backdrop-blur-sm"
               />
-              <span className="absolute right-6 top-1/2 transform -translate-y-1/2 text-2xl">🔍</span>
             </div>
 
             {/* Фильтры */}
@@ -395,21 +406,7 @@ const SectionSport = () => {
             </div>
           </div>
         </motion.div>
-
-        {/* Демо-сообщение */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border border-blue-400/30 rounded-2xl p-6 mb-8 text-center"
-        >
-          <div className="flex items-center justify-center space-x-3 text-blue-200">
-            <span className="text-2xl">💡</span>
-            <p className="text-lg">
-              {t("sectionSport.demoMessage", "Демонстрация работы фильтров и поиска")}
-            </p>
-          </div>
-        </motion.div>
-
+        
         {/* Список секций */}
         <motion.div
           variants={containerVariants}
@@ -429,7 +426,7 @@ const SectionSport = () => {
                 className="bg-white/5 rounded-3xl backdrop-blur-lg border border-white/20 shadow-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group cursor-pointer"
                 onMouseEnter={() => setHoveredCard(section.id)}
                 onMouseLeave={() => setHoveredCard(null)}
-                onClick={() => handleCardClick(section.slug)}
+                onClick={() => openModal(section)}
               >
                 {/* Картинка секции */}
                 <div className="relative h-48 overflow-hidden">
@@ -518,6 +515,140 @@ const SectionSport = () => {
           </motion.div>
         )}
       </div>
+
+      {/* Модальное окно */}
+      <AnimatePresence>
+        {isModalOpen && selectedSection && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              ref={modalRef}
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl border border-white/20 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="relative">
+                <img
+                  src={selectedSection.image}
+                  alt={selectedSection.name}
+                  className="w-full h-80 object-cover"
+                />
+                <button
+                  onClick={closeModal}
+                  className="absolute top-4 right-4 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors duration-300 text-xl"
+                >
+                  ✕
+                </button>
+                <div className="absolute top-4 left-4">
+                  <div className={`bg-gradient-to-r ${getSportColor(selectedSection.sportType)} text-white px-4 py-2 rounded-2xl font-bold backdrop-blur-sm flex items-center space-x-2`}>
+                    <span className="text-lg">{getSportIcon(selectedSection.sportType)}</span>
+                    <span>{filters.find(f => f.id === selectedSection.sportType)?.label}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8">
+                <h2 className="text-4xl font-bold text-white mb-6">
+                  {selectedSection.name}
+                </h2>
+
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
+                  <div className="space-y-4">
+                    <div className="bg-white/5 rounded-2xl p-4">
+                      <div className="text-emerald-300 text-sm mb-1">
+                        {t("sectionSport.modal.coach", "Тренер")}
+                      </div>
+                      <div className="text-white font-semibold text-xl">
+                        {selectedSection.coach}
+                      </div>
+                    </div>
+                    <div className="bg-white/5 rounded-2xl p-4">
+                      <div className="text-emerald-300 text-sm mb-1">
+                        {t("sectionSport.modal.schedule", "Расписание")}
+                      </div>
+                      <div className="text-white font-semibold text-xl">
+                        {selectedSection.schedule}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/5 rounded-2xl p-6">
+                    <h3 className="text-xl font-bold text-white mb-3 flex items-center">
+                      <span className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm mr-3">📞</span>
+                      {t("sectionSport.modal.contactInfo", "Контактная информация")}
+                    </h3>
+                    <p className="text-blue-100 text-lg">
+                      {selectedSection.contactInfo}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 rounded-2xl p-6 mb-6">
+                  <h3 className="text-xl font-bold text-white mb-3 flex items-center">
+                    <span className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white text-sm mr-3">📝</span>
+                    {t("sectionSport.modal.description", "Описание")}
+                  </h3>
+                  <p className="text-blue-100 text-lg leading-relaxed">
+                    {selectedSection.description}
+                  </p>
+                </div>
+
+                {/* Информация о тренере */}
+                {selectedSection.coachInfo && (
+                  <div className="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-2xl p-6 mb-6 border border-emerald-500/20">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                      <span className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm mr-3">👨‍🏫</span>
+                      {t("sectionSport.modal.coachInfo", "Информация о тренере")}
+                    </h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-emerald-300 text-sm mb-1">{t("sectionSport.modal.coachName", "ФИО")}</div>
+                        <div className="text-white font-semibold text-lg">{selectedSection.coachInfo.name}</div>
+                      </div>
+                      <div>
+                        <div className="text-emerald-300 text-sm mb-1">{t("sectionSport.modal.coachRank", "Звание")}</div>
+                        <div className="text-white font-semibold text-lg">{selectedSection.coachInfo.rank}</div>
+                      </div>
+                      <div className="md:col-span-2">
+                        <div className="text-emerald-300 text-sm mb-1">{t("sectionSport.modal.coachContacts", "Контакты")}</div>
+                        <div className="text-white font-semibold text-lg">{selectedSection.coachInfo.contacts}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Расписание тренировок */}
+                {selectedSection.trainingSchedule && selectedSection.trainingSchedule.length > 0 && (
+                  <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 rounded-2xl p-6 border border-blue-500/20">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                      <span className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center text-white text-sm mr-3">🕒</span>
+                      {t("sectionSport.modal.trainingSchedule", "Расписание тренировок")}
+                    </h3>
+                    <div className="space-y-3">
+                      {selectedSection.trainingSchedule.map((schedule, index) => (
+                        <div key={index} className="flex justify-between items-center py-3 border-b border-white/10">
+                          <span className="text-emerald-300 text-lg font-medium">
+                            {schedule.day}
+                          </span>
+                          <span className="text-white font-semibold text-lg">
+                            {schedule.time}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };

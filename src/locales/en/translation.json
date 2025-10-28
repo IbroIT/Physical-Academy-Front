@@ -8226,6 +8226,18 @@
     }
   },
   "sectionSport": {
+    "modal": {
+      "coachContacts": "Coach Contacts",
+      "coachRank": "Coach Rank",
+      "coach": "Coach",
+      "coachName": "Coach Name",
+      "schedule": "Schedule",
+      "trainingSchedule": "Training Schedule",
+      "title": "Section Details",
+      "description": "Description",
+      "coachInfo": "Coach Information",
+      "contactInfo": "Contact Information"
+    },
     "title": "Sports Sections of KGAFKiS",
     "subtitle": "The Academy provides wide opportunities for sports activities. Every student can choose a section according to their interests - from athletics to wrestling.",
     "badge": "Sports Sections",
