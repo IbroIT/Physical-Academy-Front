@@ -222,7 +222,7 @@ const SectionSport = () => {
       const res = await fetch(
         `${API_URL}/api/sports/types/?language=${i18n.language}`
       );
-      
+
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       let list = data.results || data;
@@ -237,13 +237,13 @@ const SectionSport = () => {
         if (typeof item === "string") {
           return { id: item, label: item, icon: getSportIcon(item) };
         }
+        // Prefer slug as the filter id so it matches section.sport_type (which is a slug)
+        const slug = item.slug ?? item.key ?? String(item.id);
+        const name = item.label ?? item.name ?? item.title ?? String(item.id);
         return {
-          id: item.id ?? item.key ?? item.slug ?? String(item.id),
-          label: item.label ?? item.name ?? item.title ?? String(item.id),
-          icon:
-            item.icon ??
-            item.emoji ??
-            getSportIcon(item.id ?? item.key ?? item.slug ?? "other"),
+          id: slug,
+          label: name,
+          icon: item.icon ?? item.emoji ?? getSportIcon(slug),
         };
       });
 
