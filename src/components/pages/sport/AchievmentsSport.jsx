@@ -82,47 +82,111 @@ const AchievementsSport = () => {
     all: normalizeAchievements(apiData.achievements),
   };
 
-  // Категории с правильными данными
-  const categories = [
+  // Категории с правильными данными — теперь загружаются с бэкенда (fallback на локальные)
+  const defaultCategoriesTemplate = [
     {
       id: "all",
-      label: t("achievementsSport.categories.all", "Все достижения"),
+      labelKey: "achievementsSport.categories.all",
+      labelDefault: "Все достижения",
       icon: "🏆",
       color: "from-blue-500 to-emerald-500",
-      count: achievementsData.all.length,
     },
     {
       id: "individual",
-      label: t("achievementsSport.categories.individual", "Индивидуальные"),
+      labelKey: "achievementsSport.categories.individual",
+      labelDefault: "Индивидуальные",
       icon: "🏅",
       color: "from-blue-500 to-cyan-500",
-      count: achievementsData.all.filter((a) => a.category === "individual")
-        .length,
     },
     {
       id: "team",
-      label: t("achievementsSport.categories.team", "Командные"),
+      labelKey: "achievementsSport.categories.team",
+      labelDefault: "Командные",
       icon: "👥",
       color: "from-green-500 to-emerald-500",
-      count: achievementsData.all.filter((a) => a.category === "team").length,
     },
     {
       id: "international",
-      label: t("achievementsSport.categories.international", "Международные"),
+      labelKey: "achievementsSport.categories.international",
+      labelDefault: "Международные",
       icon: "🌍",
       color: "from-purple-500 to-blue-500",
-      count: achievementsData.all.filter((a) => a.category === "international")
-        .length,
     },
     {
       id: "olympic",
-      label: t("achievementsSport.categories.olympic", "Олимпийские"),
+      labelKey: "achievementsSport.categories.olympic",
+      labelDefault: "Олимпийские",
       icon: "🥇",
       color: "from-yellow-500 to-orange-500",
-      count: achievementsData.all.filter((a) => a.category === "olympic")
-        .length,
     },
   ];
+
+  const [categories, setCategories] = useState(() => {
+    // initial map with counts computed from current data
+    const countsMap = {};
+    achievementsData.all.forEach(
+      (a) => (countsMap[a.category] = (countsMap[a.category] || 0) + 1)
+    );
+    return defaultCategoriesTemplate.map((c) => ({
+      id: c.id,
+      label: t(c.labelKey, c.labelDefault),
+      icon: c.icon,
+      color: c.color,
+      count:
+        c.id === "all" ? achievementsData.all.length : countsMap[c.id] || 0,
+    }));
+  });
+
+  // Fetch categories/counts from backend statistics endpoint and merge labels
+  const fetchCategoriesData = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      const res = await fetch(
+        `${API_URL}/api/sports/statistics/?language=${i18n.language}`
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const counts = data.achievements_by_category || [];
+
+      const countsMap = {};
+      counts.forEach((it) => {
+        // expected shape {category: 'individual', count: 5}
+        const key =
+          it.category || it["category"] || String(it.id || it.key || "");
+        countsMap[key] = it.count || it.value || 0;
+      });
+
+      // ensure we always have an 'all' count
+      const total =
+        countsMap["all"] ||
+        achievementsData.all.length ||
+        counts.reduce((s, c) => s + (c.count || 0), 0);
+
+      const mapped = defaultCategoriesTemplate.map((c) => ({
+        id: c.id,
+        label: t(c.labelKey, c.labelDefault),
+        icon: c.icon,
+        color: c.color,
+        count:
+          c.id === "all"
+            ? total
+            : countsMap[c.id] ||
+              achievementsData.all.filter((a) => a.category === c.id).length ||
+              0,
+      }));
+
+      setCategories(mapped);
+    } catch (err) {
+      console.error("Error fetching achievement categories:", err);
+      // keep local categories (no-op)
+    }
+  };
+
+  useEffect(() => {
+    fetchCategoriesData();
+    // update when achievements data changes or language changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language, apiData.achievements]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
