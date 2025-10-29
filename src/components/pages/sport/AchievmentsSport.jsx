@@ -136,46 +136,77 @@ const AchievementsSport = () => {
         c.id === "all" ? achievementsData.all.length : countsMap[c.id] || 0,
     }));
   });
+  const [categoriesById, setCategoriesById] = useState({});
 
-  // Fetch categories/counts from backend statistics endpoint and merge labels
+  // Fetch categories metadata from backend and statistics for counts, then merge
   const fetchCategoriesData = async () => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || "";
-      const res = await fetch(
-        `${API_URL}/api/sports/statistics/?language=${i18n.language}`
-      );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const counts = data.achievements_by_category || [];
+      // fetch both endpoints in parallel
+      const [catsRes, statsRes] = await Promise.all([
+        fetch(
+          `${API_URL}/api/sports/achievement-categories/?language=${i18n.language}`
+        ),
+        fetch(`${API_URL}/api/sports/statistics/?language=${i18n.language}`),
+      ]);
 
+      if (!catsRes.ok) throw new Error(`categories HTTP ${catsRes.status}`);
+      if (!statsRes.ok && statsRes.status !== 404)
+        throw new Error(`statistics HTTP ${statsRes.status}`);
+
+      const catsData = await catsRes.json();
+      const statsData = statsRes.ok ? await statsRes.json() : null;
+
+      const catsList = catsData.results || catsData || [];
+      const statsList = (statsData && statsData.achievements_by_category) || [];
+
+      // build counts map keyed by slug or id
       const countsMap = {};
-      counts.forEach((it) => {
-        // expected shape {category: 'individual', count: 5}
+      statsList.forEach((it) => {
         const key =
           it.category || it["category"] || String(it.id || it.key || "");
         countsMap[key] = it.count || it.value || 0;
       });
 
-      // ensure we always have an 'all' count
-      const total =
-        countsMap["all"] ||
-        achievementsData.all.length ||
-        counts.reduce((s, c) => s + (c.count || 0), 0);
+      // build id->slug map for numeric category values returned in achievements
+      const idToSlug = {};
+      catsList.forEach((c) => {
+        if (c && typeof c.id !== "undefined") {
+          idToSlug[c.id] = c.slug || String(c.id);
+        }
+      });
 
-      const mapped = defaultCategoriesTemplate.map((c) => ({
-        id: c.id,
-        label: t(c.labelKey, c.labelDefault),
-        icon: c.icon,
-        color: c.color,
-        count:
-          c.id === "all"
-            ? total
-            : countsMap[c.id] ||
-              achievementsData.all.filter((a) => a.category === c.id).length ||
-              0,
+      // total count: prefer stats total if available
+      const total =
+        statsData && typeof statsData.total_achievements !== "undefined"
+          ? statsData.total_achievements
+          : achievementsData.all.length ||
+            Object.values(countsMap).reduce((s, v) => s + v, 0);
+
+      // map categories from backend and combine counts
+      const mapped = catsList.map((c) => ({
+        id: c.slug || String(c.id),
+        slug: c.slug || String(c.id),
+        numericId: c.id,
+        label: c.name || c.title || c.slug || String(c.id),
+        icon: c.icon || "🏅",
+        color: c.color || "from-blue-500 to-cyan-500",
+        count: countsMap[c.slug] || countsMap[c.id] || 0,
       }));
 
-      setCategories(mapped);
+      // ensure 'all' at beginning
+      const allItem = {
+        id: "all",
+        slug: "all",
+        label: t("achievementsSport.categories.all", "Все достижения"),
+        icon: "🏆",
+        color: "from-blue-500 to-emerald-500",
+        count: total,
+      };
+      const final = [allItem, ...mapped];
+
+      setCategories(final);
+      setCategoriesById(idToSlug);
     } catch (err) {
       console.error("Error fetching achievement categories:", err);
       // keep local categories (no-op)
@@ -235,10 +266,21 @@ const AchievementsSport = () => {
   };
 
   // Фильтрация достижений по выбранной категории
-  const filteredAchievements = achievementsData.all.filter(
-    (achievement) =>
-      activeCategory === "all" || achievement.category === activeCategory
-  );
+  const filteredAchievements = achievementsData.all.filter((achievement) => {
+    if (activeCategory === "all") return true;
+    const achCat = achievement.category;
+    if (!achCat && achCat !== 0) return false;
+    // if category is already a slug string
+    if (typeof achCat === "string") return achCat === activeCategory;
+    // if category is numeric id, map via categoriesById
+    const num = Number(achCat);
+    if (!Number.isNaN(num)) {
+      const slug = categoriesById[num] || String(num);
+      return slug === activeCategory;
+    }
+    // fallback to string compare
+    return String(achCat) === activeCategory;
+  });
 
   const containerVariants = {
     hidden: { opacity: 0 },
