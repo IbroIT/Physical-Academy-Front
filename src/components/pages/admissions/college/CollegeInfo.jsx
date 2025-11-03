@@ -588,7 +588,6 @@ const CollegeInfo = () => {
                             ))
                           ) : (
                             <div className="text-center py-8 text-blue-200">
-                              Программы загружаются...
                             </div>
                           )}
                         </div>
@@ -641,7 +640,6 @@ const CollegeInfo = () => {
                             ))
                           ) : (
                             <div className="text-center py-8 text-blue-200 col-span-2">
-                              Информация о поступлении загружается...
                             </div>
                           )}
                         </div>
@@ -722,7 +720,6 @@ const CollegeInfo = () => {
                     ))
                   ) : (
                     <div className="text-center py-4 text-blue-200">
-                      Информация о руководстве загружается...
                     </div>
                   )}
                 </div>
@@ -761,7 +758,6 @@ const CollegeInfo = () => {
                     ))
                   ) : (
                     <div className="text-center py-4 text-blue-200">
-                      События загружаются...
                     </div>
                   )}
                 </div>
@@ -800,7 +796,6 @@ const CollegeInfo = () => {
                     ))
                   ) : (
                     <div className="text-center py-4 text-blue-200">
-                      Контактная информация загружается...
                     </div>
                   )}
                 </div>
