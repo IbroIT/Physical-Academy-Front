@@ -400,7 +400,7 @@ const ExchangePrograms = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder={t("students.exchange.search") || "Search..."}
+                    placeholder={t("students.exchange.searchPlaceholder") || "Search..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-blue-300 rounded-2xl focus:outline-none focus:border-emerald-400 transition-all duration-300 backdrop-blur-sm"
