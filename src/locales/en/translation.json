@@ -3270,6 +3270,10 @@
       ]
     },
     "exchange": {
+      "searchPlaceholder": "Search exchange programs...",
+      "allRegions": "All Regions",
+      "allDurations": "Any Duration",
+      "noProgramsDesc": "Try changing filter parameters",
       "title": "Exchange Programs",
       "subtitle": "International study opportunities at partner universities worldwide",
       "filters": {
