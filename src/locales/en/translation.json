@@ -669,7 +669,8 @@
       "details": "Details",
       "view": "View",
       "download": "Download",
-      "clearSearch": "Clear Search"
+      "clearSearch": "Clear Search",
+      "preview": "Preview"
     },
     "empty": {
       "search": "No documents found for \"{{searchTerm}}\"",
