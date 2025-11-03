@@ -303,9 +303,6 @@ const BachelorRegistration = () => {
                   <span>{t('bachelor.admission.contacts.address')}</span>
                 </div>
               </div>
-              <button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-green-500 text-white py-3 rounded-lg hover:from-blue-600 hover:to-green-600 transition-all transform hover:scale-105 font-medium border border-white/20 shadow-lg">
-                {t('bachelor.admission.contacts.button')}
-              </button>
             </div>
           </div>
         </div>
