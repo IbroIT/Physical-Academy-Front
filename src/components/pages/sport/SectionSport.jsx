@@ -184,7 +184,7 @@ const SectionSport = () => {
     return colors[sportType] || colors.other;
   };
 
-  const filters = [
+  const defaultFilters = [
     { id: "all", label: t("sectionSport.filters.all", "Все"), icon: "🎯" },
     {
       id: "game",
@@ -212,6 +212,57 @@ const SectionSport = () => {
       icon: "🏃",
     },
   ];
+
+  const [filters, setFilters] = useState(defaultFilters);
+
+  // Fetch filter types from backend: /api/sports/types/?language=...
+  const fetchFiltersData = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      const res = await fetch(
+        `${API_URL}/api/sports/types/?language=${i18n.language}`
+      );
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      let list = data.results || data;
+      if (!Array.isArray(list)) {
+        console.warn("/api/sports/types returned unexpected shape", list);
+        setFilters(defaultFilters);
+        return;
+      }
+
+      const mapped = list.map((item) => {
+        // support simple string items or objects {id,label,icon}
+        if (typeof item === "string") {
+          return { id: item, label: item, icon: getSportIcon(item) };
+        }
+        // Prefer slug as the filter id so it matches section.sport_type (which is a slug)
+        const slug = item.slug ?? item.key ?? String(item.id);
+        const name = item.label ?? item.name ?? item.title ?? String(item.id);
+        return {
+          id: slug,
+          label: name,
+          icon: item.icon ?? item.emoji ?? getSportIcon(slug),
+        };
+      });
+
+      // ensure 'all' exists at beginning
+      if (!mapped.find((m) => m.id === "all")) {
+        mapped.unshift(defaultFilters[0]);
+      }
+
+      setFilters(mapped);
+    } catch (err) {
+      console.error("Error fetching sport filter types:", err);
+      setFilters(defaultFilters);
+    }
+  };
+
+  useEffect(() => {
+    fetchFiltersData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

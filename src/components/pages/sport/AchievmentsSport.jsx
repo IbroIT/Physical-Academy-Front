@@ -82,47 +82,142 @@ const AchievementsSport = () => {
     all: normalizeAchievements(apiData.achievements),
   };
 
-  // Категории с правильными данными
-  const categories = [
+  // Категории с правильными данными — теперь загружаются с бэкенда (fallback на локальные)
+  const defaultCategoriesTemplate = [
     {
       id: "all",
-      label: t("achievementsSport.categories.all", "Все достижения"),
+      labelKey: "achievementsSport.categories.all",
+      labelDefault: "Все достижения",
       icon: "🏆",
       color: "from-blue-500 to-emerald-500",
-      count: achievementsData.all.length,
     },
     {
       id: "individual",
-      label: t("achievementsSport.categories.individual", "Индивидуальные"),
+      labelKey: "achievementsSport.categories.individual",
+      labelDefault: "Индивидуальные",
       icon: "🏅",
       color: "from-blue-500 to-cyan-500",
-      count: achievementsData.all.filter((a) => a.category === "individual")
-        .length,
     },
     {
       id: "team",
-      label: t("achievementsSport.categories.team", "Командные"),
+      labelKey: "achievementsSport.categories.team",
+      labelDefault: "Командные",
       icon: "👥",
       color: "from-green-500 to-emerald-500",
-      count: achievementsData.all.filter((a) => a.category === "team").length,
     },
     {
       id: "international",
-      label: t("achievementsSport.categories.international", "Международные"),
+      labelKey: "achievementsSport.categories.international",
+      labelDefault: "Международные",
       icon: "🌍",
       color: "from-purple-500 to-blue-500",
-      count: achievementsData.all.filter((a) => a.category === "international")
-        .length,
     },
     {
       id: "olympic",
-      label: t("achievementsSport.categories.olympic", "Олимпийские"),
+      labelKey: "achievementsSport.categories.olympic",
+      labelDefault: "Олимпийские",
       icon: "🥇",
       color: "from-yellow-500 to-orange-500",
-      count: achievementsData.all.filter((a) => a.category === "olympic")
-        .length,
     },
   ];
+
+  const [categories, setCategories] = useState(() => {
+    // initial map with counts computed from current data
+    const countsMap = {};
+    achievementsData.all.forEach(
+      (a) => (countsMap[a.category] = (countsMap[a.category] || 0) + 1)
+    );
+    return defaultCategoriesTemplate.map((c) => ({
+      id: c.id,
+      label: t(c.labelKey, c.labelDefault),
+      icon: c.icon,
+      color: c.color,
+      count:
+        c.id === "all" ? achievementsData.all.length : countsMap[c.id] || 0,
+    }));
+  });
+  const [categoriesById, setCategoriesById] = useState({});
+
+  // Fetch categories metadata from backend and statistics for counts, then merge
+  const fetchCategoriesData = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "";
+      // fetch both endpoints in parallel
+      const [catsRes, statsRes] = await Promise.all([
+        fetch(
+          `${API_URL}/api/sports/achievement-categories/?language=${i18n.language}`
+        ),
+        fetch(`${API_URL}/api/sports/statistics/?language=${i18n.language}`),
+      ]);
+
+      if (!catsRes.ok) throw new Error(`categories HTTP ${catsRes.status}`);
+      if (!statsRes.ok && statsRes.status !== 404)
+        throw new Error(`statistics HTTP ${statsRes.status}`);
+
+      const catsData = await catsRes.json();
+      const statsData = statsRes.ok ? await statsRes.json() : null;
+
+      const catsList = catsData.results || catsData || [];
+      const statsList = (statsData && statsData.achievements_by_category) || [];
+
+      // build counts map keyed by slug or id
+      const countsMap = {};
+      statsList.forEach((it) => {
+        const key =
+          it.category || it["category"] || String(it.id || it.key || "");
+        countsMap[key] = it.count || it.value || 0;
+      });
+
+      // build id->slug map for numeric category values returned in achievements
+      const idToSlug = {};
+      catsList.forEach((c) => {
+        if (c && typeof c.id !== "undefined") {
+          idToSlug[c.id] = c.slug || String(c.id);
+        }
+      });
+
+      // total count: prefer stats total if available
+      const total =
+        statsData && typeof statsData.total_achievements !== "undefined"
+          ? statsData.total_achievements
+          : achievementsData.all.length ||
+            Object.values(countsMap).reduce((s, v) => s + v, 0);
+
+      // map categories from backend and combine counts
+      const mapped = catsList.map((c) => ({
+        id: c.slug || String(c.id),
+        slug: c.slug || String(c.id),
+        numericId: c.id,
+        label: c.name || c.title || c.slug || String(c.id),
+        icon: c.icon || "🏅",
+        color: c.color || "from-blue-500 to-cyan-500",
+        count: countsMap[c.slug] || countsMap[c.id] || 0,
+      }));
+
+      // ensure 'all' at beginning
+      const allItem = {
+        id: "all",
+        slug: "all",
+        label: t("achievementsSport.categories.all", "Все достижения"),
+        icon: "🏆",
+        color: "from-blue-500 to-emerald-500",
+        count: total,
+      };
+      const final = [allItem, ...mapped];
+
+      setCategories(final);
+      setCategoriesById(idToSlug);
+    } catch (err) {
+      console.error("Error fetching achievement categories:", err);
+      // keep local categories (no-op)
+    }
+  };
+
+  useEffect(() => {
+    fetchCategoriesData();
+    // update when achievements data changes or language changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language, apiData.achievements]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -171,10 +266,21 @@ const AchievementsSport = () => {
   };
 
   // Фильтрация достижений по выбранной категории
-  const filteredAchievements = achievementsData.all.filter(
-    (achievement) =>
-      activeCategory === "all" || achievement.category === activeCategory
-  );
+  const filteredAchievements = achievementsData.all.filter((achievement) => {
+    if (activeCategory === "all") return true;
+    const achCat = achievement.category;
+    if (!achCat && achCat !== 0) return false;
+    // if category is already a slug string
+    if (typeof achCat === "string") return achCat === activeCategory;
+    // if category is numeric id, map via categoriesById
+    const num = Number(achCat);
+    if (!Number.isNaN(num)) {
+      const slug = categoriesById[num] || String(num);
+      return slug === activeCategory;
+    }
+    // fallback to string compare
+    return String(achCat) === activeCategory;
+  });
 
   const containerVariants = {
     hidden: { opacity: 0 },
