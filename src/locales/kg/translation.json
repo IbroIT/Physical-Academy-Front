@@ -4396,24 +4396,24 @@
       "address": {
         "title": "Дарек",
         "description": "Академиянын негизги кампусу",
-        "text": "Спорттуу көч., 123, Москва ш., 123456"
+        "text": "Ахунбаева көчөсү, 97, Бишкек, Кыргызстан"
       },
       "phone": {
         "title": "Телефондор",
         "description": "Техникалык колдоо",
         "numbers": [
-          { "label": "Кабыл алуу комиссиясы", "number": "+7 (999) 111-11-11" },
-          { "label": "Спорт бөлүмү", "number": "+7 (999) 222-22-22" },
-          { "label": "Медициналык пункт", "number": "+7 (999) 333-33-33" }
+          { "label": "Кабыл алуу комиссиясы", "number": "+996 (312) 57 04 89" },
+          { "label": "Спорт бөлүмү", "number": "+996 (312) 57 04 90" },
+          { "label": "Медициналык пункт", "number": "+996 (312) 57 04 91" }
         ]
       },
       "email": {
         "title": "Email",
         "description": "2 саат ичинде тез жооп",
         "addresses": [
-          { "label": "Жалпы суроолор", "address": "info@sports-academy.edu" },
-          { "label": "Кабыл алуу", "address": "admission@sports-academy.edu" },
-          { "label": "Тренерлер үчүн", "address": "coaching@sports-academy.edu" }
+          { "label": "Жалпы суроолор", "address": "sport_akadem@mail.ru" },
+          { "label": "Кабыл алуу", "address": "sport_akadem@mail.ru" },
+          { "label": "Тренерлер үчүн", "address": "sport_akadem@mail.ru" }
         ]
       },
       "hours": {
@@ -4634,7 +4634,7 @@
     },
     "map": {
       "bishkekKyrgyzstan": "Бишкек, Кыргызстан",
-      "address": "Жукеева-Пудовкина көч., 114",
+      "address": "Ахунбаева көчөсү, 97",
       "title": "Бизди кантип табасыз",
       "subtitle": "Академиянын дареги жана жол жүрүү ыкмалары",
       "interactiveMap": "Интерактивдүү карта",
@@ -4659,7 +4659,7 @@
       "workingHours": "Иш сааттары",
       "hours": "Дүй-Жүм: 9:00-18:00",
       "contactPhone": "Телефон",
-      "phoneNumber": "+7 (999) 123-45-67",
+      "phoneNumber": "+996 (312) 57-04-89",
       "views": {
         "standard": "Стандарттуу",
         "satellite": "Спутник",

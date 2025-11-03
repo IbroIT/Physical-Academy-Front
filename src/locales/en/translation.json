@@ -4383,24 +4383,24 @@
       "address": {
         "title": "Address",
         "description": "Main academy campus",
-        "text": "Sportivnaya St., 123, Moscow, 123456"
+        "text": "Akhunbaeva St, 97, Bishkek, Kyrgyzstan"
       },
       "phone": {
         "title": "Phones",
         "description": "24/7 support",
         "numbers": [
-          { "label": "Admissions Office", "number": "+7 (999) 111-11-11" },
-          { "label": "Sports Department", "number": "+7 (999) 222-22-22" },
-          { "label": "Medical Office", "number": "+7 (999) 333-33-33" }
+          { "label": "Admissions Office", "number": "+996 (312) 57 04 89" },
+          { "label": "Sports Department", "number": "+996 (312) 57 04 90" },
+          { "label": "Medical Office", "number": "+996 (312) 57 04 91" }
         ]
       },
       "email": {
         "title": "Email",
         "description": "Quick response within 2 hours",
         "addresses": [
-          { "label": "General Questions", "address": "info@sports-academy.edu" },
-          { "label": "Admissions", "address": "admission@sports-academy.edu" },
-          { "label": "Coaching", "address": "coaching@sports-academy.edu" }
+          { "label": "General Questions", "address": "sport_akadem@mail.ru" },
+          { "label": "Admissions", "address": "sport_akadem@mail.ru" },
+          { "label": "Coaching", "address": "sport_akadem@mail.ru" }
         ]
       },
       "hours": {
@@ -4621,7 +4621,7 @@
     },
     "map": {
       "bishkekKyrgyzstan": "Bishkek, Kyrgyzstan",
-      "address": "Zhukeeva Pudovkina St., 114",
+      "address": "Akhunbaeva St, 97",
       "title": "How to Find Us",
       "subtitle": "Academy address and directions",
       "interactiveMap": "Interactive Map",
@@ -4646,7 +4646,7 @@
       "workingHours": "Working Hours",
       "hours": "Mon-Fri: 9:00-18:00",
       "contactPhone": "Phone",
-      "phoneNumber": "+7 (999) 123-45-67",
+      "phoneNumber": "+996 (312) 57-04-89",
       "views": {
         "standard": "Standard",
         "satellite": "Satellite",

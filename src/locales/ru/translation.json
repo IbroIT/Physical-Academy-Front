@@ -4334,24 +4334,24 @@
       "address": {
         "title": "Адрес",
         "description": "Главный кампус академии",
-        "text": "ул. Спортивная, 123, г. Москва, 123456"
+        "text": "ул. Ахунбаева, 97, Бишкек, Кыргызстан"
       },
       "phone": {
         "title": "Телефоны",
         "description": "Круглосуточная поддержка",
         "numbers": [
-          { "label": "Приемная комиссия", "number": "+7 (999) 111-11-11" },
-          { "label": "Спортивный отдел", "number": "+7 (999) 222-22-22" },
-          { "label": "Медпункт", "number": "+7 (999) 333-33-33" }
+          { "label": "Приемная комиссия", "number": "+996 (312) 57 04 89" },
+          { "label": "Спортивный отдел", "number": "+996 (312) 57 04 90" },
+          { "label": "Медпункт", "number": "+996 (312) 57 04 91" }
         ]
       },
       "email": {
         "title": "Email",
         "description": "Быстрый ответ в течение 2 часов",
         "addresses": [
-          { "label": "Общие вопросы", "address": "info@sports-academy.edu" },
-          { "label": "Поступления", "address": "admission@sports-academy.edu" },
-          { "label": "Тренерам", "address": "coaching@sports-academy.edu" }
+          { "label": "Общие вопросы", "address": "sport_akadem@mail.ru" },
+          { "label": "Поступления", "address": "sport_akadem@mail.ru" },
+          { "label": "Тренерам", "address": "sport_akadem@mail.ru" }
         ]
       },
       "hours": {
@@ -4572,7 +4572,7 @@
     },
     "map": {
       "bishkekKyrgyzstan": "Бишкек, Кыргызстан",
-      "address": "ул. Жукеева-Пудовкина 114",
+      "address": "ул. Ахунбаева, 97",
       "title": "Как нас найти",
       "subtitle": "Адрес академии и способы проезда",
       "interactiveMap": "Интерактивная карта",
@@ -4597,7 +4597,7 @@
       "workingHours": "Часы работы",
       "hours": "Пн-Пт: 9:00-18:00",
       "contactPhone": "Телефон",
-      "phoneNumber": "+7 (999) 123-45-67",
+      "phoneNumber": "+996 (312) 57-04-89",
       "views": {
         "standard": "Стандартная",
         "satellite": "Спутник",
