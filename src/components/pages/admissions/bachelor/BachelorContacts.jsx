@@ -36,8 +36,8 @@ const BachelorContacts = () => {
     {
       id: 'admission',
       name: t('bachelor.contacts.departments.admission.name', 'Приемная комиссия'),
-      email: 'admission@academy.ru',
-      phone: '+7 (999) 123-45-67',
+      email: 'sport_akadem@mail.ru',
+      phone: '+996 (312) 57 04 89',
       hours: t('bachelor.contacts.departments.admission.hours', 'Пн-Пт: 9:00-18:00'),
       description: t('bachelor.contacts.departments.admission.description', 'Вопросы поступления, документы, вступительные испытания'),
       icon: '📝',
@@ -46,8 +46,8 @@ const BachelorContacts = () => {
     {
       id: 'international',
       name: t('bachelor.contacts.departments.international.name', 'Международный отдел'),
-      email: 'international@academy.ru',
-      phone: '+7 (999) 123-45-68',
+      email: 'sport_akadem@mail.ru',
+      phone: '+996 (312) 57 04 88',
       hours: t('bachelor.contacts.departments.international.hours', 'Пн-Пт: 10:00-17:00'),
       description: t('bachelor.contacts.departments.international.description', 'Иностранным абитуриентам, визовая поддержка'),
       icon: '🌍',
@@ -56,8 +56,8 @@ const BachelorContacts = () => {
     {
       id: 'quotas',
       name: t('bachelor.contacts.departments.quotas.name', 'Отдел квот и грантов'),
-      email: 'quotas@academy.ru',
-      phone: '+7 (999) 123-45-69',
+      email: 'sport_akadem@mail.ru',
+      phone: '+996 (312) 57 04 87',
       hours: t('bachelor.contacts.departments.quotas.hours', 'Пн-Чт: 9:00-17:00, Пт: 9:00-16:00'),
       description: t('bachelor.contacts.departments.quotas.description', 'Бюджетные места, стипендии, образовательные гранты'),
       icon: '🎓',
@@ -66,8 +66,8 @@ const BachelorContacts = () => {
     {
       id: 'general',
       name: t('bachelor.contacts.departments.general.name', 'Общий отдел'),
-      email: 'info@academy.ru',
-      phone: '+7 (999) 123-45-70',
+      email: 'sport_akadem@mail.ru',
+      phone: '+996 (312) 57 04 86',
       hours: t('bachelor.contacts.departments.general.hours', 'Пн-Пт: 8:00-19:00'),
       description: t('bachelor.contacts.departments.general.description', 'Общие вопросы, административные вопросы'),
       icon: '🏛️',
