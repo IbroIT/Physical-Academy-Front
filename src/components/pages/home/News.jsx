@@ -68,7 +68,7 @@ const NewsHomePage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-cyan-600 text-xl">Загрузка новостей...</div>
+        <div className="text-cyan-600 text-xl"></div>
       </div>
     );
   }
@@ -84,7 +84,7 @@ const NewsHomePage = () => {
   if (newsData.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600 text-xl">Нет доступных новостей</div>
+        <div className="text-gray-600 text-xl"></div>
       </div>
     );
   }

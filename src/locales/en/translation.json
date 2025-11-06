@@ -1,10 +1,12 @@
 {
   "nav": {
+    "kgafkis": "KSaPCS",
     "sport": "Sport",
     "sections": "Sections",
     "infrastructure": "Infrastructure",
     "achievements": "Sport Achievements",
-    "academy": "Academy",
+    "academy": "Home",
+    "about_academyy": "KSaPCS",
     "about_academy": "About Academy",
     "history": "History",
     "mission_strategy": "Mission & Strategy",
@@ -43,7 +45,8 @@
     "science": "Science",
     "scientific_publications": "Scientific Publications",
     "vestnik": "Vestnik",
-    "web_of_science": "Web of Science",
+    "web_of_science": "Scientometric databases",
+    "ipchain": "IPChain",
     "scopus": "Scopus",
     "research_and_technical_council": "Research & Technical Council",
     "student_scientific_society": "Student Scientific Society",
@@ -54,6 +57,8 @@
     "exchange_programs": "Exchange Programs",
     "instructions": "Instructions",
     "scholarship": "Scholarship",
+    "my_edu": "MyEdu",
+    "portal_login": "Enter to MyEdu",
     "useful_links": "Useful Links",
     "ebilim_login": "eBilim Login",
     "visa_support": "Visa Support",
@@ -63,6 +68,56 @@
     "logo_alt": "KGAFKiS Logo",
     "open_menu": "Open Menu",
     "close_menu": "Close Menu"
+  },
+  "newsDetail": {
+    "loading": "Loading news...",
+    "header": {
+      "back": "Back to news",
+      "share": "Share"
+    },
+    "errors": {
+      "notFound": "News not found on server",
+      "loading": "Loading error",
+      "noId": "News ID not specified"
+    },
+    "error": {
+      "title": "Something went wrong",
+      "notFound": "News not found",
+      "homeButton": "Home",
+      "retryButton": "Try again"
+    },
+    "share": {
+      "copied": "Link copied to clipboard!",
+      "error": "Error while trying to share"
+    },
+    "photoCounter": "{{count}} photos • Click to view",
+    "gallery": {
+      "title": "Image gallery",
+      "photoCount": "{{count}} photos",
+      "photoNumber": "Photo {{number}}"
+    },
+    "defaultCategory": "General",
+    "meta": {
+      "readTime": "2 min read",
+      "views": "{{count}} views"
+    },
+    "content": {
+      "soon": "Full news content will be available soon..."
+    },
+    "lightbox": {
+      "counter": "{{current}} / {{total}}",
+      "photoInfo": "{{title}} - Photo {{number}}",
+      "thumbnailAlt": "Thumbnail {{number}}"
+    },
+    "fallback": {
+      "title": "Interesting news",
+      "description": "Learn more about this exciting news.",
+      "fullContent": "This is fallback content that is shown when server data is unavailable. Please check your internet connection and try again.",
+      "category": "General",
+      "author": "Editorial",
+      "tags": ["news", "information"],
+      "readTime": "2 min read"
+    }
   },
 "vestnik": {
       "errorTitle": "Data Loading Error",
@@ -887,8 +942,8 @@
       },
       "contacts": {
         "title": "Contacts",
-        "email": "admission@academy.ru",
-        "phone": "+7 (495) 123-45-67",
+        "email": "sport_akadem@mail.ru",
+        "phone": "996 (312) 57 04 89",
         "address": "Main building, room 101"
       },
       "steps": {
@@ -1088,22 +1143,22 @@
       "departments": {
         "admission": {
           "name": "Admissions Committee",
-          "hours": "Mon-Fri: 9:00-18:00",
+          "hours": "Mon-Fri: 8:00-17:00",
           "description": "Admission questions, documents, entrance exams"
         },
         "international": {
           "name": "International Department",
-          "hours": "Mon-Fri: 10:00-17:00",
+          "hours": "Mon-Fri: 8:00-17:00",
           "description": "International applicants, visa support"
         },
         "quotas": {
           "name": "Quotas and Grants Department",
-          "hours": "Mon-Thu: 9:00-17:00, Fri: 9:00-16:00",
+          "hours": "Mon-Fri: 8:00-17:00",
           "description": "Budget spots, scholarships, educational grants"
         },
         "general": {
           "name": "General Department",
-          "hours": "Mon-Fri: 8:00-19:00",
+          "hours": "Mon-Fri: 8:00-17:00",
           "description": "General questions, administrative issues"
         }
       },
@@ -1129,13 +1184,8 @@
       },
       "address": {
         "title": "Academy Address",
-        "street": "Primernaya St., 123",
-        "city": "Moscow, 123456"
-      },
-      "transport": {
-        "title": "How to get here",
-        "metro": "Metro: Primernaya Station",
-        "bus": "Buses: 123, 456, 789"
+        "street": "Akhunbaeva St, 97",
+        "city": "Bishkek, Kyrgyzstan"
       }
     },
     "actions": {
@@ -1904,8 +1954,9 @@
   "science": {
     "sections": {
       "ipchain": {
-        "title": "IPChain",
-        "subtitle": "Blockchain for Intellectual Property",
+        "title": "IPChain Platform",
+        "subtitle": "Blockchain-powered Intellectual Property Management",
+        "error": "Failed to load data",
         "tabs": {
           "overview": "Overview",
           "patents": "Patents",
@@ -1913,130 +1964,155 @@
           "benefits": "Benefits"
         },
         "overview": {
-          "title": "IPChain Technology",
-          "description": "IPChain is a distributed ledger for intellectual property rights registration and management, ensuring transparency and data immutability.",
+          "title": "Blockchain IP Management Platform",
+          "description": "Revolutionary intellectual property management system leveraging blockchain technology for secure, transparent, and efficient IP rights protection and commercialization.",
+          "buttonText": "Explore Platform",
           "stats": [
             {
-              "value": "150+",
-              "label": "Registered Patents"
+              "value": "50+",
+              "label": "Patents Filed"
             },
             {
-              "value": "95%",
-              "label": "Registration Time Reduction"
-            },
-            {
-              "value": "24/7",
-              "label": "System Access"
+              "value": "25+",
+              "label": "Countries"
             },
             {
               "value": "100%",
-              "label": "Forgery Protection"
+              "label": "Secure"
+            },
+            {
+              "value": "24/7",
+              "label": "Monitoring"
             }
           ],
-          "buttonText": "More on IPChain",
           "blockchainCard": {
             "icon": "🔗",
-            "title": "Blockchain Technology",
-            "description": "Reliable intellectual property protection"
+            "title": "Blockchain Powered",
+            "description": "Every intellectual property asset is securely timestamped and immutably recorded on our distributed ledger technology."
           }
         },
         "patents": {
-          "title": "Registered Patents",
-          "buttonText": "More Details",
-          "items": [
-            {
-              "title": "Sports Data Management System",
-              "number": "RU 2023123456",
-              "description": "Innovative system for collecting and analyzing sports indicators in real time",
-              "icon": "📜",
-              "status": "Active",
-              "year": "2023",
-              "date": "15.03.2023",
-              "dateLabel": "📅"
-            },
-            {
-              "title": "Biomechanical Analysis Method",
-              "number": "RU 2023123457",
-              "description": "Unique methodology for analyzing athlete movements using AI",
-              "icon": "🔬",
-              "status": "Active",
-              "year": "2023",
-              "date": "20.04.2023",
-              "dateLabel": "📅"
-            },
-            {
-              "title": "Virtual Reality Trainer",
-              "number": "RU 2023123458",
-              "description": "Specialized trainer for athlete preparation in VR environment",
-              "icon": "🥽",
-              "status": "Active",
-              "year": "2023",
-              "date": "10.05.2023",
-              "dateLabel": "📅"
-            }
-          ]
-        },
+  "title": "Intellectual Property Portfolio",
+  "buttonText": "View Full Patent Details",
+  "dateLabel": "Filed:",
+  "modal": {
+    "statusLabel": "Status",
+    "yearLabel": "Year",
+    "filedLabel": "Filed",
+    "technologiesTitle": "Key Technologies",
+    "applicationsTitle": "Applications",
+    "downloadButton": "Download Patent PDF",
+    "contactButton": "Contact IP Department",
+    "detailedDescription": "Detailed Description",
+    "defaultTechnologies": [
+      "Blockchain Verification",
+      "Cryptographic Security",
+      "Smart Contracts",
+      "Distributed Ledger"
+    ],
+    "defaultApplications": [
+      "IP Rights Management",
+      "Digital Asset Protection",
+      "Royalty Distribution",
+      "Cross-border Verification"
+    ]
+  },
+  "items": [
+    {
+      "title": "Blockchain IP Verification System",
+      "number": "US20240012345A1",
+      "description": "A revolutionary system for verifying intellectual property rights using blockchain technology with enhanced security features and automated validation processes.",
+      "fullDescription": "This patent describes a comprehensive system for intellectual property verification leveraging blockchain technology. It includes methods for timestamping, cryptographic proof generation, and automated validation processes that ensure the integrity and authenticity of IP assets. The system is designed to be scalable and interoperable across different blockchain networks.",
+      "status": "Granted",
+      "year": "2024",
+      "date": "2024-03-15",
+      "icon": "🔒",
+      "technologies": [
+        "Blockchain Verification",
+        "Cryptographic Security",
+        "Smart Contracts",
+        "Distributed Ledger"
+      ],
+      "applications": [
+        "IP Rights Management",
+        "Digital Asset Protection",
+        "Royalty Distribution",
+        "Cross-border Verification"
+      ]
+    }
+  ]
+},
         "blockchain": {
-          "title": "Blockchain Technologies",
-          "featuresTitle": "Technology Advantages",
-          "hashesTitle": "Hash Identifiers",
+          "title": "Blockchain Technology",
+          "featuresTitle": "Core Features",
+          "hashesTitle": "Live Blockchain Data",
           "features": [
             {
-              "title": "Data Immutability",
-              "description": "All records are cryptographically protected and cannot be changed"
+              "title": "Immutable Records",
+              "description": "All IP registrations are permanently stored on blockchain with cryptographic proof of existence"
             },
             {
-              "title": "Transparency",
-              "description": "Complete transaction history available for verification"
+              "title": "Smart Contracts",
+              "description": "Automated licensing and royalty distribution through self-executing smart contracts"
             },
             {
-              "title": "Security",
-              "description": "Distributed architecture provides protection against hacking"
+              "title": "Global Verification",
+              "description": "Instant verification of IP rights across international jurisdictions"
             },
             {
-              "title": "Automation",
-              "description": "Smart contracts automate rights management processes"
+              "title": "Real-time Monitoring",
+              "description": "24/7 monitoring of IP usage and automatic infringement detection"
             }
           ],
           "hashes": [
             {
-              "label": "Patent #1",
-              "value": "0x1a2b3c4d5e6f7890abc123def456ghi789jkl012mno345pqr678stu901vwx234yz5"
+              "label": "Current Block",
+              "value": "15,842,367"
             },
             {
-              "label": "Patent #2",
-              "value": "0x6f7890abc123def456ghi789jkl012mno345pqr678stu901vwx234yz51a2b3c4d5e"
+              "label": "IP Registrations",
+              "value": "2,847"
             },
             {
-              "label": "Patent #3",
-              "value": "0xdef456ghi789jkl012mno345pqr678stu901vwx234yz51a2b3c4d5e6f7890abc123"
+              "label": "Smart Contracts",
+              "value": "1,563"
+            },
+            {
+              "label": "Network Hash",
+              "value": "0x8f3a...c42b"
             }
           ]
         },
         "benefits": {
-          "title": "IPChain Benefits",
+          "title": "Platform Benefits",
           "items": [
             {
-              "icon": "⚡",
-              "title": "Speed",
-              "description": "Instant intellectual property rights registration"
+              "title": "Enhanced Security",
+              "description": "Military-grade encryption and decentralized storage protect your intellectual property",
+              "icon": "🛡️"
             },
             {
-              "icon": "🔒",
-              "title": "Security",
-              "description": "Cryptographic protection and distributed data storage"
+              "title": "Cost Efficient",
+              "description": "Reduce IP management costs by up to 70% with automated processes",
+              "icon": "💰"
             },
             {
-              "icon": "💸",
-              "title": "Savings",
-              "description": "Reduced costs for legal support and registration"
+              "title": "Global Protection",
+              "description": "Single registration provides international IP protection coverage",
+              "icon": "🌍"
             },
             {
-              "icon": "🌐",
-              "title": "Accessibility",
-              "description": "24/7 system access from anywhere in the world"
+              "title": "Instant Verification",
+              "description": "Verify IP ownership and rights in seconds with blockchain technology",
+              "icon": "⚡"
             }
-          ]
+          ],
+          "cta": {
+            "title": "Ready to Secure Your Intellectual Property?",
+            "description": "Join hundreds of innovators already protecting their creations with our blockchain-powered IP management platform.",
+            "primaryButton": "Start Free Trial",
+            "secondaryButton": "Schedule Demo"
+          }
         }
       },
       "webofscience": {
@@ -2770,22 +2846,22 @@
       "phone": {
         "icon": "📞",
         "label": "Phone",
-        "value": "+7 (495) 123-45-67"
+        "value": "+996 (312) 57 04 89"
       },
       "email": {
         "icon": "📧",
         "label": "Email",
-        "value": "coaching@university.ru"
+        "value": " sport_akadem@mail.ru"
       },
       "address": {
         "icon": "🏢",
         "label": "Address",
-        "value": "Moscow, Sportivnaya St., 10"
+        "value": "Bishkek, Akhunbaeva St, 97"
       },
       "workingHours": {
         "icon": "🕒",
         "label": "Working Hours",
-        "value": "Mon-Fri: 9:00-18:00"
+        "value": "Mon-Fri: 8:00-17:00"
       }
     },
     "dean": {
@@ -2793,7 +2869,7 @@
       "name": "Smirnov Alexey Vasilievich",
       "position": "Faculty Dean",
       "degree": "Doctor of Pedagogical Sciences, Professor",
-      "email": "dean.coaching@university.ru"
+      "email": " sport_akadem@mail.ru"
     }
   },
   "correspondenceTraining": {
@@ -2990,10 +3066,10 @@
     ],
     "contacts": {
       "title": "Contact Information",
-      "phone": "+7 (495) 123-45-67",
-      "email": "distance@academy.edu",
-      "address": "Distantsionnaya St., 15, office 301",
-      "workingHours": "Mon-Fri: 9:00-18:00, Sat: 10:00-15:00",
+      "phone": "+996 (312) 57 04 89",
+      "email": " sport_akadem@mail.ru",
+      "address": "Akhunbaeva St, 97",
+      "workingHours": "Mon-Fri: 8:00-17:00",
       "support": "support@academy.edu"
     },
     "leadership": {
@@ -3003,7 +3079,7 @@
         "name": "Ivanova Maria Sergeevna",
         "position": "Dean of Correspondence Education Faculty",
         "degree": "Doctor of Pedagogical Sciences, Professor",
-        "email": "dean.distance@academy.edu"
+        "email": " sport_akadem@mail.ru"
       }
     }
   },
@@ -3184,10 +3260,10 @@
     ],
 
     "contacts": {
-      "phone": "+7 (495) 123-45-67",
-      "email": "military@sports-academy.ru",
-      "address": "Moscow, Voennaya St., 10, room 101",
-      "workingHours": "Mon-Fri: 9:00-18:00"
+      "phone": "+996 (312) 57 04 89",
+      "email": " sport_akadem@mail.ru",
+      "address": "Bishkek, Akhunbaeva St, 97",
+      "workingHours": "Mon-Fri: 8:00-17:00"
     },
 
     "dean": {
@@ -3196,7 +3272,7 @@
       "position": "Head of Military Training Faculty",
       "education": "Higher Military Education, Candidate of Military Sciences",
       "avatar": "👨‍✈️",
-      "email": "dean.military@sports-academy.ru"
+      "email": " sport_akadem@mail.ru"
     }
   },
   "students": {
@@ -3731,18 +3807,18 @@
             "icon": "👤",
             "name": "Maria Ivanova Petrovna",
             "position": "Coordinator for Students with Disabilities",
-            "phone": "+7 (999) 123-45-67",
-            "email": "disabilities@college.ru",
-            "hours": "Mon-Fri: 9:00-18:00",
+            "phone": "+996 (312) 57 04 89",
+            "email": " sport_akadem@mail.ru",
+            "hours": "Mon-Fri: 8:00-17:00",
             "location": "Room 215, main building"
           },
           {
             "icon": "👨‍⚕️",
             "name": "Alexey Petrov Vladimirovich",
             "position": "Psychological Consultant",
-            "phone": "+7 (999) 123-45-68",
-            "email": "psychologist@college.ru",
-            "hours": "Mon-Wed-Fri: 10:00-17:00",
+            "phone": "+996 (312) 57 04 88",
+            "email": " sport_akadem@mail.ru",
+            "hours": "Mon-Wed-Fri: 8:00-17:00",
             "location": "Room 312, main building"
           },
           {
@@ -5602,7 +5678,7 @@
       "weekdays": "Mon-Fri",
       "saturday": "Saturday",
       "sunday": "Sunday",
-      "weekdaysTime": "9:00 - 18:00",
+      "weekdaysTime": "8:00 - 17:00",
       "saturdayTime": "10:00 - 16:00",
       "closed": "Closed"
     },
@@ -5669,7 +5745,6 @@
   "announcements": {
     "title": "University Announcements",
     "subtitle": "Current information about events, educational process and important events",
-    "readMore": "Read More",
     "share": "Share",
     "allAnnouncements": "All Announcements",
     "urgency": {
@@ -5732,16 +5807,62 @@
       }
     ],
     "detail": {
+      "loading": "Loading announcement...",
+      "header": {
+        "back": "Back to announcements",
+        "share": "Share"
+      },
+      "errors": {
+        "notFound": "Announcement not found on server",
+        "loading": "Loading error",
+        "noId": "Announcement ID not specified"
+      },
+      "error": {
+        "title": "Something went wrong",
+        "notFound": "Announcement not found",
+        "backButton": "To announcements",
+        "retryButton": "Try again"
+      },
+      "share": {
+        "copied": "Link copied to clipboard!",
+        "error": "Error while trying to share"
+      },
+      "photoCounter": "{{count}} photos • Click to view",
+      "gallery": {
+        "title": "Image gallery",
+        "photoCount": "{{count}} photos",
+        "photoNumber": "Photo {{number}}"
+      },
+      "defaultCategory": "General",
+      "defaultDepartment": "University",
+      "author": "Author",
+      "meta": {
+        "readTime": "2 min read",
+        "views": "{{count}} views"
+      },
+      "content": {
+        "soon": "Full announcement content will be available soon..."
+      },
+      "lightbox": {
+        "counter": "{{current}} / {{total}}",
+        "photoInfo": "{{title}} - Photo {{number}}",
+        "thumbnailAlt": "Thumbnail {{number}}"
+      },
+      "fallback": {
+        "title": "University Announcement",
+        "description": "Important information from the university administration.",
+        "fullContent": "This is fallback content that is shown when server data is unavailable. Please check your internet connection and try again.",
+        "category": "General",
+        "department": "Administration",
+        "author": "University Administration",
+        "tags": ["university", "announcement"],
+        "readTime": "2 min read"
+      },
       "notFound": "Announcement Not Found",
       "backToAnnouncements": "Back to Announcements List",
       "readMore": "Read More",
       "shareCopied": "Link copied to clipboard!",
       "shareError": "Error when trying to share:",
-      "content": [
-        "This is detailed announcement description containing all necessary information about event, educational process or important university event.",
-        "All university students and staff must be familiar with this information. Please understand organizational aspects.",
-        "In case of questions, contact relevant university department for additional information."
-      ],
       "quote": "University strives to create comfortable conditions for learning and development of all students. Your participation in university life is important for us.",
       "features": [
         {

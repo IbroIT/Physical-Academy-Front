@@ -173,18 +173,6 @@ const AboutAcademy = () => {
                   {t('about.mission.description')}
                 </p>
               </div>
-              
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl p-8 text-white"
-              >
-                <h3 className="text-2xl font-bold mb-4">
-                  {t('about.vision.title')}
-                </h3>
-                <p className="text-blue-100">
-                  {t('about.vision.description')}
-                </p>
-              </motion.div>
 
               {/* Интерактивные фичи под текстом */}
               <div className="grid grid-cols-2 gap-4 mt-8">

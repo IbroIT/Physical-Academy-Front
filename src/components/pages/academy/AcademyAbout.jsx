@@ -411,41 +411,6 @@ const AcademyAbout = () => {
           <LoadingSkeleton />
         ) : (
           <>
-            <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 transition-all duration-1000 delay-300 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}>
-              {stats.map((stat, index) => (
-                <div 
-                  key={index}
-                  className="group relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl transition-all duration-500 hover:scale-105 hover:border-green-400/30 text-center"
-                >
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center text-2xl mb-4 mx-auto group-hover:scale-110 transition-transform duration-300`}>
-                    {stat.icon}
-                  </div>
-
-                  <div className="text-3xl md:text-4xl font-bold text-white mb-2 font-mono">
-                    {stat.number}
-                    <span className="text-green-300">{stat.suffix}</span>
-                  </div>
-
-                  <div className="text-blue-100 font-medium text-sm md:text-base">{stat.label}</div>
-
-                  <div className="mt-4">
-                    <div className="w-full bg-white/20 rounded-full h-1">
-                      <div
-                        className="bg-gradient-to-r from-green-400 to-green-500 h-1 rounded-full transition-all duration-2000"
-                        style={{ 
-                          width: isVisible ? `${(stat.number / (backendData.stats[index]?.value || [15, 10000, 50, 98][index])) * 100}%` : '0%'
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-ping"></div>
-                </div>
-              ))}
-            </div>
-
             {/* Основной контент */}
             <div className="grid lg:grid-cols-2 gap-8 md:gap-12 mb-12 md:mb-16">
               {/* Текстовый контент и фичи */}

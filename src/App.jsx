@@ -161,6 +161,7 @@ function App() {
                   <Route path="/science/nts" element={<ScientificCouncil />} />
                   <Route path="/science/nts-committee" element={<NTSCommittee />} />
                   <Route path="/science/ssu" element={<StudentScientificSociety />} />
+                  
 
                   {/* Students routes */}
                   <Route path="/students/info" element={<UsefulInfo />} />
@@ -183,6 +184,7 @@ function App() {
 
                   {/* Fallback route */}
                   <Route path="*" element={<Home />} />
+
                 </Routes>
               </main>
               <Footer />

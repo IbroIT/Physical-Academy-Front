@@ -23,12 +23,11 @@ const Home = () => {
       <SeoHead pageKey="home" />
       <OrganizationSchema />
       <BreadcrumbSchema />
-        <Banner />  
-        <AboutAcademy />
+        <Banner />
         <News />
-        <QuotesBanner />
         <AdsPage />
-        <UniversityEventsPage />
+        <QuotesBanner />
+        <AboutAcademy />
         <Facts />
     </div>
   )
