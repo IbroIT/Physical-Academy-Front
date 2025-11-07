@@ -414,14 +414,6 @@ const Ipchain = () => {
                         </motion.div>
                       ))}
                     </motion.div>
-                    
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-8 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl hover:from-purple-600 hover:to-blue-600 transition-all duration-300 font-semibold shadow-lg"
-                    >
-                      {translations.overview?.buttonText}
-                    </motion.button>
                   </motion.div>
                   
                   <motion.div
