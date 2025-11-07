@@ -225,28 +225,28 @@ const AcademyAbout = () => {
     return [
       {
         type: 'image',
-        url: '/images/academy/campus.jpg',
+        url: 'https://data.kaktus.media/image/big/2018-06-18_17-39-15_124172.jpg',
         title: t('academy.about.media.campus'),
         description: t('academy.about.media.campusDesc'),
         thumbnail: '/images/academy/campus-thumb.jpg'
       },
       {
         type: 'image', 
-        url: '/images/academy/virtual-tour.jpg',
+        url: 'https://blog.virtualtoureasy.com/wp-content/uploads/2020/08/vr2_14d8abc47bd9d93f20e279579f16416b_2000.jpg',
         title: t('academy.about.media.virtualTour'),
         description: t('academy.about.media.virtualTourDesc'),
         thumbnail: '/images/academy/tour-thumb.jpg'
       },
       {
         type: 'image',
-        url: '/images/academy/labs.jpg',
+        url: 'https://img.freepik.com/free-photo/virolog-coducting-experiment-course-coronavirus-pandemic-with-micropipette-chemist-modern-laboratory-doing-research-using-dispenser-global-epidemic-with-covid-19_482257-5737.jpg?semt=ais_hybrid&w=740&q=80',
         title: t('academy.about.media.labs'),
         description: t('academy.about.media.labsDesc'),
         thumbnail: '/images/academy/labs-thumb.jpg'
       },
       {
         type: 'image',
-        url: '/images/academy/students.jpg',
+        url: 'https://sputnik.kg/img/103993/17/1039931751_0:0:5568:3132_1920x0_80_0_0_77bdf94fc9d135d045890700b3c86781.jpg',
         title: t('academy.about.media.students'),
         description: t('academy.about.media.studentsDesc'),
         thumbnail: '/images/academy/students-thumb.jpg'

@@ -34,7 +34,7 @@ const AddressMap = () => {
   const academyLocation = {
     lat: 42.8539,
     lng: 74.5829,
-    address: 'ул. Жукеева-Пудовкина 114, Бишкек, Кыргызстан'
+    address: 'ул. Ахунбаева 97, Бишкек, Кыргызстан'
   };
 
   const handleGetDirections = () => {
@@ -206,55 +206,6 @@ const AddressMap = () => {
             </div>
           </motion.div>
         </div>
-
-        {/* Campus Map */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, delay: 0.7 }}
-          className="bg-white/5 rounded-3xl backdrop-blur-lg border border-white/20 p-6 lg:p-8 mb-12"
-        >
-          <h2 className="text-2xl lg:text-3xl font-bold text-white mb-8 text-center">
-            {t('contact.map.campusLayout', 'Инфраструктура кампуса')}
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {campusBuildings.map((building, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                onClick={() => setSelectedBuilding(selectedBuilding === index ? null : index)}
-                className={`text-center p-6 rounded-2xl backdrop-blur-sm border cursor-pointer transition-all duration-300 ${
-                  selectedBuilding === index
-                    ? 'bg-gradient-to-r from-blue-500/20 to-emerald-500/20 border-emerald-400/50 shadow-2xl'
-                    : 'bg-white/5 border-white/10 hover:border-blue-400/30'
-                }`}
-              >
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white text-2xl">
-                  {building.icon || '🏛️'}
-                </div>
-                <h4 className="font-bold text-white text-lg mb-2">{building.name}</h4>
-                <p className="text-blue-100 text-sm mb-4">{building.description}</p>
-                
-                <AnimatePresence>
-                  {selectedBuilding === index && building.details && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="mt-4 pt-4 border-t border-emerald-400/30"
-                    >
-                      <p className="text-blue-200 text-sm leading-relaxed">{building.details}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
 
         {/* Contact Information */}
         <motion.div

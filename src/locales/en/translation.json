@@ -1,6 +1,8 @@
 {
   "nav": {
-    "kgafkis": "KSaPCS",
+    "kgafkis": "KSAPCS named after B.T.Turusbekov",
+    "kgafkis1": "KSAPCS named after",
+    "kgafkis2": "B.T.Turusbekov",
     "sport": "Sport",
     "sections": "Sections",
     "infrastructure": "Infrastructure",
@@ -11,7 +13,7 @@
     "history": "History",
     "mission_strategy": "Mission & Strategy",
     "accreditation": "Accreditation",
-    "kgafkis_in_numbers": "KGAFKiS in Numbers",
+    "kgafkis_in_numbers": "KSaPCS in Numbers",
     "leadership": "Leadership",
     "board_of_trustees": "Board of Trustees",
     "audit_commission": "Audit Commission",
@@ -4019,7 +4021,7 @@
           "role": "president",
           "roleLabel": "President",
           "email": "ivan.petrov@sports-academy.edu",
-          "phone": "+7 (999) 123-45-67",
+          "phone": "+996 (312) 57 04 90",
           "telegram": "@ivan_petrov",
           "tags": ["Leadership", "Basketball", "Volunteering"],
           "responsibilities": [
@@ -4530,32 +4532,32 @@
           "name": "Admissions Office",
           "description": "Admissions, documents, entrance exams",
           "contactPerson": "Maria Ivanova Petrovna",
-          "phone": "+7 (999) 111-11-11",
-          "email": "admission@sports-academy.edu",
+          "phone": "+996 (312) 57 04 89",
+          "email": "sport_akadem@mail.ru",
           "icon": "🎓"
         },
         {
           "name": "Sports Department",
           "description": "Training, competitions, sports preparation",
           "contactPerson": "Alexey Petrov Sergeevich",
-          "phone": "+7 (999) 222-22-22",
-          "email": "sports@sports-academy.edu",
+          "phone": "+996 (312) 57 04 89",
+          "email": "sport_akadem@mail.ru",
           "icon": "⚽"
         },
         {
           "name": "Medical Center",
           "description": "Medical checkups, rehabilitation, sports medicine",
           "contactPerson": "Elena Sidorova Vladimirovna",
-          "phone": "+7 (999) 333-33-33",
-          "email": "medical@sports-academy.edu",
+          "phone": "+996 (312) 57 04 89",
+          "email": "sport_akadem@mail.ru",
           "icon": "🏥"
         },
         {
           "name": "Coaching Staff",
           "description": "Individual training, preparation methods",
           "contactPerson": "Dmitry Kozlov Ivanovich",
-          "phone": "+7 (999) 444-44-44",
-          "email": "coaching@sports-academy.edu",
+          "phone": "+996 (312) 57 04 89",
+          "email": "sport_akadem@mail.ru",
           "icon": "👨‍🏫"
         }
       ]
@@ -4699,7 +4701,7 @@
       "bishkekKyrgyzstan": "Bishkek, Kyrgyzstan",
       "address": "Akhunbaeva St, 97",
       "title": "How to Find Us",
-      "subtitle": "Academy address and directions",
+      "subtitle": "KSAPCS named after B.T. Turusbekov's address",
       "interactiveMap": "Interactive Map",
       "currentLocation": "Current Location",
       "defaultAddress": "Address not specified",
@@ -4720,7 +4722,7 @@
       "mainBuilding": "Main Building",
       "visitUs": "Visit Us",
       "workingHours": "Working Hours",
-      "hours": "Mon-Fri: 9:00-18:00",
+      "hours": "Mon-Fri: 8:00-17:00",
       "contactPhone": "Phone",
       "phoneNumber": "+996 (312) 57-04-89",
       "views": {
@@ -5734,7 +5736,7 @@
     }
   },
   "facts": {
-    "title": "Sports Academy in Numbers",
+    "title": "KSAPCS in Numbers",
     "subtitle": "Years of excellence in sports education and athlete training",
     "students": "Active Students",
     "graduates": "Successful Graduates",
@@ -7435,7 +7437,7 @@
     "applicationSuccess": "Thank you for your application! We will contact you shortly."
   },
   "numbers": {
-    "title": "ACADEMY IN NUMBERS",
+    "title": "KSAPCS IN NUMBERS",
     "subtitle": "Statistics and achievements of leading sports academy in the country",
     "achievementsTitle": "Key Achievements",
     "growthTitle": "Annual Growth",
@@ -7773,8 +7775,8 @@
         {
           "icon": "📞",
           "label": "Phone",
-          "value": "+7 (999) 123-45-67",
-          "hours": "Mon-Fri: 9:00-18:00"
+          "value": "+996 (312) 57 04 90",
+          "hours": "Mon-Fri: 8:00-17:00"
         },
         {
           "icon": "📧",
@@ -7784,12 +7786,12 @@
         {
           "icon": "📍",
           "label": "Address",
-          "value": "Moscow, Obraztsova st., 25, Room 101"
+          "value": "Bishkek, Akhunbaeva St, 97"
         },
         {
           "icon": "🕒",
           "label": "Working Hours",
-          "value": "Mon-Fri: 9:00-18:00, Sat: 10:00-16:00"
+          "value": "Mon-Fri: 8:00-17:00"
         }
       ]
     },
@@ -8405,7 +8407,7 @@
         "coachInfo": {
           "name": "Ivanov Alexey Sergeevich",
           "rank": "Honored Coach of Russia",
-          "contacts": "+7 (999) 123-45-67"
+          "contacts": "+996 (312) 57 04 90"
         },
         "contactInfo": "Registration through sports complex"
       },
@@ -8417,7 +8419,7 @@
         "coachInfo": {
           "name": "Petrov Vladimir Konstantinovich",
           "rank": "Master of Sports of International Class",
-          "contacts": "+7 (999) 765-43-21"
+          "contacts": "+996 312 57 04 89"
         },
         "contactInfo": "Registration with coach"
       },
@@ -8429,7 +8431,7 @@
         "coachInfo": {
           "name": "Sidorova Maria Ivanovna",
           "rank": "Candidate for Master of Sports",
-          "contacts": "+7 (999) 555-44-33"
+          "contacts": "+996 312 57 04 89"
         },
         "contactInfo": "Swimming pool, 2nd floor"
       }
