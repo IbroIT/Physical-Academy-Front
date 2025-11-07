@@ -57,6 +57,18 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Функция для разделения текста на две части
+  const splitText = (text) => {
+    const words = text.split(' ');
+    if (words.length <= 1) return [text, ''];
+    
+    const mid = Math.ceil(words.length / 2);
+    const firstLine = words.slice(0, mid).join(' ');
+    const secondLine = words.slice(mid).join(' ');
+    
+    return [firstLine, secondLine];
+  };
+
   // Данные меню для КГАФКиС
   const menuData = {
     academy: {
@@ -226,6 +238,10 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
     }
   };
 
+  // Разделяем текст для мобильной версии
+  const [firstLine] = splitText(t('nav.kgafkis1', 'КГАФКиС'));
+  const [secondLine] = splitText(t('nav.kgafkis2', 'КГАФКиС'));
+
   return (
     <nav
       className="sticky top-0 left-0 w-full z-50 transition-all duration-500 bg-white py-2 shadow-lg border-b border-blue-100"
@@ -242,9 +258,19 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                 <img
                   src={DefaultLogo}
                   alt={t('nav.logo_alt', 'Логотип КГАФКиС')}
-                  className="h-15 w-auto object-contain transition-opacity duration-300"
+                  className="h-14 w-auto object-contain transition-opacity duration-300"
                 />
-                <h2 className="ml-3 text-xl font-bold text-blue-800 group-hover:text-teal-600 transition-colors duration-300">{t('nav.kgafkis', 'КГАФКиС')}</h2>
+                {/* Название для десктопной версии */}
+                <h2 className="ml-3 text-xl font-bold text-blue-800 group-hover:text-teal-600 transition-colors duration-300 hidden sm:block">
+                  {t('nav.kgafkis', 'КГАФКиС')}
+                </h2>
+                
+                {/* Название для мобильной версии - разделено на две строки */}
+                <div className="ml-2 xs:flex sm:hidden flex-col">
+                  <span className="text-sm font-bold text-blue-800 leading-tight">{firstLine}</span>
+                  <br/>
+                  <span className="text-sm font-bold text-blue-800 leading-tight">{secondLine}</span>
+                </div>
               </div>
             </a>
           </div>

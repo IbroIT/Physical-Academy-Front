@@ -40,14 +40,14 @@ const ContactInfo = () => {
     {
       icon: '📞',
       title: t('contact.info.phone.title', 'Телефоны'),
-      content: contactInfo.phones?.numbers || contactInfo.phones || ['+7 (999) 123-45-67'],
+      content: contactInfo.phones?.numbers || contactInfo.phones || ['+996 312 57 04 89'],
       color: 'blue',
       description: t('contact.info.phone.description', 'Круглосуточная поддержка')
     },
     {
       icon: '📧',
       title: t('contact.info.email.title', 'Email'),
-      content: contactInfo.emails?.addresses || contactInfo.emails || ['info@sports-academy.edu'],
+      content: contactInfo.emails?.addresses || contactInfo.emails || ['sport_akadem@mail.ru'],
       color: 'cyan',
       description: t('contact.info.email.description', 'Быстрый ответ в течение 2 часов')
     },
