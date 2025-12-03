@@ -24,10 +24,10 @@ import CollegeInfo from "./components/pages/admissions/college/CollegeInfo";
 
 // Education pages
 import PedagogicalSports from "./components/pages/education/faculties/PedagogicalSports";
-import CoachingFaculty from "./components/pages/education/faculties/CoachingFaculty";
-import MilitaryTraining from "./components/pages/education/faculties/MilitaryTraining";
-import CorrespondenceTraining from "./components/pages/education/faculties/CorrespondenceTraining";
-import GeneralDepartments from "./components/pages/education/departments/GeneralDepartments";
+import CoachingFaculty from "./components/pages/education/faculties/CoachingFacultyNew";
+import MilitaryTraining from "./components/pages/education/faculties/MilitaryTrainingNew";
+import CorrespondenceTraining from "./components/pages/education/faculties/CorrespondenceTrainingNew";
+import GeneralDepartments from "./components/pages/education/departments/GeneralDepartmentsNew";
 import CollegeSports from "./components/pages/education/college/CollegeSports";
 
 // Science pages
