@@ -382,17 +382,6 @@ const safeArray = useCallback((data) => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12 md:mb-16"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isVisible ? { scale: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300"
-          >
-            <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-green-300 font-medium text-sm md:text-base">
-              {t('bachelor.info.badge')}
-            </span>
-          </motion.div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
             {t('bachelor.info.title')}
           </h1>

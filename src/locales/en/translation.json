@@ -37,10 +37,10 @@
     "college": "College",
     "education": "Education",
     "faculties": "Faculties",
-    "pedagogical_national_sports": "Pedagogical & National Sports",
+    "pedagogical_national_sports": "Faculty of Pedagogical and National Sports",
     "coaching_faculty": "Coaching Faculty",
-    "military_training_physical_culture": "Military Training & Physical Culture",
-    "correspondence_advanced_training": "Correspondence & Advanced Training",
+    "military_training_physical_culture": "Faculty of Pre-Conscription Training and Physical Education",
+    "correspondence_advanced_training": "Faculty of Distance Learning, Advanced Training and Staff Retraining",
     "general_faculty_departments": "General Faculty Departments",
     "master_program": "Master's Program",
     "college_physical_culture_sports": "College of Physical Culture & Sports",
@@ -183,7 +183,7 @@
         "strategy": "Strategy"
       },
       "missionTitle": "Our Mission",
-      "missionStatement": "Develop physical culture and sports science through quality education, innovative research and training of leaders capable of changing the world of sports and healthy lifestyle.",
+      "missionStatement": "To ensure the training of specialists in physical education and sports who possess professional and general cultural competencies, capable of addressing important tasks related to health formation and ensuring the physical and sports training of the population.",
       "visionTitle": "Our Vision",
       "visionStatement": "Become a world leader in sports education, where every student reveals their potential, and scientific discoveries shape the future of physical culture and human health.",
       "values": {
@@ -269,8 +269,11 @@
     "about": {
       "subtitle2": "Our Academy",
       "badge3": "Modern Education in Physical Culture and Sports",
-      "intro2": "Today we continue to develop, implementing modern technologies in educational process and expanding international cooperation. Our mission is to educate new generation of sports industry leaders.",
-      "intro": "Our academy was founded to train highly qualified specialists in physical culture and sports. Over the years, we have created a unique educational ecosystem combining traditions and innovations.",
+      "intro": "The Kyrgyz State Academy of Physical Culture and Sports named after B.T. Turusbekov is one of the oldest higher education institutions in the country, with a 70-year history.",
+      "intro1": "It is a leading university in Kyrgyzstan, providing training of highly qualified specialists in the field of physical education, sports, and sports science.",
+      "intro2": "The academy has a modern infrastructure: a unique sports base, library, dormitories, and academic buildings.",
+      "intro3": "The B.T. Turusbekov KSAPS actively cooperates with international organizations, participates in scientific projects and sports competitions.",
+      "intro4": "Graduates of the academy successfully work as physical education teachers, coaches in more than 30 sports, as well as sports managers both in Kyrgyzstan and abroad.",
       "badge": "About Academy",
       "title": "ABOUT ACADEMY",
       "subtitle": "Leading center for training specialists in physical culture and sports with rich history and innovative approach",
@@ -761,8 +764,7 @@
       },
       "badge": "Admission 2024",
       "title": "Bachelor's Degree Admission",
-      "subtitle": "Complete information about admission to the academy",
-      "requirementsTitle": "Admission Requirements",
+      "requirementsTitle": "Admission criteria:",
       "deadlinesTitle": "Document Submission Deadlines",
       "process": {
         "title": "Admission Process",
@@ -807,26 +809,30 @@
         "active": "Active"
       },
       "requirements": {
-        "age": "Age from 17 to 25 years",
-        "education": "High school diploma",
-        "exams": "Entrance exam results",
-        "language": "English proficiency (for international programs)",
-        "health": "Medical certificate"
+        "age": "Admission is carried out on a competitive basis according to the results of entrance examinations in IVS or OFP.",
+        "education": "The final score also includes the average grade of the certificate or diploma (FPK).",
+        "exams": "Admitted outside the competition on a budget basis:",
+        "language": "Winners and prize-winners of the Olympic Games; Winners of World and Asian Championships; Winners of major international competitions; Winners of the current year’s Republican School Spartakiad (with supporting documents) "
       },
       "documents": {
         "title": "Required Documents",
-        "passport": "Passport copy",
-        "diploma": "Diploma or certificate",
-        "photos": "3x4 photos",
-        "medical": "Medical certificate",
-        "military": "Military ID (for male applicants)"
+        "passport": "Application form (filled out at the admissions office)",
+        "diploma": "State-issued education certificate (secondary school certificate or diploma of secondary vocational education)",
+        "photos": "Passport",
+        "medical": "Military registration certificate (for male applicants)",
+        "military": "Medical certificate form 086-U (including fluorography)",
+        "other": "Athlete’s classification book (for applicants entering the coaching profile)",
+        "transcript": "Photographs 3×4 — 12 pieces",
+        "recommendation": "Medical commission conclusion (obtained at KSAPCS)",
+        "portfolio": "Postal envelopes — 5 pieces",
+        "language_certificate": "Processing fee — 400 KGS",
+        "financial_guarantee": "Certificate of residence"
       },
       "contacts": {
-        "title": "Admission Committee Contacts",
-        "email": "sport_akadem@mail.ru",
-        "phone": "+996 (312) 57 04 89",
-        "address": "Main building, room 101",
-        "button": "Schedule a Consultation"
+        "title": "Important:",
+        "email": " ORT exam results are not considered during admission!",
+        "phone": "Applicants claiming admission outside the competition must provide:",
+        "address": "MSIC (Master of Sports of International Class) certificate. Documents confirming achievements at international competitions or participation/victory in the current year’s School Spartakiad"
       }
     },
     "title": "Bachelor's Degree",
@@ -4465,7 +4471,7 @@
       },
       "phone": {
         "title": "Phones",
-        "description": "24/7 support",
+        "description": "Only during business hours",
         "numbers": [
           { "label": "Admissions Office", "number": "+996 (312) 57 04 89" },
           { "label": "Sports Department", "number": "+996 (312) 57 04 90" },
@@ -4487,8 +4493,7 @@
         "schedule": [
           "Administration: Mon-Fri 9:00-18:00",
           "Gyms: 24/7",
-          "Pool: 6:00-23:00",
-          "Stadium: 5:00-24:00"
+          "Stadium: 00:00-24:00"
         ]
       },
       "tabs": {
@@ -8094,7 +8099,7 @@
     "subtitle": "Where education meets excellence, nurturing future champions in sports and life",
     "mission": {
       "title": "Our Mission",
-      "description": "To provide world-class education combined with professional sports training, developing well-rounded individuals who excel both academically and athletically while fostering strong character and leadership skills."
+      "description": "To ensure the training of specialists in physical education and sports who possess professional and general cultural competencies, capable of addressing important tasks related to health formation and ensuring the physical and sports training of the population."
     },
     "vision": {
       "title": "Our Vision",
@@ -8102,20 +8107,20 @@
     },
     "features": {
       "education": {
-        "title": "Quality Education",
-        "description": "Comprehensive academic programs with modern teaching methods and experienced educators"
+        "title": "Professionalism",
+        "description": "High-quality education delivered by experienced faculty with real-world expertise"
       },
       "sports": {
-        "title": "Sports Excellence",
-        "description": "Professional training facilities and coaching for various sports disciplines"
+        "title": "Modern teaching methods",
+        "description": "Cutting-edge training techniques and facilities to maximize athletic potential"
       },
       "community": {
-        "title": "Strong Community",
-        "description": "A supportive environment that fosters teamwork, friendship, and mutual growth"
+        "title": "Active student life",
+        "description": "Vibrant campus community with diverse clubs, events, and support services"
       },
       "achievements": {
-        "title": "Proven Success",
-        "description": "Track record of producing champions and successful professionals"
+        "title": "Partnership and Practice",
+        "description": "Collaboration with leading sports organizations to provide students with real-world opportunities for growth and development"
       }
     },
     "stats": {

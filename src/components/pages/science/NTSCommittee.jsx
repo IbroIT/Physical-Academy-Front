@@ -295,13 +295,6 @@ const NTSCommittee = () => {
           {/* Header */}
           <motion.div variants={itemVariants} className="text-center">
             <div className="inline-flex flex-col items-center bg-white/5 backdrop-blur-sm rounded-2xl px-8 py-6 shadow-2xl border border-white/10">
-              <motion.div
-                className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white shadow-lg mb-4"
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.8 }}
-              >
-                <span className="text-2xl">🏛️</span>
-              </motion.div>
               <h2 className="text-3xl font-bold text-white mb-2">
                 {committeeSections.title}
               </h2>

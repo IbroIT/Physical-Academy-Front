@@ -46,7 +46,6 @@ const PedagogicalSports = () => {
     fetchFacultyData();
   }, [i18n.language]);
 
-  // Функция для нормализации данных из API
   // Вспомогательная утилита: безопасно привести разные типы в массив
   const asArray = (v) => {
     if (!v) return [];
@@ -78,71 +77,25 @@ const PedagogicalSports = () => {
 
   const normalizeFacultyData = (apiFaculty) => {
     if (!apiFaculty) {
-      return {
-        name: t("pedagogicalSports.name", "Факультет педагогики и спорта"),
-        fullDescription: t(
-          "pedagogicalSports.fullDescription",
-          "Современный факультет, объединяющий педагогическое мастерство и спортивное excellence."
-        ),
-        badge: t("pedagogicalSports.badge", "Педагогическое образование"),
-        stats: [],
-        about: {
-          missionTitle: t(
-            "pedagogicalSports.about.missionTitle",
-            "Миссия факультета"
-          ),
-          advantagesTitle: t(
-            "pedagogicalSports.about.advantagesTitle",
-            "Ключевые преимущества"
-          ),
-          achievementsTitle: t(
-            "pedagogicalSports.about.achievementsTitle",
-            "Наши достижения"
-          ),
-          mission: "",
-          advantages: [],
-          achievements: [],
-        },
-        programs: [],
-        pedagogicalSpecializations: [],
-        sportsSpecializations: [],
-        teachers: [],
-        contacts: { items: [], dean: null },
-      };
+      return getDefaultData();
     }
 
     return {
-      name:
-        apiFaculty.name ||
-        t("pedagogicalSports.name", "Факультет педагогики и спорта"),
-      fullDescription:
-        apiFaculty.description ||
-        t(
-          "pedagogicalSports.fullDescription",
-          "Современный факультет, объединяющий педагогическое мастерство и спортивное excellence."
-        ),
-      badge: t("pedagogicalSports.badge", "Педагогическое образование"),
+      name: apiFaculty.name || getDefaultData().name,
+      fullDescription: apiFaculty.description || getDefaultData().fullDescription,
+      badge: getDefaultData().badge,
       stats: asArray(apiFaculty.statistics).map((stat) => ({
         label: stat.meaning || "",
         value: stat.titleInt || "0",
         icon: getIconForStat(stat.meaning),
       })),
       about: {
-        missionTitle: t(
-          "pedagogicalSports.about.missionTitle",
-          "Миссия факультета"
-        ),
-        advantagesTitle: t(
-          "pedagogicalSports.about.advantagesTitle",
-          "Ключевые преимущества"
-        ),
-        achievementsTitle: t(
-          "pedagogicalSports.about.achievementsTitle",
-          "Наши достижения"
-        ),
+        missionTitle: t("pedagogicalSports.about.missionTitle"),
+        advantagesTitle: t("pedagogicalSports.about.advantagesTitle"),
+        achievementsTitle: t("pedagogicalSports.about.achievementsTitle"),
         mission: Array.isArray(apiFaculty.mission)
           ? apiFaculty.mission.join(". ")
-          : apiFaculty.mission || "",
+          : apiFaculty.mission || getDefaultData().about.mission,
         advantages: asArray(apiFaculty.achievements),
         achievements: asArray(apiFaculty.statistics)
           .slice(0, 3)
@@ -157,33 +110,32 @@ const PedagogicalSports = () => {
         name: program.name,
         description: program.description,
         level: program.degree,
-        duration: `${program.duration_years} ${t(
-          "pedagogicalSports.programs.years",
-          "лет"
-        )}`,
+        duration: `${program.duration_years} ${t("pedagogicalSports.programs.years")}`,
         format: program.offline
-          ? t("pedagogicalSports.programs.offline", "Очная")
-          : t("pedagogicalSports.programs.online", "Онлайн"),
+          ? t("pedagogicalSports.programs.offline")
+          : t("pedagogicalSports.programs.online"),
         icon: program.emoji || "🎓",
         tuitionFee: program.tuition_fee,
       })),
-      pedagogicalSpecializations: asArray(apiFaculty.specializations).map(
-        (spec) => ({
+      specializations: {
+        pedagogicalTitle: t("pedagogicalSports.specializations.pedagogicalTitle"),
+        sportsTitle: t("pedagogicalSports.specializations.sportsTitle"),
+        pedagogical: asArray(apiFaculty.specializations).map((spec) => ({
           id: spec.id,
           name: spec.name,
           description: spec.description,
           icon: getIconFromName(spec.name),
           competencies: asArray(spec.features),
-        })
-      ),
-      sportsSpecializations: asArray(apiFaculty.sports).map((sport) => ({
-        id: sport.id,
-        name: sport.name,
-        category: getSportCategory(sport.name),
-        coaches: "12",
-        icon: sport.emoji || "⚽",
-        description: sport.description,
-      })),
+        })),
+        sports: asArray(apiFaculty.sports).map((sport) => ({
+          id: sport.id,
+          name: sport.name,
+          category: getSportCategory(sport.name),
+          coaches: sport.coaches || "12",
+          icon: sport.emoji || "⚽",
+          description: sport.description,
+        })),
+      },
       teachers: asArray(apiFaculty.teachers).map((teacher) => ({
         id: teacher.id,
         name: teacher.full_name,
@@ -194,6 +146,8 @@ const PedagogicalSports = () => {
         specializations: asArray(teacher.specializations),
       })),
       contacts: {
+        title: t("pedagogicalSports.contacts.title"),
+        deanTitle: t("pedagogicalSports.contacts.deanTitle"),
         items: asArray(apiFaculty.contacts).map((contact) => ({
           title: contact.title,
           value: contact.value,
@@ -213,6 +167,30 @@ const PedagogicalSports = () => {
       },
     };
   };
+
+  const getDefaultData = () => ({
+    name: t("pedagogicalSports.name"),
+    fullDescription: t("pedagogicalSports.fullDescription"),
+    badge: t("pedagogicalSports.badge"),
+    stats: t("pedagogicalSports.stats", { returnObjects: true }),
+    about: {
+      missionTitle: t("pedagogicalSports.about.missionTitle"),
+      advantagesTitle: t("pedagogicalSports.about.advantagesTitle"),
+      achievementsTitle: t("pedagogicalSports.about.achievementsTitle"),
+      mission: t("pedagogicalSports.about.mission"),
+      advantages: t("pedagogicalSports.about.advantages", { returnObjects: true }),
+      achievements: t("pedagogicalSports.about.achievements", { returnObjects: true }),
+    },
+    programs: t("pedagogicalSports.programs", { returnObjects: true }),
+    specializations: {
+      pedagogicalTitle: t("pedagogicalSports.specializations.pedagogicalTitle"),
+      sportsTitle: t("pedagogicalSports.specializations.sportsTitle"),
+      pedagogical: t("pedagogicalSports.specializations.pedagogical", { returnObjects: true }),
+      sports: t("pedagogicalSports.specializations.sports", { returnObjects: true }),
+    },
+    teachers: t("pedagogicalSports.teachers", { returnObjects: true }),
+    contacts: t("pedagogicalSports.contacts", { returnObjects: true }),
+  });
 
   const getIconForStat = (meaning) => {
     const icons = {
@@ -306,25 +284,21 @@ const PedagogicalSports = () => {
     }, duration / steps);
   };
 
-  // Проверяем есть ли контактные данные
+  // Проверяем наличие данных для условного рендеринга вкладок
+  const hasPrograms = facultyData.programs && facultyData.programs.length > 0;
+  const hasSpecializations = 
+    (facultyData.specializations.pedagogical && facultyData.specializations.pedagogical.length > 0) ||
+    (facultyData.specializations.sports && facultyData.specializations.sports.length > 0);
+  const hasTeachers = facultyData.teachers && facultyData.teachers.length > 0;
   const hasContactData =
     facultyData.contacts &&
     (facultyData.contacts.dean ||
       (facultyData.contacts.items && facultyData.contacts.items.length > 0));
 
-  // Проверяем есть ли преподаватели
-  const hasTeachers = facultyData.teachers && facultyData.teachers.length > 0;
-  const hasPrograms = facultyData.programs && facultyData.programs.length > 0;
-  const hasSpecializations =
-    (facultyData.pedagogicalSpecializations &&
-      facultyData.pedagogicalSpecializations.length > 0) ||
-    (facultyData.sportsSpecializations &&
-      facultyData.sportsSpecializations.length > 0);
-
   const tabs = [
     {
       id: "about",
-      label: t("pedagogicalSports.tabs.about", "О факультете"),
+      label: t("pedagogicalSports.tabs.about"),
       icon: "🏃‍♂️",
       color: "from-blue-500 to-cyan-500",
     },
@@ -332,7 +306,7 @@ const PedagogicalSports = () => {
       ? [
           {
             id: "programs",
-            label: t("pedagogicalSports.tabs.programs", "Программы"),
+            label: t("pedagogicalSports.tabs.programs"),
             icon: "📚",
             color: "from-green-500 to-emerald-500",
           },
@@ -342,29 +316,27 @@ const PedagogicalSports = () => {
       ? [
           {
             id: "specializations",
-            label: t("pedagogicalSports.tabs.specializations", "Специализации"),
+            label: t("pedagogicalSports.tabs.specializations"),
             icon: "🎯",
             color: "from-blue-500 to-green-500",
           },
         ]
       : []),
-    // Показываем вкладку Преподаватели только если есть данные
     ...(hasTeachers
       ? [
           {
             id: "teachers",
-            label: t("pedagogicalSports.tabs.teachers", "Преподаватели"),
+            label: t("pedagogicalSports.tabs.teachers"),
             icon: "👨‍🏫",
             color: "from-cyan-500 to-blue-500",
           },
         ]
       : []),
-    // Показываем вкладку Контакты только если есть данные
     ...(hasContactData
       ? [
           {
             id: "contacts",
-            label: t("pedagogicalSports.tabs.contacts", "Контакты"),
+            label: t("pedagogicalSports.tabs.contacts"),
             icon: "📞",
             color: "from-emerald-500 to-green-500",
           },
@@ -393,7 +365,7 @@ const PedagogicalSports = () => {
     },
   };
 
-  // Логируем ошибки, но не блокируем рендер - страница показывается с пустыми данными
+  // Логируем ошибки, но не блокируем рендер
   if (apiData.error) {
     console.warn("Faculty API error, using fallback data:", apiData.error);
   }
@@ -411,13 +383,9 @@ const PedagogicalSports = () => {
 
         {/* Спортивные символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🏃‍♂️</div>
-        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">
-          ⚽
-        </div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">⚽</div>
         <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">🏅</div>
-        <div className="absolute bottom-1/4 right-1/3 text-5xl opacity-5">
-          🎯
-        </div>
+        <div className="absolute bottom-1/4 right-1/3 text-5xl opacity-5">🎯</div>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
@@ -428,18 +396,6 @@ const PedagogicalSports = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16 lg:mb-20"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isVisible ? { scale: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="inline-flex items-center px-6 py-3 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/20 mb-6"
-          >
-            <span className="w-2 h-2 bg-gradient-to-r from-blue-400 to-emerald-400 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-blue-100 font-medium text-lg">
-              {facultyData.badge}
-            </span>
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
@@ -481,7 +437,6 @@ const PedagogicalSports = () => {
               onMouseEnter={() => setHoveredCard(index)}
               onMouseLeave={() => setHoveredCard(null)}
             >
-              {/* Background effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
 
               <div className="relative z-10">
@@ -577,21 +532,19 @@ const PedagogicalSports = () => {
                           {facultyData.about.advantagesTitle}
                         </h4>
                         <ul className="space-y-4">
-                          {facultyData.about.advantages.map(
-                            (advantage, index) => (
-                              <motion.li
-                                key={index}
-                                className="flex items-start group"
-                                whileHover={{ x: 10 }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                <span className="w-3 h-3 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full mt-2 mr-4 flex-shrink-0 group-hover:scale-150 transition-transform duration-300"></span>
-                                <span className="text-blue-100 text-lg group-hover:text-white transition-colors duration-300">
-                                  {advantage}
-                                </span>
-                              </motion.li>
-                            )
-                          )}
+                          {facultyData.about.advantages.map((advantage, index) => (
+                            <motion.li
+                              key={index}
+                              className="flex items-start group"
+                              whileHover={{ x: 10 }}
+                              transition={{ duration: 0.3 }}
+                            >
+                              <span className="w-3 h-3 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full mt-2 mr-4 flex-shrink-0 group-hover:scale-150 transition-transform duration-300"></span>
+                              <span className="text-blue-100 text-lg group-hover:text-white transition-colors duration-300">
+                                {advantage}
+                              </span>
+                            </motion.li>
+                          ))}
                         </ul>
                       </div>
                     </div>
@@ -604,27 +557,25 @@ const PedagogicalSports = () => {
                           {facultyData.about.achievementsTitle}
                         </h4>
                         <div className="space-y-4">
-                          {facultyData.about.achievements.map(
-                            (achievement, index) => (
-                              <motion.div
-                                key={index}
-                                className="flex items-center space-x-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
-                                whileHover={{ scale: 1.02 }}
-                              >
-                                <span className="text-3xl text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                                  {achievement.icon}
-                                </span>
-                                <div>
-                                  <div className="text-white font-bold text-xl">
-                                    {achievement.value}
-                                  </div>
-                                  <div className="text-blue-200 text-lg">
-                                    {achievement.label}
-                                  </div>
+                          {facultyData.about.achievements.map((achievement, index) => (
+                            <motion.div
+                              key={index}
+                              className="flex items-center space-x-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
+                              whileHover={{ scale: 1.02 }}
+                            >
+                              <span className="text-3xl text-emerald-400 group-hover:scale-110 transition-transform duration-300">
+                                {achievement.icon}
+                              </span>
+                              <div>
+                                <div className="text-white font-bold text-xl">
+                                  {achievement.value}
                                 </div>
-                              </motion.div>
-                            )
-                          )}
+                                <div className="text-blue-200 text-lg">
+                                  {achievement.label}
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -653,7 +604,6 @@ const PedagogicalSports = () => {
                         onMouseEnter={() => setHoveredCard(`program-${index}`)}
                         onMouseLeave={() => setHoveredCard(null)}
                       >
-                        {/* Background effect */}
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
 
                         <div className="relative z-10">
@@ -675,11 +625,7 @@ const PedagogicalSports = () => {
                           <div className="space-y-4 text-lg">
                             <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
                               <span className="text-blue-200">
-                                {t(
-                                  "pedagogicalSports.programs.level",
-                                  "Уровень"
-                                )}
-                                :
+                                {t("pedagogicalSports.programs.level")}:
                               </span>
                               <span className="text-white font-semibold">
                                 {program.level}
@@ -687,11 +633,7 @@ const PedagogicalSports = () => {
                             </div>
                             <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
                               <span className="text-blue-200">
-                                {t(
-                                  "pedagogicalSports.programs.duration",
-                                  "Длительность"
-                                )}
-                                :
+                                {t("pedagogicalSports.programs.duration")}:
                               </span>
                               <span className="text-white font-semibold">
                                 {program.duration}
@@ -699,11 +641,7 @@ const PedagogicalSports = () => {
                             </div>
                             <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
                               <span className="text-blue-200">
-                                {t(
-                                  "pedagogicalSports.programs.format",
-                                  "Форма"
-                                )}
-                                :
+                                {t("pedagogicalSports.programs.format")}:
                               </span>
                               <span className="text-white font-semibold">
                                 {program.format}
@@ -712,11 +650,7 @@ const PedagogicalSports = () => {
                             {program.tuitionFee && (
                               <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
                                 <span className="text-blue-200">
-                                  {t(
-                                    "pedagogicalSports.programs.tuition",
-                                    "Стоимость"
-                                  )}
-                                  :
+                                  {t("pedagogicalSports.programs.tuition")}:
                                 </span>
                                 <span className="text-white font-semibold">
                                   {program.tuitionFee} ₽
@@ -741,115 +675,94 @@ const PedagogicalSports = () => {
                   transition={{ duration: 0.5 }}
                   className="space-y-8"
                 >
-                  <div
-                    className={`grid ${
-                      facultyData.pedagogicalSpecializations.length > 0 &&
-                      facultyData.sportsSpecializations.length > 0
-                        ? "md:grid-cols-2"
-                        : "md:grid-cols-1"
-                    } gap-8`}
-                  >
-                    {facultyData.pedagogicalSpecializations.length > 0 && (
+                  <div className="grid md:grid-cols-2 gap-8">
+                    {facultyData.specializations.pedagogical.length > 0 && (
                       <div>
                         <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
                           <span className="w-3 h-12 bg-gradient-to-b from-blue-400 to-cyan-400 rounded mr-4"></span>
-                          {t(
-                            "pedagogicalSports.specializations.pedagogicalTitle",
-                            "Педагогические специализации"
-                          )}
+                          {facultyData.specializations.pedagogicalTitle}
                         </h3>
                         <div className="space-y-4">
-                          {facultyData.pedagogicalSpecializations.map(
-                            (spec, index) => (
-                              <motion.div
-                                key={spec.id || index}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="flex items-start space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-blue-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
-                              >
-                                <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
-                                  {spec.icon}
-                                </div>
-                                <div className="flex-1">
-                                  <h4 className="font-bold text-white text-xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">
-                                    {spec.name}
-                                  </h4>
-                                  <p className="text-blue-100 text-lg mb-4">
-                                    {spec.description}
-                                  </p>
-                                  {spec.competencies &&
-                                    spec.competencies.length > 0 && (
-                                      <div className="flex flex-wrap gap-2">
-                                        {spec.competencies.map((comp, i) => (
-                                          <motion.span
-                                            key={i}
-                                            className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-2xl text-base font-medium hover:bg-blue-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-blue-400/30"
-                                            whileHover={{ scale: 1.05 }}
-                                          >
-                                            {comp}
-                                          </motion.span>
-                                        ))}
-                                      </div>
-                                    )}
-                                </div>
-                              </motion.div>
-                            )
-                          )}
+                          {facultyData.specializations.pedagogical.map((spec, index) => (
+                            <motion.div
+                              key={spec.id || index}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="flex items-start space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-blue-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
+                            >
+                              <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
+                                {spec.icon}
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="font-bold text-white text-xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">
+                                  {spec.name}
+                                </h4>
+                                <p className="text-blue-100 text-lg mb-4">
+                                  {spec.description}
+                                </p>
+                                {spec.competencies && spec.competencies.length > 0 && (
+                                  <div className="flex flex-wrap gap-2">
+                                    {spec.competencies.map((comp, i) => (
+                                      <motion.span
+                                        key={i}
+                                        className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-2xl text-base font-medium hover:bg-blue-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-blue-400/30"
+                                        whileHover={{ scale: 1.05 }}
+                                      >
+                                        {comp}
+                                      </motion.span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </motion.div>
+                          ))}
                         </div>
                       </div>
                     )}
-                    {facultyData.sportsSpecializations.length > 0 && (
+                    {facultyData.specializations.sports.length > 0 && (
                       <div>
                         <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
                           <span className="w-3 h-12 bg-gradient-to-b from-emerald-400 to-green-400 rounded mr-4"></span>
-                          {t(
-                            "pedagogicalSports.specializations.sportsTitle",
-                            "Спортивные направления"
-                          )}
+                          {facultyData.specializations.sportsTitle}
                         </h3>
                         <div className="space-y-4">
-                          {facultyData.sportsSpecializations.map(
-                            (sport, index) => (
-                              <motion.div
-                                key={sport.id || index}
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
-                              >
-                                <div className="flex items-center space-x-4">
-                                  <span className="text-4xl group-hover:scale-110 transition-transform duration-300">
-                                    {sport.icon}
-                                  </span>
-                                  <div>
-                                    <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">
-                                      {sport.name}
+                          {facultyData.specializations.sports.map((sport, index) => (
+                            <motion.div
+                              key={sport.id || index}
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
+                            >
+                              <div className="flex items-center space-x-4">
+                                <span className="text-4xl group-hover:scale-110 transition-transform duration-300">
+                                  {sport.icon}
+                                </span>
+                                <div>
+                                  <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">
+                                    {sport.name}
+                                  </div>
+                                  <div className="text-blue-200 text-lg">
+                                    {sport.category}
+                                  </div>
+                                  {sport.description && (
+                                    <div className="text-blue-300 text-sm mt-1">
+                                      {sport.description}
                                     </div>
-                                    <div className="text-blue-200 text-lg">
-                                      {sport.category}
-                                    </div>
-                                    {sport.description && (
-                                      <div className="text-blue-300 text-sm mt-1">
-                                        {sport.description}
-                                      </div>
-                                    )}
-                                  </div>
+                                  )}
                                 </div>
-                                <div className="text-right">
-                                  <div className="text-white font-bold text-2xl">
-                                    {sport.coaches}
-                                  </div>
-                                  <div className="text-blue-300 text-base">
-                                    {t(
-                                      "pedagogicalSports.specializations.coaches",
-                                      "тренеров"
-                                    )}
-                                  </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-white font-bold text-2xl">
+                                  {sport.coaches}
                                 </div>
-                              </motion.div>
-                            )
-                          )}
+                                <div className="text-blue-300 text-base">
+                                  {t("pedagogicalSports.specializations.coaches")}
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -925,51 +838,48 @@ const PedagogicalSports = () => {
                   transition={{ duration: 0.5 }}
                   className="grid lg:grid-cols-2 gap-8"
                 >
-                  {/* Контактные данные */}
-                  {facultyData.contacts.items &&
-                    facultyData.contacts.items.length > 0 && (
-                      <div className="space-y-6">
-                        <h3 className="text-3xl font-bold text-white flex items-center">
-                          <span className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">
-                            📞
-                          </span>
-                          {t("pedagogicalSports.contacts.title", "Контакты")}
-                        </h3>
-                        <div className="space-y-4">
-                          {facultyData.contacts.items.map((contact, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-center space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 backdrop-blur-sm group"
-                              whileHover={{ scale: 1.02 }}
-                            >
-                              <div className="w-14 h-14 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-300">
-                                {contact.icon}
+                  {facultyData.contacts.items && facultyData.contacts.items.length > 0 && (
+                    <div className="space-y-6">
+                      <h3 className="text-3xl font-bold text-white flex items-center">
+                        <span className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">
+                          📞
+                        </span>
+                        {facultyData.contacts.title}
+                      </h3>
+                      <div className="space-y-4">
+                        {facultyData.contacts.items.map((contact, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-center space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 backdrop-blur-sm group"
+                            whileHover={{ scale: 1.02 }}
+                          >
+                            <div className="w-14 h-14 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-300">
+                              {contact.icon}
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-emerald-300 font-semibold text-sm mb-1">
+                                {contact.title}
                               </div>
-                              <div className="flex-1">
-                                <div className="text-emerald-300 font-semibold text-sm mb-1">
-                                  {contact.title}
-                                </div>
-                                <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">
-                                  {contact.value}
-                                </div>
+                              <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">
+                                {contact.value}
                               </div>
-                            </motion.div>
-                          ))}
-                        </div>
+                            </div>
+                          </motion.div>
+                        ))}
                       </div>
-                    )}
+                    </div>
+                  )}
 
-                  {/* Руководство факультета */}
                   {facultyData.contacts.dean && (
                     <div className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-2xl p-6 lg:p-8 border border-emerald-500/20 backdrop-blur-sm">
                       <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
                         <span className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">
                           👨‍💼
                         </span>
-                        {t("pedagogicalSports.leadership.title", "Руководство")}
+                        {facultyData.contacts.deanTitle}
                       </h3>
                       <div className="text-center">
                         <div className="w-24 h-24 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg">

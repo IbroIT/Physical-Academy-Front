@@ -45,7 +45,6 @@ const CorrespondenceTraining = () => {
     fetchFacultyData();
   }, [i18n.language]);
 
-  // Функция для нормализации данных из API
   // Вспомогательная утилита: безопасно привести разные типы в массив
   const asArray = (v) => {
     if (!v) return [];
@@ -72,112 +71,66 @@ const CorrespondenceTraining = () => {
     )
       return "🕒";
     if (lowerTitle.includes("факс") || lowerTitle.includes("fax")) return "📠";
-    return "📝"; // По умолчанию
+    return "📝";
   };
 
   const normalizeFacultyData = (apiFaculty) => {
     if (!apiFaculty) {
-      return {
-        name: t("correspondenceTraining.name", "Заочное обучение"),
-        fullDescription: t(
-          "correspondenceTraining.fullDescription",
-          "Современное дистанционное образование с использованием передовых технологий."
-        ),
-        badge: t("correspondenceTraining.badge", "Дистанционное образование"),
-        stats: [],
-        about: {
-          missionTitle: t(
-            "correspondenceTraining.about.missionTitle",
-            "Миссия факультета"
-          ),
-          advantagesTitle: t(
-            "correspondenceTraining.about.advantagesTitle",
-            "Ключевые преимущества"
-          ),
-          achievementsTitle: t(
-            "correspondenceTraining.about.achievementsTitle",
-            "Наши достижения"
-          ),
-          mission: "",
-          advantages: [],
-          achievements: [],
-        },
-        programs: [],
-        specializations: [],
-        technologies: [],
-        teachers: [],
-        contacts: { items: [], dean: null },
-      };
+      return getDefaultData();
     }
 
     return {
-      name:
-        apiFaculty.name || t("correspondenceTraining.name", "Заочное обучение"),
-      fullDescription:
-        apiFaculty.description ||
-        t(
-          "correspondenceTraining.fullDescription",
-          "Современное дистанционное образование с использованием передовых технологий."
-        ),
-      badge: t("correspondenceTraining.badge", "Дистанционное образование"),
+      name: apiFaculty.name || getDefaultData().name,
+      fullDescription: apiFaculty.description || getDefaultData().fullDescription,
+      badge: getDefaultData().badge,
       stats: asArray(apiFaculty.statistics).map((stat) => ({
         label: stat.meaning || "",
         value: stat.titleInt || "0",
         icon: getIconForStat(stat.meaning),
       })),
       about: {
-        missionTitle: t(
-          "correspondenceTraining.about.missionTitle",
-          "Миссия факультета"
-        ),
-        advantagesTitle: t(
-          "correspondenceTraining.about.advantagesTitle",
-          "Ключевые преимущества"
-        ),
-        achievementsTitle: t(
-          "correspondenceTraining.about.achievementsTitle",
-          "Наши достижения"
-        ),
+        missionTitle: t("correspondenceTraining.about.missionTitle"),
+        advantagesTitle: t("correspondenceTraining.about.advantagesTitle"),
         mission: Array.isArray(apiFaculty.mission)
           ? apiFaculty.mission.join(". ")
-          : apiFaculty.mission || "",
+          : apiFaculty.mission || getDefaultData().about.mission,
         advantages: asArray(apiFaculty.achievements),
-        achievements: asArray(apiFaculty.statistics)
-          .slice(0, 3)
-          .map((stat, index) => ({
-            value: stat.titleInt || "0",
-            label: stat.meaning || "",
-            icon: getAchievementIcon(index),
-          })),
       },
+      features: asArray(apiFaculty.features).map((feature) => ({
+        icon: feature.emoji || "🎯",
+        title: feature.name || "",
+        description: feature.description || "",
+      })),
       programs: asArray(apiFaculty.programs).map((program) => ({
         id: program.id,
         name: program.name,
         description: program.description,
         level: program.degree,
-        duration: `${program.duration_years} ${t(
-          "correspondenceTraining.programs.years",
-          "лет"
-        )}`,
+        duration: `${program.duration_years} ${t("correspondenceTraining.programDetails.duration")}`,
         format: program.offline
-          ? t("correspondenceTraining.programs.offline", "Очная")
-          : t("correspondenceTraining.programs.online", "Онлайн"),
+          ? t("correspondenceTraining.programDetails.format")
+          : "Online",
         icon: program.emoji || "🎓",
         tuitionFee: program.tuition_fee,
-      })),
-      specializations: asArray(apiFaculty.specializations).map((spec) => ({
-        id: spec.id,
-        name: spec.name,
-        description: spec.description,
-        icon: getSpecializationIcon(spec.name),
-        competencies: asArray(spec.features),
       })),
       technologies: asArray(apiFaculty.technologies).map((tech) => ({
         id: tech.id,
         name: tech.name,
         description: tech.description,
         icon: tech.emoji || "🖥️",
-        usage: tech.usage_percentage || "0%",
+      })),
+      platforms: asArray(apiFaculty.platforms).map((platform) => ({
+        id: platform.id,
+        name: platform.name,
+        description: platform.description,
+        icon: platform.emoji || "🎓",
+        link: platform.link || "#",
+      })),
+      learningProcess: asArray(apiFaculty.learningProcess).map((step, index) => ({
+        step: (index + 1).toString(),
+        icon: step.emoji || ["📝", "🎯", "📚", "💬", "📊"][index] || "📝",
+        title: step.name || "",
+        description: step.description || "",
       })),
       teachers: asArray(apiFaculty.teachers).map((teacher) => ({
         id: teacher.id,
@@ -189,7 +142,7 @@ const CorrespondenceTraining = () => {
         specializations: asArray(teacher.specializations),
       })),
       contacts: {
-        // Берем все контакты из API как массив
+        title: t("correspondenceTraining.contacts.title"),
         items: asArray(apiFaculty.contacts).map((contact) => ({
           title: contact.title,
           value: contact.value,
@@ -208,6 +161,26 @@ const CorrespondenceTraining = () => {
     };
   };
 
+  const getDefaultData = () => ({
+    name: t("correspondenceTraining.name"),
+    fullDescription: t("correspondenceTraining.fullDescription"),
+    badge: t("correspondenceTraining.badge"),
+    stats: t("correspondenceTraining.stats", { returnObjects: true }),
+    about: {
+      missionTitle: t("correspondenceTraining.about.missionTitle"),
+      advantagesTitle: t("correspondenceTraining.about.advantagesTitle"),
+      mission: t("correspondenceTraining.about.mission"),
+      advantages: t("correspondenceTraining.about.advantages", { returnObjects: true }),
+    },
+    features: t("correspondenceTraining.features", { returnObjects: true }),
+    programs: t("correspondenceTraining.programs", { returnObjects: true }),
+    technologies: t("correspondenceTraining.technologies", { returnObjects: true }),
+    platforms: t("correspondenceTraining.platforms", { returnObjects: true }),
+    learningProcess: t("correspondenceTraining.learningProcess", { returnObjects: true }),
+    contacts: t("correspondenceTraining.contacts", { returnObjects: true }),
+    leadership: t("correspondenceTraining.leadership", { returnObjects: true }),
+  });
+
   const getIconForStat = (meaning) => {
     const icons = {
       студентов: "👨‍🎓",
@@ -215,24 +188,11 @@ const CorrespondenceTraining = () => {
       преподавателей: "👨‍🏫",
       курсов: "📚",
       онлайн: "👨‍💻",
+      трудоустройство: "💼",
+      балл: "⭐",
       default: "📊",
     };
     return icons[meaning?.toLowerCase()] || icons.default;
-  };
-
-  const getAchievementIcon = (index) => {
-    const icons = ["📊", "🤝", "⭐", "🎯", "🚀"];
-    return icons[index] || icons[0];
-  };
-
-  const getSpecializationIcon = (name) => {
-    const icons = {
-      электронное: "💻",
-      образовательные: "🚀",
-      дистанционное: "🌐",
-      default: "🎯",
-    };
-    return icons[name?.toLowerCase().split(" ")[0]] || icons.default;
   };
 
   const getInitials = (fullName) => {
@@ -267,9 +227,14 @@ const CorrespondenceTraining = () => {
   }, [facultyData.stats]);
 
   const startCounters = () => {
-    const targetValues = facultyData.stats.map(
-      (stat) => parseInt(stat.value.replace(/\D/g, "")) || 0
-    );
+    const targetValues = facultyData.stats.map((stat) => {
+      const value = stat.value;
+      if (value.includes("%")) {
+        return parseFloat(value) || 0;
+      } else {
+        return parseInt(value.replace(/\D/g, "")) || 0;
+      }
+    });
     const duration = 2000;
     const steps = 60;
     const stepValues = targetValues.map((target) => target / steps);
@@ -292,71 +257,50 @@ const CorrespondenceTraining = () => {
     }, duration / steps);
   };
 
-  // Проверяем есть ли контактные данные
+  // Проверяем наличие данных для условного рендеринга вкладок
+  const hasFeatures = facultyData.features && facultyData.features.length > 0;
+  const hasPrograms = facultyData.programs && facultyData.programs.length > 0;
+  const hasTechnologies = facultyData.technologies && facultyData.technologies.length > 0;
+  const hasPlatforms = facultyData.platforms && facultyData.platforms.length > 0;
+  const hasLearningProcess = facultyData.learningProcess && facultyData.learningProcess.length > 0;
   const hasContactData =
     facultyData.contacts &&
     (facultyData.contacts.dean ||
       (facultyData.contacts.items && facultyData.contacts.items.length > 0));
 
-  const hasTeachers = facultyData.teachers && facultyData.teachers.length > 0;
-  const hasPrograms = facultyData.programs && facultyData.programs.length > 0;
-  const hasSpecializations =
-    facultyData.specializations && facultyData.specializations.length > 0;
-  const hasTechnologies =
-    facultyData.technologies && facultyData.technologies.length > 0;
+  // Определяем табы на основе доступных данных
+  const getTabs = () => {
+  const allTabs = t("correspondenceTraining.tabs", { returnObjects: true }) || [];
+  
+  const availableTabs = allTabs.filter(tab => {
+    switch(tab.id) {
+      case "programs": return hasPrograms;
+      case "technology": return hasTechnologies || hasPlatforms;
+      case "process": return hasLearningProcess;
+      case "contacts": return hasContactData;
+      case "about": return true; // about всегда показываем
+      default: return true;
+    }
+  });
+  
+  const getTabColor = (tabId) => {
+    const colors = {
+      about: "from-blue-500 to-cyan-500",
+      programs: "from-green-500 to-emerald-500",
+      technology: "from-purple-500 to-pink-500",
+      process: "from-orange-500 to-yellow-500",
+      contacts: "from-emerald-500 to-green-500"
+    };
+    return colors[tabId] || "from-blue-500 to-cyan-500";
+  };
+  
+  return availableTabs.map(tab => ({
+    ...tab,
+    color: getTabColor(tab.id)
+  }));
+};
 
-  // Табы в нужном порядке
-  const tabs = [
-    {
-      id: "about",
-      label: t("correspondenceTraining.tabs.about", "О факультете"),
-      icon: "🏢",
-      color: "from-blue-500 to-cyan-500",
-    },
-    ...(hasPrograms
-      ? [
-          {
-            id: "programs",
-            label: t("correspondenceTraining.tabs.programs", "Программы"),
-            icon: "📚",
-            color: "from-green-500 to-emerald-500",
-          },
-        ]
-      : []),
-    ...(hasSpecializations
-      ? [
-          {
-            id: "specializations",
-            label: t(
-              "correspondenceTraining.tabs.specializations",
-              "Специализации"
-            ),
-            icon: "🎯",
-            color: "from-blue-500 to-green-500",
-          },
-        ]
-      : []),
-    ...(hasTeachers
-      ? [
-          {
-            id: "teachers",
-            label: t("correspondenceTraining.tabs.teachers", "Преподаватели"),
-            icon: "👨‍🏫",
-            color: "from-cyan-500 to-blue-500",
-          },
-        ]
-      : []),
-    ...(hasContactData
-      ? [
-          {
-            id: "contacts",
-            label: t("correspondenceTraining.tabs.contacts", "Контакты"),
-            icon: "📞",
-            color: "from-emerald-500 to-green-500",
-          },
-        ]
-      : []),
-  ];
+const tabs = getTabs();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -379,7 +323,6 @@ const CorrespondenceTraining = () => {
     },
   };
 
-  // Логируем ошибки, но не блокируем рендер - страница показывается с пустыми данными
   if (apiData.error) {
     console.warn("Faculty API error, using fallback data:", apiData.error);
   }
@@ -397,13 +340,9 @@ const CorrespondenceTraining = () => {
 
         {/* Технологические символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🌐</div>
-        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">
-          💻
-        </div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">💻</div>
         <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">📱</div>
-        <div className="absolute bottom-1/4 right-1/3 text-5xl opacity-5">
-          🔄
-        </div>
+        <div className="absolute bottom-1/4 right-1/3 text-5xl opacity-5">🔄</div>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
@@ -414,18 +353,6 @@ const CorrespondenceTraining = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16 lg:mb-20"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isVisible ? { scale: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="inline-flex items-center px-6 py-3 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/20 mb-6"
-          >
-            <span className="w-2 h-2 bg-gradient-to-r from-blue-400 to-emerald-400 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-blue-100 font-medium text-lg">
-              {facultyData.badge}
-            </span>
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
@@ -495,6 +422,34 @@ const CorrespondenceTraining = () => {
           ))}
         </motion.div>
 
+        {/* Features */}
+        {hasFeatures && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="grid md:grid-cols-3 gap-6 mb-16 lg:mb-20"
+          >
+            {facultyData.features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/5 rounded-2xl p-6 text-center border border-white/10 hover:border-cyan-400/30 transition-all duration-500 transform hover:-translate-y-2 group backdrop-blur-sm"
+              >
+                <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors duration-300">
+                  {feature.title}
+                </h3>
+                <p className="text-blue-100 text-lg">{feature.description}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+
         {/* Main Content */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -554,64 +509,29 @@ const CorrespondenceTraining = () => {
                       <p className="text-blue-100 text-lg leading-relaxed border-l-4 border-blue-500 pl-6 py-4 bg-white/5 rounded-r-2xl backdrop-blur-sm">
                         {facultyData.about.mission}
                       </p>
-                      <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl p-6 border border-blue-500/20 backdrop-blur-sm">
-                        <h4 className="text-xl font-bold text-white mb-4 flex items-center">
-                          <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white mr-3 text-sm">
-                            ✨
-                          </span>
-                          {facultyData.about.advantagesTitle}
-                        </h4>
-                        <ul className="space-y-4">
-                          {facultyData.about.advantages.map(
-                            (advantage, index) => (
-                              <motion.li
-                                key={index}
-                                className="flex items-start group"
-                                whileHover={{ x: 10 }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                <span className="w-3 h-3 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full mt-2 mr-4 flex-shrink-0 group-hover:scale-150 transition-transform duration-300"></span>
-                                <span className="text-blue-100 text-lg group-hover:text-white transition-colors duration-300">
-                                  {advantage}
-                                </span>
-                              </motion.li>
-                            )
-                          )}
-                        </ul>
-                      </div>
                     </div>
-                    <div className="space-y-6">
-                      <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 rounded-2xl p-6 border border-emerald-500/20 backdrop-blur-sm">
-                        <h4 className="text-xl font-bold text-white mb-4 flex items-center">
-                          <span className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl flex items-center justify-center text-white mr-3 text-sm">
-                            🏆
-                          </span>
-                          {facultyData.about.achievementsTitle}
-                        </h4>
-                        <div className="space-y-4">
-                          {facultyData.about.achievements.map(
-                            (achievement, index) => (
-                              <motion.div
-                                key={index}
-                                className="flex items-center space-x-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
-                                whileHover={{ scale: 1.02 }}
-                              >
-                                <span className="text-3xl text-emerald-400 group-hover:scale-110 transition-transform duration-300">
-                                  {achievement.icon}
-                                </span>
-                                <div>
-                                  <div className="text-white font-bold text-xl">
-                                    {achievement.value}
-                                  </div>
-                                  <div className="text-blue-200 text-lg">
-                                    {achievement.label}
-                                  </div>
-                                </div>
-                              </motion.div>
-                            )
-                          )}
-                        </div>
-                      </div>
+                    <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl p-6 border border-blue-500/20 backdrop-blur-sm">
+                      <h4 className="text-xl font-bold text-white mb-4 flex items-center">
+                        <span className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white mr-3 text-sm">
+                          ✨
+                        </span>
+                        {facultyData.about.advantagesTitle}
+                      </h4>
+                      <ul className="space-y-4">
+                        {facultyData.about.advantages.map((advantage, index) => (
+                          <motion.li
+                            key={index}
+                            className="flex items-start group"
+                            whileHover={{ x: 10 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <span className="w-3 h-3 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full mt-2 mr-4 flex-shrink-0 group-hover:scale-150 transition-transform duration-300"></span>
+                            <span className="text-blue-100 text-lg group-hover:text-white transition-colors duration-300">
+                              {advantage}
+                            </span>
+                          </motion.li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </motion.div>
@@ -627,279 +547,225 @@ const CorrespondenceTraining = () => {
                   transition={{ duration: 0.5 }}
                   className="space-y-8"
                 >
-                  <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {facultyData.programs && facultyData.programs.length > 0 ? (
-                      facultyData.programs.map((program, index) => (
-                        <motion.div
-                          key={program.id || index}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden backdrop-blur-sm"
-                          onMouseEnter={() =>
-                            setHoveredCard(`program-${index}`)
-                          }
-                          onMouseLeave={() => setHoveredCard(null)}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
-
-                          <div className="relative z-10">
-                            <div
-                              className={`text-5xl mb-6 transition-transform duration-500 ${
-                                hoveredCard === `program-${index}`
-                                  ? "scale-110 rotate-6"
-                                  : "group-hover:scale-105"
-                              }`}
-                            >
-                              {program.icon}
-                            </div>
-                            <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-emerald-300 transition-colors duration-300">
-                              {program.name}
-                            </h4>
-                            <p className="text-blue-100 text-lg mb-6 leading-relaxed">
-                              {program.description}
-                            </p>
-                            <div className="space-y-4 text-lg">
-                              <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
-                                <span className="text-blue-200">
-                                  {t(
-                                    "correspondenceTraining.programs.level",
-                                    "Уровень"
-                                  )}
-                                  :
-                                </span>
-                                <span className="text-white font-semibold">
-                                  {program.level}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
-                                <span className="text-blue-200">
-                                  {t(
-                                    "correspondenceTraining.programs.duration",
-                                    "Длительность"
-                                  )}
-                                  :
-                                </span>
-                                <span className="text-white font-semibold">
-                                  {program.duration}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
-                                <span className="text-blue-200">
-                                  {t(
-                                    "correspondenceTraining.programs.format",
-                                    "Форма"
-                                  )}
-                                  :
-                                </span>
-                                <span className="text-white font-semibold">
-                                  {program.format}
-                                </span>
-                              </div>
-                              {program.tuitionFee && (
-                                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
-                                  <span className="text-blue-200">
-                                    {t(
-                                      "correspondenceTraining.programs.tuition",
-                                      "Стоимость"
-                                    )}
-                                    :
-                                  </span>
-                                  <span className="text-white font-semibold">
-                                    {program.tuitionFee} ₽
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))
-                    ) : (
-                      <div className="col-span-full text-center text-blue-200 text-lg py-8">
-                        {t(
-                          "correspondenceTraining.noPrograms",
-                          "Программы пока не добавлены"
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Specializations Tab */}
-              {activeTab === "specializations" && (
-                <motion.div
-                  key="specializations"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  className="space-y-8"
-                >
-                  <div
-                    className={`grid ${
-                      hasTechnologies ? "md:grid-cols-2" : "md:grid-cols-1"
-                    } gap-8`}
-                  >
-                    {hasSpecializations && (
-                      <div>
-                        <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-                          <span className="w-3 h-12 bg-gradient-to-b from-blue-400 to-cyan-400 rounded mr-4"></span>
-                          {t(
-                            "correspondenceTraining.specializations.title",
-                            "Направления подготовки"
-                          )}
-                        </h3>
-                        <div className="space-y-4">
-                          {facultyData.specializations.map((spec, index) => (
-                            <motion.div
-                              key={spec.id || index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-start space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-blue-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
-                            >
-                              <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
-                                {spec.icon}
-                              </div>
-                              <div className="flex-1">
-                                <h4 className="font-bold text-white text-xl mb-3 group-hover:text-cyan-300 transition-colors duration-300">
-                                  {spec.name}
-                                </h4>
-                                <p className="text-blue-100 text-lg mb-4">
-                                  {spec.description}
-                                </p>
-                                {spec.competencies &&
-                                  spec.competencies.length > 0 && (
-                                    <div className="flex flex-wrap gap-2">
-                                      {spec.competencies.map((comp, i) => (
-                                        <motion.span
-                                          key={i}
-                                          className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-2xl text-base font-medium hover:bg-blue-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-blue-400/30"
-                                          whileHover={{ scale: 1.05 }}
-                                        >
-                                          {comp}
-                                        </motion.span>
-                                      ))}
-                                    </div>
-                                  )}
-                              </div>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {hasTechnologies && (
-                      <div>
-                        <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-                          <span className="w-3 h-12 bg-gradient-to-b from-emerald-400 to-green-400 rounded mr-4"></span>
-                          {t(
-                            "correspondenceTraining.technologies.title",
-                            "Технологии обучения"
-                          )}
-                        </h3>
-                        <div className="space-y-4">
-                          {facultyData.technologies.map((tech, index) => (
-                            <motion.div
-                              key={tech.id || index}
-                              initial={{ opacity: 0, x: 20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
-                            >
-                              <div className="flex items-center space-x-4">
-                                <span className="text-4xl group-hover:scale-110 transition-transform duration-300">
-                                  {tech.icon}
-                                </span>
-                                <div>
-                                  <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">
-                                    {tech.name}
-                                  </div>
-                                  <div className="text-blue-200 text-lg">
-                                    {tech.description}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-white font-bold text-2xl">
-                                  {tech.usage}
-                                </div>
-                                <div className="text-emerald-300 text-base">
-                                  {t(
-                                    "correspondenceTraining.technologies.usage",
-                                    "использование"
-                                  )}
-                                </div>
-                              </div>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Teachers Tab */}
-              {activeTab === "teachers" && (
-                <motion.div
-                  key="teachers"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  className="space-y-8"
-                >
-                  <h3 className="text-3xl font-bold text-white text-center mb-8 flex items-center justify-center">
-                    <span className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">
-                      👨‍🏫
-                    </span>
-                    {t(
-                      "correspondenceTraining.teachers.title",
-                      "Преподавательский состав"
-                    )}
+                  <h3 className="text-3xl font-bold text-white text-center mb-8">
+                    {t("correspondenceTraining.programsTitle", "Образовательные программы")}
                   </h3>
-
-                  <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
-                    {facultyData.teachers.map((teacher, index) => (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {facultyData.programs.map((program, index) => (
                       <motion.div
-                        key={teacher.id || index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        key={program.id || index}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-cyan-400/30 transition-all duration-500 transform hover:-translate-y-2 group text-center relative overflow-hidden backdrop-blur-sm"
-                        onMouseEnter={() => setHoveredCard(`teacher-${index}`)}
+                        className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-emerald-400/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden backdrop-blur-sm"
+                        onMouseEnter={() => setHoveredCard(`program-${index}`)}
                         onMouseLeave={() => setHoveredCard(null)}
                       >
-                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
 
                         <div className="relative z-10">
-                          <div className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                            {teacher.avatar}
+                          <div
+                            className={`text-5xl mb-6 transition-transform duration-500 ${
+                              hoveredCard === `program-${index}`
+                                ? "scale-110 rotate-6"
+                                : "group-hover:scale-105"
+                            }`}
+                          >
+                            {program.icon}
                           </div>
-                          <h4 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors duration-300">
-                            {teacher.name}
+                          <h4 className="text-2xl font-bold text-white mb-4 group-hover:text-emerald-300 transition-colors duration-300">
+                            {program.name}
                           </h4>
-                          <p className="text-cyan-400 text-lg mb-2">
-                            {teacher.position}
+                          <p className="text-blue-100 text-lg mb-6 leading-relaxed">
+                            {program.description}
                           </p>
-                          <p className="text-blue-100 text-lg mb-4">
-                            {teacher.qualification}
-                          </p>
-                          <div className="flex flex-wrap justify-center gap-2">
-                            {teacher.specializations?.map((spec, i) => (
-                              <motion.span
-                                key={i}
-                                className="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-xl text-sm font-medium hover:bg-cyan-500/30 hover:scale-105 transition-all duration-300 cursor-default border border-cyan-400/30"
-                                whileHover={{ scale: 1.05 }}
-                              >
-                                {spec}
-                              </motion.span>
-                            ))}
+                          <div className="space-y-4 text-lg">
+                            <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
+                              <span className="text-blue-200">
+                                {t("correspondenceTraining.programDetails.level")}:
+                              </span>
+                              <span className="text-white font-semibold">
+                                {program.level}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
+                              <span className="text-blue-200">
+                                {t("correspondenceTraining.programDetails.duration")}:
+                              </span>
+                              <span className="text-white font-semibold">
+                                {program.duration}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center p-3 bg-white/5 rounded-2xl">
+                              <span className="text-blue-200">
+                                {t("correspondenceTraining.programDetails.format")}:
+                              </span>
+                              <span className="text-white font-semibold">
+                                {program.format}
+                              </span>
+                            </div>
+                            {program.tuitionFee && (
+                              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-2xl">
+                                <span className="text-blue-200">
+                                  {t("correspondenceTraining.programDetails.cost")}:
+                                </span>
+                                <span className="text-white font-semibold">
+                                  {program.tuitionFee} ₽
+                                </span>
+                              </div>
+                            )}
                           </div>
+                          <motion.button
+                            className="w-full mt-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-2xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            {t("correspondenceTraining.buttons.apply")}
+                          </motion.button>
                         </div>
                       </motion.div>
                     ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Technology Tab */}
+              {activeTab === "technology" && (
+                <motion.div
+                  key="technology"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-12"
+                >
+                  {/* Technologies */}
+                  {hasTechnologies && (
+                    <div>
+                      <h3 className="text-3xl font-bold text-white text-center mb-8">
+                        {t("correspondenceTraining.technology.title")}
+                      </h3>
+                      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {facultyData.technologies.map((tech, index) => (
+                          <motion.div
+                            key={tech.id || index}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="bg-white/5 rounded-2xl p-6 text-center border border-white/10 hover:border-purple-400/30 transition-all duration-500 transform hover:-translate-y-2 group backdrop-blur-sm"
+                          >
+                            <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                              {tech.icon}
+                            </div>
+                            <h4 className="text-xl font-bold text-white mb-3 group-hover:text-purple-300 transition-colors duration-300">
+                              {tech.name}
+                            </h4>
+                            <p className="text-blue-100 text-lg">{tech.description}</p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Platforms */}
+                  {hasPlatforms && (
+                    <div>
+                      <h3 className="text-3xl font-bold text-white text-center mb-8">
+                        {t("correspondenceTraining.platformss.title")}
+                      </h3>
+                      <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+                        {facultyData.platforms.map((platform, index) => (
+                          <motion.div
+                            key={platform.id || index}
+                            initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-center space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-pink-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm"
+                          >
+                            <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform duration-300">
+                              {platform.icon}
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-bold text-white text-xl mb-2 group-hover:text-pink-300 transition-colors duration-300">
+                                {platform.name}
+                              </h4>
+                              <p className="text-blue-100 text-lg mb-3">
+                                {platform.description}
+                              </p>
+                              <motion.a
+                                href={platform.link}
+                                className="inline-flex items-center text-pink-300 hover:text-pink-200 font-medium group"
+                                whileHover={{ x: 5 }}
+                              >
+                                {t("correspondenceTraining.buttons.goTo")}
+                                <span className="ml-2 group-hover:translate-x-2 transition-transform duration-300">→</span>
+                              </motion.a>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {/* Process Tab */}
+              {activeTab === "process" && (
+                <motion.div
+                  key="process"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-8"
+                >
+                  <h3 className="text-3xl font-bold text-white text-center mb-8">
+                    {t("correspondenceTraining.learningProcesss.title")}
+                  </h3>
+                  <div className="relative">
+                    {/* Timeline line */}
+                    <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-orange-500 to-yellow-500 transform -translate-x-1/2 hidden md:block"></div>
+
+                    <div className="space-y-8 md:space-y-12">
+                      {facultyData.learningProcess.map((step, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="relative"
+                        >
+                          {/* Timeline dot */}
+                          <div className="absolute left-0 w-16 h-16 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg hidden md:flex">
+                            {step.step}
+                          </div>
+
+                          <div className="md:ml-24 bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-orange-400/30 transition-all duration-500 transform hover:-translate-y-1 group backdrop-blur-sm">
+                            <div className="flex items-start space-x-4">
+                              <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl flex items-center justify-center text-white text-2xl md:hidden group-hover:scale-110 transition-transform duration-300">
+                                {step.icon}
+                              </div>
+                              <div className="md:hidden flex-shrink-0 w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center text-white font-bold">
+                                {step.step}
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-3 mb-3">
+                                  <span className="text-2xl hidden md:block group-hover:scale-110 transition-transform duration-300">
+                                    {step.icon}
+                                  </span>
+                                  <h4 className="font-bold text-white text-xl group-hover:text-orange-300 transition-colors duration-300">
+                                    {step.title}
+                                  </h4>
+                                </div>
+                                <p className="text-blue-100 text-lg leading-relaxed">
+                                  {step.description}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -915,44 +781,40 @@ const CorrespondenceTraining = () => {
                   className="grid lg:grid-cols-2 gap-8"
                 >
                   {/* Контактные данные */}
-                  {facultyData.contacts.items &&
-                    facultyData.contacts.items.length > 0 && (
-                      <div className="space-y-6">
-                        <h3 className="text-3xl font-bold text-white flex items-center">
-                          <span className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">
-                            📞
-                          </span>
-                          {t(
-                            "correspondenceTraining.contacts.title",
-                            "Контакты"
-                          )}
-                        </h3>
-                        <div className="space-y-4">
-                          {facultyData.contacts.items.map((contact, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-center space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 backdrop-blur-sm group"
-                              whileHover={{ scale: 1.02 }}
-                            >
-                              <div className="w-14 h-14 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-300">
-                                {contact.icon}
+                  {facultyData.contacts.items && facultyData.contacts.items.length > 0 && (
+                    <div className="space-y-6">
+                      <h3 className="text-3xl font-bold text-white flex items-center">
+                        <span className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">
+                          📞
+                        </span>
+                        {facultyData.contacts.title}
+                      </h3>
+                      <div className="space-y-4">
+                        {facultyData.contacts.items.map((contact, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="flex items-center space-x-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300 backdrop-blur-sm group"
+                            whileHover={{ scale: 1.02 }}
+                          >
+                            <div className="w-14 h-14 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-300">
+                              {contact.icon}
+                            </div>
+                            <div className="flex-1">
+                              <div className="text-emerald-300 font-semibold text-sm mb-1">
+                                {contact.title}
                               </div>
-                              <div className="flex-1">
-                                <div className="text-emerald-300 font-semibold text-sm mb-1">
-                                  {contact.title}
-                                </div>
-                                <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">
-                                  {contact.value}
-                                </div>
+                              <div className="text-white font-bold text-xl group-hover:text-emerald-300 transition-colors duration-300">
+                                {contact.value}
                               </div>
-                            </motion.div>
-                          ))}
-                        </div>
+                            </div>
+                          </motion.div>
+                        ))}
                       </div>
-                    )}
+                    </div>
+                  )}
 
                   {/* Руководство факультета */}
                   {facultyData.contacts.dean && (
@@ -961,10 +823,7 @@ const CorrespondenceTraining = () => {
                         <span className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white mr-4 text-lg">
                           👨‍💼
                         </span>
-                        {t(
-                          "correspondenceTraining.leadership.title",
-                          "Руководство"
-                        )}
+                        {t("correspondenceTraining.leadership.title")}
                       </h3>
                       <div className="text-center">
                         <div className="w-24 h-24 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg">

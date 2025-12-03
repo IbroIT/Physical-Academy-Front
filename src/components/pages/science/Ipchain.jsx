@@ -334,14 +334,6 @@ const Ipchain = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12 lg:mb-20"
         >
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={isVisible ? { scale: 1, rotate: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center text-white text-2xl shadow-2xl"
-          >
-            ⛓️
-          </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {ipchainData.title}
           </h1>

@@ -388,12 +388,6 @@ const AcademyAbout = () => {
         <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}>
-          <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300">
-            <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-green-300 font-medium text-sm md:text-base">
-              {t('academy.about.badge', 'О Академии')}
-            </span>
-          </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
             {t('academy.about.subtitle2', 'Наша академия')}
           </h2>
@@ -420,10 +414,16 @@ const AcademyAbout = () => {
                 {/* Основной текст */}
                 <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl">
                   <p className="text-blue-100 leading-relaxed text-lg md:text-xl mb-6 pb-6 border-b border-white/10">
-                    {t('academy.about.intro', 'Наша академия была основана с целью предоставления высококачественного образования в области физической культуры и спорта. Мы гордимся нашей историей и достижениями, которые сделали нас одним из ведущих учебных заведений в этой сфере.')}
+                    {t('academy.about.intro', 'Кыргызская государственная академия физической культуры и спорта имени Б.Т. Турусбекова один из старейших вузов страны с 70-летней историей.')}
+                  </p>
+                  <p className="text-blue-100 leading-relaxed text-lg md:text-xl mb-6 pb-6 border-b border-white/10">
+                    {t('academy.about.intro1', 'Наша академия была основана с целью предоставления высококачественного образования в области физической культуры и спорта. Мы гордимся нашей историей и достижениями, которые сделали нас одним из ведущих учебных заведений в этой сфере.')}
+                  </p>
+                  <p className="text-blue-100 leading-relaxed text-lg md:text-xl mb-6 pb-6 border-b border-white/10">
+                    {t('academy.about.intro2', 'Наша академия была основана с целью предоставления высококачественного образования в области физической культуры и спорта. Мы гордимся нашей историей и достижениями, которые сделали нас одним из ведущих учебных заведений в этой сфере.')}
                   </p>
                   <p className="text-blue-100 leading-relaxed text-lg md:text-xl">
-                    {t('academy.about.intro2', 'Наши студенты получают не только теоретические знания, но и практические навыки, необходимые для успешной карьеры в области физической культуры, спорта и оздоровления. Мы стремимся создать вдохновляющую образовательную среду, которая способствует развитию талантов и достижению высоких результатов.')}
+                    {t('academy.about.intro3', 'Наши студенты получают не только теоретические знания, но и практические навыки, необходимые для успешной карьеры в области физической культуры, спорта и оздоровления. Мы стремимся создать вдохновляющую образовательную среду, которая способствует развитию талантов и достижению высоких результатов.')}
                   </p>
                 </div>
 

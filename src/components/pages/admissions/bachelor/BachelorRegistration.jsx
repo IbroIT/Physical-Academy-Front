@@ -93,8 +93,7 @@ const BachelorRegistration = () => {
     t('bachelor.admission.requirements.age'),
     t('bachelor.admission.requirements.education'),
     t('bachelor.admission.requirements.exams'),
-    t('bachelor.admission.requirements.language'),
-    t('bachelor.admission.requirements.health')
+    t('bachelor.admission.requirements.language')
   ];
 
   const documents = [
@@ -102,7 +101,13 @@ const BachelorRegistration = () => {
     { name: t('bachelor.admission.documents.diploma'), required: true },
     { name: t('bachelor.admission.documents.photos'), required: true },
     { name: t('bachelor.admission.documents.medical'), required: true },
-    { name: t('bachelor.admission.documents.military'), required: false }
+    { name: t('bachelor.admission.documents.military'), required: true },
+    { name: t('bachelor.admission.documents.other'), required: true },
+    { name: t('bachelor.admission.documents.transcript'), required: true },
+    { name: t('bachelor.admission.documents.recommendation'), required: true },
+    { name: t('bachelor.admission.documents.portfolio'), required: true },
+    { name: t('bachelor.admission.documents.language_certificate'), required: true },
+    { name: t('bachelor.admission.documents.financial_guarantee'), required: true }
   ];
 
   return (
@@ -123,19 +128,10 @@ const BachelorRegistration = () => {
         <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}>
-          <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300">
-            <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-green-300 font-medium text-sm md:text-base">
-              {t('bachelor.admission.badge')}
-            </span>
-          </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
             {t('bachelor.admission.title')}
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-green-400 mx-auto mb-6 md:mb-8"></div>
-          <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto px-4 leading-relaxed">
-            {t('bachelor.admission.subtitle')}
-          </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 md:gap-12">
@@ -205,7 +201,7 @@ const BachelorRegistration = () => {
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}>
               <h3 className="font-semibold text-white mb-4 text-lg flex items-center gap-2">
-                <span className="text-blue-400">📋</span>
+                <span className="text-blue-400">📚</span>
                 <span>{t('bachelor.admission.requirementsTitle')}</span>
               </h3>
               <ul className="space-y-3">
@@ -286,20 +282,17 @@ const BachelorRegistration = () => {
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}>
               <h3 className="font-semibold text-blue-300 mb-4 flex items-center gap-2">
-                <span className="text-blue-400">📞</span>
+                <span className="text-blue-400">❗</span>
                 <span>{t('bachelor.admission.contacts.title')}</span>
               </h3>
               <div className="space-y-3 text-blue-200 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-400">📧</span>
                   <span>{t('bachelor.admission.contacts.email')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-400">📱</span>
                   <span>{t('bachelor.admission.contacts.phone')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-400">🏛️</span>
                   <span>{t('bachelor.admission.contacts.address')}</span>
                 </div>
               </div>

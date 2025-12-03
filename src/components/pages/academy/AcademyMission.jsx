@@ -118,12 +118,6 @@ const AcademyMission = () => {
       gradient: "from-emerald-500 to-blue-600",
     },
     {
-      id: "values",
-      label: t("academy.mission.tabs.values"),
-      icon: "💎",
-      gradient: "from-blue-600 to-emerald-600",
-    },
-    {
       id: "strategy",
       label: t("academy.mission.tabs.strategy"),
       icon: "🚀",
@@ -238,9 +232,6 @@ const AcademyMission = () => {
       <h3 className="text-2xl text-white mb-4">
         {t("common.loading", { defaultValue: "Данные отсутствуют" })}
       </h3>
-      <p className="text-blue-200 text-lg">
-        Информация для этого раздела еще не добавлена в систему
-      </p>
     </div>
   );
 
@@ -397,7 +388,7 @@ const AcademyMission = () => {
                           : "bg-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white"
                       }`}
                     >
-                      {["🎓", "💡", "🤝", "🔬", "⚡", "🌟", "🎯", "💎"][
+                      {["🎓", "💡", "🤝", "🔬", "⚡", "🌟", "🎯"][
                         index
                       ] || "💡"}
                     </motion.div>
@@ -513,17 +504,6 @@ const AcademyMission = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12 lg:mb-20"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isVisible ? { scale: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="inline-flex items-center px-6 py-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6"
-          >
-            <span className="w-2 h-2 bg-emerald-400 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-emerald-300 font-medium text-sm lg:text-base">
-              {t("academy.mission.badge")}
-            </span>
-          </motion.div>
 
           <motion.h2
             initial={{ opacity: 0, y: 30 }}

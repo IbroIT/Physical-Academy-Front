@@ -167,14 +167,6 @@ const ContactInfo = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12 lg:mb-16"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isVisible ? { scale: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
-          >
-            📞
-          </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {t('contact.info.title', 'Контактная информация')}
           </h1>
