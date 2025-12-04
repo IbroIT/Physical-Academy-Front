@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const DepartmentTabs = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('');
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +11,7 @@ const DepartmentTabs = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/general-departments/categories/');
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/general-departments/categories/?lang=${i18n.language}`);
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -29,7 +29,7 @@ const DepartmentTabs = () => {
     };
 
     fetchCategories();
-  }, []);
+  }, [i18n.language]);
 
   const getColorStyles = (color) => {
     const colorMap = {
