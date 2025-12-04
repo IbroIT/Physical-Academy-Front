@@ -95,8 +95,7 @@ const NewsDetailPage = () => {
     author: 'Редакция',
     created_at: new Date().toISOString(),
     tags: ['новости', 'информация'],
-    read_time: '2 мин чтения',
-    views: 0
+    read_time: '2 мин чтения'
   });
 
   if (loading) {
