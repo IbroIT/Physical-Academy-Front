@@ -20,6 +20,11 @@ export const getImageUrl = (imagePath) => {
     return imagePath;
   }
 
+  // Если это Cloudinary public_id (содержит 'upload/')
+  if (imagePath.includes('upload/')) {
+    return `https://res.cloudinary.com/dyg5p8i69/${imagePath}`;
+  }
+
   // Если относительный путь, добавляем базовый URL
   // Убираем начальный слеш если есть
   const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;

@@ -8511,5 +8511,314 @@
     },
     "noObjects": "Facilities in development",
     "comingSoon": "Information about facilities in this category will be added soon"
+  },
+  "faculty": {
+    "pedagogical": {
+      "title": "Pedagogical Faculty",
+      "description": "The faculty prepares highly qualified specialists in the field of physical education and sports",
+      "tabs": {
+        "history": "History",
+        "departments": "Departments",
+        "achievements": "Achievements"
+      },
+      "cards": {
+        "physicalEducation": {
+          "title": "Physical Education",
+          "description": "Program for training specialists in physical education of schoolchildren"
+        },
+        "sportsTraining": {
+          "title": "Sports Training",
+          "description": "Specialization in sports training and training methodologies"
+        },
+        "sportsManagement": {
+          "title": "Sports Management",
+          "description": "Management of sports organizations and events"
+        }
+      },
+      "history": {
+        "title": "History",
+        "events": {
+          "foundation": {
+            "year": "1950",
+            "title": "Faculty Foundation",
+            "description": "The Pedagogical Faculty was founded as part of the Kyrgyz State University"
+          },
+          "firstGraduates": {
+            "year": "1955",
+            "title": "First Graduates",
+            "description": "The faculty's first graduates began working in the republic's schools"
+          },
+          "expansion": {
+            "year": "1970",
+            "title": "Expansion",
+            "description": "The faculty was expanded with new specializations and sports facilities were built"
+          }
+        }
+      }
+    }
+  },
+  "departmentTabs": {
+    "title": "Faculty Departments",
+    "description": "Our departments represent academic excellence centers, uniting experienced teachers and modern educational methodologies",
+    "tabs": {
+      "languages": "Languages Department",
+      "philosophy": "Philosophy and Humanities Department (PHD)",
+      "fundamental": "Fundamental and Natural Sciences Department (FNSD)",
+      "theory": "Theory, Methodology and Physical Culture and Sports Department (TMPCSD)",
+      "pedagogy": "Pedagogy, Psychology and Physical Culture History Department (PPPHCD)"
+    },
+    "content": {
+      "about": "About Department",
+      "features": "Main Directions",
+      "staff": "Staff",
+      "programs": "Programs",
+      "languages": {
+        "number": "01",
+        "description": "Languages Department specializes in foreign languages study and teaching, linguistics and intercultural communication. We prepare specialists capable of freely orienting in international environment.",
+        "feature1": "Teaching 10+ foreign languages",
+        "feature2": "Modern language training methodologies",
+        "feature3": "International internships and exchanges",
+        "staffCount": "25 teachers",
+        "programsCount": "8 educational programs"
+      },
+      "philosophy": {
+        "number": "02",
+        "description": "Philosophy and Humanities Department deals with fundamental questions of being, culture and society. We develop critical thinking and humanitarian literacy.",
+        "feature1": "Philosophical research and publications",
+        "feature2": "Cultural projects and expertise",
+        "feature3": "Interdisciplinary humanitarian programs",
+        "staffCount": "18 teachers",
+        "programsCount": "6 educational programs"
+      },
+      "fundamental": {
+        "number": "03",
+        "description": "Fundamental and Natural Sciences Department provides basic training in mathematics, physics, chemistry and biology for all study directions.",
+        "feature1": "Modern equipment laboratories",
+        "feature2": "Fundamental scientific research",
+        "feature3": "Natural sciences integration into educational process",
+        "staffCount": "32 teachers",
+        "programsCount": "12 educational programs"
+      },
+      "theory": {
+        "number": "04",
+        "description": "Theory, Methodology and Physical Culture and Sports Department prepares specialists in physical education, sports science and training methodology.",
+        "feature1": "Modern sports methodologies",
+        "feature2": "Scientific research in sports",
+        "feature3": "Professional coaches training",
+        "staffCount": "28 teachers",
+        "programsCount": "10 educational programs"
+      },
+      "pedagogy": {
+        "number": "05",
+        "description": "Pedagogy, Psychology and Physical Culture History Department specializes in teachers, psychologists and physical education researchers training.",
+        "feature1": "Psychological-pedagogical training",
+        "feature2": "Sports history research",
+        "feature3": "Innovative educational technologies",
+        "staffCount": "22 teachers",
+        "programsCount": "7 educational programs"
+      }
+    }
+  },
+  "coachingFacultyNew": {
+    "title": "Coaching Faculty",
+    "description": "Professional coaches and sports science specialists training center",
+    "tabs": {
+      "history": "History",
+      "programs": "Programs",
+      "specializations": "Specializations",
+      "departments": "Departments"
+    },
+    "history": {
+      "description": "Coaching faculty history is the path from small educational department to leading coaches training center of highest qualification.",
+      "1955": "Faculty foundation. First graduation - 30 coaches",
+      "1980": "New specializations opening. International recognition of programs",
+      "2000": "Modern sports base and laboratories creation",
+      "2015": "International exchange programs and internships launch",
+      "2024": "Educational programs modernization. Sports analytics implementation"
+    },
+    "cards": {
+      "programs": {
+        "bachelor": "Bachelor's",
+        "bachelorDesc": "4-year coaches training program in various sports",
+        "master": "Master's",
+        "masterDesc": "2-year advanced specialization in coaching activity",
+        "qualification": "Qualification improvement",
+        "qualificationDesc": "Short courses for practicing coaches from 72 to 144 hours"
+      },
+      "specializations": {
+        "team": "Team sports",
+        "teamDesc": "Coaching training in football, basketball, volleyball, hockey",
+        "individual": "Individual sports",
+        "individualDesc": "Tennis, golf, badminton, table tennis",
+        "combat": "Martial arts",
+        "combatDesc": "Wrestling, boxing, judo, karate, taekwondo",
+        "cyclic": "Cyclic sports",
+        "cyclicDesc": "Athletics, swimming, skiing, cycling"
+      },
+      "departments": {
+        "games": "Sports Games Department",
+        "gamesDesc": "Team sports coaches training",
+        "cyclic": "Cyclic Sports Department",
+        "cyclicDesc": "Running, swimming and skiing disciplines specialization",
+        "combat": "Martial Arts Department",
+        "combatDesc": "Combat sports and power sports coaches training",
+        "medicine": "Sports Medicine Department",
+        "medicineDesc": "Training process medical support"
+      }
+    }
+  },
+  "militaryTrainingNew": {
+    "title": "Pre-Conscription Training and Physical Education Faculty",
+    "description": "Specialists training in physical culture and youth military-sports preparation",
+    "tabs": {
+      "history": "History",
+      "programs": "Programs",
+      "specializations": "Directions",
+      "departments": "Departments"
+    },
+    "history": {
+      "description": "Faculty prepares specialists capable of effectively organizing physical education and youth patriotic-military preparation.",
+      "1960": "Military training and physical education faculty creation",
+      "1985": "Pre-conscription training programs expansion",
+      "2000": "Modern physical training methodologies implementation",
+      "2010": "Specialized training grounds and training bases opening",
+      "2023": "Programs modernization according to modern requirements"
+    },
+    "cards": {
+      "programs": {
+        "bachelor": "Physical Culture and Life Safety",
+        "bachelorDesc": "Physical education teachers and basic safety training",
+        "military": "Military-sports training",
+        "militaryDesc": "Military-applied sports specialization",
+        "patriotic": "Patriotic education",
+        "patrioticDesc": "Youth patriotic education programs"
+      },
+      "specializations": {
+        "physical": "Physical training",
+        "physicalDesc": "General and special pre-conscripts physical training",
+        "tactical": "Tactical training",
+        "tacticalDesc": "Military tactics basics and drill training",
+        "shooting": "Shooting training",
+        "shootingDesc": "Shooting and weapons handling training",
+        "survival": "Survival in extreme conditions",
+        "survivalDesc": "Survival skills and first aid training"
+      },
+      "departments": {
+        "physical": "Physical Training Department",
+        "physicalDesc": "General physical and military-applied training",
+        "tactical": "Tactical Training Department",
+        "tacticalDesc": "Military tactics and topography",
+        "safety": "Life Safety Department",
+        "safetyDesc": "Life safety and civil defense",
+        "patriotic": "Patriotic Education Department",
+        "patrioticDesc": "Patriotic education and history"
+      }
+    }
+  },
+  "correspondenceTrainingNew": {
+    "title": "Distance Learning, Advanced Training and Staff Retraining Faculty",
+    "description": "Flexible learning programs for working specialists in physical culture and sports",
+    "tabs": {
+      "history": "History",
+      "programs": "Programs",
+      "formats": "Learning formats",
+      "departments": "Directions"
+    },
+    "history": {
+      "description": "Faculty provides opportunity to receive quality education without production break for working specialists.",
+      "1970": "Distance department opening for working coaches",
+      "1990": "Qualification improvement programs launch",
+      "2005": "Distance learning technologies implementation",
+      "2015": "Online education center creation",
+      "2024": "Complete educational process digitization"
+    },
+    "cards": {
+      "programs": {
+        "correspondence": "Distance learning",
+        "correspondenceDesc": "Higher education without work break",
+        "qualification": "Qualification improvement",
+        "qualificationDesc": "Short programs from 72 to 144 hours",
+        "retraining": "Professional retraining",
+        "retrainingDesc": "New specialty receiving from 250 hours"
+      },
+      "formats": {
+        "correspondence": "Distance form",
+        "correspondenceDesc": "Traditional distance form with sessions 2 times per year",
+        "distance": "Distance learning",
+        "distanceDesc": "Online learning through educational platform",
+        "mixed": "Mixed format",
+        "mixedDesc": "Face-to-face and online classes combination",
+        "intensive": "Intensive courses",
+        "intensiveDesc": "Accelerated programs during holidays"
+      },
+      "departments": {
+        "coaching": "Coaching direction",
+        "coachingDesc": "Coaches training and retraining",
+        "teaching": "Teaching direction",
+        "teachingDesc": "Physical education teachers",
+        "management": "Sports management",
+        "managementDesc": "Sports organizations management",
+        "rehabilitation": "Physical rehabilitation",
+        "rehabilitationDesc": "Restoration specialists"
+      }
+    }
+  },
+  "generalDepartmentsNew": {
+    "title": "General Faculty Departments",
+    "description": "Departments providing fundamental training for all faculty students",
+    "tabs": {
+      "about": "About departments",
+      "languages": "Languages",
+      "humanities": "Humanities",
+      "natural": "Natural sciences"
+    },
+    "history": {
+      "description": "General faculty departments play key role in forming well-rounded specialists with broad outlook for all faculties.",
+      "1955": "First general faculty departments creation",
+      "1980": "Humanitarian block disciplines expansion",
+      "2000": "Natural sciences training modernization",
+      "2015": "Students language training strengthening",
+      "2024": "Interdisciplinary programs integration"
+    },
+    "cards": {
+      "languages": {
+        "foreign": "Foreign languages",
+        "foreignDesc": "English, German, French, Chinese languages",
+        "russian": "Russian language",
+        "russianDesc": "Russian language and speech culture",
+        "communication": "Business communication",
+        "communicationDesc": "Business communication and rhetoric"
+      },
+      "humanities": {
+        "philosophy": "Philosophy",
+        "philosophyDesc": "Philosophy, logic, ethics",
+        "history": "History",
+        "historyDesc": "Kyrgyzstan history and world history",
+        "psychology": "Psychology",
+        "psychologyDesc": "General and sports psychology",
+        "pedagogy": "Pedagogy",
+        "pedagogyDesc": "Physical education theory and methodology"
+      },
+      "natural": {
+        "anatomy": "Anatomy",
+        "anatomyDesc": "Human anatomy and sports morphology",
+        "physiology": "Physiology",
+        "physiologyDesc": "Sports physiology and physical loads",
+        "biochemistry": "Biochemistry",
+        "biochemistryDesc": "Muscular activity biochemistry",
+        "biomechanics": "Biomechanics",
+        "biomechanicsDesc": "Motor activity biomechanics"
+      },
+      "departments": {
+        "languages": "Foreign Languages Department",
+        "languagesDesc": "Foreign languages teaching",
+        "humanities": "Humanitarian Disciplines Department",
+        "humanitiesDesc": "Philosophy, history, cultural studies",
+        "naturalSciences": "Natural Sciences Department",
+        "naturalSciencesDesc": "Anatomy, physiology, biochemistry",
+        "pedagogy": "Pedagogy and Psychology Department",
+        "pedagogyDesc": "Sports pedagogy and psychology"
+      }
+    }
   }
 }
