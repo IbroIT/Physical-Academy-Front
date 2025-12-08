@@ -81,18 +81,18 @@ const UniversityAnnouncementsPage = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="relative">
       {/* Header Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))]" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-600 to-emerald-600 bg-clip-text text-transparent mb-6"
+              className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-600 to-emerald-600 bg-clip-text text-transparent mb-4"
             >
               {t("announcements.title", "Объявления Университета")}
             </motion.h1>
@@ -116,9 +116,9 @@ const UniversityAnnouncementsPage = () => {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.4 }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20"
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {announcementsData.map((announcement, index) => (
             <motion.div
               key={announcement.id}
@@ -206,6 +206,9 @@ const UniversityAnnouncementsPage = () => {
           ))}
         </div>
       </motion.div>
+
+      {/* Smooth transition at the bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none"></div>
     </div>
   );
 };

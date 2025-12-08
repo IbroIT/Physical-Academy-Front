@@ -84,6 +84,9 @@ const QuotesBanner = () => {
 
   return (
     <div className="relative w-full bg-gradient-to-br from-cyan-50 via-white to-emerald-50 py-16 overflow-hidden border-b border-cyan-100">
+      {/* Smooth transition at the top */}
+      <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none"></div>
+
       {/* Анимированные фоновые элементы */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-32 h-32 bg-cyan-200 rounded-full opacity-20 animate-float"></div>
