@@ -170,16 +170,10 @@ const MilitaryTrainingNew = () => {
       }
       const cards = getCardsData();
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cards.map((card) => (
-            <div key={card.id} className="bg-white rounded-xl border border-green-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4">
-                <div className="w-6 h-6 rounded-full bg-teal-500"></div>
-              </div>
-              <h3 className="text-xl font-bold text-green-900 mb-3">{card.title}</h3>
-              <p className="text-gray-700">{card.description}</p>
-            </div>
-          ))}
+        <div>
+          <p>Военно-физкультурный факультет осуществляет подготовку офицеров запаса для Вооруженных Сил Кыргызской Республики.</p>
+          <p>Факультет предоставляет студентам возможность получить высшее образование по специальностям физической культуры и одновременно пройти военную подготовку.</p>
+          <p>Выпускники факультета получают диплом о высшем образовании и офицерское звание, что позволяет им служить в Вооруженных Силах или работать в гражданских организациях.</p>
         </div>
       );
     }
