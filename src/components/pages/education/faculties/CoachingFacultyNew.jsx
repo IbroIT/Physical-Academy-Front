@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '../../../../utils/imageUtils';
 
-const FacultyInfoComponent = () => {
+const CoachingFacultyNew = () => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('history');
   const [historyData, setHistoryData] = useState([]);
@@ -19,7 +19,7 @@ const FacultyInfoComponent = () => {
       setErrorTabs(null);
       try {
         const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
-        const tabsResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/tabs/?lang=${lang}`);
+        const tabsResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/coaching/tabs/?lang=${lang}`);
         if (!tabsResponse.ok) {
           throw new Error('Failed to fetch tabs data');
         }
@@ -29,7 +29,7 @@ const FacultyInfoComponent = () => {
         // Fetch cards for each tab except history
         const cardsPromises = tabs
           .filter(tab => tab.key !== 'history')
-          .map(tab => fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/cards/?tab=${tab.key}&lang=${lang}`)
+          .map(tab => fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/coaching/cards/?tab=${tab.key}&lang=${lang}`)
             .then(res => res.ok ? res.json() : [])
             .then(data => ({ key: tab.key, data: data.sort((a, b) => a.order - b.order) })));
 
@@ -55,7 +55,7 @@ const FacultyInfoComponent = () => {
       setError(null);
       try {
         const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
-        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/history/?lang=${lang}`);
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/coaching/history/?lang=${lang}`);
         if (!response.ok) {
           throw new Error('Failed to fetch history data');
         }
@@ -130,12 +130,60 @@ const FacultyInfoComponent = () => {
     return tab ? tab.title : tabs[0]?.title || '';
   };
 
+  const tabs_old = [
+    { 
+      id: 'history', 
+      title: t('coachingFacultyNew.tabs.history'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      )
+    },
+    { 
+      id: 'about', 
+      title: t('coachingFacultyNew.tabs.about'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    },
+    { 
+      id: 'management', 
+      title: t('coachingFacultyNew.tabs.management'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      )
+    },
+    { 
+      id: 'specializations', 
+      title: t('coachingFacultyNew.tabs.specializations'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      )
+    },
+    { 
+      id: 'departments', 
+      title: t('coachingFacultyNew.tabs.departments'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      )
+    },
+  ];
+
   const renderContent = () => {
     if (activeTab === 'history') {
       if (loading) {
         return (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
         );
       }
@@ -151,22 +199,22 @@ const FacultyInfoComponent = () => {
         <div className="relative">
           <div className="mb-8 text-center">
             <p className="text-lg text-gray-700 max-w-4xl mx-auto">
-              {t('faculty.pedagogical.history.title')}
+              {t('coachingFacultyNew.history.description')}
             </p>
           </div>
-          <div className="absolute left-8 md:left-1/2 transform md:-translate-x-1/2 h-full w-1 bg-gradient-to-b from-blue-500 to-green-500"></div>
+          <div className="absolute left-8 md:left-1/2 transform md:-translate-x-1/2 h-full w-1 bg-gradient-to-b from-orange-500 to-red-500"></div>
           
           {timeline.map((item, index) => (
             <div key={item.id || index} className={`relative mb-12 flex items-start ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
               <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right md:pr-12' : 'md:pl-12'}`}>
                 <div className="inline-block">
-                  <div className="text-2xl font-bold text-blue-900 mb-2">{item.year}</div>
-                  <div className="bg-white p-4 rounded-xl border border-blue-200 shadow-sm">
+                  <div className="text-2xl font-bold text-orange-900 mb-2">{item.year}</div>
+                  <div className="bg-white p-4 rounded-xl border border-orange-200 shadow-sm">
                     <p className="text-gray-700">{item.event}</p>
                   </div>
                 </div>
               </div>
-              <div className="absolute left-6 md:left-1/2 transform md:-translate-x-1/2 w-4 h-4 rounded-full bg-green-500 border-4 border-white z-10"></div>
+              <div className="absolute left-6 md:left-1/2 transform md:-translate-x-1/2 w-4 h-4 rounded-full bg-red-500 border-4 border-white z-10"></div>
             </div>
           ))}
         </div>
@@ -175,7 +223,7 @@ const FacultyInfoComponent = () => {
       if (loadingTabs) {
         return (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
         );
       }
@@ -183,11 +231,11 @@ const FacultyInfoComponent = () => {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cards.map((card) => (
-            <div key={card.id} className="bg-white rounded-xl border border-blue-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                <div className="w-6 h-6 rounded-full bg-green-500"></div>
+            <div key={card.id} className="bg-white rounded-xl border border-orange-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
+              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-4">
+                <div className="w-6 h-6 rounded-full bg-red-500"></div>
               </div>
-              <h3 className="text-xl font-bold text-blue-900 mb-3">{card.title}</h3>
+              <h3 className="text-xl font-bold text-orange-900 mb-3">{card.title}</h3>
               <p className="text-gray-700">{card.description}</p>
             </div>
           ))}
@@ -197,17 +245,17 @@ const FacultyInfoComponent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-white to-orange-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         
         {/* Заголовок и описание */}
         <div className="mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-6">
-            {t('faculty.pedagogical.title')}
+          <h1 className="text-4xl md:text-5xl font-bold text-orange-900 mb-6">
+            {t('coachingFacultyNew.title')}
           </h1>
           <div className="max-w-3xl mx-auto">
             <p className="text-lg md:text-xl text-gray-700">
-              {t('faculty.pedagogical.description')}
+              {t('coachingFacultyNew.description')}
             </p>
           </div>
         </div>
@@ -215,7 +263,7 @@ const FacultyInfoComponent = () => {
         {/* Табы */}
         {loadingTabs ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
           </div>
         ) : errorTabs ? (
           <div className="text-center py-12">
@@ -229,8 +277,8 @@ const FacultyInfoComponent = () => {
                 onClick={() => setActiveTab(tab.key)}
                 className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105 ${
                   activeTab === tab.key
-                    ? 'bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-lg'
-                    : 'bg-white text-blue-900 hover:bg-blue-50 border border-blue-200'
+                    ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg'
+                    : 'bg-white text-orange-900 hover:bg-orange-50 border border-orange-200'
                 }`}
               >
                 {tab.icon}
@@ -241,16 +289,16 @@ const FacultyInfoComponent = () => {
         )}
 
         {/* Контент */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-blue-100 p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-orange-100 p-6 md:p-8">
           <div className="flex items-center mb-8">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-green-500 flex items-center justify-center mr-4">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center mr-4">
               {tabs.find(t => t.key === activeTab)?.icon}
             </div>
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-blue-900">
+              <h2 className="text-2xl md:text-3xl font-bold text-orange-900">
                 {getActiveTabTitle()}
               </h2>
-              <div className="h-1 w-24 bg-gradient-to-r from-blue-500 to-green-500 rounded-full mt-2"></div>
+              <div className="h-1 w-24 bg-gradient-to-r from-orange-500 to-red-500 rounded-full mt-2"></div>
             </div>
           </div>
           
@@ -262,4 +310,4 @@ const FacultyInfoComponent = () => {
   );
 };
 
-export default FacultyInfoComponent;
+export default CoachingFacultyNew;

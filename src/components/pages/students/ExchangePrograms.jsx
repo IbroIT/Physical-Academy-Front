@@ -308,14 +308,6 @@ const ExchangePrograms = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12 lg:mb-20"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isVisible ? { scale: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
-          >
-            🌍
-          </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {backendData.title}
           </h1>
@@ -400,7 +392,7 @@ const ExchangePrograms = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder={t("students.exchange.search") || "Search..."}
+                    placeholder={t("students.exchange.searchPlaceholder") || "Search..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-blue-300 rounded-2xl focus:outline-none focus:border-emerald-400 transition-all duration-300 backdrop-blur-sm"

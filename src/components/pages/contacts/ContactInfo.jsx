@@ -40,14 +40,14 @@ const ContactInfo = () => {
     {
       icon: '📞',
       title: t('contact.info.phone.title', 'Телефоны'),
-      content: contactInfo.phones?.numbers || contactInfo.phones || ['+7 (999) 123-45-67'],
+      content: contactInfo.phones?.numbers || contactInfo.phones || ['+996 312 57 04 89'],
       color: 'blue',
       description: t('contact.info.phone.description', 'Круглосуточная поддержка')
     },
     {
       icon: '📧',
       title: t('contact.info.email.title', 'Email'),
-      content: contactInfo.emails?.addresses || contactInfo.emails || ['info@sports-academy.edu'],
+      content: contactInfo.emails?.addresses || contactInfo.emails || ['sport_akadem@mail.ru'],
       color: 'cyan',
       description: t('contact.info.email.description', 'Быстрый ответ в течение 2 часов')
     },
@@ -167,14 +167,6 @@ const ContactInfo = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12 lg:mb-16"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isVisible ? { scale: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
-          >
-            📞
-          </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {t('contact.info.title', 'Контактная информация')}
           </h1>

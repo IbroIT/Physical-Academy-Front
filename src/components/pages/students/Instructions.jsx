@@ -430,14 +430,6 @@ const Instructions = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-8 lg:mb-12"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isVisible ? { scale: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
-          >
-            📚
-          </motion.div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight">
             {backendData.title}
           </h1>

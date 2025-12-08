@@ -1,11 +1,11 @@
 // components/AcademyMission.jsx
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
 
 const AcademyMission = () => {
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState('mission');
+  const [activeTab, setActiveTab] = useState("mission");
   const [isVisible, setIsVisible] = useState(false);
   const [hoveredValue, setHoveredValue] = useState(null);
   const sectionRef = useRef(null);
@@ -14,67 +14,65 @@ const AcademyMission = () => {
   const [backendData, setBackendData] = useState({
     missions: [],
     loading: false,
-    error: null
+    error: null,
   });
 
   // Получение текущего языка для API
   const getApiLanguage = useCallback(() => {
     const langMap = {
-      'en': 'en',
-      'ru': 'ru',
-      'kg': 'kg'
+      en: "en",
+      ru: "ru",
+      kg: "kg",
     };
-    return langMap[i18n.language] || 'ru';
+    return langMap[i18n.language] || "ru";
   }, [i18n.language]);
 
   // Функция для загрузки данных с бэкенда
   const fetchBackendData = useCallback(async () => {
     try {
-      setBackendData(prev => ({ 
-        ...prev, 
-        loading: true, 
-        error: null 
+      setBackendData((prev) => ({
+        ...prev,
+        loading: true,
+        error: null,
       }));
-      
+
       const lang = getApiLanguage();
       const API_URL = import.meta.env.VITE_API_URL;
       const url = `${API_URL}/api/academy/missions/?lang=${lang}`;
 
-      
       const response = await fetch(url);
-      
+
       // Проверяем content-type
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
         const text = await response.text();
         console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
-        setBackendData(prev => ({
+        setBackendData((prev) => ({
           ...prev,
           missions: [],
-          loading: false
+          loading: false,
         }));
         return;
       }
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
-      setBackendData(prev => ({
+
+      setBackendData((prev) => ({
         ...prev,
         missions: data.results || [],
         loading: false,
-        error: null
+        error: null,
       }));
-
     } catch (error) {
-      console.error('Error fetching academy missions:', error);
-      setBackendData(prev => ({
+      console.error("Error fetching academy missions:", error);
+      setBackendData((prev) => ({
         ...prev,
         loading: false,
-        error: 'Failed to load data'
+        error: "Failed to load data",
       }));
     }
   }, [getApiLanguage]);
@@ -107,62 +105,72 @@ const AcademyMission = () => {
   }, []);
 
   const tabs = [
-    { 
-      id: 'mission', 
-      label: t('academy.mission.tabs.mission'), 
-      icon: '🎯',
-      gradient: 'from-blue-500 to-emerald-500'
+    {
+      id: "mission",
+      label: t("academy.mission.tabs.mission"),
+      icon: "🎯",
+      gradient: "from-blue-500 to-emerald-500",
     },
-    { 
-      id: 'vision', 
-      label: t('academy.mission.tabs.vision'), 
-      icon: '🔭',
-      gradient: 'from-emerald-500 to-blue-600'
+    {
+      id: "vision",
+      label: t("academy.mission.tabs.vision"),
+      icon: "🔭",
+      gradient: "from-emerald-500 to-blue-600",
     },
-    { 
-      id: 'values', 
-      label: t('academy.mission.tabs.values'), 
-      icon: '💎',
-      gradient: 'from-blue-600 to-emerald-600'
+    {
+      id: "strategy",
+      label: t("academy.mission.tabs.strategy"),
+      icon: "🚀",
+      gradient: "from-emerald-400 to-blue-500",
     },
-    { 
-      id: 'strategy', 
-      label: t('academy.mission.tabs.strategy'), 
-      icon: '🚀',
-      gradient: 'from-emerald-400 to-blue-500'
-    }
   ];
 
   // Получение данных миссии и видения с бэкенда
   const getMissionData = () => {
-    return backendData.missions.find(mission => 
-      mission.category?.name?.toLowerCase().includes('миссия') || 
-      mission.category?.name?.toLowerCase().includes('mission')
+    return backendData.missions.find(
+      (mission) =>
+        mission.category?.name?.toLowerCase().includes("миссия") ||
+        mission.category?.name?.toLowerCase().includes("mission")
     );
   };
 
   const getVisionData = () => {
-    return backendData.missions.find(mission => 
-      mission.category?.name?.toLowerCase().includes('видение') || 
-      mission.category?.name?.toLowerCase().includes('vision')
+    return backendData.missions.find(
+      (mission) =>
+        mission.category?.name?.toLowerCase().includes("видение") ||
+        mission.category?.name?.toLowerCase().includes("vision")
+    );
+  };
+
+  const getValuesData = () => {
+    return backendData.missions.filter(
+      (mission) =>
+        mission.category?.name?.toLowerCase().includes("ценности") ||
+        mission.category?.name?.toLowerCase().includes("value")
+    );
+  };
+
+  const getStrategyData = () => {
+    return backendData.missions.filter(
+      (mission) =>
+        mission.category?.name?.toLowerCase().includes("стратегия") ||
+        mission.category?.name?.toLowerCase().includes("strategy")
     );
   };
 
   const missionData = getMissionData();
   const visionData = getVisionData();
-
-  // Статические данные для values и strategy (из i18n)
-  const values = t('academy.mission.values.list', { returnObjects: true });
-  const strategicGoals = t('academy.mission.strategy.goals', { returnObjects: true });
+  const valuesData = getValuesData();
+  const strategyData = getStrategyData();
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2
-      }
-    }
+        staggerChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants = {
@@ -172,9 +180,9 @@ const AcademyMission = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut"
-      }
-    }
+        ease: "easeOut",
+      },
+    },
   };
 
   // Компонент загрузки
@@ -200,17 +208,30 @@ const AcademyMission = () => {
     <div className="text-center py-8">
       <div className="text-red-400 text-6xl mb-4">⚠️</div>
       <h2 className="text-2xl text-white mb-4">
-        {t('academy.mission.errorTitle', { defaultValue: 'Ошибка загрузки данных' })}
+        {t("common.error", { defaultValue: "Ошибка загрузки данных" })}
       </h2>
       <p className="text-blue-200 mb-6">
-        {backendData.error}
+        {backendData.error ||
+          t("common.errors.apiError", {
+            defaultValue: "Не удалось загрузить данные с сервера",
+          })}
       </p>
       <button
         onClick={onRetry}
         className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
       >
-        {t('academy.mission.retry', { defaultValue: 'Попробовать снова' })}
+        {t("accreditation.retry", { defaultValue: "Попробовать снова" })}
       </button>
+    </div>
+  );
+
+  // Компонент пустых данных
+  const EmptyState = () => (
+    <div className="text-center py-12">
+      <div className="text-blue-300 text-6xl mb-6">📋</div>
+      <h3 className="text-2xl text-white mb-4">
+        {t("common.loading", { defaultValue: "Данные отсутствуют" })}
+      </h3>
     </div>
   );
 
@@ -219,12 +240,15 @@ const AcademyMission = () => {
       return <LoadingSkeleton />;
     }
 
-    if (backendData.error && (activeTab === 'mission' || activeTab === 'vision')) {
+    if (backendData.error) {
       return <ErrorMessage onRetry={fetchBackendData} />;
     }
 
     switch (activeTab) {
-      case 'mission':
+      case "mission":
+        if (!missionData) {
+          return <EmptyState />;
+        }
         return (
           <motion.div
             key="mission"
@@ -240,7 +264,7 @@ const AcademyMission = () => {
                 <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl animate-pulse"></div>
                 <div className="absolute bottom-0 right-0 w-40 h-40 bg-emerald-500/20 rounded-full blur-2xl animate-bounce delay-1000"></div>
               </div>
-              
+
               <div className="relative z-10">
                 <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-8">
                   <motion.div
@@ -250,21 +274,21 @@ const AcademyMission = () => {
                     🎯
                   </motion.div>
                   <div className="flex-1 text-center lg:text-left">
-                    <motion.h3 
+                    <motion.h3
                       className="text-3xl lg:text-4xl font-bold text-white mb-6"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
                     >
-                      {missionData ? missionData.title : t('academy.mission.missionTitle')}
+                      {missionData.title}
                     </motion.h3>
-                    <motion.p 
+                    <motion.p
                       className="text-blue-100 text-xl lg:text-2xl leading-relaxed bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
                     >
-                      {missionData ? missionData.description : t('academy.mission.missionStatement')}
+                      {missionData.description}
                     </motion.p>
                   </div>
                 </div>
@@ -273,7 +297,10 @@ const AcademyMission = () => {
           </motion.div>
         );
 
-      case 'vision':
+      case "vision":
+        if (!visionData) {
+          return <EmptyState />;
+        }
         return (
           <motion.div
             key="vision"
@@ -289,7 +316,7 @@ const AcademyMission = () => {
                 <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/20 rounded-full blur-2xl animate-pulse"></div>
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-600/20 rounded-full blur-2xl animate-bounce delay-500"></div>
               </div>
-              
+
               <div className="relative z-10">
                 <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-8">
                   <motion.div
@@ -299,21 +326,21 @@ const AcademyMission = () => {
                     🔭
                   </motion.div>
                   <div className="flex-1 text-center lg:text-left">
-                    <motion.h3 
+                    <motion.h3
                       className="text-3xl lg:text-4xl font-bold text-white mb-6"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
                     >
-                      {visionData ? visionData.title : t('academy.mission.visionTitle')}
+                      {visionData.title}
                     </motion.h3>
-                    <motion.p 
+                    <motion.p
                       className="text-blue-100 text-xl lg:text-2xl leading-relaxed bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
                     >
-                      {visionData ? visionData.description : t('academy.mission.visionStatement')}
+                      {visionData.description}
                     </motion.p>
                   </div>
                 </div>
@@ -322,7 +349,10 @@ const AcademyMission = () => {
           </motion.div>
         );
 
-      case 'values':
+      case "values":
+        if (!valuesData || valuesData.length === 0) {
+          return <EmptyState />;
+        }
         return (
           <motion.div
             key="values"
@@ -331,7 +361,7 @@ const AcademyMission = () => {
             animate="visible"
             className="grid md:grid-cols-2 gap-6 lg:gap-8"
           >
-            {values.map((value, index) => (
+            {valuesData.map((value, index) => (
               <motion.div
                 key={value.id}
                 variants={itemVariants}
@@ -340,34 +370,40 @@ const AcademyMission = () => {
                 className="bg-white/5 backdrop-blur-lg rounded-3xl p-6 lg:p-8 border border-white/10 hover:border-emerald-400/50 transition-all duration-500 group hover:-translate-y-2 relative overflow-hidden"
               >
                 {/* Анимированный фон при наведении */}
-                <div className={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500 ${
-                  value.color === 'blue' ? 'from-blue-500 to-blue-600' : 'from-emerald-500 to-emerald-600'
-                }`}></div>
-                
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500 ${
+                    index % 2 === 0
+                      ? "from-blue-500 to-blue-600"
+                      : "from-emerald-500 to-emerald-600"
+                  }`}
+                ></div>
+
                 <div className="relative z-10">
                   <div className="flex items-start space-x-4 lg:space-x-6">
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 360 }}
                       className={`flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center text-2xl lg:text-3xl transition-all duration-500 ${
-                        value.color === 'blue'
-                          ? 'bg-blue-500/20 text-blue-400 group-hover:bg-blue-500 group-hover:text-white' 
-                          : 'bg-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white'
+                        index % 2 === 0
+                          ? "bg-blue-500/20 text-blue-400 group-hover:bg-blue-500 group-hover:text-white"
+                          : "bg-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white"
                       }`}
                     >
-                      {value.icon}
+                      {["🎓", "💡", "🤝", "🔬", "⚡", "🌟", "🎯"][
+                        index
+                      ] || "💡"}
                     </motion.div>
-                    
+
                     <div className="flex-1">
-                      <motion.h3 
+                      <motion.h3
                         className={`text-xl lg:text-2xl font-bold mb-3 lg:mb-4 transition-colors duration-300 ${
-                          value.color === 'blue' 
-                            ? 'text-white group-hover:text-blue-300' 
-                            : 'text-white group-hover:text-emerald-300'
+                          index % 2 === 0
+                            ? "text-white group-hover:text-blue-300"
+                            : "text-white group-hover:text-emerald-300"
                         }`}
                       >
                         {value.title}
                       </motion.h3>
-                      <motion.p 
+                      <motion.p
                         className="text-blue-100 leading-relaxed text-lg lg:text-xl"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -383,7 +419,10 @@ const AcademyMission = () => {
           </motion.div>
         );
 
-      case 'strategy':
+      case "strategy":
+        if (!strategyData || strategyData.length === 0) {
+          return <EmptyState />;
+        }
         return (
           <motion.div
             key="strategy"
@@ -392,7 +431,7 @@ const AcademyMission = () => {
             animate="visible"
             className="space-y-6 lg:space-y-8"
           >
-            {strategicGoals.map((goal, index) => (
+            {strategyData.map((goal, index) => (
               <motion.div
                 key={goal.id}
                 variants={itemVariants}
@@ -404,69 +443,31 @@ const AcademyMission = () => {
                     whileHover={{ scale: 1.1 }}
                     className="flex-shrink-0 w-20 h-20 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg"
                   >
-                    {goal.icon}
+                    {["🎯", "🌍", "🚀", "💻", "🏆", "📚"][index] || "🎯"}
                   </motion.div>
-                  
+
                   {/* Контент цели */}
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 lg:mb-6">
-                      <motion.h4 
+                      <motion.h4
                         className="font-bold text-white text-xl lg:text-2xl mb-2 lg:mb-0"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: index * 0.1 }}
                       >
-                        {goal.goal}
+                        {goal.title}
                       </motion.h4>
-                      <motion.span 
-                        className="text-emerald-300 font-semibold bg-emerald-500/20 px-4 py-2 rounded-full text-sm lg:text-base whitespace-nowrap"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: index * 0.1 + 0.2 }}
-                      >
-                        {goal.timeline}
-                      </motion.span>
                     </div>
-                    
-                    {/* Прогресс бар */}
-                    <motion.div 
-                      className="mb-4 lg:mb-6"
+
+                    {/* Описание стратегии */}
+                    <motion.p
+                      className="text-blue-100 text-lg lg:text-xl leading-relaxed"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.1 + 0.3 }}
+                      transition={{ delay: index * 0.1 + 0.2 }}
                     >
-                      <div className="flex justify-between text-blue-200 text-sm lg:text-base mb-2">
-                        <span>{t('academy.mission.strategy.progress')}</span>
-                        <span className="text-emerald-300 font-semibold">{goal.progress}%</span>
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-3 lg:h-4 backdrop-blur-sm">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${goal.progress}%` }}
-                          transition={{ duration: 1.5, delay: index * 0.2 + 0.5 }}
-                          className="bg-gradient-to-r from-blue-500 to-emerald-500 h-3 lg:h-4 rounded-full shadow-lg"
-                        ></motion.div>
-                      </div>
-                    </motion.div>
-                    
-                    {/* Метрики */}
-                    <motion.ul 
-                      className="space-y-2 lg:space-y-3"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.1 + 0.4 }}
-                    >
-                      {goal.metrics.map((metric, idx) => (
-                        <motion.li 
-                          key={idx}
-                          className="flex items-start group"
-                          whileHover={{ x: 10 }}
-                        >
-                          <span className="w-2 h-2 bg-emerald-400 rounded-full mt-2 mr-3 lg:mr-4 flex-shrink-0 group-hover:scale-150 transition-transform duration-300"></span>
-                          <span className="text-blue-100 text-lg lg:text-xl">{metric}</span>
-                        </motion.li>
-                      ))}
-                    </motion.ul>
+                      {goal.description}
+                    </motion.p>
                   </div>
                 </div>
               </motion.div>
@@ -503,41 +504,30 @@ const AcademyMission = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12 lg:mb-20"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isVisible ? { scale: 1 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="inline-flex items-center px-6 py-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-6"
-          >
-            <span className="w-2 h-2 bg-emerald-400 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-emerald-300 font-medium text-sm lg:text-base">
-              {t('academy.mission.badge')}
-            </span>
-          </motion.div>
-          
+
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-6 tracking-tight"
           >
-            {t('academy.mission.title')}
+            {t("academy.mission.title")}
           </motion.h2>
-          
+
           <motion.div
             initial={{ scale: 0 }}
             animate={isVisible ? { scale: 1 } : {}}
             transition={{ duration: 0.5, delay: 0.4 }}
             className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"
           ></motion.div>
-          
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.5 }}
             className="text-lg lg:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed"
           >
-            {t('academy.mission.subtitle')}
+            {t("academy.mission.subtitle")}
           </motion.p>
         </motion.div>
 
@@ -557,17 +547,19 @@ const AcademyMission = () => {
               className={`group flex items-center space-x-3 px-6 lg:px-8 py-3 lg:py-4 rounded-2xl font-semibold transition-all duration-500 backdrop-blur-sm border ${
                 activeTab === tab.id
                   ? `bg-gradient-to-r ${tab.gradient} text-white shadow-2xl scale-105 border-transparent`
-                  : 'bg-white/5 text-blue-100 border-white/10 hover:bg-white/10 hover:border-white/20'
+                  : "bg-white/5 text-blue-100 border-white/10 hover:bg-white/10 hover:border-white/20"
               }`}
             >
               <motion.span
                 className={`text-2xl transition-transform duration-300 ${
-                  activeTab === tab.id ? 'scale-110' : 'group-hover:scale-110'
+                  activeTab === tab.id ? "scale-110" : "group-hover:scale-110"
                 }`}
               >
                 {tab.icon}
               </motion.span>
-              <span className="text-base lg:text-lg whitespace-nowrap">{tab.label}</span>
+              <span className="text-base lg:text-lg whitespace-nowrap">
+                {tab.label}
+              </span>
             </motion.button>
           ))}
         </motion.div>
@@ -579,9 +571,7 @@ const AcademyMission = () => {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="bg-white/5 backdrop-blur-lg rounded-3xl p-6 lg:p-8 border border-white/20 shadow-2xl mb-16"
         >
-          <AnimatePresence mode="wait">
-            {renderContent()}
-          </AnimatePresence>
+          <AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
         </motion.div>
       </div>
     </motion.section>

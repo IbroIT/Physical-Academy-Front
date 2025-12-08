@@ -57,13 +57,25 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Функция для разделения текста на две части
+  const splitText = (text) => {
+    const words = text.split(' ');
+    if (words.length <= 1) return [text, ''];
+    
+    const mid = Math.ceil(words.length / 2);
+    const firstLine = words.slice(0, mid).join(' ');
+    const secondLine = words.slice(mid).join(' ');
+    
+    return [firstLine, secondLine];
+  };
+
   // Данные меню для КГАФКиС
   const menuData = {
     academy: {
       title: t('nav.academy', 'Академия'),
       submenu: [
         { 
-          title: t('nav.about_academy', 'Об академии'),
+          title: t('nav.about_academyy', 'Об академии'),
           hasNested: true,
           nestedItems: [
             { title: t('nav.about_academy', 'Об академии'), link: '/academy/about' },
@@ -146,7 +158,8 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
         { title: t('nav.scientific_publications', 'Научные публикации'), link: '/science/publications' },
         { title: t('nav.vestnik', 'Вестник'), link: '/science/vestnik' },
         { title: t('nav.web_of_science', 'Web of Science'), link: '/science/web-of-science' },
-        { title: t('nav.scopus', 'Scopus'), link: '/science/scopus' },
+        { title: t('nav.ipchain', 'IPChain'), link: '/science/ipchain' },
+        // { title: t('nav.scopus', 'Scopus'), link: '/science/scopus' },
         { title: t('nav.research_and_technical_council', 'Научно-технический совет'), link: '/science/nts-committee' },
         { title: t('nav.student_scientific_society', 'Студенческое научное общество'), link: '/science/ssu' }
       ]
@@ -206,11 +219,14 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
           title: t('nav.useful_links', 'Полезные ссылки'),
           hasNested: true,
           nestedItems: [
-            { title: t('nav.ebilim_login', 'Вход в eBilim'), link: '/students/ebilim' },
             { title: t('nav.visa_support', 'Визовая поддержка'), link: '/students/visa-support' }
           ]
         }
       ]
+    },
+    myEdu: {
+      title: t('nav.my_edu', 'Моё образование'),
+      link: 'https://myedu.kgafkis.kg/'
     },
     contacts: {
       title: t('nav.contacts', 'Контакты'),
@@ -221,6 +237,10 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
       ]
     }
   };
+
+  // Разделяем текст для мобильной версии
+  const [firstLine] = splitText(t('nav.kgafkis1', 'КГАФКиС'));
+  const [secondLine] = splitText(t('nav.kgafkis2', 'КГАФКиС'));
 
   return (
     <nav
@@ -238,8 +258,19 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                 <img
                   src={DefaultLogo}
                   alt={t('nav.logo_alt', 'Логотип КГАФКиС')}
-                  className="h-10 w-auto object-contain transition-opacity duration-300"
+                  className="h-14 w-auto object-contain transition-opacity duration-300"
                 />
+                {/* Название для десктопной версии */}
+                <h2 className="ml-3 text-xl font-bold text-blue-800 group-hover:text-teal-600 transition-colors duration-300 hidden sm:block">
+                  {t('nav.kgafkis', 'КГАФКиС')}
+                </h2>
+                
+                {/* Название для мобильной версии - разделено на две строки */}
+                <div className="ml-2 xs:flex sm:hidden flex-col">
+                  <span className="text-sm font-bold text-blue-800 leading-tight">{firstLine}</span>
+                  <br/>
+                  <span className="text-sm font-bold text-blue-800 leading-tight">{secondLine}</span>
+                </div>
               </div>
             </a>
           </div>
@@ -269,8 +300,8 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
                     // Простая ссылка для главной страницы
                     <a
                       href={item.link}
-                      className="relative px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 group text-blue-800 hover:text-teal-600 hover:bg-blue-50"
-                    >
+                      className="relative px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 group text-blue-800 hover:text-teal-600 hover:bg-blue-50 flex items-center"
+                      >
                       <span className="relative z-10">{item.title}</span>
                       <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-teal-400 transition-all duration-300 group-hover:w-3/4`}></div>
                     </a>

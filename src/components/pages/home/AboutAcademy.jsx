@@ -114,50 +114,6 @@ const AboutAcademy = () => {
             </motion.p>
           </motion.div>
 
-          {/* Статистика */}
-          <motion.div
-            variants={containerVariants}
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20"
-          >
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: stat.delay, type: "spring", stiffness: 100 }}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 text-center shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-              >
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.1, 1],
-                    rotate: [0, 5, -5, 0]
-                  }}
-                  transition={{ 
-                    duration: 2, 
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    delay: index * 0.5
-                  }}
-                  className="text-4xl mb-4"
-                >
-                  {stat.icon}
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: stat.delay + 0.3 }}
-                  className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2"
-                >
-                  {stat.number}
-                </motion.div>
-                <div className="text-gray-600 font-medium">
-                  {t(stat.label)}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
           {/* Основной контент с фоткой справа */}
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
             {/* Текст контент слева */}
@@ -173,18 +129,6 @@ const AboutAcademy = () => {
                   {t('about.mission.description')}
                 </p>
               </div>
-              
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl p-8 text-white"
-              >
-                <h3 className="text-2xl font-bold mb-4">
-                  {t('about.vision.title')}
-                </h3>
-                <p className="text-blue-100">
-                  {t('about.vision.description')}
-                </p>
-              </motion.div>
 
               {/* Интерактивные фичи под текстом */}
               <div className="grid grid-cols-2 gap-4 mt-8">

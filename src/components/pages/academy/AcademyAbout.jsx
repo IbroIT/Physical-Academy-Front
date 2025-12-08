@@ -225,28 +225,28 @@ const AcademyAbout = () => {
     return [
       {
         type: 'image',
-        url: '/images/academy/campus.jpg',
+        url: 'https://data.kaktus.media/image/big/2018-06-18_17-39-15_124172.jpg',
         title: t('academy.about.media.campus'),
         description: t('academy.about.media.campusDesc'),
         thumbnail: '/images/academy/campus-thumb.jpg'
       },
       {
         type: 'image', 
-        url: '/images/academy/virtual-tour.jpg',
+        url: 'https://blog.virtualtoureasy.com/wp-content/uploads/2020/08/vr2_14d8abc47bd9d93f20e279579f16416b_2000.jpg',
         title: t('academy.about.media.virtualTour'),
         description: t('academy.about.media.virtualTourDesc'),
         thumbnail: '/images/academy/tour-thumb.jpg'
       },
       {
         type: 'image',
-        url: '/images/academy/labs.jpg',
+        url: 'https://img.freepik.com/free-photo/virolog-coducting-experiment-course-coronavirus-pandemic-with-micropipette-chemist-modern-laboratory-doing-research-using-dispenser-global-epidemic-with-covid-19_482257-5737.jpg?semt=ais_hybrid&w=740&q=80',
         title: t('academy.about.media.labs'),
         description: t('academy.about.media.labsDesc'),
         thumbnail: '/images/academy/labs-thumb.jpg'
       },
       {
         type: 'image',
-        url: '/images/academy/students.jpg',
+        url: 'https://sputnik.kg/img/103993/17/1039931751_0:0:5568:3132_1920x0_80_0_0_77bdf94fc9d135d045890700b3c86781.jpg',
         title: t('academy.about.media.students'),
         description: t('academy.about.media.studentsDesc'),
         thumbnail: '/images/academy/students-thumb.jpg'
@@ -388,12 +388,6 @@ const AcademyAbout = () => {
         <div className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}>
-          <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/10 backdrop-blur-lg border border-white/20 mb-6 group hover:bg-white/20 transition-all duration-300">
-            <span className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-green-300 font-medium text-sm md:text-base">
-              {t('academy.about.badge', 'О Академии')}
-            </span>
-          </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
             {t('academy.about.subtitle2', 'Наша академия')}
           </h2>
@@ -411,41 +405,6 @@ const AcademyAbout = () => {
           <LoadingSkeleton />
         ) : (
           <>
-            <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 transition-all duration-1000 delay-300 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}>
-              {stats.map((stat, index) => (
-                <div 
-                  key={index}
-                  className="group relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl transition-all duration-500 hover:scale-105 hover:border-green-400/30 text-center"
-                >
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center text-2xl mb-4 mx-auto group-hover:scale-110 transition-transform duration-300`}>
-                    {stat.icon}
-                  </div>
-
-                  <div className="text-3xl md:text-4xl font-bold text-white mb-2 font-mono">
-                    {stat.number}
-                    <span className="text-green-300">{stat.suffix}</span>
-                  </div>
-
-                  <div className="text-blue-100 font-medium text-sm md:text-base">{stat.label}</div>
-
-                  <div className="mt-4">
-                    <div className="w-full bg-white/20 rounded-full h-1">
-                      <div
-                        className="bg-gradient-to-r from-green-400 to-green-500 h-1 rounded-full transition-all duration-2000"
-                        style={{ 
-                          width: isVisible ? `${(stat.number / (backendData.stats[index]?.value || [15, 10000, 50, 98][index])) * 100}%` : '0%'
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-ping"></div>
-                </div>
-              ))}
-            </div>
-
             {/* Основной контент */}
             <div className="grid lg:grid-cols-2 gap-8 md:gap-12 mb-12 md:mb-16">
               {/* Текстовый контент и фичи */}
@@ -455,10 +414,16 @@ const AcademyAbout = () => {
                 {/* Основной текст */}
                 <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl">
                   <p className="text-blue-100 leading-relaxed text-lg md:text-xl mb-6 pb-6 border-b border-white/10">
-                    {t('academy.about.intro', 'Наша академия была основана с целью предоставления высококачественного образования в области физической культуры и спорта. Мы гордимся нашей историей и достижениями, которые сделали нас одним из ведущих учебных заведений в этой сфере.')}
+                    {t('academy.about.intro', 'Кыргызская государственная академия физической культуры и спорта имени Б.Т. Турусбекова один из старейших вузов страны с 70-летней историей.')}
+                  </p>
+                  <p className="text-blue-100 leading-relaxed text-lg md:text-xl mb-6 pb-6 border-b border-white/10">
+                    {t('academy.about.intro1', 'Наша академия была основана с целью предоставления высококачественного образования в области физической культуры и спорта. Мы гордимся нашей историей и достижениями, которые сделали нас одним из ведущих учебных заведений в этой сфере.')}
+                  </p>
+                  <p className="text-blue-100 leading-relaxed text-lg md:text-xl mb-6 pb-6 border-b border-white/10">
+                    {t('academy.about.intro2', 'Наша академия была основана с целью предоставления высококачественного образования в области физической культуры и спорта. Мы гордимся нашей историей и достижениями, которые сделали нас одним из ведущих учебных заведений в этой сфере.')}
                   </p>
                   <p className="text-blue-100 leading-relaxed text-lg md:text-xl">
-                    {t('academy.about.intro2', 'Наши студенты получают не только теоретические знания, но и практические навыки, необходимые для успешной карьеры в области физической культуры, спорта и оздоровления. Мы стремимся создать вдохновляющую образовательную среду, которая способствует развитию талантов и достижению высоких результатов.')}
+                    {t('academy.about.intro3', 'Наши студенты получают не только теоретические знания, но и практические навыки, необходимые для успешной карьеры в области физической культуры, спорта и оздоровления. Мы стремимся создать вдохновляющую образовательную среду, которая способствует развитию талантов и достижению высоких результатов.')}
                   </p>
                 </div>
 

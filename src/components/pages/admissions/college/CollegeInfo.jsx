@@ -361,14 +361,6 @@ const CollegeInfo = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12 lg:mb-20"
         >
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={isVisible ? { scale: 1, rotate: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl shadow-2xl"
-          >
-            🏛️
-          </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {collegeData.title || "Колледж"}
           </h1>
@@ -588,7 +580,6 @@ const CollegeInfo = () => {
                             ))
                           ) : (
                             <div className="text-center py-8 text-blue-200">
-                              Программы загружаются...
                             </div>
                           )}
                         </div>
@@ -641,7 +632,6 @@ const CollegeInfo = () => {
                             ))
                           ) : (
                             <div className="text-center py-8 text-blue-200 col-span-2">
-                              Информация о поступлении загружается...
                             </div>
                           )}
                         </div>
@@ -722,7 +712,6 @@ const CollegeInfo = () => {
                     ))
                   ) : (
                     <div className="text-center py-4 text-blue-200">
-                      Информация о руководстве загружается...
                     </div>
                   )}
                 </div>
@@ -761,7 +750,6 @@ const CollegeInfo = () => {
                     ))
                   ) : (
                     <div className="text-center py-4 text-blue-200">
-                      События загружаются...
                     </div>
                   )}
                 </div>
@@ -800,7 +788,6 @@ const CollegeInfo = () => {
                     ))
                   ) : (
                     <div className="text-center py-4 text-blue-200">
-                      Контактная информация загружается...
                     </div>
                   )}
                 </div>

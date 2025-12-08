@@ -204,12 +204,6 @@ const BachelorQuotas = () => {
           </motion.div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
             {t('bachelorQuotas.title', 'Образовательные квоты')}
-            {/* Индикатор источника данных */}
-            {quotasData ? (
-              <span className="text-green-400 text-sm ml-2">🟢 API</span>
-            ) : (
-              <span className="text-yellow-400 text-sm ml-2">🟡 Demo</span>
-            )}
           </h1>
           <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
