@@ -117,7 +117,7 @@ export const useAccreditations = (activeOnly = false) => {
     refetch: fetchAccreditations,
   };
 };
-v
+
 // Hook for organization structure
 export const useOrganizationStructure = (hierarchical = false) => {
   const { i18n } = useTranslation();
