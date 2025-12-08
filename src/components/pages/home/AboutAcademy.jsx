@@ -10,25 +10,42 @@ const AboutAcademy = () => {
 
   const features = [
     {
-      icon: '🎓',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+        </svg>
+      ),
       title: 'about.features.education.title',
       description: 'about.features.education.description',
       color: 'from-blue-500 to-blue-600'
     },
     {
-      icon: '🏃‍♂️',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      ),
       title: 'about.features.sports.title',
       description: 'about.features.sports.description',
       color: 'from-green-500 to-green-600'
     },
     {
-      icon: '👥',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      ),
       title: 'about.features.community.title',
       description: 'about.features.community.description',
       color: 'from-cyan-500 to-blue-500'
     },
     {
-      icon: '🏆',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+        </svg>
+      ),
       title: 'about.features.achievements.title',
       description: 'about.features.achievements.description',
       color: 'from-emerald-500 to-green-500'
@@ -149,7 +166,7 @@ const AboutAcademy = () => {
                           scale: activeFeature === index ? [1, 1.2, 1] : 1
                         }}
                         transition={{ duration: 0.5 }}
-                        className="text-2xl"
+                        className="text-white"
                       >
                         {feature.icon}
                       </motion.span>
@@ -215,9 +232,12 @@ const AboutAcademy = () => {
                     duration: 6, 
                     repeat: Infinity 
                   }}
-                  className="absolute -top-4 -left-4 w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-2xl"
+                  className="absolute -top-4 -left-4 w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center"
                 >
-                  🎓
+                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                  </svg>
                 </motion.div>
                 <motion.div
                   animate={{ 
@@ -230,9 +250,11 @@ const AboutAcademy = () => {
                     repeat: Infinity,
                     delay: 2 
                   }}
-                  className="absolute -bottom-4 -right-4 w-16 h-16 bg-green-400/30 backdrop-blur-sm rounded-2xl flex items-center justify-center text-xl"
+                  className="absolute -bottom-4 -right-4 w-16 h-16 bg-green-400/30 backdrop-blur-sm rounded-2xl flex items-center justify-center"
                 >
-                  ⚽
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
                 </motion.div>
               </motion.div>
 
@@ -245,7 +267,7 @@ const AboutAcademy = () => {
                 className={`mt-6 bg-gradient-to-r ${features[activeFeature].color} rounded-2xl p-6 text-white shadow-xl`}
               >
                 <div className="flex items-center space-x-3 mb-3">
-                  <span className="text-2xl">{features[activeFeature].icon}</span>
+                  <span className="text-white">{features[activeFeature].icon}</span>
                   <h3 className="text-xl font-bold">
                     {t(features[activeFeature].title)}
                   </h3>
