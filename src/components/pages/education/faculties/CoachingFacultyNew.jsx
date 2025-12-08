@@ -217,12 +217,29 @@ const CoachingFacultyNew = () => {
           </div>
         );
       }
+      
+      if (activeTab === 'about') {
+        return (
+          <div>
+            <p>Тренерский факультет готовит высококвалифицированных специалистов в области спортивного тренерства и спортивной подготовки.</p>
+            <p>Студенты изучают методику тренировки, спортивную физиологию, психологию спорта и специализированные дисциплины по различным видам спорта.</p>
+            <p>Выпускники факультета работают тренерами в спортивных школах, клубах и сборных командах, обеспечивая высокий уровень спортивных достижений.</p>
+          </div>
+        );
+      }
+      
       const cards = getCardsData();
       return (
-        <div>
-          <p>Тренерский факультет готовит высококвалифицированных специалистов в области спортивного тренерства и спортивной подготовки.</p>
-          <p>Студенты изучают методику тренировки, спортивную физиологию, психологию спорта и специализированные дисциплины по различным видам спорта.</p>
-          <p>Выпускники факультета работают тренерами в спортивных школах, клубах и сборных командах, обеспечивая высокий уровень спортивных достижений.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cards.map((card) => (
+            <div key={card.id} className="bg-white rounded-xl border border-orange-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
+              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-4">
+                <div className="w-6 h-6 rounded-full bg-red-500"></div>
+              </div>
+              <h3 className="text-xl font-bold text-orange-900 mb-3">{card.title}</h3>
+              <p className="text-gray-700">{card.description}</p>
+            </div>
+          ))}
         </div>
       );
     }

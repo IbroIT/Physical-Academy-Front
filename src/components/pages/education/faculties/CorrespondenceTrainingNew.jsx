@@ -168,12 +168,29 @@ const CorrespondenceTrainingNew = () => {
           </div>
         );
       }
+      
+      if (activeTab === 'about') {
+        return (
+          <div>
+            <p>Заочное отделение факультета физической культуры и спорта предназначено для работающих специалистов, желающих получить высшее образование в сфере физической культуры.</p>
+            <p>Обучение проводится в гибком формате, позволяющем совмещать работу и учебу. Студенты посещают занятия в выходные дни и во время каникул.</p>
+            <p>Программа обучения включает теоретические дисциплины, практические занятия и педагогическую практику, обеспечивая высокий уровень подготовки специалистов.</p>
+          </div>
+        );
+      }
+      
       const cards = getCardsData();
       return (
-        <div>
-          <p>Заочное отделение факультета физической культуры и спорта предназначено для работающих специалистов, желающих получить высшее образование в сфере физической культуры.</p>
-          <p>Обучение проводится в гибком формате, позволяющем совмещать работу и учебу. Студенты посещают занятия в выходные дни и во время каникул.</p>
-          <p>Программа обучения включает теоретические дисциплины, практические занятия и педагогическую практику, обеспечивая высокий уровень подготовки специалистов.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cards.map((card) => (
+            <div key={card.id} className="bg-white rounded-xl border border-purple-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
+              <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
+                <div className="w-6 h-6 rounded-full bg-pink-500"></div>
+              </div>
+              <h3 className="text-xl font-bold text-purple-900 mb-3">{card.title}</h3>
+              <p className="text-gray-700">{card.description}</p>
+            </div>
+          ))}
         </div>
       );
     }
