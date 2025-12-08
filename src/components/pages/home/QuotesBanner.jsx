@@ -46,7 +46,7 @@ const QuotesBanner = () => {
   useEffect(() => {
     if (quotes.length === 0) return;
     
-    const interval = setInterval(nextQuote, 5000);
+    const interval = setInterval(nextQuote, 8000);
     return () => clearInterval(interval);
   }, [nextQuote, quotes.length]);
 
@@ -109,7 +109,7 @@ const QuotesBanner = () => {
         }`}>
           
           {/* Карточка с цитатой */}
-          <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-cyan-100/50 p-8 md:p-12">
+          <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-cyan-100/50 p-10 md:p-16">
             <div className="text-center">
               {/* Иконка цитаты и изображение автора */}
               <div className="mb-6 flex flex-col items-center">
@@ -216,7 +216,7 @@ const QuotesBanner = () => {
                 className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-1000 ease-linear"
                 style={{ 
                   width: '100%',
-                  animation: 'progress 5s linear infinite'
+                  animation: 'progress 8s linear infinite'
                 }}
               ></div>
             </div>
