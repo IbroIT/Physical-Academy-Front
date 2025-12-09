@@ -147,27 +147,17 @@ const CorrespondenceTrainingNew = () => {
       }
       const timeline = getHistoryTimeline();
       return (
-        <div className="relative">
-          <div className="mb-8 text-center">
-            <p className="text-lg text-gray-700 max-w-4xl mx-auto">
-              {t('correspondenceTrainingNew.history.description')}
-            </p>
+        <div>
+          <div className="mb-6">
+            <img 
+              src="/img3.jpg" 
+              alt="История факультета" 
+              className="w-full max-w-2xl mx-auto rounded-lg shadow-lg"
+            />
           </div>
-          <div className="absolute left-8 md:left-1/2 transform md:-translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-500 to-pink-500"></div>
-          
-          {timeline.map((item, index) => (
-            <div key={item.id || index} className={`relative mb-12 flex items-start ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
-              <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right md:pr-12' : 'md:pl-12'}`}>
-                <div className="inline-block">
-                  <div className="text-2xl font-bold text-purple-900 mb-2">{item.year}</div>
-                  <div className="bg-white p-4 rounded-xl border border-purple-200 shadow-sm">
-                    <p className="text-gray-700">{item.event}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="absolute left-6 md:left-1/2 transform md:-translate-x-1/2 w-4 h-4 rounded-full bg-pink-500 border-4 border-white z-10"></div>
-            </div>
-          ))}
+          <p>Заочное отделение факультета физической культуры и спорта было открыто в 1985 году для обеспечения доступного образования для работающих специалистов.</p>
+          <p>За время существования заочного отделения факультет подготовил более 3000 специалистов в области физической культуры и спорта.</p>
+          <p>Студенты заочного отделения успешно сочетают работу и учебу, получая качественное образование и практические навыки в спортивной сфере.</p>
         </div>
       );
     } else {
@@ -178,6 +168,17 @@ const CorrespondenceTrainingNew = () => {
           </div>
         );
       }
+      
+      if (activeTab === 'about') {
+        return (
+          <div>
+            <p>Заочное отделение факультета физической культуры и спорта предназначено для работающих специалистов, желающих получить высшее образование в сфере физической культуры.</p>
+            <p>Обучение проводится в гибком формате, позволяющем совмещать работу и учебу. Студенты посещают занятия в выходные дни и во время каникул.</p>
+            <p>Программа обучения включает теоретические дисциплины, практические занятия и педагогическую практику, обеспечивая высокий уровень подготовки специалистов.</p>
+          </div>
+        );
+      }
+      
       const cards = getCardsData();
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
