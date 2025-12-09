@@ -1,6 +1,8 @@
 // components/AcademyAbout.jsx
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import Campus from '../../../assets/IMG_0456 (1).jpg';
+import Gym from '../../../assets/IMG_1771 (1).jpg';
 
 const AcademyAbout = () => {
   const { t, i18n } = useTranslation();
@@ -211,47 +213,49 @@ const AcademyAbout = () => {
 
   // УПРОЩЕННАЯ ФУНКЦИЯ ДЛЯ МЕДИА ДАННЫХ
   const getMediaData = useCallback(() => {
+    const API_URL = import.meta.env.VITE_API_URL;
+    // Проверка и обработка фото с бэкенда
     if (backendData.photos.length > 0) {
-      return backendData.photos.slice(0, 4).map(photo => ({
-        type: 'image',
-        url: photo.photo,
-        title: photo.description || 'Фото академии',
-        description: photo.description || 'Описание фото',
-        thumbnail: photo.photo
-      }));
+      return backendData.photos.slice(0, 4).map(photo => {
+        // Если путь относительный, добавляем базовый URL
+        let url = photo.photo;
+        if (url && !/^https?:\/\//.test(url)) {
+          url = `${API_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+        }
+        // Миниатюра: если нет или некорректна, fallback на основное фото
+        let thumbnail = photo.thumbnail || url;
+        if (thumbnail && !/^https?:\/\//.test(thumbnail)) {
+          thumbnail = `${API_URL}${thumbnail.startsWith('/') ? '' : '/'}${thumbnail}`;
+        }
+        if (!thumbnail) thumbnail = url;
+        return {
+          type: 'image',
+          url,
+          title: photo.description || 'Фото академии',
+          description: photo.description || 'Описание фото',
+          thumbnail
+        };
+      });
     }
 
-    // Фиксированные демо-данные без дублирования
-    return [
+    // Фиксированные демо-данные с fallback
+    const demoImages = [
       {
         type: 'image',
-        url: 'https://data.kaktus.media/image/big/2018-06-18_17-39-15_124172.jpg',
+        url: Campus,
         title: t('academy.about.media.campus'),
         description: t('academy.about.media.campusDesc'),
-        thumbnail: '/images/academy/campus-thumb.jpg'
+        thumbnail: Campus
       },
       {
         type: 'image', 
-        url: 'https://blog.virtualtoureasy.com/wp-content/uploads/2020/08/vr2_14d8abc47bd9d93f20e279579f16416b_2000.jpg',
+        url: Gym,
         title: t('academy.about.media.virtualTour'),
         description: t('academy.about.media.virtualTourDesc'),
-        thumbnail: '/images/academy/tour-thumb.jpg'
-      },
-      {
-        type: 'image',
-        url: 'https://img.freepik.com/free-photo/virolog-coducting-experiment-course-coronavirus-pandemic-with-micropipette-chemist-modern-laboratory-doing-research-using-dispenser-global-epidemic-with-covid-19_482257-5737.jpg?semt=ais_hybrid&w=740&q=80',
-        title: t('academy.about.media.labs'),
-        description: t('academy.about.media.labsDesc'),
-        thumbnail: '/images/academy/labs-thumb.jpg'
-      },
-      {
-        type: 'image',
-        url: 'https://sputnik.kg/img/103993/17/1039931751_0:0:5568:3132_1920x0_80_0_0_77bdf94fc9d135d045890700b3c86781.jpg',
-        title: t('academy.about.media.students'),
-        description: t('academy.about.media.studentsDesc'),
-        thumbnail: '/images/academy/students-thumb.jpg'
+        thumbnail: Gym
       }
     ];
+    return demoImages;
   }, [backendData.photos]);
 
   const getFeaturesData = () => {
@@ -308,7 +312,7 @@ const AcademyAbout = () => {
   }, []);
 
   // УПРОЩЕННЫЙ КОМПОНЕНТ ИЗОБРАЖЕНИЯ
-  const SimpleImage = useCallback(({ src, alt, className }) => {
+  const SimpleImage = useCallback(({ src, alt, className, srcSet, sizes }) => {
     const [loaded, setLoaded] = useState(false);
 
     return (
@@ -320,17 +324,22 @@ const AcademyAbout = () => {
         )}
         <img
           src={src}
+          srcSet={srcSet}
+          sizes={sizes || "(max-width: 768px) 100vw, 50vw"}
           alt={alt}
+          loading="lazy"
+          decoding="async"
           className={`w-full h-full object-cover transition-opacity duration-300 ${
             loaded ? 'opacity-100' : 'opacity-0'
           }`}
+          style={{ imageRendering: 'auto' }}
           onLoad={() => setLoaded(true)}
           onError={(e) => {
             // Заглушка при ошибке загрузки
             e.target.src = `data:image/svg+xml;base64,${btoa(`
-              <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
-                <rect width="400" height="300" fill="#1e3a8a"/>
-                <text x="200" y="150" text-anchor="middle" fill="white" font-family="Arial" font-size="18">${alt}</text>
+              <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"300\" viewBox=\"0 0 400 300\">
+                <rect width=\"400\" height=\"300\" fill=\"#1e3a8a\"/>
+                <text x=\"200\" y=\"150\" text-anchor=\"middle\" fill=\"white\" font-family=\"Arial\" font-size=\"18\">${alt}</text>
               </svg>
             `)}`;
             setLoaded(true);
