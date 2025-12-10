@@ -12,6 +12,9 @@ const CoachingFacultyNew = () => {
   const [loadingTabs, setLoadingTabs] = useState(false);
   const [errorTabs, setErrorTabs] = useState(null);
   const [cardsData, setCardsData] = useState({});
+  const [aboutData, setAboutData] = useState([]);
+  const [loadingAbout, setLoadingAbout] = useState(false);
+  const [errorAbout, setErrorAbout] = useState(null);
 
   useEffect(() => {
     const fetchTabsAndCards = async () => {
@@ -26,9 +29,9 @@ const CoachingFacultyNew = () => {
         const tabs = await tabsResponse.json();
         setTabsData(tabs.sort((a, b) => a.order - b.order));
 
-        // Fetch cards for each tab except history
+        // Fetch cards for each tab except history and about_faculty
         const cardsPromises = tabs
-          .filter(tab => tab.key !== 'history')
+          .filter(tab => tab.key !== 'history' && tab.key !== 'about_faculty')
           .map(tab => fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/coaching/cards/?tab=${tab.key}&lang=${lang}`)
             .then(res => res.ok ? res.json() : [])
             .then(data => ({ key: tab.key, data: data.sort((a, b) => a.order - b.order) })));
@@ -69,6 +72,28 @@ const CoachingFacultyNew = () => {
     };
 
     fetchHistory();
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const fetchAbout = async () => {
+      setLoadingAbout(true);
+      setErrorAbout(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/coaching/about/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch about data');
+        }
+        const data = await response.json();
+        setAboutData(data.sort((a, b) => a.order - b.order));
+      } catch (err) {
+        setErrorAbout(err.message);
+      } finally {
+        setLoadingAbout(false);
+      }
+    };
+
+    fetchAbout();
   }, [i18n.language]);
 
   const getDefaultIcon = (key) => {
@@ -196,17 +221,21 @@ const CoachingFacultyNew = () => {
       }
       const timeline = getHistoryTimeline();
       return (
-        <div>
-          <div className="mb-6">
-            <img 
-              src="/img1.jpeg" 
-              alt="История факультета" 
-              className="w-full max-w-2xl mx-auto rounded-lg shadow-lg"
-            />
-          </div>
-          <p>Тренерский факультет был основан в 1975 году как специализированное отделение для подготовки профессиональных тренеров по различным видам спорта.</p>
-          <p>Факультет стал центром подготовки тренерских кадров для республиканских спортивных федераций и клубов.</p>
-          <p>Выпускники факультета работают тренерами в спортивных школах, клубах и сборных командах, добиваясь высоких результатов на республиканском и международном уровнях.</p>
+        <div className="space-y-8">
+          {timeline.map((item, index) => (
+            <div key={item.id} className="flex flex-col gap-6">
+              <div className="w-full">
+                <img 
+                  src={getImageUrl(item.image)} 
+                  alt={`История факультета ${index + 1}`} 
+                  className="w-full max-w-2xl mx-auto rounded-lg shadow-lg"
+                />
+              </div>
+              <div className="w-full">
+                <p className="text-gray-700 text-lg leading-relaxed text-center">{item.event}</p>
+              </div>
+            </div>
+          ))}
         </div>
       );
     } else {
@@ -218,12 +247,26 @@ const CoachingFacultyNew = () => {
         );
       }
       
-      if (activeTab === 'about') {
+      if (activeTab === 'about_faculty') {
+        if (loadingAbout) {
+          return (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            </div>
+          );
+        }
+        if (errorAbout) {
+          return (
+            <div className="text-center py-12">
+              <p className="text-red-500">Error loading about: {errorAbout}</p>
+            </div>
+          );
+        }
         return (
-          <div>
-            <p>Тренерский факультет готовит высококвалифицированных специалистов в области спортивного тренерства и спортивной подготовки.</p>
-            <p>Студенты изучают методику тренировки, спортивную физиологию, психологию спорта и специализированные дисциплины по различным видам спорта.</p>
-            <p>Выпускники факультета работают тренерами в спортивных школах, клубах и сборных командах, обеспечивая высокий уровень спортивных достижений.</p>
+          <div className="space-y-4">
+            {aboutData.map((item) => (
+              <p key={item.id} className="text-gray-700 text-lg leading-relaxed">{item.text}</p>
+            ))}
           </div>
         );
       }
