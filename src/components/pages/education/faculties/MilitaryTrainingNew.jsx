@@ -29,9 +29,9 @@ const MilitaryTrainingNew = () => {
         const tabs = await tabsResponse.json();
         setTabsData(tabs.sort((a, b) => a.order - b.order));
 
-        // Fetch cards for each tab except history and about_faculty
+        // Fetch cards for each tab except history, about_faculty, Specializations and departments
         const cardsPromises = tabs
-          .filter(tab => tab.key !== 'history' && tab.key !== 'about_faculty')
+          .filter(tab => tab.key !== 'history' && tab.key !== 'about_faculty' && tab.key !== 'Specializations' && tab.key !== 'departments')
           .map(tab => fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/military/cards/?tab=${tab.key}&lang=${lang}`)
             .then(res => res.ok ? res.json() : [])
             .then(data => ({ key: tab.key, data: data.sort((a, b) => a.order - b.order) })));
@@ -222,7 +222,109 @@ const MilitaryTrainingNew = () => {
           </div>
         );
       }
-      
+
+      if (activeTab === 'Management') {
+        const managementData = [
+          {
+            id: 1,
+            name: 'Полковник Иванов Иван Иванович',
+            position: 'Начальник военного факультета',
+            phone: '+996 (312) 12-34-56',
+            email: 'ivanov.military@academy.kg',
+            resume_url: '#',
+            photo: '/img1.jpeg'
+          },
+          {
+            id: 2,
+            name: 'Майор Петрова Мария Сергеевна',
+            position: 'Заместитель начальника факультета',
+            phone: '+996 (312) 12-34-57',
+            email: 'petrova.military@academy.kg',
+            resume_url: '#',
+            photo: '/img1.jpeg'
+          },
+          {
+            id: 3,
+            name: 'Капитан Сидоров Алексей Петрович',
+            position: 'Старший преподаватель',
+            phone: '+996 (312) 12-34-58',
+            email: 'sidorov.military@academy.kg',
+            resume_url: '#',
+            photo: '/img1.jpeg'
+          }
+        ];
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {managementData.map((person) => (
+              <div key={person.id} className="bg-white rounded-xl border border-green-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
+                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 mx-auto border-4 border-green-100">
+                  <img
+                    src={person.photo}
+                    alt={person.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-green-900 mb-2 text-center">{person.name}</h3>
+                <p className="text-gray-600 mb-3 text-center font-medium">{person.position}</p>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span>{person.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span>{person.email}</span>
+                  </div>
+                </div>
+                <a
+                  href={person.resume_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-2 px-4 rounded-lg font-medium hover:from-green-600 hover:to-teal-600 transition-all duration-300 text-center block"
+                >
+                  Посмотреть резюме
+                </a>
+              </div>
+            ))}
+          </div>
+        );
+      }
+
+      if (activeTab === 'Specializations') {
+        const specializationsData = [
+          'Военная подготовка офицеров запаса',
+          'Физическая подготовка военнослужащих',
+          'Спортивная подготовка в вооруженных силах',
+          'Военно-прикладные виды спорта',
+          'Тактическая подготовка',
+          'Военная топография и ориентирование'
+        ];
+
+        return (
+          <div className="space-y-4">
+            {specializationsData.map((spec, index) => (
+              <div key={index} className="bg-white rounded-lg border border-green-200 p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-green-900">{spec}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      }
+
+
+
       const cards = getCardsData();
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
