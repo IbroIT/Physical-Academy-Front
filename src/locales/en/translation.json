@@ -32,7 +32,7 @@
     "international_applicants": "International Applicants",
     "quotas": "Quotas",
     "contacts": "Contacts",
-    "master_phd": "Master's",
+    "master_phd": "Master's/Graduate",
     "doctorate": "Doctorate",
     "college": "College",
     "education": "Education",
@@ -42,7 +42,7 @@
     "military_training_physical_culture": "Faculty of Pre-Conscription Training and Physical Education",
     "correspondence_advanced_training": "Faculty of Distance Learning, Advanced Training and Staff Retraining",
     "general_faculty_departments": "General Faculty Departments",
-    "master_program": "Master's Program",
+    "master_program": "Master's/Graduate Program",
     "college_physical_culture_sports": "College of Physical Culture & Sports",
     "science": "Science",
     "scientific_publications": "Scientific Publications",
@@ -6791,7 +6791,7 @@
     ]
   },
   "master": {
-    "title": "MASTER'S PROGRAMS",
+    "title": "MASTER'S/GRADUATE PROGRAMS",
     "subtitle": "Advanced education for future leaders in physical culture and sports",
     "learnMore": "Learn More",
     "applyNow": "Apply Now",

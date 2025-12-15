@@ -326,50 +326,6 @@ const fetchBackendData = useCallback(async (type) => {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        {/* Заголовок */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 lg:mb-20"
-        >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-            {t('graduateStudies.title')}
-          </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
-          <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {t('graduateStudies.subtitle')}
-          </p>
-        </motion.div>
-
-        {/* Статистика */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 lg:mb-16"
-        >
-          {stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4 + index * 0.1 }}
-              className="bg-white/5 rounded-2xl p-6 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300 group"
-            >
-              <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                {stat.icon}
-              </div>
-              <div className="text-3xl lg:text-4xl font-bold text-emerald-400 mb-2 group-hover:scale-110 transition-transform duration-300">
-                {stat.number}
-              </div>
-              <div className="text-blue-200 text-sm lg:text-base">
-                {stat.label}
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-
         {/* Навигация вкладок */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
