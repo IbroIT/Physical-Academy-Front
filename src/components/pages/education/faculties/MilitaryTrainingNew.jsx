@@ -15,6 +15,12 @@ const MilitaryTrainingNew = () => {
   const [aboutData, setAboutData] = useState([]);
   const [loadingAbout, setLoadingAbout] = useState(false);
   const [errorAbout, setErrorAbout] = useState(null);
+  const [managementData, setManagementData] = useState([]);
+  const [loadingManagement, setLoadingManagement] = useState(false);
+  const [errorManagement, setErrorManagement] = useState(null);
+  const [specializationsData, setSpecializationsData] = useState([]);
+  const [loadingSpecializations, setLoadingSpecializations] = useState(false);
+  const [errorSpecializations, setErrorSpecializations] = useState(null);
 
   useEffect(() => {
     const fetchTabsAndCards = async () => {
@@ -94,6 +100,50 @@ const MilitaryTrainingNew = () => {
     };
 
     fetchAbout();
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const fetchManagement = async () => {
+      setLoadingManagement(true);
+      setErrorManagement(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/military/management/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch management data');
+        }
+        const data = await response.json();
+        setManagementData(data.sort((a, b) => a.order - b.order));
+      } catch (err) {
+        setErrorManagement(err.message);
+      } finally {
+        setLoadingManagement(false);
+      }
+    };
+
+    fetchManagement();
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const fetchSpecializations = async () => {
+      setLoadingSpecializations(true);
+      setErrorSpecializations(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/military/specializations/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch specializations data');
+        }
+        const data = await response.json();
+        setSpecializationsData(data.sort((a, b) => a.order - b.order));
+      } catch (err) {
+        setErrorSpecializations(err.message);
+      } finally {
+        setLoadingSpecializations(false);
+      }
+    };
+
+    fetchSpecializations();
   }, [i18n.language]);
 
   const getDefaultIcon = (key) => {
@@ -223,50 +273,35 @@ const MilitaryTrainingNew = () => {
         );
       }
 
-      if (activeTab === 'Management') {
-        const managementData = [
-          {
-            id: 1,
-            name: 'Полковник Иванов Иван Иванович',
-            position: 'Начальник военного факультета',
-            phone: '+996 (312) 12-34-56',
-            email: 'ivanov.military@academy.kg',
-            resume_url: '#',
-            photo: '/img1.jpeg'
-          },
-          {
-            id: 2,
-            name: 'Майор Петрова Мария Сергеевна',
-            position: 'Заместитель начальника факультета',
-            phone: '+996 (312) 12-34-57',
-            email: 'petrova.military@academy.kg',
-            resume_url: '#',
-            photo: '/img1.jpeg'
-          },
-          {
-            id: 3,
-            name: 'Капитан Сидоров Алексей Петрович',
-            position: 'Старший преподаватель',
-            phone: '+996 (312) 12-34-58',
-            email: 'sidorov.military@academy.kg',
-            resume_url: '#',
-            photo: '/img1.jpeg'
-          }
-        ];
+      if (activeTab === 'management') {
+        if (loadingManagement) {
+          return (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+            </div>
+          );
+        }
+        if (errorManagement) {
+          return (
+            <div className="text-center py-12">
+              <p className="text-red-500">Error loading management: {errorManagement}</p>
+            </div>
+          );
+        }
 
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {managementData.map((person) => (
               <div key={person.id} className="bg-white rounded-xl border border-green-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
                 <div className="w-24 h-24 rounded-full overflow-hidden mb-4 mx-auto border-4 border-green-100">
-                  <img
-                    src={person.photo}
-                    alt={person.name}
+                  <img 
+                    src={getImageUrl(person.photo)} 
+                    alt={person.name} 
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <h3 className="text-xl font-bold text-green-900 mb-2 text-center">{person.name}</h3>
-                <p className="text-gray-600 mb-3 text-center font-medium">{person.position}</p>
+                <p className="text-gray-600 mb-3 text-center font-medium">{person.role}</p>
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-sm text-gray-700">
                     <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,7 +317,7 @@ const MilitaryTrainingNew = () => {
                   </div>
                 </div>
                 <a
-                  href={person.resume_url}
+                  href={person.resume}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-2 px-4 rounded-lg font-medium hover:from-green-600 hover:to-teal-600 transition-all duration-300 text-center block"
@@ -295,7 +330,7 @@ const MilitaryTrainingNew = () => {
         );
       }
 
-      if (activeTab === 'Specializations') {
+      if (activeTab === 'specializations') {
         const specializationsData = [
           'Военная подготовка офицеров запаса',
           'Физическая подготовка военнослужащих',

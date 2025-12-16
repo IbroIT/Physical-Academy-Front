@@ -15,6 +15,12 @@ const CorrespondenceTrainingNew = () => {
   const [aboutData, setAboutData] = useState([]);
   const [loadingAbout, setLoadingAbout] = useState(false);
   const [errorAbout, setErrorAbout] = useState(null);
+  const [managementData, setManagementData] = useState([]);
+  const [loadingManagement, setLoadingManagement] = useState(false);
+  const [errorManagement, setErrorManagement] = useState(null);
+  const [specializationsData, setSpecializationsData] = useState([]);
+  const [loadingSpecializations, setLoadingSpecializations] = useState(false);
+  const [errorSpecializations, setErrorSpecializations] = useState(null);
 
   useEffect(() => {
     const fetchTabsAndCards = async () => {
@@ -94,6 +100,50 @@ const CorrespondenceTrainingNew = () => {
     };
 
     fetchAbout();
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const fetchManagement = async () => {
+      setLoadingManagement(true);
+      setErrorManagement(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/correspondence/management/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch management data');
+        }
+        const data = await response.json();
+        setManagementData(data.sort((a, b) => a.order - b.order));
+      } catch (err) {
+        setErrorManagement(err.message);
+      } finally {
+        setLoadingManagement(false);
+      }
+    };
+
+    fetchManagement();
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const fetchSpecializations = async () => {
+      setLoadingSpecializations(true);
+      setErrorSpecializations(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/correspondence/specializations/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch specializations data');
+        }
+        const data = await response.json();
+        setSpecializationsData(data.sort((a, b) => a.order - b.order));
+      } catch (err) {
+        setErrorSpecializations(err.message);
+      } finally {
+        setLoadingSpecializations(false);
+      }
+    };
+
+    fetchSpecializations();
   }, [i18n.language]);
 
   const getDefaultIcon = (key) => {
@@ -223,50 +273,35 @@ const CorrespondenceTrainingNew = () => {
         );
       }
 
-      if (activeTab === 'руководство') {
-        const managementData = [
-          {
-            id: 1,
-            name: 'Профессор Иванова Анна Михайловна',
-            position: 'Декан заочного факультета',
-            phone: '+996 (312) 12-34-56',
-            email: 'ivanova.correspondence@academy.kg',
-            resume_url: '#',
-            photo: '/img1.jpeg'
-          },
-          {
-            id: 2,
-            name: 'Доцент Петров Сергей Александрович',
-            position: 'Заместитель декана',
-            phone: '+996 (312) 12-34-57',
-            email: 'petrov.correspondence@academy.kg',
-            resume_url: '#',
-            photo: '/img1.jpeg'
-          },
-          {
-            id: 3,
-            name: 'Старший преподаватель Сидорова Елена Викторовна',
-            position: 'Заведующая учебной частью',
-            phone: '+996 (312) 12-34-58',
-            email: 'sidorova.correspondence@academy.kg',
-            resume_url: '#',
-            photo: '/img1.jpeg'
-          }
-        ];
+      if (activeTab === 'management') {
+        if (loadingManagement) {
+          return (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+            </div>
+          );
+        }
+        if (errorManagement) {
+          return (
+            <div className="text-center py-12">
+              <p className="text-red-500">Error loading management: {errorManagement}</p>
+            </div>
+          );
+        }
 
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {managementData.map((person) => (
               <div key={person.id} className="bg-white rounded-xl border border-purple-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
                 <div className="w-24 h-24 rounded-full overflow-hidden mb-4 mx-auto border-4 border-purple-100">
-                  <img
-                    src={person.photo}
-                    alt={person.name}
+                  <img 
+                    src={getImageUrl(person.photo)} 
+                    alt={person.name} 
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <h3 className="text-xl font-bold text-purple-900 mb-2 text-center">{person.name}</h3>
-                <p className="text-gray-600 mb-3 text-center font-medium">{person.position}</p>
+                <p className="text-gray-600 mb-3 text-center font-medium">{person.role}</p>
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-sm text-gray-700">
                     <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,7 +317,7 @@ const CorrespondenceTrainingNew = () => {
                   </div>
                 </div>
                 <a
-                  href={person.resume_url}
+                  href={person.resume}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300 text-center block"
@@ -296,26 +331,35 @@ const CorrespondenceTrainingNew = () => {
       }
 
       if (activeTab === 'Specializations') {
-        const specializationsData = [
-          'Физическая культура и спорт (заочная форма)',
-          'Спортивная педагогика (заочная форма)',
-          'Адаптивная физическая культура (заочная форма)',
-          'Спортивный менеджмент (заочная форма)',
-          'Оздоровительная физическая культура (заочная форма)',
-          'Теория и методика физического воспитания (заочная форма)'
-        ];
+        if (loadingSpecializations) {
+          return (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+            </div>
+          );
+        }
+        if (errorSpecializations) {
+          return (
+            <div className="text-center py-12">
+              <p className="text-red-500">Error loading specializations: {errorSpecializations}</p>
+            </div>
+          );
+        }
 
         return (
           <div className="space-y-4">
-            {specializationsData.map((spec, index) => (
-              <div key={index} className="bg-white rounded-lg border border-purple-200 p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
+            {specializationsData.map((spec) => (
+              <div key={spec.id} className="bg-white rounded-lg border border-purple-200 p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
                     <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-purple-900">{spec}</h3>
+                  <div>
+                    <h3 className="text-lg font-semibold text-purple-900">{spec.title}</h3>
+                    {spec.description && <p className="text-gray-700 mt-1">{spec.description}</p>}
+                  </div>
                 </div>
               </div>
             ))}
