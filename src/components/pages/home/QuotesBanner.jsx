@@ -195,7 +195,7 @@ const QuotesBanner = () => {
                       : 'bg-cyan-200 hover:bg-cyan-300'
                   }`}
                 />
-              ))}
+              ))}                   
             </div>
 
             {/* Стрелка вперед */}
