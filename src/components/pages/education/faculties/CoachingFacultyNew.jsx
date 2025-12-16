@@ -22,6 +22,9 @@ const CoachingFacultyNew = () => {
   const [specializationsData, setSpecializationsData] = useState([]);
   const [loadingSpecializations, setLoadingSpecializations] = useState(false);
   const [errorSpecializations, setErrorSpecializations] = useState(null);
+  const [departmentsData, setDepartmentsData] = useState([]);
+  const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const [errorDepartments, setErrorDepartments] = useState(null);
 
   useEffect(() => {
     const fetchTabsAndCards = async () => {
@@ -145,6 +148,28 @@ const CoachingFacultyNew = () => {
     };
 
     fetchSpecializations();
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      setLoadingDepartments(true);
+      setErrorDepartments(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/coaching/departments/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch departments data');
+        }
+        const data = await response.json();
+        setDepartmentsData(data.sort((a, b) => a.order - b.order));
+      } catch (err) {
+        setErrorDepartments(err.message);
+      } finally {
+        setLoadingDepartments(false);
+      }
+    };
+
+    fetchDepartments();
   }, [i18n.language]);
 
   const getDefaultIcon = (key) => {
@@ -423,77 +448,20 @@ const CoachingFacultyNew = () => {
       }
 
       if (activeTab === 'departments') {
-        const departmentsData = [
-          {
-            id: 1,
-            name: 'Кафедра теории и методики спортивной тренировки',
-            description: 'Кафедра занимается разработкой тренировочных программ, методик спортивной подготовки и научных исследований в области спортивной тренировки.',
-            staff: [
-              {
-                id: 1,
-                name: 'Профессор Смирнов Олег Викторович',
-                position: 'Заведующий кафедрой',
-                resume_url: '/resumes/smirnov.pdf'
-              },
-              {
-                id: 2,
-                name: 'Доцент Кузнецова Елена Михайловна',
-                position: 'Старший преподаватель',
-                resume_url: '/resumes/kuznetsova.pdf'
-              },
-              {
-                id: 3,
-                name: 'Старший преподаватель Попов Дмитрий Сергеевич',
-                position: 'Преподаватель',
-                resume_url: '/resumes/popov.pdf'
-              }
-            ]
-          },
-          {
-            id: 2,
-            name: 'Кафедра спортивных игр',
-            description: 'Кафедра специализируется на подготовке тренеров по различным видам спортивных игр: футбол, баскетбол, волейбол, гандбол.',
-            staff: [
-              {
-                id: 4,
-                name: 'Профессор Морозов Андрей Иванович',
-                position: 'Заведующий кафедрой',
-                resume_url: '/resumes/morozov.pdf'
-              },
-              {
-                id: 5,
-                name: 'Доцент Васильева Ольга Петровна',
-                position: 'Старший преподаватель',
-                resume_url: '/resumes/vasilieva.pdf'
-              }
-            ]
-          },
-          {
-            id: 3,
-            name: 'Кафедра легкой атлетики и тяжелой атлетики',
-            description: 'Кафедра готовит специалистов по легкой атлетике, тяжелой атлетике и силовым видам спорта.',
-            staff: [
-              {
-                id: 6,
-                name: 'Профессор Новиков Сергей Александрович',
-                position: 'Заведующий кафедрой',
-                resume_url: '/resumes/novikov.pdf'
-              },
-              {
-                id: 7,
-                name: 'Доцент Романова Мария Дмитриевна',
-                position: 'Старший преподаватель',
-                resume_url: '/resumes/romanova.pdf'
-              },
-              {
-                id: 8,
-                name: 'Старший преподаватель Федоров Алексей Владимирович',
-                position: 'Преподаватель',
-                resume_url: '/resumes/fedorov.pdf'
-              }
-            ]
-          }
-        ];
+        if (loadingDepartments) {
+          return (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            </div>
+          );
+        }
+        if (errorDepartments) {
+          return (
+            <div className="text-center py-12">
+              <p className="text-red-500">Error loading departments: {errorDepartments}</p>
+            </div>
+          );
+        }
 
         return (
           <div className="space-y-4">
@@ -535,7 +503,7 @@ const CoachingFacultyNew = () => {
                             <h5 className="font-semibold text-orange-900 mb-1">{person.name}</h5>
                             <p className="text-gray-600 text-sm mb-3">{person.position}</p>
                             <a
-                              href={person.resume_url}
+                              href={person.resume}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-800 text-sm font-medium"

@@ -19,6 +19,9 @@ const FacultyInfoComponent = () => {
   const [specializationsData, setSpecializationsData] = useState([]);
   const [loadingSpecializations, setLoadingSpecializations] = useState(false);
   const [errorSpecializations, setErrorSpecializations] = useState(null);
+  const [departmentsData, setDepartmentsData] = useState([]);
+  const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const [errorDepartments, setErrorDepartments] = useState(null);
 
   useEffect(() => {
     const fetchTabsAndCards = async () => {
@@ -120,6 +123,28 @@ const FacultyInfoComponent = () => {
     };
 
     fetchSpecializations();
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      setLoadingDepartments(true);
+      setErrorDepartments(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/departments/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch departments data');
+        }
+        const data = await response.json();
+        setDepartmentsData(data.sort((a, b) => a.order - b.order));
+      } catch (err) {
+        setErrorDepartments(err.message);
+      } finally {
+        setLoadingDepartments(false);
+      }
+    };
+
+    fetchDepartments();
   }, [i18n.language]);
 
   const getDefaultIcon = (key) => {
@@ -333,77 +358,20 @@ const FacultyInfoComponent = () => {
       }
 
       if (activeTab === 'departments') {
-        const departmentsData = [
-          {
-            id: 1,
-            name: 'Кафедра теории и методики физического воспитания',
-            description: 'Кафедра занимается разработкой современных методик преподавания физической культуры, подготовкой учебных программ и проведением научных исследований в области спортивной педагогики.',
-            staff: [
-              {
-                id: 1,
-                name: 'Профессор Иванов Иван Иванович',
-                position: 'Заведующий кафедрой',
-                resume_url: '/resumes/ivanov.pdf'
-              },
-              {
-                id: 2,
-                name: 'Доцент Петрова Мария Сергеевна',
-                position: 'Старший преподаватель',
-                resume_url: '/resumes/petrova.pdf'
-              },
-              {
-                id: 3,
-                name: 'Старший преподаватель Сидоров Алексей Петрович',
-                position: 'Преподаватель',
-                resume_url: '/resumes/sidorov.pdf'
-              }
-            ]
-          },
-          {
-            id: 2,
-            name: 'Кафедра спортивной медицины и лечебной физкультуры',
-            description: 'Кафедра специализируется на медицинских аспектах физической культуры, реабилитации спортсменов и профилактике спортивных травм.',
-            staff: [
-              {
-                id: 4,
-                name: 'Профессор Козлова Анна Викторовна',
-                position: 'Заведующий кафедрой',
-                resume_url: '/resumes/kozlova.pdf'
-              },
-              {
-                id: 5,
-                name: 'Доцент Николаев Дмитрий Андреевич',
-                position: 'Старший преподаватель',
-                resume_url: '/resumes/nikolaev.pdf'
-              }
-            ]
-          },
-          {
-            id: 3,
-            name: 'Кафедра спортивных игр и единоборств',
-            description: 'Кафедра готовит специалистов по различным видам спортивных игр и единоборств, разрабатывает тренировочные программы и методики.',
-            staff: [
-              {
-                id: 6,
-                name: 'Профессор Михайлов Сергей Петрович',
-                position: 'Заведующий кафедрой',
-                resume_url: '/resumes/mikhailov.pdf'
-              },
-              {
-                id: 7,
-                name: 'Доцент Сергеева Ольга Ивановна',
-                position: 'Старший преподаватель',
-                resume_url: '/resumes/sergeeva.pdf'
-              },
-              {
-                id: 8,
-                name: 'Старший преподаватель Волков Андрей Михайлович',
-                position: 'Преподаватель',
-                resume_url: '/resumes/volkov.pdf'
-              }
-            ]
-          }
-        ];
+        if (loadingDepartments) {
+          return (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+          );
+        }
+        if (errorDepartments) {
+          return (
+            <div className="text-center py-12">
+              <p className="text-red-500">Error loading departments: {errorDepartments}</p>
+            </div>
+          );
+        }
 
         return (
           <div className="space-y-4">
@@ -445,7 +413,7 @@ const FacultyInfoComponent = () => {
                             <h5 className="font-semibold text-blue-900 mb-1">{person.name}</h5>
                             <p className="text-gray-600 text-sm mb-3">{person.position}</p>
                             <a
-                              href={person.resume_url}
+                              href={person.resume}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
