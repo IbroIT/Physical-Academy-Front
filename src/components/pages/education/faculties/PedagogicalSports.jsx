@@ -15,6 +15,9 @@ const FacultyInfoComponent = () => {
   const [aboutData, setAboutData] = useState([]);
   const [loadingAbout, setLoadingAbout] = useState(false);
   const [errorAbout, setErrorAbout] = useState(null);
+  const [managementData, setManagementData] = useState([]);
+  const [loadingManagement, setLoadingManagement] = useState(false);
+  const [errorManagement, setErrorManagement] = useState(null);
 
   useEffect(() => {
     const fetchTabsAndCards = async () => {
@@ -31,7 +34,7 @@ const FacultyInfoComponent = () => {
 
         // Fetch cards for each tab except history
         const cardsPromises = tabs
-          .filter(tab => tab.key !== 'history')
+          .filter(tab => tab.key !== 'history' && tab.key !== 'about_faculty' && tab.key !== 'management')
           .map(tab => fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/cards/?tab=${tab.key}&lang=${lang}`)
             .then(res => res.ok ? res.json() : [])
             .then(data => ({ key: tab.key, data: data.sort((a, b) => a.order - b.order) })));
@@ -94,6 +97,28 @@ const FacultyInfoComponent = () => {
     };
 
     fetchAbout();
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const fetchManagement = async () => {
+      setLoadingManagement(true);
+      setErrorManagement(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/management/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch management data');
+        }
+        const data = await response.json();
+        setManagementData(data.sort((a, b) => a.order - b.order));
+      } catch (err) {
+        setErrorManagement(err.message);
+      } finally {
+        setLoadingManagement(false);
+      }
+    };
+
+    fetchManagement();
   }, [i18n.language]);
 
   const getDefaultIcon = (key) => {
@@ -217,6 +242,63 @@ const FacultyInfoComponent = () => {
                 <div className="whitespace-pre-line text-gray-700 leading-relaxed">
                   {item.text}
                 </div>
+              </div>
+            ))}
+          </div>
+        );
+      }
+
+      if (activeTab === 'management') {
+        if (loadingManagement) {
+          return (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+          );
+        }
+        if (errorManagement) {
+          return (
+            <div className="text-center py-12">
+              <p className="text-red-500">Error loading management: {errorManagement}</p>
+            </div>
+          );
+        }
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {managementData.map((person) => (
+              <div key={person.id} className="bg-white rounded-xl border border-blue-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
+                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 mx-auto border-4 border-blue-100">
+                  <img 
+                    src={getImageUrl(person.photo)} 
+                    alt={person.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-blue-900 mb-2 text-center">{person.name}</h3>
+                <p className="text-gray-600 mb-3 text-center font-medium">{person.role}</p>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span>{person.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span>{person.email}</span>
+                  </div>
+                </div>
+                <a
+                  href={person.resume}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-gradient-to-r from-blue-500 to-green-500 text-white py-2 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-green-600 transition-all duration-300 text-center block"
+                >
+                  Посмотреть резюме
+                </a>
               </div>
             ))}
           </div>
