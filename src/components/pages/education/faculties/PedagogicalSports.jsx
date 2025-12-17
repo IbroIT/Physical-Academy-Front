@@ -4,7 +4,7 @@ import { getImageUrl } from '../../../../utils/imageUtils';
 
 const FacultyInfoComponent = () => {
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState('history');
+  const [activeTab, setActiveTab] = useState('about_faculty');
   const [historyData, setHistoryData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
