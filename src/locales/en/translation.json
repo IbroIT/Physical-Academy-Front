@@ -5002,340 +5002,191 @@
     "no_metrics": "No metrics data available"
   },
   "collegeSports": {
-      "perYear": "per year",
-    "applyNow": "Apply Now",
-    "downloadBrochure": "Download Brochure",
-    "scheduleConsultation": "Schedule Consultation",
-    "startDate": "Start Date",
-    "september": "September 2024",
-    "places": "Available Places",
-    "advantagesTitle": "Why Choose Our College",
-    "advantages": {
-      "0": {
-        "title": "Championship Teams",
-        "description": "Compete at national level with our winning sports teams"
-      },
-      "1": {
-        "title": "Expert Coaches",
-        "description": "Learn from professional coaches and industry experts"
-      },
-      "2": {
-        "title": "Career Success",
-        "description": "95% employment rate within 6 months of graduation"
-      },
-      "3": {
-        "title": "Global Network",
-        "description": "Join our worldwide alumni network of successful graduates"
-      }
-    },
-    "badge": "Sports College",
-    "title": "College of Physical Culture and Sports",
-    "subtitle": "Professional training of specialists in physical culture, sports and fitness. Modern educational programs and practical training.",
-    "sections": {
-      "about": "About College",
-      "programs": "Programs",
-      "admissions": "Admission",
-      "campus": "Campus",
-      "sports": "Sports"
-    },
-    "stats": {
-      "students": "students",
-      "programs": "programs",
-      "employment": "employment",
-      "sports": "sports types"
-    },
-    "about": {
-      "title": "About Our College",
-      "description1": "College of Physical Culture and Sports is a modern educational institution combining traditions of sports training and innovative pedagogical technologies.",
-      "description2": "We train qualified specialists capable of working in educational institutions, sports organizations, fitness centers and rehabilitation centers.",
-      "description3": "Our graduates are in demand in the labor market and successfully realize themselves in various fields of physical culture and sports.",
-      "missionTitle": "Our Mission",
-      "mission": "Training highly qualified specialists in physical culture and sports capable of working effectively in modern conditions and contributing to the development of sports movement.",
-      "features": [
-        {
-          "icon": "👨‍🏫",
-          "title": "Experienced Teachers",
-          "description": "Teachers with practical experience in sports industry",
-          "color": "blue"
-        },
-        {
-          "icon": "🔬",
-          "title": "Modern Equipment",
-          "description": "Equipped sports halls and laboratories for practical classes",
-          "color": "green"
-        },
-        {
-          "icon": "🤝",
-          "title": "Partnerships",
-          "description": "Cooperation with leading sports organizations and clubs",
-          "color": "blue"
+    "title": "COLLEGE OF SPORTS",
+    "subtitle": "Professional education in the field of physical culture and sports",
+    "demoNotification": "Demo data is being used. When connected to the backend, actual data will be displayed.",
+    "viewProfile": "View Profile",
+    "noContent": "Content not found",
+    "duration": "Duration of study",
+    "subjects": "Subjects",
+    "errorTitle": "Loading error",
+    "retry": "Try again",
+    "tabs": {
+      "general": {
+        "title": "General Information",
+        "content": "The College of Sports is a leading educational institution in the field of physical culture and sports.",
+        "list": {
+          "1": {
+            "title": "Modern equipment",
+            "description": "Sports halls, swimming pools, gym complexes"
+          },
+          "2": {
+            "title": "Professional teaching staff",
+            "description": "Candidates and doctors of sciences, honored coaches"
+          },
+          "3": {
+            "title": "International cooperation",
+            "description": "Partnerships with leading sports universities in Europe and Asia"
+          }
         }
-      ]
+      },
+      "mission": {
+        "title": "Mission of the College",
+        "text": "Formation of competitive specialists in the field of physical culture and sports through the integration of education, science and practice for the development of a healthy society and achievement of sports heights."
+      },
+      "strategy": {
+        "title": "Development Strategy",
+        "text": "The strategic goal of the college is to become a leading educational center in Central Asia for training specialists in the field of physical culture and sports.",
+        "show": "Show details",
+        "hide": "Hide details",
+        "detailsTitle": "Implementation Plan",
+        "details": "Modernization of educational programs, development of research base, strengthening of material and technical base, international cooperation.",
+        "pdfTitle": "Strategic Development Plan 2024-2030",
+        "pdfSize": "2.4 MB",
+        "download": "Download",
+        "pdfAlert": "This is a demo version. In the production version, the PDF file will be available for download."
+      },
+      "management": "College Leadership",
+      "teachers": "Teachers",
+      "specializations": "Specializations",
+      "gallery": "Photo Gallery"
     },
-    "programs": {
-      "title": "Educational Programs",
-      "keySubjects": "Key Subjects",
-      "careerPaths": "Career Prospects",
-      "learnMore": "Learn More",
-      "list": [
+    "demo": {
+      "general": {
+        "title": "College of Sports",
+        "description": "This is a leading educational institution in the field of physical culture and sports. We train highly qualified specialists who become leaders in the sports industry.",
+        "advantages": {
+          "title": "Our advantages",
+          "items": [
+            {
+              "title": "Modern equipment",
+              "description": "Sports halls, swimming pools, gym complexes"
+            },
+            {
+              "title": "Professional teaching staff",
+              "description": "Candidates and doctors of sciences, honored coaches"
+            },
+            {
+              "title": "International cooperation",
+              "description": "Partnerships with leading sports universities in Europe and Asia"
+            },
+            {
+              "title": "Practice-oriented training",
+              "description": "Internships in sports clubs and organizations"
+            }
+          ]
+        },
+        "statistics": "The college was founded in 1995 and has trained more than 5,000 specialists working in various fields of the sports industry."
+      },
+      "mission": {
+        "title": "Mission of the College",
+        "text": "Formation of competitive specialists in the field of physical culture and sports through the integration of education, science and practice for the development of a healthy society and achievement of sports heights.",
+        "details": "Main areas of mission implementation: implementation of innovative educational technologies, development of research activities, strengthening of material and technical base, international cooperation."
+      },
+      "management": [
         {
-          "id": "physical-education",
-          "title": "Physical Culture",
-          "duration": "2 years 10 months",
-          "description": "Training specialists for work in educational institutions and sports organizations",
-          "subjects": [
-            "Theory and Methodology of Physical Culture",
-            "Anatomy and Physiology",
-            "Sports Medicine",
-            "Pedagogy and Psychology"
-          ],
-          "careers": [
-            "Physical Education Teacher",
-            "Sports Instructor",
-            "Physical Education Methodologist"
-          ],
-          "icon": "🏃‍♂️",
-          "color": "from-blue-500 to-cyan-500"
+          "name": "Abdrakhmanov Aybek Toktogulovich",
+          "position": "College Director",
+          "description": "Candidate of Pedagogical Sciences, Honored Coach of the Kyrgyz Republic, author of more than 20 scientific works on sports pedagogy",
+          "phone": "+996 (312) 66-55-44",
+          "email": "director@sports-college.edu.kg",
+          "experience": "25 years of teaching experience"
         },
         {
-          "id": "sports-coaching",
-          "title": "Sports Training",
-          "duration": "2 years 10 months",
-          "description": "Training coaches in various sports for work in sports schools and clubs",
-          "subjects": [
-            "Theory of Sports Training",
-            "Biomechanics of Sports Movements",
-            "Sports Nutrition",
-            "Sports Psychology"
-          ],
-          "careers": [
-            "Sports Coach",
-            "Methodologist Instructor",
-            "Sports Manager"
-          ],
-          "icon": "👨‍🏫",
-          "color": "from-green-500 to-emerald-500"
+          "name": "Ismailova Gulmira Bakasovna",
+          "position": "Deputy Director for Academic Affairs",
+          "description": "Candidate of Biological Sciences, specialist in sports medicine, member of the National Olympic Committee",
+          "phone": "+996 (312) 66-55-45",
+          "email": "vice-director@sports-college.edu.kg",
+          "experience": "18 years of administrative experience"
         },
         {
-          "id": "fitness-training",
-          "title": "Fitness Training",
-          "duration": "2 years 10 months",
-          "description": "Training specialists for work in fitness industry and wellness centers",
-          "subjects": [
-            "Basics of Fitness Training",
-            "Functional Training",
-            "Nutriciology",
-            "Personal Training"
-          ],
-          "careers": [
-            "Fitness Trainer",
-            "Group Program Instructor",
-            "Personal Trainer"
-          ],
-          "icon": "💪",
-          "color": "from-blue-500 to-green-500"
-        }
-      ]
-    },
-    "admission": {
-      "title": "College Admission",
-      "step": "Step",
-      "steps": [
-        {
-          "step": 1,
-          "title": "Document Submission",
-          "description": "Submission of required document package to college admission committee",
-          "icon": "📋",
-          "color": "blue"
-        },
-        {
-          "step": 2,
-          "title": "Entrance Tests",
-          "description": "Passing tests in general education subjects and physical training",
-          "icon": "📚",
-          "color": "green"
-        },
-        {
-          "step": 3,
-          "title": "Interview",
-          "description": "Personal conversation with admission committee members and department representatives",
-          "icon": "🎯",
-          "color": "blue"
-        },
-        {
-          "step": 4,
-          "title": "Enrollment",
-          "description": "Enrollment order processing and start of educational process",
-          "icon": "✅",
-          "color": "green"
+          "name": "Sultanov Baky t Rustamovich",
+          "position": "Deputy Director for Educational Work",
+          "description": "Master of Sports in judo, organizer of international sports events",
+          "phone": "+996 (312) 66-55-46",
+          "email": "education@sports-college.edu.kg",
+          "experience": "15 years of coaching work"
         }
       ],
-      "requirements": {
-        "title": "Requirements for Applicants",
-        "list": [
-          "Certificate of secondary general education",
-          "Medical certificate 086/u",
-          "Entrance test results",
-          "3x4 cm photos",
-          "Passport copy"
-        ]
-      },
-      "deadlines": {
-        "title": "Document Submission Deadlines",
-        "list": [
-          {
-            "period": "Main Admission",
-            "date": "August 20"
-          },
-          {
-            "period": "Additional Admission",
-            "date": "September 10"
-          },
-          {
-            "period": "Paid Basis",
-            "date": "September 25"
-          }
-        ]
-      }
-    },
-    "campus": {
-      "title": "Campus and Infrastructure",
-      "viewDetails": "View Details",
-      "life": {
-        "title": "Student Life",
-        "features": [
-          {
-            "icon": "🎭",
-            "title": "Cultural Events",
-            "description": "Creative evenings, concerts and holidays"
-          },
-          {
-            "icon": "🏆",
-            "title": "Sports Competitions",
-            "description": "Participation in city and regional tournaments"
-          },
-          {
-            "icon": "👥",
-            "title": "Student Clubs",
-            "description": "Interest clubs and professional communities"
-          }
-        ]
-      }
-    },
-    "facilities": {
-      "list": [
+      "teachers": [
         {
-          "name": "Sports Hall",
-          "description": "Modern multifunctional sports hall with 800 m² area and professional equipment",
-          "icon": "🏋️",
-          "color": "blue"
+          "name": "Kydyraliev Nurland Bolotbekovich",
+          "position": "Professor, Doctor of Pedagogical Sciences",
+          "description": "Specialist in the theory and methodology of physical education, author of textbooks on sports pedagogy",
+          "qualification": "Highest category",
+          "subjects": "Theory of sports, Teaching methodology"
         },
         {
-          "name": "Stadium",
-          "description": "Football field with artificial turf, running tracks and athletics sectors",
-          "icon": "🏟️",
-          "color": "green"
+          "name": "Orozova Aigul Saparbekovna",
+          "position": "Associate Professor, Candidate of Medical Sciences",
+          "description": "Expert in sports medicine and rehabilitation, physician of the highest category",
+          "qualification": "Highest category",
+          "subjects": "Sports medicine, Sports physiology"
         },
         {
-          "name": "Swimming Pool",
-          "description": "25-meter swimming pool with 6 lanes and aqua aerobics area",
-          "icon": "🏊",
-          "color": "blue"
+          "name": "Tursunov Arsen Asanovich",
+          "position": "Senior Lecturer",
+          "description": "Master of Sports of international class in athletics, coach of the national team",
+          "qualification": "First category",
+          "subjects": "Athletics, Sports training"
         },
         {
-          "name": "Sports Grounds",
-          "description": "Outdoor grounds for basketball, volleyball, tennis and other team sports",
-          "icon": "🎾",
-          "color": "green"
-        }
-      ]
-    },
-    "sports": {
-      "title": "Sports Life",
-      "teams": [
-        {
-          "name": "Football Team",
-          "coach": "Coach: Petrov A.V.",
-          "status": "City Champion",
-          "icon": "⚽"
-        },
-        {
-          "name": "Basketball Team",
-          "coach": "Coach: Sidorova M.K.",
-          "status": "Regional Prize Winner",
-          "icon": "🏀"
-        },
-        {
-          "name": "Volleyball Team",
-          "coach": "Coach: Kozlov S.P.",
-          "status": "Semi-finalist",
-          "icon": "🏐"
-        },
-        {
-          "name": "Athletics",
-          "coach": "Coach: Ivanova L.N.",
-          "status": "Multiple Champion",
-          "icon": "🏃‍♂️"
+          "name": "Jumabaeva Gulnara Kadyrbekovna",
+          "position": "Teacher",
+          "description": "Specialist in adaptive physical culture, organizer of inclusive sports programs",
+          "qualification": "First category",
+          "subjects": "Adaptive physical culture"
         }
       ],
-      "achievements": {
-        "title": "Our Achievements",
-        "list": [
-          {
-            "icon": "🥇",
-            "number": "25",
-            "description": "championship wins"
-          },
-          {
-            "icon": "🥈",
-            "number": "40",
-            "description": "silver awards"
-          },
-          {
-            "icon": "🥉",
-            "number": "35",
-            "description": "bronze medals"
-          },
-          {
-            "icon": "🏅",
-            "number": "100+",
-            "description": "ranked athletes"
-          }
-        ]
-      },
-      "schedule": {
-        "title": "Training Schedule",
-        "team": "Team",
-        "days": "Days",
-        "time": "Time",
-        "location": "Location",
-        "list": [
-          {
-            "team": "Football",
-            "days": "Mon, Wed, Fri",
-            "time": "16:00-18:00",
-            "location": "Stadium"
-          },
-          {
-            "team": "Basketball",
-            "days": "Tue, Thu",
-            "time": "17:00-19:00",
-            "location": "Gym 1"
-          },
-          {
-            "team": "Volleyball",
-            "days": "Mon, Wed",
-            "time": "18:00-20:00",
-            "location": "Gym 2"
-          },
-          {
-            "team": "Athletics",
-            "days": "Tue, Thu, Sat",
-            "time": "15:00-17:00",
-            "location": "Stadium"
-          }
-        ]
-      }
+      "specializations": [
+        {
+          "title": "Football Coach",
+          "description": "Training of professional coaches for children's and youth sports schools and football clubs. Teaching modern training methods, tactics and game strategy.",
+          "duration": "7-9 years",
+          "subjects": "Football tactics, Technical training, Sports psychology"
+        },
+        {
+          "title": "Fitness and Bodybuilding Instructor",
+          "description": "Training in strength training methods, development of individual training programs, basics of sports nutrition.",
+          "duration": "5-7 years",
+          "subjects": "Anatomy, Physiology, Nutrition basics"
+        },
+        {
+          "title": "Sports Management Specialist",
+          "description": "Training of managers for sports organizations, clubs and federations. Study of marketing, financial management and event organization.",
+          "duration": "6-8 years",
+          "subjects": "Management, Marketing, Sports economics"
+        },
+        {
+          "title": "Swimming Coach",
+          "description": "Training in teaching methods for swimming to different age groups, water rescue techniques, organization of classes in the pool.",
+          "duration": "7-9 years",
+          "subjects": "Swimming technique, Teaching methodology, Water safety"
+        }
+      ],
+      "gallery": [
+        {
+          "title": "College Sports Hall",
+          "description": "Modern multifunctional sports hall equipped for training in various sports. Hall area 800 sq.m., ceiling height 12 meters.",
+          "imageUrl": "https://images.unsplash.com/photo-1549060279-7e168fce7090?w=800"
+        },
+        {
+          "title": "Gym Complex",
+          "description": "Professional equipment for strength training from leading world manufacturers. The complex includes more than 50 exercise machines.",
+          "imageUrl": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800"
+        },
+        {
+          "title": "Olympic Standard Swimming Pool",
+          "description": "50-meter pool with 8 lanes, equipped with a modern filtration and water heating system. Water temperature is maintained at 28°C.",
+          "imageUrl": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800"
+        },
+        {
+          "title": "Classrooms for Theoretical Studies",
+          "description": "Classrooms equipped with multimedia equipment, interactive whiteboards and computers with access to electronic educational resources.",
+          "imageUrl": "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800"
+        }
+      ]
     }
   },
   "departments": {
