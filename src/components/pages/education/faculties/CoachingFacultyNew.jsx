@@ -25,6 +25,7 @@ const CoachingFacultyNew = () => {
   const [departmentsData, setDepartmentsData] = useState([]);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
   const [errorDepartments, setErrorDepartments] = useState(null);
+  const [photoGalleryData, setPhotoGalleryData] = useState([]);
 
   useEffect(() => {
     const fetchTabsAndCards = async () => {
@@ -41,7 +42,7 @@ const CoachingFacultyNew = () => {
 
         // Fetch cards for each tab except history, about_faculty, Specializations and departments
         const cardsPromises = tabs
-          .filter(tab => tab.key !== 'history' && tab.key !== 'about_faculty' && tab.key !== 'Specializations' && tab.key !== 'departments')
+          .filter(tab => tab.key !== 'history' && tab.key !== 'about_faculty' && tab.key !== 'Specializations' && tab.key !== 'departments' && tab.key !== 'photo_gallery')
           .map(tab => fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/coaching/cards/?tab=${tab.key}&lang=${lang}`)
             .then(res => res.ok ? res.json() : [])
             .then(data => ({ key: tab.key, data: data.sort((a, b) => a.order - b.order) })));
@@ -172,6 +173,49 @@ const CoachingFacultyNew = () => {
     fetchDepartments();
   }, [i18n.language]);
 
+  useEffect(() => {
+    // Static photo gallery data for coaching faculty
+    const staticPhotoGallery = [
+      {
+        id: 1,
+        image: '/img/coaching1.jpg',
+        title: 'Тренировки по баскетболу',
+        description: 'Студенты факультета на тренировке по баскетболу под руководством опытных тренеров.'
+      },
+      {
+        id: 2,
+        image: '/img/coaching2.jpg',
+        title: 'Футбольные занятия',
+        description: 'Практические занятия по футболу и тактике игры.'
+      },
+      {
+        id: 3,
+        image: '/img/coaching3.jpg',
+        title: 'Лекционная аудитория',
+        description: 'Современная лекционная аудитория для теоретических занятий по тренерской деятельности.'
+      },
+      {
+        id: 4,
+        image: '/img/coaching4.jpg',
+        title: 'Спортивные соревнования',
+        description: 'Межфакультетские спортивные соревнования с участием студентов тренерского факультета.'
+      },
+      {
+        id: 5,
+        image: '/img/coaching5.jpg',
+        title: 'Практические занятия',
+        description: 'Практические занятия по методике преподавания физической культуры.'
+      },
+      {
+        id: 6,
+        image: '/img/coaching6.jpg',
+        title: 'Выпускной факультета',
+        description: 'Торжественное мероприятие по случаю выпуска новых тренеров и специалистов.'
+      }
+    ];
+    setPhotoGalleryData(staticPhotoGallery);
+  }, []);
+
   const getDefaultIcon = (key) => {
     switch (key) {
       case 'history':
@@ -202,6 +246,12 @@ const CoachingFacultyNew = () => {
         return (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        );
+      case 'photo_gallery':
+        return (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         );
       default:
@@ -348,7 +398,12 @@ const CoachingFacultyNew = () => {
         return (
           <div className="space-y-4">
             {aboutData.map((item) => (
-              <p key={item.id} className="text-gray-700 text-lg leading-relaxed">{item.text}</p>
+              <div key={item.id} className="prose prose-lg max-w-none">
+                <div 
+                  className="text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: item.text }}
+                />
+              </div>
             ))}
           </div>
         );
@@ -494,7 +549,10 @@ const CoachingFacultyNew = () => {
                 {expandedDepartments[department.id] && (
                   <div className="px-4 pb-4 border-t border-orange-100">
                     <div className="pt-4">
-                      <p className="text-gray-700 mb-6">{department.description}</p>
+                      <div 
+                        className="text-gray-700 mb-6"
+                        dangerouslySetInnerHTML={{ __html: department.description }}
+                      />
 
                       <h4 className="text-lg font-semibold text-orange-900 mb-4">Сотрудники кафедры</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -519,6 +577,28 @@ const CoachingFacultyNew = () => {
                     </div>
                   </div>
                 )}
+              </div>
+            ))}
+          </div>
+        );
+      }
+
+      if (activeTab === 'photo_gallery') {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {photoGalleryData.map((photo) => (
+              <div key={photo.id} className="bg-white rounded-xl border border-orange-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
+                <div className="aspect-w-16 aspect-h-12">
+                  <img 
+                    src={photo.image} 
+                    alt={photo.title} 
+                    className="w-full h-48 object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-orange-900 mb-2">{photo.title}</h3>
+                  <p className="text-gray-700 text-sm leading-relaxed">{photo.description}</p>
+                </div>
               </div>
             ))}
           </div>

@@ -24,6 +24,9 @@ const FacultyInfoComponent = () => {
   const [departmentsData, setDepartmentsData] = useState([]);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
   const [errorDepartments, setErrorDepartments] = useState(null);
+  const [photoGalleryData, setPhotoGalleryData] = useState([]);
+  const [loadingPhotoGallery, setLoadingPhotoGallery] = useState(false);
+  const [errorPhotoGallery, setErrorPhotoGallery] = useState(null);
   const [expandedDepartments, setExpandedDepartments] = useState({});
 
   useEffect(() => {
@@ -37,11 +40,20 @@ const FacultyInfoComponent = () => {
           throw new Error('Failed to fetch tabs data');
         }
         const tabs = await tabsResponse.json();
-        setTabsData(tabs.sort((a, b) => a.order - b.order));
+        // Add static photo gallery tab if not already present
+        const existingTabs = tabs.sort((a, b) => a.order - b.order);
+        const hasPhotoGallery = existingTabs.some(tab => tab.key === 'photo_gallery');
+        const staticTabs = hasPhotoGallery ? existingTabs : [...existingTabs, {
+          key: 'photo_gallery',
+          title: 'Фотогалерея',
+          icon: null,
+          order: 999 // Put it at the end
+        }];
+        setTabsData(staticTabs);
 
-        // Fetch cards for each tab except history, about_faculty, management, specializations and departments
+        // Fetch cards for each tab except history, about_faculty, management, specializations, departments and photo_gallery
         const cardsPromises = tabs
-          .filter(tab => tab.key !== 'history' && tab.key !== 'about_faculty' && tab.key !== 'management' && tab.key !== 'specializations' && tab.key !== 'departments')
+          .filter(tab => tab.key !== 'history' && tab.key !== 'about_faculty' && tab.key !== 'management' && tab.key !== 'specializations' && tab.key !== 'departments' && tab.key !== 'photo_gallery')
           .map(tab => fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/cards/?tab=${tab.key}&lang=${lang}`)
             .then(res => res.ok ? res.json() : [])
             .then(data => ({ key: tab.key, data: data.sort((a, b) => a.order - b.order) })));
@@ -172,6 +184,49 @@ const FacultyInfoComponent = () => {
     fetchDepartments();
   }, [i18n.language]);
 
+  useEffect(() => {
+    // Static photo gallery data
+    const staticPhotoGallery = [
+      {
+        id: 1,
+        image: '/img1.jpeg',
+        title: 'Спортивный зал факультета',
+        description: 'Современный спортивный зал с профессиональным оборудованием для тренировок студентов.'
+      },
+      {
+        id: 2,
+        image: '/img2.jpeg',
+        title: 'Тренировка по волейболу',
+        description: 'Студенты факультета на тренировке по волейболу под руководством опытных тренеров.'
+      },
+      {
+        id: 3,
+        image: '/img3.jpeg',
+        title: 'Лекционная аудитория',
+        description: 'Современная лекционная аудитория для теоретических занятий по спортивной педагогике.'
+      },
+      {
+        id: 4,
+        image: '/img4.jpeg',
+        title: 'Спортивные соревнования',
+        description: 'Межфакультетские спортивные соревнования с участием студентов педагогического факультета.'
+      },
+      {
+        id: 5,
+        image: '/img5.jpeg',
+        title: 'Практические занятия',
+        description: 'Практические занятия по методике преподавания физической культуры.'
+      },
+      {
+        id: 6,
+        image: '/img6.jpeg',
+        title: 'Выпускной факультета',
+        description: 'Торжественное мероприятие по случаю выпуска новых специалистов в области физической культуры.'
+      }
+    ];
+    setPhotoGalleryData(staticPhotoGallery);
+  }, []);
+
   const getDefaultIcon = (key) => {
     switch (key) {
       case 'history':
@@ -202,6 +257,12 @@ const FacultyInfoComponent = () => {
         return (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        );
+      case 'photo_gallery':
+        return (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         );
       default:
@@ -297,9 +358,10 @@ const FacultyInfoComponent = () => {
           <div className="space-y-6">
             {aboutData.map((item) => (
               <div key={item.id} className="prose prose-lg max-w-none">
-                <div className="whitespace-pre-line text-gray-700 leading-relaxed">
-                  {item.text}
-                </div>
+                <div 
+                  className="text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: item.text }}
+                />
               </div>
             ))}
           </div>
@@ -449,7 +511,10 @@ const FacultyInfoComponent = () => {
                 {expandedDepartments[department.id] && (
                   <div className="px-4 pb-4 border-t border-blue-100">
                     <div className="pt-4">
-                      <p className="text-gray-700 mb-6">{department.description}</p>
+                      <div 
+                        className="text-gray-700 mb-6"
+                        dangerouslySetInnerHTML={{ __html: department.description }}
+                      />
 
                       <h4 className="text-lg font-semibold text-blue-900 mb-4">Сотрудники кафедры</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -476,6 +541,28 @@ const FacultyInfoComponent = () => {
                     </div>
                   </div>
                 )}
+              </div>
+            ))}
+          </div>
+        );
+      }
+
+      if (activeTab === 'photo_gallery') {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {photoGalleryData.map((photo) => (
+              <div key={photo.id} className="bg-white rounded-xl border border-blue-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
+                <div className="aspect-w-16 aspect-h-12">
+                  <img 
+                    src={photo.image} 
+                    alt={photo.title} 
+                    className="w-full h-48 object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-blue-900 mb-2">{photo.title}</h3>
+                  <p className="text-gray-700 text-sm leading-relaxed">{photo.description}</p>
+                </div>
               </div>
             ))}
           </div>

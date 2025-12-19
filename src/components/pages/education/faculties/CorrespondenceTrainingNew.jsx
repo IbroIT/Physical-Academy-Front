@@ -267,7 +267,12 @@ const CorrespondenceTrainingNew = () => {
         return (
           <div className="space-y-4">
             {aboutData.map((item) => (
-              <p key={item.id} className="text-gray-700 text-lg leading-relaxed">{item.text}</p>
+              <div key={item.id} className="prose prose-lg max-w-none">
+                <div 
+                  className="text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: item.text }}
+                />
+              </div>
             ))}
           </div>
         );
