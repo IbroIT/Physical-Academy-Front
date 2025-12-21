@@ -22,6 +22,8 @@ const MilitaryTrainingNew = () => {
   const [loadingSpecializations, setLoadingSpecializations] = useState(false);
   const [errorSpecializations, setErrorSpecializations] = useState(null);
   const [photoGalleryData, setPhotoGalleryData] = useState([]);
+  const [loadingPhotoGallery, setLoadingPhotoGallery] = useState(false);
+  const [errorPhotoGallery, setErrorPhotoGallery] = useState(null);
 
   useEffect(() => {
     const fetchTabsAndCards = async () => {
@@ -148,47 +150,26 @@ const MilitaryTrainingNew = () => {
   }, [i18n.language]);
 
   useEffect(() => {
-    // Static photo gallery data for military training faculty
-    const staticPhotoGallery = [
-      {
-        id: 1,
-        image: '/img/military1.jpg',
-        title: 'Военная подготовка',
-        description: 'Студенты на занятиях по военной подготовке и тактике.'
-      },
-      {
-        id: 2,
-        image: '/img/military2.jpg',
-        title: 'Физическая подготовка',
-        description: 'Тренировки по физической подготовке военнослужащих.'
-      },
-      {
-        id: 3,
-        image: '/img/military3.jpg',
-        title: 'Тактические занятия',
-        description: 'Практические занятия по тактике и ориентированию на местности.'
-      },
-      {
-        id: 4,
-        image: '/img/military4.jpg',
-        title: 'Военно-прикладные виды спорта',
-        description: 'Занятия по военно-прикладным видам спорта и соревнования.'
-      },
-      {
-        id: 5,
-        image: '/img/military5.jpg',
-        title: 'Военная топография',
-        description: 'Изучение карт и топографических навыков.'
-      },
-      {
-        id: 6,
-        image: '/img/military6.jpg',
-        title: 'Выпускной факультета',
-        description: 'Торжественное мероприятие по выпуску специалистов военной подготовки.'
+    const fetchPhotoGallery = async () => {
+      setLoadingPhotoGallery(true);
+      setErrorPhotoGallery(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/military/gallery-cards/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch photo gallery data');
+        }
+        const data = await response.json();
+        setPhotoGalleryData(data.results);
+      } catch (err) {
+        setErrorPhotoGallery(err.message);
+      } finally {
+        setLoadingPhotoGallery(false);
       }
-    ];
-    setPhotoGalleryData(staticPhotoGallery);
-  }, []);
+    };
+
+    fetchPhotoGallery();
+  }, [i18n.language]);
 
   const getDefaultIcon = (key) => {
     switch (key) {
@@ -416,13 +397,27 @@ const MilitaryTrainingNew = () => {
 
 
       if (activeTab === 'photo_gallery') {
+        if (loadingPhotoGallery) {
+          return (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+            </div>
+          );
+        }
+        if (errorPhotoGallery) {
+          return (
+            <div className="text-center py-12">
+              <p className="text-red-500">Error loading photo gallery: {errorPhotoGallery}</p>
+            </div>
+          );
+        }
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {photoGalleryData.map((photo) => (
               <div key={photo.id} className="bg-white rounded-xl border border-green-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
                 <div className="aspect-w-16 aspect-h-12">
                   <img 
-                    src={photo.image} 
+                    src={photo.photo} 
                     alt={photo.title} 
                     className="w-full h-48 object-cover"
                   />

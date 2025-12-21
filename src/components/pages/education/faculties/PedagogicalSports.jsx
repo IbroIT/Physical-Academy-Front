@@ -185,47 +185,26 @@ const FacultyInfoComponent = () => {
   }, [i18n.language]);
 
   useEffect(() => {
-    // Static photo gallery data
-    const staticPhotoGallery = [
-      {
-        id: 1,
-        image: '/img1.jpeg',
-        title: 'Спортивный зал факультета',
-        description: 'Современный спортивный зал с профессиональным оборудованием для тренировок студентов.'
-      },
-      {
-        id: 2,
-        image: '/img2.jpeg',
-        title: 'Тренировка по волейболу',
-        description: 'Студенты факультета на тренировке по волейболу под руководством опытных тренеров.'
-      },
-      {
-        id: 3,
-        image: '/img3.jpeg',
-        title: 'Лекционная аудитория',
-        description: 'Современная лекционная аудитория для теоретических занятий по спортивной педагогике.'
-      },
-      {
-        id: 4,
-        image: '/img4.jpeg',
-        title: 'Спортивные соревнования',
-        description: 'Межфакультетские спортивные соревнования с участием студентов педагогического факультета.'
-      },
-      {
-        id: 5,
-        image: '/img5.jpeg',
-        title: 'Практические занятия',
-        description: 'Практические занятия по методике преподавания физической культуры.'
-      },
-      {
-        id: 6,
-        image: '/img6.jpeg',
-        title: 'Выпускной факультета',
-        description: 'Торжественное мероприятие по случаю выпуска новых специалистов в области физической культуры.'
+    const fetchPhotoGallery = async () => {
+      setLoadingPhotoGallery(true);
+      setErrorPhotoGallery(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/gallery-cards/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch photo gallery data');
+        }
+        const data = await response.json();
+        setPhotoGalleryData(data.results);
+      } catch (err) {
+        setErrorPhotoGallery(err.message);
+      } finally {
+        setLoadingPhotoGallery(false);
       }
-    ];
-    setPhotoGalleryData(staticPhotoGallery);
-  }, []);
+    };
+
+    fetchPhotoGallery();
+  }, [i18n.language]);
 
   const getDefaultIcon = (key) => {
     switch (key) {
@@ -548,13 +527,27 @@ const FacultyInfoComponent = () => {
       }
 
       if (activeTab === 'photo_gallery') {
+        if (loadingPhotoGallery) {
+          return (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+          );
+        }
+        if (errorPhotoGallery) {
+          return (
+            <div className="text-center py-12">
+              <p className="text-red-500">Error loading photo gallery: {errorPhotoGallery}</p>
+            </div>
+          );
+        }
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {photoGalleryData.map((photo) => (
               <div key={photo.id} className="bg-white rounded-xl border border-blue-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
                 <div className="aspect-w-16 aspect-h-12">
                   <img 
-                    src={photo.image} 
+                    src={photo.photo} 
                     alt={photo.title} 
                     className="w-full h-48 object-cover"
                   />
