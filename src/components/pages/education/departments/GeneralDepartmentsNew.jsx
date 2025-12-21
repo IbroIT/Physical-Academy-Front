@@ -7,6 +7,9 @@ const DepartmentTabs = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [teachersData, setTeachersData] = useState([]);
+  const [loadingTeachers, setLoadingTeachers] = useState(false);
+  const [errorTeachers, setErrorTeachers] = useState(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -29,6 +32,28 @@ const DepartmentTabs = () => {
     };
 
     fetchCategories();
+  }, [i18n.language]);
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      setLoadingTeachers(true);
+      setErrorTeachers(null);
+      try {
+        const lang = i18n.language === 'ru' ? 'ru' : i18n.language === 'en' ? 'en' : 'kg';
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/general-departments/management/?lang=${lang}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch teachers data');
+        }
+        const data = await response.json();
+        setTeachersData(data.sort((a, b) => a.order - b.order));
+      } catch (err) {
+        setErrorTeachers(err.message);
+      } finally {
+        setLoadingTeachers(false);
+      }
+    };
+
+    fetchTeachers();
   }, [i18n.language]);
 
   const getColorStyles = (color) => {
@@ -135,7 +160,7 @@ const DepartmentTabs = () => {
               </button>
             );
           })}
-        </div>
+        </div>  
 
         {/* Tab Content */}
         {activeCategory && (
@@ -167,84 +192,45 @@ const DepartmentTabs = () => {
                   <h3 className="text-xl font-semibold text-gray-700 mb-4">
                     Преподаватели
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[
-                      {
-                        photo: "/img/teacher1.jpg",
-                        name: "Иванов Иван Иванович",
-                        role: "Заведующий кафедрой",
-                        phone: "+7 (495) 123-45-67",
-                        email: "ivanov@academy.ru",
-                        resume: "/resumes/ivanov.pdf"
-                      },
-                      {
-                        photo: "/img/teacher2.jpg",
-                        name: "Петрова Мария Сергеевна",
-                        role: "Доцент кафедры",
-                        phone: "+7 (495) 123-45-68",
-                        email: "petrova@academy.ru",
-                        resume: "/resumes/petrova.pdf"
-                      },
-                      {
-                        photo: "/img/teacher3.jpg",
-                        name: "Сидоров Алексей Петрович",
-                        role: "Старший преподаватель",
-                        phone: "+7 (495) 123-45-69",
-                        email: "sidorov@academy.ru",
-                        resume: "/resumes/sidorov.pdf"
-                      },
-                      {
-                        photo: "/img/teacher4.jpg",
-                        name: "Кузнецова Ольга Викторовна",
-                        role: "Преподаватель",
-                        phone: "+7 (495) 123-45-70",
-                        email: "kuznetsova@academy.ru",
-                        resume: "/resumes/kuznetsova.pdf"
-                      },
-                      {
-                        photo: "/img/teacher5.jpg",
-                        name: "Михайлов Дмитрий Андреевич",
-                        role: "Ассистент",
-                        phone: "+7 (495) 123-45-71",
-                        email: "mikhailov@academy.ru",
-                        resume: "/resumes/mikhailov.pdf"
-                      },
-                      {
-                        photo: "/img/teacher6.jpg",
-                        name: "Васильева Анна Михайловна",
-                        role: "Старший преподаватель",
-                        phone: "+7 (495) 123-45-72",
-                        email: "vasilieva@academy.ru",
-                        resume: "/resumes/vasilieva.pdf"
-                      }
-                    ].map((teacher, index) => (
-                      <div key={index} className="bg-white rounded-xl border border-blue-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
-                        <div className="w-24 h-24 rounded-full overflow-hidden mb-4 mx-auto border-4 border-blue-100">
-                          <img 
-                            src={teacher.photo} 
-                            alt={teacher.name} 
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <h3 className="text-xl font-bold text-blue-900 mb-2 text-center">{teacher.name}</h3>
-                        <p className="text-gray-600 mb-3 text-center font-medium">{teacher.role}</p>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm text-gray-700">
-                            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                            </svg>
-                            <span>{teacher.phone}</span>
+                  {loadingTeachers ? (
+                    <div className="flex justify-center items-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    </div>
+                  ) : errorTeachers ? (
+                    <div className="text-center py-8">
+                      <p className="text-red-500">Error loading teachers: {errorTeachers}</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {teachersData.map((teacher) => (
+                        <div key={teacher.id} className="bg-white rounded-xl border border-blue-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
+                          <div className="w-24 h-24 rounded-full overflow-hidden mb-4 mx-auto border-4 border-blue-100">
+                            <img 
+                              src={teacher.photo} 
+                              alt={teacher.name} 
+                              className="w-full h-full object-cover"
+                            />
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-700">
-                            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            <span>{teacher.email}</span>
+                          <h3 className="text-xl font-bold text-blue-900 mb-2 text-center">{teacher.name}</h3>
+                          <p className="text-gray-600 mb-3 text-center font-medium">{teacher.role}</p>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm text-gray-700">
+                              <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                              </svg>
+                              <span>{teacher.phone}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-700">
+                              <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                              <span>{teacher.email}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
