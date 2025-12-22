@@ -1,320 +1,184 @@
-// MasterProgram.jsx
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const MasterProgram = () => {
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState("master");
-  const [isVisible, setIsVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState(null);
+  const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [programDetails, setProgramDetails] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [errorDetails, setErrorDetails] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
 
-  // Состояния для данных с бэкенда
-  const [backendData, setBackendData] = useState({
-    programs: [],
-    loading: false,
-    error: null,
-  });
-
-  const sectionRef = useRef(null);
-
-  // Демо-данные для карточек вкладок
-  const demoPrograms = {
-    master: [
-      {
-        id: 1,
-        title: t("master.programs.master1.title"),
-        subtitle: t("master.programs.master1.subtitle"),
-        description: t("master.programs.master1.description"),
-        features: [
-          t("master.programs.master1.features.0"),
-          t("master.programs.master1.features.1"),
-          t("master.programs.master1.features.2"),
-          t("master.programs.master1.features.3"),
-          t("master.programs.master1.features.4"),
-          t("master.programs.master1.features.5")
-        ],
-        duration: t("master.duration2Years"),
-        format: t("master.fullTime"),
-        price: "90000.00",
-        currency: t("master.currency"),
-        icon: "🎓",
-        color: "from-blue-500 to-blue-600",
-        facultyInfo: {
-          name: t("master.programs.master1.faculty.name"),
-          description: t("master.programs.master1.faculty.description"),
-          achievements: [
-            t("master.programs.master1.faculty.achievements.0"),
-            t("master.programs.master1.faculty.achievements.1"),
-            t("master.programs.master1.faculty.achievements.2"),
-            t("master.programs.master1.faculty.achievements.3")
-          ],
-          director: {
-            name: t("master.programs.master1.faculty.director.name"),
-            position: t("master.programs.master1.faculty.director.position"),
-            avatar: "👨‍🏫"
-          }
-        },
-        cards: [
-          {
-            id: 101,
-            title: t("master.programs.master1.cards.0.title"),
-            description: t("master.programs.master1.cards.0.description"),
-            duration: t("master.duration2Years"),
-            price: "85000.00",
-            icon: "🏃‍♂️"
-          },
-          {
-            id: 102,
-            title: t("master.programs.master1.cards.1.title"),
-            description: t("master.programs.master1.cards.1.description"),
-            duration: t("master.duration2Years"),
-            price: "95000.00",
-            icon: "🤝"
-          }
-        ]
-      },
-      {
-        id: 2,
-        title: t("master.programs.master2.title"),
-        subtitle: t("master.programs.master2.subtitle"),
-        description: t("master.programs.master2.description"),
-        features: [
-          t("master.programs.master2.features.0"),
-          t("master.programs.master2.features.1"),
-          t("master.programs.master2.features.2"),
-          t("master.programs.master2.features.3"),
-          t("master.programs.master2.features.4")
-        ],
-        duration: t("master.duration2Years"),
-        format: t("master.partTime"),
-        price: "85000.00",
-        currency: t("master.currency"),
-        icon: "🔬",
-        color: "from-indigo-500 to-purple-600",
-        facultyInfo: {
-          name: t("master.programs.master2.faculty.name"),
-          description: t("master.programs.master2.faculty.description"),
-          achievements: [
-            t("master.programs.master2.faculty.achievements.0"),
-            t("master.programs.master2.faculty.achievements.1"),
-            t("master.programs.master2.faculty.achievements.2"),
-            t("master.programs.master2.faculty.achievements.3")
-          ],
-          director: {
-            name: t("master.programs.master2.faculty.director.name"),
-            position: t("master.programs.master2.faculty.director.position"),
-            avatar: "👩‍🔬"
-          }
-        },
-        cards: [
-          {
-            id: 201,
-            title: t("master.programs.master2.cards.0.title"),
-            description: t("master.programs.master2.cards.0.description"),
-            duration: t("master.duration2Years"),
-            price: "88000.00",
-            icon: "📊"
-          },
-          {
-            id: 202,
-            title: t("master.programs.master2.cards.1.title"),
-            description: t("master.programs.master2.cards.1.description"),
-            duration: t("master.duration2Years"),
-            price: "87000.00",
-            icon: "❤️"
-          }
-        ]
+  // Получаем список всех магистерских программ
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const API_URL = import.meta.env.VITE_API_URL || 'https://physical-academy-backend-3dccb860f75a.herokuapp.com';
+        const response = await fetch(
+          `${API_URL}/api/education/master-programs/?lang=${i18n.language}`
+        );
+        
+        if (!response.ok) {
+          throw new Error(t('masterProgram.errors.fetchFailed'));
+        }
+        
+        const data = await response.json();
+        console.log('Master programs API response:', data);
+        
+        // Обработка различных форматов ответа API
+        let programsArray = [];
+        if (Array.isArray(data)) {
+          programsArray = data;
+        } else if (data && Array.isArray(data.results)) {
+          programsArray = data.results;
+        } else if (data && Array.isArray(data.data)) {
+          programsArray = data.data;
+        } else if (data && Array.isArray(data.programs)) {
+          programsArray = data.programs;
+        } else {
+          console.warn('Unexpected API response format:', data);
+          programsArray = [];
+        }
+        
+        // Добавляем цвета для табов
+        const colors = ['blue', 'green', 'blue-600', 'green-600', 'blue-700'];
+        const programsWithColors = programsArray.map((program, index) => ({
+          ...program,
+          color: colors[index % colors.length]
+        }));
+        
+        setPrograms(programsWithColors);
+        if (programsWithColors.length > 0) {
+          setActiveTab(programsWithColors[0].id);
+        }
+      } catch (err) {
+        setError(err.message || t('masterProgram.errors.unknown'));
+      } finally {
+        setLoading(false);
       }
-    ],
-    aspirant: [
-      {
-        id: 3,
-        title: t("master.programs.aspirant1.title"),
-        subtitle: t("master.programs.aspirant1.subtitle"),
-        description: t("master.programs.aspirant1.description"),
-        features: [
-          t("master.programs.aspirant1.features.0"),
-          t("master.programs.aspirant1.features.1"),
-          t("master.programs.aspirant1.features.2"),
-          t("master.programs.aspirant1.features.3"),
-          t("master.programs.aspirant1.features.4")
-        ],
-        duration: t("master.duration3Years"),
-        format: t("master.fullTime"),
-        price: "75000.00",
-        currency: t("master.currency"),
-        icon: "📚",
-        color: "from-orange-500 to-red-600",
-        facultyInfo: {
-          name: t("master.programs.aspirant1.faculty.name"),
-          description: t("master.programs.aspirant1.faculty.description"),
-          achievements: [
-            t("master.programs.aspirant1.faculty.achievements.0"),
-            t("master.programs.aspirant1.faculty.achievements.1"),
-            t("master.programs.aspirant1.faculty.achievements.2"),
-            t("master.programs.aspirant1.faculty.achievements.3")
-          ],
-          director: {
-            name: t("master.programs.aspirant1.faculty.director.name"),
-            position: t("master.programs.aspirant1.faculty.director.position"),
-            avatar: "👨‍🎓"
-          }
-        },
-        cards: [
-          {
-            id: 301,
-            title: t("master.programs.aspirant1.cards.0.title"),
-            description: t("master.programs.aspirant1.cards.0.description"),
-            duration: t("master.duration3Years"),
-            price: "72000.00",
-            icon: "🎯"
-          },
-          {
-            id: 302,
-            title: t("master.programs.aspirant1.cards.1.title"),
-            description: t("master.programs.aspirant1.cards.1.description"),
-            duration: t("master.duration3Years"),
-            price: "78000.00",
-            icon: "🧠"
-          }
-        ]
-      }
-    ]
-  };
-
-  // Получение текущего языка для API
-  const getApiLanguage = useCallback(() => {
-    const langMap = {
-      en: "en",
-      ru: "ru",
-      kg: "kg",
     };
-    return langMap[i18n.language] || "ru";
-  }, [i18n.language]);
 
-  // Функция для загрузки данных с бэкенда
-  const fetchBackendData = useCallback(async () => {
-    try {
-      setBackendData((prev) => ({
-        ...prev,
-        loading: true,
-        error: null,
-      }));
+    fetchPrograms();
+  }, [i18n.language, t]);
 
-      const lang = getApiLanguage();
-      const API_URL = import.meta.env.VITE_API_URL;
+  // Получаем детали конкретной программы по ID
+  useEffect(() => {
+    if (!activeTab) return;
 
-      const response = await fetch(
-        `${API_URL}/api/education/master-programs/?lang=${lang}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    const fetchProgramDetails = async () => {
+      setLoadingDetails(true);
+      setErrorDetails(null);
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'https://physical-academy-backend-3dccb860f75a.herokuapp.com';
+        const url = `${API_URL}/api/education/master-programs/${activeTab}/?lang=${i18n.language}`;
+        console.log('Fetching program details from:', url);
+        
+        const response = await fetch(url);
+        console.log('Program details response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`${t('masterProgram.errors.detailsFailed')}: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Program details data:', data);
+        
+        // Обработка различных форматов ответа API
+        let programData = data;
+        if (data && typeof data === 'object') {
+          if (data.data) programData = data.data;
+          else if (data.result) programData = data.result;
+          else if (data.program) programData = data.program;
+          
+          // Стандартизация полей
+          if (!programData.description && programData.info?.description) {
+            programData.description = programData.info.description;
+          }
+          if (!programData.curriculum && programData.courses) {
+            programData.curriculum = programData.courses;
+          }
+          if (!programData.faculty && programData.teachers) {
+            programData.faculty = programData.teachers;
+          }
+        }
+        
+        console.log('Processed program data:', programData);
+        setProgramDetails(programData);
+      } catch (err) {
+        console.error('Error fetching program details:', err);
+        setErrorDetails(err.message || t('masterProgram.errors.unknown'));
+      } finally {
+        setLoadingDetails(false);
       }
+    };
 
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Invalid content type");
+    fetchProgramDetails();
+  }, [activeTab, i18n.language, t]);
+
+  const getColorStyles = (color) => {
+    const colorMap = {
+      blue: {
+        border: 'border-blue-500',
+        bg: 'bg-blue-50',
+        text: 'text-blue-700',
+        accent: 'bg-blue-500',
+        gradient: 'from-blue-500 to-blue-600',
+        hoverGradient: 'from-blue-600 to-blue-700'
+      },
+      green: {
+        border: 'border-green-500',
+        bg: 'bg-green-50',
+        text: 'text-green-700',
+        accent: 'bg-green-500',
+        gradient: 'from-green-500 to-green-600',
+        hoverGradient: 'from-green-600 to-green-700'
+      },
+      'blue-600': {
+        border: 'border-blue-600',
+        bg: 'bg-blue-100',
+        text: 'text-blue-800',
+        accent: 'bg-blue-600',
+        gradient: 'from-blue-600 to-blue-700',
+        hoverGradient: 'from-blue-700 to-blue-800'
+      },
+      'green-600': {
+        border: 'border-green-600',
+        bg: 'bg-green-100',
+        text: 'text-green-800',
+        accent: 'bg-green-600',
+        gradient: 'from-green-600 to-green-700',
+        hoverGradient: 'from-green-700 to-green-800'
+      },
+      'blue-700': {
+        border: 'border-blue-700',
+        bg: 'bg-blue-50',
+        text: 'text-blue-900',
+        accent: 'bg-blue-700',
+        gradient: 'from-blue-700 to-blue-800',
+        hoverGradient: 'from-blue-800 to-blue-900'
       }
-
-      const data = await response.json();
-
-      setBackendData({
-        programs: data.results || [],
-        loading: false,
-        error: null,
-      });
-    } catch (error) {
-      console.error("Error fetching master programs:", error);
-      setBackendData({
-        programs: [],
-        loading: false,
-        error: "Failed to load programs data",
-      });
-    }
-  }, [getApiLanguage]);
-
-  // Загрузка данных при монтировании
-  useEffect(() => {
-    fetchBackendData();
-  }, []);
-
-  // Перезагрузка данных при изменении языка
-  useEffect(() => {
-    fetchBackendData();
-  }, [i18n.language]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Преобразование данных с бэкенда в формат компонента
-  const getFormattedPrograms = useCallback(() => {
-    // ЗАКОММЕНТИРУЕМ ДЛЯ ПРОСМОТРА ДЕМО-ДАННЫХ
-    // if (!backendData.programs || backendData.programs.length === 0) {
-      // Если данных нет, возвращаем демо-данные для активной вкладки
-      return demoPrograms[activeTab] || [];
-    // }
-    
-    // // Если есть данные с API, форматируем их по вкладкам
-    // const apiPrograms = backendData.programs.map((program, index) => ({
-    //   id: program.id || index,
-    //   title: program.name,
-    //   subtitle: program.subtitle || "",
-    //   duration: `${program.duration_years} ${t("master.years")}`,
-    //   format: program.offline ? t("master.offline") : t("master.online"),
-    //   description: program.description,
-    //   features: Array.isArray(program.features)
-    //     ? program.features
-    //     : typeof program.features === "string"
-    //     ? program.features.split(",").map((f) => f.trim())
-    //     : [],
-    //   price: program.tuition_fee || "0",
-    //   currency: t("master.currency"),
-    //   perYear: t("master.perYear"),
-    //   icon: program.emoji || "🎓",
-    //   color: getProgramColor(index),
-    //   facultyInfo: program.facultyInfo || null,
-    //   cards: program.cards || [],
-    //   isDemo: false,
-    // }));
-
-    // // Группируем по типам программ
-    // const masterPrograms = apiPrograms.filter(p => p.title.toLowerCase().includes("магистр"));
-    // const aspirantPrograms = apiPrograms.filter(p => p.title.toLowerCase().includes("аспирант"));
-    
-    // return {
-    //   master: masterPrograms,
-    //   aspirant: aspirantPrograms,
-    // }[activeTab] || [];
-  }, [backendData.programs, t, activeTab]);
-
-  const getProgramColor = (index) => {
-    const colors = [
-      "from-blue-500 to-blue-600",
-      "from-indigo-500 to-purple-600",
-      "from-orange-500 to-red-600",
-      "from-green-500 to-emerald-600",
-    ];
-    return colors[index % colors.length];
+    };
+    return colorMap[color] || colorMap.blue;
   };
 
-  const formattedPrograms = getFormattedPrograms();
+  const getActiveTabStyle = (tabId) => {
+    if (!Array.isArray(programs)) return '';
+    const program = programs.find(prog => prog.id === tabId);
+    if (!program) return '';
+    const styles = getColorStyles(program.color);
+    return `${styles.border} ${styles.bg} ${styles.text}`;
+  };
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setSelectedProgram(null);
+  const getActiveProgram = () => {
+    if (!Array.isArray(programs) || !activeTab) return null;
+    return programs.find(prog => prog.id === activeTab);
   };
 
   const handleLearnMore = (program) => {
@@ -327,488 +191,225 @@ const MasterProgram = () => {
     setSelectedProgram(null);
   };
 
-  // Компонент загрузки
-  const LoadingSkeleton = () => (
-    <div className="animate-pulse space-y-6">
-      {/* Заголовок скелетон */}
-      <div className="text-center mb-12">
-        <div className="bg-white/10 rounded-2xl h-12 w-3/4 mx-auto mb-4"></div>
-        <div className="bg-white/10 rounded-2xl h-4 w-1/2 mx-auto mb-3"></div>
-        <div className="bg-white/10 rounded-2xl h-4 w-2/3 mx-auto"></div>
-      </div>
+  const handleApplyNow = () => {
+    // В реальном приложении здесь будет логика открытия формы заявки
+    alert(t('masterProgram.applicationSuccess'));
+  };
 
-      {/* Программы скелетон */}
-      <div className="grid grid-cols-1 gap-8">
-        {[1].map((item) => (
-          <div key={item} className="bg-white/10 rounded-2xl p-8">
-            <div className="bg-white/10 rounded-2xl w-20 h-20 mx-auto mb-6"></div>
-            <div className="bg-white/10 rounded-2xl h-8 w-3/4 mx-auto mb-4"></div>
-            <div className="bg-white/10 rounded-2xl h-4 w-full mb-3"></div>
-            <div className="bg-white/10 rounded-2xl h-4 w-2/3"></div>
+  // Функция для форматирования стоимости обучения
+  const formatTuitionFee = (fee) => {
+    if (!fee || fee === "0.00") return t('masterProgram.freeTuition');
+    return `${fee} ₽/${t('masterProgram.perYear')}`;
+  };
+
+  // Функция для получения формата обучения
+  const getStudyFormat = (program) => {
+    if (program.online && program.offline) {
+      return t('masterProgram.formatHybrid');
+    } else if (program.online) {
+      return t('masterProgram.formatOnline');
+    } else {
+      return t('masterProgram.formatFullTime');
+    }
+  };
+
+  // Функция для получения продолжительности
+  const getDuration = (program) => {
+    if (program.duration_years) {
+      return `${program.duration_years} ${t('masterProgram.years')}`;
+    } else if (program.duration) {
+      return program.duration;
+    }
+    return t('masterProgram.defaultDuration');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">{t('masterProgram.loading')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6 inline-block">
+            <p className="text-red-500 font-semibold mb-2">{t('masterProgram.errorTitle')}</p>
+            <p className="text-red-400">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+            >
+              {t('masterProgram.retry')}
+            </button>
           </div>
-        ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
-  // Компонент ошибки
-  const ErrorMessage = ({ onRetry }) => (
-    <div className="text-center py-12">
-      <div className="text-red-400 text-6xl mb-4">⚠️</div>
-      <h2 className="text-2xl text-white mb-4">{t("master.errorTitle")}</h2>
-      <p className="text-blue-200 mb-6">{backendData.error}</p>
-      <button
-        onClick={onRetry}
-        className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
-      >
-        {t("master.retry")}
-      </button>
-    </div>
-  );
-
-  const tabs = [
-    { id: "master", label: t("master.tabs.master"), icon: "🎓" },
-    { id: "aspirant", label: t("master.tabs.aspirant"), icon: "📚" }
-  ];
-
-  // ЗАКОММЕНТИРУЕМ ДЛЯ ПРОСМОТРА ДЕМО-ДАННЫХ
-  // if (backendData.error && backendData.programs.length === 0) {
-  //   return (
-  //     <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 overflow-hidden">
-  //       <div className="container mx-auto px-4">
-  //         <ErrorMessage onRetry={fetchBackendData} />
-  //       </div>
-  //     </section>
-  //   );
-  // }
+  const activeProgram = getActiveProgram();
 
   return (
-    <>
-      <section
-        ref={sectionRef}
-        className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 overflow-hidden"
-      >
-        {/* Анимированный фон */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-600/10 via-transparent to-transparent"></div>
-          <div className="absolute top-20 left-10 w-32 h-32 bg-green-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-          <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-4">
+            {t('masterProgram.title')}
+          </h1>
+          <div className="w-20 h-1 bg-green-500 mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            {t('masterProgram.subtitle')}
+          </p>
+        </div>
+        
+        {/* Tabs Navigation */}
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
+          {Array.isArray(programs) && programs.map((program) => {
+            const styles = getColorStyles(program.color);
+            return (
+              <button
+                key={program.id}
+                onClick={() => setActiveTab(program.id)}
+                className={`
+                  px-6 py-3 rounded-xl font-semibold transition-all duration-300
+                  transform hover:-translate-y-1 hover:shadow-lg
+                  ${activeTab === program.id 
+                    ? `border-b-4 ${getActiveTabStyle(program.id)} shadow-md` 
+                    : 'bg-white text-gray-700 border-b-2 border-gray-200 hover:bg-gray-50'
+                  }
+                `}
+              >
+                {program.name || program.title}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Заголовок */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12 md:mb-16"
-          >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 md:mb-6">
-              {t("master.title")}
-            </h1>
-            <div className="w-20 h-1 bg-green-400 mx-auto mb-3 md:mb-4"></div>
-            <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto px-4">
-              {t("master.subtitle")}
-            </p>
-          </motion.div>
-
-          {/* Два столбца - Магистратура и Аспирантура */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="max-w-7xl mx-auto"
-          >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-              {/* Магистратура (Master) */}
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                animate={isVisible ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="space-y-6"
-              >
-                {/* Заголовок колонки */}
-                <div className="text-center mb-8">
-                  <div className="inline-block mb-4">
-                    <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-lg mx-auto">
-                      🎓
-                    </div>
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                    {t("master.tabs.master")}
+        {/* Основной контент */}
+        {activeProgram && (
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-12">
+            <div className={`h-2 ${getColorStyles(activeProgram.color).accent}`} />
+            <div className="p-8 md:p-12">
+              {/* Заголовок программы */}
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                    {activeProgram.name || activeProgram.title}
                   </h2>
-                  <div className="h-1 w-12 bg-green-400 mx-auto"></div>
-                </div>
-
-                {/* Информация о магистратуре */}
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-orange-400/30">
-                  <h3 className="text-white font-bold text-lg mb-4 text-center">
-                    {t("master.aboutProgram")}
-                  </h3>
-                  <div className="space-y-2">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-2 bg-orange-400/20 rounded-full"></div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Карточки без резюме */}
-                <div className="space-y-4">
-                  {demoPrograms.master.map((program, idx) => (
-                    <motion.div
-                      key={program.id}
-                      whileHover={{ scale: 1.02 }}
-                      className="bg-white/10 backdrop-blur-lg rounded-2xl p-5 border border-orange-400/30 cursor-pointer hover:border-orange-400/50 transition-all"
-                      onClick={() => handleLearnMore(program)}
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0">
-                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${program.color} flex items-center justify-center text-2xl`}>
-                            {program.icon}
-                          </div>
-                        </div>
-                        <div className="flex-grow">
-                          <h4 className="text-white font-bold text-base md:text-lg mb-1">
-                            {program.title}
-                          </h4>
-                          <p className="text-blue-200 text-sm mb-3">
-                            {program.description}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            <span className="text-green-300 text-xs font-semibold bg-green-500/20 px-2 py-1 rounded">
-                              {program.duration}
-                            </span>
-                            <span className="text-blue-300 text-xs bg-blue-500/20 px-2 py-1 rounded">
-                              {program.price} {program.currency}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Аспирантура (Aspirant) */}
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={isVisible ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="space-y-6"
-              >
-                {/* Заголовок колонки */}
-                <div className="text-center mb-8">
-                  <div className="inline-block mb-4">
-                    <div className="w-16 h-16 bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-lg mx-auto">
-                      📚
-                    </div>
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                    {t("master.tabs.aspirant")}
-                  </h2>
-                  <div className="h-1 w-12 bg-green-400 mx-auto"></div>
-                </div>
-
-                {/* Информация об аспирантуре */}
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-orange-400/30">
-                  <h3 className="text-white font-bold text-lg mb-4 text-center">
-                    {t("master.aboutProgram")}
-                  </h3>
-                  <div className="space-y-2">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-2 bg-orange-400/20 rounded-full"></div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Карточки без резюме */}
-                <div className="space-y-4">
-                  {demoPrograms.aspirant.map((program) => (
-                    <motion.div
-                      key={program.id}
-                      whileHover={{ scale: 1.02 }}
-                      className="bg-white/10 backdrop-blur-lg rounded-2xl p-5 border border-orange-400/30 cursor-pointer hover:border-orange-400/50 transition-all"
-                      onClick={() => handleLearnMore(program)}
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0">
-                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${program.color} flex items-center justify-center text-2xl`}>
-                            {program.icon}
-                          </div>
-                        </div>
-                        <div className="flex-grow">
-                          <h4 className="text-white font-bold text-base md:text-lg mb-1">
-                            {program.title}
-                          </h4>
-                          <p className="text-blue-200 text-sm mb-3">
-                            {program.description}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            <span className="text-green-300 text-xs font-semibold bg-green-500/20 px-2 py-1 rounded">
-                              {program.duration}
-                            </span>
-                            <span className="text-blue-300 text-xs bg-blue-500/20 px-2 py-1 rounded">
-                              {program.price} {program.currency}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
-
-          {/* Уведомление о демо-данных */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-12 text-center"
-          >
-            <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-3 border border-white/20">
-              <span className="text-yellow-300 mr-2">ℹ️</span>
-              <p className="text-blue-100">
-                {backendData.error 
-                  ? t("master.usingDemoData") 
-                  : t("master.demoDataWarning")}
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Модальное окно */}
-      <AnimatePresence>
-        {showModal && selectedProgram && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-gradient-to-br from-blue-900 to-green-900 rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-white/20 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-6 md:p-8">
-                {/* Заголовок */}
-                <div className="flex justify-between items-start mb-8">
-                  <div className="flex items-center">
-                    <div
-                      className={`w-24 h-24 rounded-2xl bg-gradient-to-r ${selectedProgram.color} flex items-center justify-center text-4xl mr-6`}
-                    >
-                      {selectedProgram.icon}
-                    </div>
-                    <div>
-                      <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                        {selectedProgram.title}
-                      </h2>
-                      {selectedProgram.subtitle && (
-                        <p className="text-green-300 font-medium text-xl mb-2">
-                          {selectedProgram.subtitle}
-                        </p>
-                      )}
-                      <div className="flex flex-wrap gap-2">
-                        {selectedProgram.duration && (
-                          <span className="text-green-300 font-semibold bg-green-500/20 px-3 py-1 rounded-lg">
-                            {selectedProgram.duration}
-                          </span>
-                        )}
-                        {selectedProgram.format && (
-                          <span className="text-blue-300 bg-blue-500/20 px-3 py-1 rounded-lg">
-                            {selectedProgram.format}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={closeModal}
-                    className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-2xl transition-colors"
-                  >
-                    ×
-                  </button>
-                </div>
-
-                {/* Индикатор демо-данных в модальном окне */}
-                {/* {selectedProgram.isDemo && ( */}
-                  <div className="mb-6 p-4 bg-yellow-500/10 rounded-xl border border-yellow-500/20">
-                    <div className="flex items-center">
-                      <span className="text-yellow-300 text-2xl mr-3">⚠️</span>
-                      <div>
-                        <h4 className="text-yellow-200 font-bold mb-1">{t("master.demoData")}</h4>
-                        <p className="text-yellow-200/80 text-sm">
-                          {t("master.demoModalWarning")}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                {/* )} */}
-
-                {/* Цена */}
-                <div className="text-center mb-8 p-6 bg-white/5 rounded-2xl">
-                  <div className="text-5xl font-bold text-white mb-2">
-                    {selectedProgram.price}
-                    {selectedProgram.currency && <span className="text-xl ml-2">{selectedProgram.currency}</span>}
-                  </div>
-                  <div className="text-blue-200 text-lg">
-                    {t("master.perYear")}
-                  </div>
-                </div>
-
-                {/* Контент */}
-                <div className="space-y-8">
-                  {/* Информация о факультете */}
-                  {selectedProgram.facultyInfo && (
-                    <div className="bg-white/5 rounded-2xl p-6">
-                      <h3 className="text-2xl font-bold text-white mb-4 flex items-center">
-                        <span className="text-3xl mr-3">🏛️</span>
-                        {t("master.aboutFaculty")}
-                      </h3>
-                      <div className="grid md:grid-cols-2 gap-8">
-                        <div>
-                          <h4 className="text-xl font-bold text-white mb-3">
-                            {selectedProgram.facultyInfo.name}
-                          </h4>
-                          <p className="text-blue-100 leading-relaxed">
-                            {selectedProgram.facultyInfo.description}
-                          </p>
-                        </div>
-                        <div>
-                          <h4 className="text-xl font-bold text-white mb-3">{t("master.achievements")}</h4>
-                          <div className="grid grid-cols-2 gap-3">
-                            {selectedProgram.facultyInfo.achievements?.map((achievement, idx) => (
-                              <div
-                                key={idx}
-                                className="bg-white/5 rounded-xl p-4 text-center"
-                              >
-                                <span className="text-green-300 font-medium">{achievement}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      {selectedProgram.facultyInfo.director && (
-                        <div className="mt-6 pt-6 border-t border-white/10">
-                          <div className="flex items-center">
-                            <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-3xl mr-6">
-                              {selectedProgram.facultyInfo.director.avatar}
-                            </div>
-                            <div>
-                              <h4 className="text-xl font-bold text-white">
-                                {selectedProgram.facultyInfo.director.name}
-                              </h4>
-                              <p className="text-green-300 text-lg mb-2">
-                                {selectedProgram.facultyInfo.director.position}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Направления подготовки */}
-                  {selectedProgram.cards && selectedProgram.cards.length > 0 && (
-                    <div>
-                      <h3 className="text-2xl font-bold text-white mb-6">
-                        {t("master.specializations")}
-                      </h3>
-                      <div className="grid md:grid-cols-2 gap-6">
-                        {selectedProgram.cards.map((card) => (
-                          <div
-                            key={card.id}
-                            className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all duration-300"
-                          >
-                            <div className="flex items-center mb-4">
-                              <div className="w-16 h-16 rounded-xl bg-gradient-to-r from-blue-500/20 to-blue-600/20 flex items-center justify-center text-3xl mr-4">
-                                {card.icon}
-                              </div>
-                              <div>
-                                <h4 className="text-xl font-bold text-white mb-1">
-                                  {card.title}
-                                </h4>
-                                <p className="text-blue-200">
-                                  {card.duration}
-                                </p>
-                              </div>
-                            </div>
-                            <p className="text-blue-100 mb-6">
-                              {card.description}
-                            </p>
-                            <div className="text-center p-4 bg-white/5 rounded-xl">
-                              <div className="text-2xl font-bold text-white mb-1">
-                                {card.price} {t("master.currency")}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Особенности программы */}
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-6">
-                      {t("master.programFeatures")}
-                    </h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {selectedProgram.features.map((feature, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center bg-white/5 rounded-xl p-4"
-                        >
-                          <div className="w-8 h-8 bg-green-400/20 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                            <span className="text-green-300">✓</span>
-                          </div>
-                          <span className="text-white text-lg">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Дополнительная информация */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-white/10">
-                    <div className="text-center p-4 bg-white/5 rounded-xl">
-                      <div className="text-blue-200 text-sm mb-2">
-                        {t("master.startDate")}
-                      </div>
-                      <div className="text-white font-bold text-lg">
-                        {t("master.september")}
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-white/5 rounded-xl">
-                      <div className="text-blue-200 text-sm mb-2">
-                        {t("master.places")}
-                      </div>
-                      <div className="text-green-300 font-bold text-lg">25</div>
-                    </div>
-                    <div className="text-center p-4 bg-white/5 rounded-xl">
-                      <div className="text-blue-200 text-sm mb-2">
-                        {t("master.studyFormat")}
-                      </div>
-                      <div className="text-white font-bold text-lg">{t("master.fullTime")}</div>
-                    </div>
-                    <div className="text-center p-4 bg-white/5 rounded-xl">
-                      <div className="text-blue-200 text-sm mb-2">
-                        {t("master.language")}
-                      </div>
-                      <div className="text-white font-bold text-lg">{t("master.russian")}</div>
-                    </div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                      {getDuration(activeProgram)}
+                    </span>
+                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                      {getStudyFormat(activeProgram)}
+                    </span>
+                    {activeProgram.tuition_fee && (
+                      <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                        {formatTuitionFee(activeProgram.tuition_fee)}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+
+              {/* Контент программы */}
+              {loadingDetails ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                  <p className="ml-4 text-gray-600">{t('masterProgram.loadingDetails')}</p>
+                </div>
+              ) : errorDetails ? (
+                <div className="text-center py-8">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                    <h3 className="text-red-800 font-semibold mb-2">{t('masterProgram.errorDetailsTitle')}</h3>
+                    <p className="text-red-600">{errorDetails}</p>
+                  </div>
+                </div>
+              ) : programDetails ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Описание программы */}
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-700 mb-4">
+                      {t('masterProgram.aboutProgram')}
+                    </h3>
+                    <div className="prose prose-lg max-w-none mb-8">
+                      {programDetails.description ? (
+                        <div 
+                          className="text-gray-600 leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: programDetails.description }}
+                        />
+                      ) : (
+                        <p className="text-gray-500 italic">{t('masterProgram.noDescription')}</p>
+                      )}
+                    </div>
+                  </div>
+                  {/* Карточка преподавателя справа */}
+                  <div className="flex justify-end">
+                    <div className="w-full max-w-xs">
+                      {programDetails.faculty && Array.isArray(programDetails.faculty) && programDetails.faculty.length > 0 && (
+                        programDetails.faculty.slice(0, 1).map((teacher, index) => (
+                          <div
+                            key={index}
+                            className="bg-white rounded-2xl p-8 shadow-lg border-t-4 border-blue-400 flex flex-col items-center"
+                            style={{ minWidth: 320 }}
+                          >
+                            <div className="w-28 h-28 rounded-full overflow-hidden mb-4 border-4 border-blue-200 bg-gray-100 flex items-center justify-center">
+                              <img
+                                src={teacher.photo || teacher.image || '/default-avatar.png'}
+                                alt={teacher.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.src = '/default-avatar.png';
+                                }}
+                              />
+                            </div>
+                            <div className="text-center">
+                              <div className="text-xl font-bold text-blue-900 mb-1">
+                                {teacher.name}
+                              </div>
+                              <div className="text-gray-600 mb-4">
+                                {teacher.position}
+                              </div>
+                              {teacher.phone && (
+                                <div className="flex items-center justify-center text-gray-700 mb-1">
+                                  <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h2.28a2 2 0 011.94 1.515l.3 1.2a2 2 0 01-.45 1.95l-.7.7a16.001 16.001 0 006.36 6.36l.7-.7a2 2 0 011.95-.45l1.2.3A2 2 0 0121 18.72V21a2 2 0 01-2 2h-1C7.163 23 1 16.837 1 9V8a2 2 0 012-2z" /></svg>
+                                  <a href={`tel:${teacher.phone}`} className="text-sm font-medium">
+                                    {teacher.phone}
+                                  </a>
+                                </div>
+                              )}
+                              {teacher.email && (
+                                <div className="flex items-center justify-center text-gray-700">
+                                  <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm2 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" /></svg>
+                                  <a href={`mailto:${teacher.email}`} className="text-sm font-medium break-all">
+                                    {teacher.email}
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">{t('masterProgram.noDetails')}</p>
+                </div>
+              )}
+            </div>
+          </div>
         )}
-      </AnimatePresence>
-    </>
+      </div>
+    </div>
   );
 };
 
