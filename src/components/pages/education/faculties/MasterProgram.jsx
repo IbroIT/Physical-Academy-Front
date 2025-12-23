@@ -1,126 +1,103 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const MasterProgram = () => {
+const DepartmentTabs = () => {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState(null);
-  const [programs, setPrograms] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [programDetails, setProgramDetails] = useState(null);
+  const [departmentDetails, setDepartmentDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [errorDetails, setErrorDetails] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedProgram, setSelectedProgram] = useState(null);
 
-  // Получаем список всех магистерских программ
+  // Получаем список всех кафедр
   useEffect(() => {
-    const fetchPrograms = async () => {
+    const fetchCategories = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        
-        const API_URL = import.meta.env.VITE_API_URL || 'https://physical-academy-backend-3dccb860f75a.herokuapp.com';
-        const response = await fetch(
-          `${API_URL}/api/education/master-programs/?lang=${i18n.language}`
-        );
-        
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/general-departments/categories/?lang=${i18n.language}`);
         if (!response.ok) {
-          throw new Error(t('masterProgram.errors.fetchFailed'));
+          throw new Error('Failed to fetch categories');
         }
-        
         const data = await response.json();
-        console.log('Master programs API response:', data);
+        console.log('Categories API response:', data); // Для отладки
         
         // Обработка различных форматов ответа API
-        let programsArray = [];
+        let categoriesArray = [];
         if (Array.isArray(data)) {
-          programsArray = data;
+          categoriesArray = data;
         } else if (data && Array.isArray(data.results)) {
-          programsArray = data.results;
+          categoriesArray = data.results;
         } else if (data && Array.isArray(data.data)) {
-          programsArray = data.data;
-        } else if (data && Array.isArray(data.programs)) {
-          programsArray = data.programs;
+          categoriesArray = data.data;
         } else {
           console.warn('Unexpected API response format:', data);
-          programsArray = [];
+          categoriesArray = [];
         }
         
-        // Добавляем цвета для табов
-        const colors = ['blue', 'green', 'blue-600', 'green-600', 'blue-700'];
-        const programsWithColors = programsArray.map((program, index) => ({
-          ...program,
-          color: colors[index % colors.length]
-        }));
-        
-        setPrograms(programsWithColors);
-        if (programsWithColors.length > 0) {
-          setActiveTab(programsWithColors[0].id);
+        setCategories(categoriesArray);
+        if (categoriesArray.length > 0) {
+          setActiveTab(categoriesArray[0].id);
         }
       } catch (err) {
-        setError(err.message || t('masterProgram.errors.unknown'));
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPrograms();
-  }, [i18n.language, t]);
+    fetchCategories();
+  }, [i18n.language]);
 
-  // Получаем детали конкретной программы по ID
+  // Получаем детали конкретной кафедры по ID
   useEffect(() => {
     if (!activeTab) return;
 
-    const fetchProgramDetails = async () => {
+    const fetchDepartmentDetails = async () => {
       setLoadingDetails(true);
       setErrorDetails(null);
       try {
-        const API_URL = import.meta.env.VITE_API_URL || 'https://physical-academy-backend-3dccb860f75a.herokuapp.com';
-        const url = `${API_URL}/api/education/master-programs/${activeTab}/?lang=${i18n.language}`;
-        console.log('Fetching program details from:', url);
+        const url = `https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/general-departments/categories/${activeTab}/?lang=${i18n.language}`;
+        console.log('Fetching department details from:', url);
         
         const response = await fetch(url);
-        console.log('Program details response status:', response.status);
+        console.log('Department details response status:', response.status);
         
         if (!response.ok) {
-          throw new Error(`${t('masterProgram.errors.detailsFailed')}: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to fetch department details: ${response.status} ${response.statusText}`);
         }
-        
         const data = await response.json();
-        console.log('Program details data:', data);
+        console.log('Department details data:', data);
         
         // Обработка различных форматов ответа API
-        let programData = data;
-        if (data && typeof data === 'object') {
-          if (data.data) programData = data.data;
-          else if (data.result) programData = data.result;
-          else if (data.program) programData = data.program;
+        let departmentData = data;
+        if (data && typeof data === 'object' && !data.description && !data.staff) {
+          // Если данные wrapped в другое поле
+          if (data.data) departmentData = data.data;
+          else if (data.result) departmentData = data.result;
+          else if (data.department) departmentData = data.department;
           
-          // Стандартизация полей
-          if (!programData.description && programData.info?.description) {
-            programData.description = programData.info.description;
+          // Если API возвращает данные в формате с info и management
+          if (departmentData.info && !departmentData.description) {
+            departmentData.description = departmentData.info.description;
           }
-          if (!programData.curriculum && programData.courses) {
-            programData.curriculum = programData.courses;
-          }
-          if (!programData.faculty && programData.teachers) {
-            programData.faculty = programData.teachers;
+          if (departmentData.management && !departmentData.staff) {
+            departmentData.staff = departmentData.management;
           }
         }
         
-        console.log('Processed program data:', programData);
-        setProgramDetails(programData);
+        console.log('Processed department data:', departmentData);
+        setDepartmentDetails(departmentData);
       } catch (err) {
-        console.error('Error fetching program details:', err);
-        setErrorDetails(err.message || t('masterProgram.errors.unknown'));
+        console.error('Error fetching department details:', err);
+        setErrorDetails(err.message);
       } finally {
         setLoadingDetails(false);
       }
     };
 
-    fetchProgramDetails();
-  }, [activeTab, i18n.language, t]);
+    fetchDepartmentDetails();
+  }, [activeTab, i18n.language]);
 
   const getColorStyles = (color) => {
     const colorMap = {
@@ -128,99 +105,47 @@ const MasterProgram = () => {
         border: 'border-blue-500',
         bg: 'bg-blue-50',
         text: 'text-blue-700',
-        accent: 'bg-blue-500',
-        gradient: 'from-blue-500 to-blue-600',
-        hoverGradient: 'from-blue-600 to-blue-700'
+        accent: 'bg-blue-500'
       },
       green: {
         border: 'border-green-500',
         bg: 'bg-green-50',
         text: 'text-green-700',
-        accent: 'bg-green-500',
-        gradient: 'from-green-500 to-green-600',
-        hoverGradient: 'from-green-600 to-green-700'
+        accent: 'bg-green-500'
       },
       'blue-600': {
         border: 'border-blue-600',
         bg: 'bg-blue-100',
         text: 'text-blue-800',
-        accent: 'bg-blue-600',
-        gradient: 'from-blue-600 to-blue-700',
-        hoverGradient: 'from-blue-700 to-blue-800'
+        accent: 'bg-blue-600'
       },
       'green-600': {
         border: 'border-green-600',
         bg: 'bg-green-100',
         text: 'text-green-800',
-        accent: 'bg-green-600',
-        gradient: 'from-green-600 to-green-700',
-        hoverGradient: 'from-green-700 to-green-800'
+        accent: 'bg-green-600'
       },
       'blue-700': {
         border: 'border-blue-700',
         bg: 'bg-blue-50',
         text: 'text-blue-900',
-        accent: 'bg-blue-700',
-        gradient: 'from-blue-700 to-blue-800',
-        hoverGradient: 'from-blue-800 to-blue-900'
+        accent: 'bg-blue-700'
       }
     };
     return colorMap[color] || colorMap.blue;
   };
 
   const getActiveTabStyle = (tabId) => {
-    if (!Array.isArray(programs)) return '';
-    const program = programs.find(prog => prog.id === tabId);
-    if (!program) return '';
-    const styles = getColorStyles(program.color);
+    if (!Array.isArray(categories)) return '';
+    const category = categories.find(cat => cat.id === tabId);
+    if (!category) return '';
+    const styles = getColorStyles(category.color);
     return `${styles.border} ${styles.bg} ${styles.text}`;
   };
 
-  const getActiveProgram = () => {
-    if (!Array.isArray(programs) || !activeTab) return null;
-    return programs.find(prog => prog.id === activeTab);
-  };
-
-  const handleLearnMore = (program) => {
-    setSelectedProgram(program);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedProgram(null);
-  };
-
-  const handleApplyNow = () => {
-    // В реальном приложении здесь будет логика открытия формы заявки
-    alert(t('masterProgram.applicationSuccess'));
-  };
-
-  // Функция для форматирования стоимости обучения
-  const formatTuitionFee = (fee) => {
-    if (!fee || fee === "0.00") return t('masterProgram.freeTuition');
-    return `${fee} ₽/${t('masterProgram.perYear')}`;
-  };
-
-  // Функция для получения формата обучения
-  const getStudyFormat = (program) => {
-    if (program.online && program.offline) {
-      return t('masterProgram.formatHybrid');
-    } else if (program.online) {
-      return t('masterProgram.formatOnline');
-    } else {
-      return t('masterProgram.formatFullTime');
-    }
-  };
-
-  // Функция для получения продолжительности
-  const getDuration = (program) => {
-    if (program.duration_years) {
-      return `${program.duration_years} ${t('masterProgram.years')}`;
-    } else if (program.duration) {
-      return program.duration;
-    }
-    return t('masterProgram.defaultDuration');
+  const getActiveCategory = () => {
+    if (!Array.isArray(categories) || !activeTab) return null;
+    return categories.find(cat => cat.id === activeTab);
   };
 
   if (loading) {
@@ -228,7 +153,7 @@ const MasterProgram = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8">
         <div className="max-w-6xl mx-auto text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">{t('masterProgram.loading')}</p>
+          <p className="mt-4 text-gray-600">Loading departments...</p>
         </div>
       </div>
     );
@@ -238,22 +163,13 @@ const MasterProgram = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 inline-block">
-            <p className="text-red-500 font-semibold mb-2">{t('masterProgram.errorTitle')}</p>
-            <p className="text-red-400">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-            >
-              {t('masterProgram.retry')}
-            </button>
-          </div>
+          <p className="text-red-500">Error: {error}</p>
         </div>
       </div>
     );
   }
 
-  const activeProgram = getActiveProgram();
+  const activeCategory = getActiveCategory();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 md:p-8">
@@ -261,148 +177,162 @@ const MasterProgram = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-4">
-            {t('masterProgram.title')}
+            {t('master.title')}
           </h1>
-          <div className="w-20 h-1 bg-green-500 mx-auto mb-4"></div>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            {t('masterProgram.subtitle')}
+            {t('master.description')}
           </p>
         </div>
-        
+
         {/* Tabs Navigation */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {Array.isArray(programs) && programs.map((program) => {
-            const styles = getColorStyles(program.color);
+          {Array.isArray(categories) && categories.map((category) => {
+            const styles = getColorStyles(category.color);
             return (
               <button
-                key={program.id}
-                onClick={() => setActiveTab(program.id)}
+                key={category.id}
+                onClick={() => setActiveTab(category.id)}
                 className={`
                   px-6 py-3 rounded-xl font-semibold transition-all duration-300
                   transform hover:-translate-y-1 hover:shadow-lg
-                  ${activeTab === program.id 
-                    ? `border-b-4 ${getActiveTabStyle(program.id)} shadow-md` 
+                  ${activeTab === category.id 
+                    ? `border-b-4 ${getActiveTabStyle(category.id)} shadow-md` 
                     : 'bg-white text-gray-700 border-b-2 border-gray-200 hover:bg-gray-50'
                   }
                 `}
               >
-                {program.name || program.title}
+                {category.name}
               </button>
             );
           })}
-        </div>
+        </div>  
 
-        {/* Основной контент */}
-        {activeProgram && (
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-12">
-            <div className={`h-2 ${getColorStyles(activeProgram.color).accent}`} />
+        {/* Tab Content */}
+        {activeCategory && (
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className={`h-2 ${getColorStyles(activeCategory.color).accent}`} />
+            
             <div className="p-8 md:p-12">
-              {/* Заголовок программы */}
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-                <div>
-                  <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                    {activeProgram.name || activeProgram.title}
-                  </h2>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                      {getDuration(activeProgram)}
-                    </span>
-                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
-                      {getStudyFormat(activeProgram)}
-                    </span>
-                    {activeProgram.tuition_fee && (
-                      <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
-                        {formatTuitionFee(activeProgram.tuition_fee)}
-                      </span>
-                    )}
-                  </div>
-                </div>
+              <div className="flex items-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-800">
+                  {activeCategory.name}
+                </h2>
               </div>
 
-              {/* Контент программы */}
               {loadingDetails ? (
-                <div className="flex justify-center items-center py-12">
+                <div className="flex justify-center items-center py-8">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-                  <p className="ml-4 text-gray-600">{t('masterProgram.loadingDetails')}</p>
+                  <p className="ml-4 text-gray-600">Загрузка информации о кафедре...</p>
                 </div>
               ) : errorDetails ? (
                 <div className="text-center py-8">
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                    <h3 className="text-red-800 font-semibold mb-2">{t('masterProgram.errorDetailsTitle')}</h3>
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h3 className="text-red-800 font-semibold mb-2">Ошибка загрузки данных</h3>
                     <p className="text-red-600">{errorDetails}</p>
+                    <p className="text-sm text-red-500 mt-2">Проверьте консоль браузера для дополнительной информации</p>
                   </div>
                 </div>
-              ) : programDetails ? (
+              ) : departmentDetails && (departmentDetails.description || departmentDetails.info?.description || (departmentDetails.staff && departmentDetails.staff.length > 0) || (departmentDetails.management && departmentDetails.management.length > 0)) ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Описание программы */}
                   <div>
                     <h3 className="text-xl font-semibold text-gray-700 mb-4">
-                      {t('masterProgram.aboutProgram')}
+                      {t('departmentTabs.content.about')}
                     </h3>
-                    <div className="prose prose-lg max-w-none mb-8">
-                      {programDetails.description ? (
+                    <div className="prose prose-lg max-w-none">
+                      {(departmentDetails.description || departmentDetails.info?.description) ? (
                         <div 
                           className="text-gray-600 leading-relaxed"
-                          dangerouslySetInnerHTML={{ __html: programDetails.description }}
+                          dangerouslySetInnerHTML={{ __html: departmentDetails.description || departmentDetails.info?.description }}
                         />
                       ) : (
-                        <p className="text-gray-500 italic">{t('masterProgram.noDescription')}</p>
+                        <p className="text-gray-500 italic">Описание кафедры отсутствует</p>
                       )}
                     </div>
                   </div>
-                  {/* Карточка преподавателя справа */}
-                  <div className="flex justify-end">
-                    <div className="w-full max-w-xs">
-                      {programDetails.faculty && Array.isArray(programDetails.faculty) && programDetails.faculty.length > 0 && (
-                        programDetails.faculty.slice(0, 1).map((teacher, index) => (
-                          <div
-                            key={index}
-                            className="bg-white rounded-2xl p-8 shadow-lg border-t-4 border-blue-400 flex flex-col items-center"
-                            style={{ minWidth: 320 }}
-                          >
-                            <div className="w-28 h-28 rounded-full overflow-hidden mb-4 border-4 border-blue-200 bg-gray-100 flex items-center justify-center">
-                              <img
-                                src={teacher.photo || teacher.image || '/default-avatar.png'}
-                                alt={teacher.name}
+                  
+                  <div>
+                    {(departmentDetails.staff && Array.isArray(departmentDetails.staff) && departmentDetails.staff.length > 0) || 
+                     (departmentDetails.management && Array.isArray(departmentDetails.management) && departmentDetails.management.length > 0) ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {(departmentDetails.staff || departmentDetails.management).map((teacher, index) => (
+                          <div key={teacher.id || teacher.name || index} className="bg-white rounded-xl border border-blue-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
+                            <div className="w-24 h-24 rounded-full overflow-hidden mb-4 mx-auto border-4 border-blue-100">
+                              <img 
+                                src={teacher.photo || teacher.image || '/default-avatar.png'} 
+                                alt={teacher.name || teacher.full_name} 
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                   e.target.src = '/default-avatar.png';
                                 }}
                               />
                             </div>
-                            <div className="text-center">
-                              <div className="text-xl font-bold text-blue-900 mb-1">
-                                {teacher.name}
-                              </div>
-                              <div className="text-gray-600 mb-4">
-                                {teacher.position}
-                              </div>
-                              {teacher.phone && (
-                                <div className="flex items-center justify-center text-gray-700 mb-1">
-                                  <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h2.28a2 2 0 011.94 1.515l.3 1.2a2 2 0 01-.45 1.95l-.7.7a16.001 16.001 0 006.36 6.36l.7-.7a2 2 0 011.95-.45l1.2.3A2 2 0 0121 18.72V21a2 2 0 01-2 2h-1C7.163 23 1 16.837 1 9V8a2 2 0 012-2z" /></svg>
-                                  <a href={`tel:${teacher.phone}`} className="text-sm font-medium">
-                                    {teacher.phone}
-                                  </a>
+                            <h3 className="text-xl font-bold text-blue-900 mb-2 text-center">
+                              {teacher.name || teacher.full_name || teacher.title}
+                            </h3>
+                            <p className="text-gray-600 mb-3 text-center font-medium">
+                              {teacher.role || teacher.position || teacher.job_title}
+                            </p>
+                            <div className="space-y-2">
+                              {(teacher.phone || teacher.phone_number) && (
+                                <div className="flex items-center gap-2 text-sm text-gray-700">
+                                  <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                  </svg>
+                                  <span>{teacher.phone || teacher.phone_number}</span>
                                 </div>
                               )}
-                              {teacher.email && (
-                                <div className="flex items-center justify-center text-gray-700">
-                                  <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm2 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-1" /></svg>
-                                  <a href={`mailto:${teacher.email}`} className="text-sm font-medium break-all">
-                                    {teacher.email}
-                                  </a>
+                              {(teacher.email || teacher.email_address) && (
+                                <div className="flex items-center gap-2 text-sm text-gray-700">
+                                  <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                  </svg>
+                                  <span>{teacher.email || teacher.email_address}</span>
                                 </div>
                               )}
                             </div>
                           </div>
-                        ))
-                      )}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500 mb-2">Информация о преподавателях отсутствует</p>
+                        <p className="text-sm text-gray-400">
+                          Staff/Management data: {
+                            departmentDetails.staff ? 
+                              (Array.isArray(departmentDetails.staff) ? 
+                                `${departmentDetails.staff.length} items (staff)` : 
+                                typeof departmentDetails.staff) : 
+                            departmentDetails.management ?
+                              (Array.isArray(departmentDetails.management) ? 
+                                `${departmentDetails.management.length} items (management)` : 
+                                typeof departmentDetails.management) :
+                            'null/undefined'
+                          }
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">{t('masterProgram.noDetails')}</p>
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                    <h3 className="text-yellow-800 font-semibold mb-2">Информация о кафедре не найдена</h3>
+                    <p className="text-yellow-700 text-sm">
+                      Возможно, API вернул пустой ответ или данные в неожиданном формате.
+                    </p>
+                    <details className="mt-2">
+                      <summary className="text-yellow-600 cursor-pointer text-sm">Показать отладочную информацию</summary>
+                      <pre className="text-xs text-yellow-800 mt-2 bg-yellow-100 p-2 rounded overflow-auto">
+                        {JSON.stringify({
+                          activeTab,
+                          departmentDetails,
+                          hasDescription: !!(departmentDetails?.description || departmentDetails?.info?.description),
+                          staffCount: (departmentDetails?.staff?.length || 0) + (departmentDetails?.management?.length || 0),
+                          departmentDetailsKeys: departmentDetails ? Object.keys(departmentDetails) : []
+                        }, null, 2)}
+                      </pre>
+                    </details>
+                  </div>
                 </div>
               )}
             </div>
@@ -413,4 +343,4 @@ const MasterProgram = () => {
   );
 };
 
-export default MasterProgram;
+export default DepartmentTabs;

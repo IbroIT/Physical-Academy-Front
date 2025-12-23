@@ -5002,8 +5002,9 @@
     "no_metrics": "No metrics data available"
   },
   "collegeSports": {
-    "title": "COLLEGE OF SPORTS",
+    "title": "College of Physical Culture and Sports",
     "subtitle": "Professional education in the field of physical culture and sports",
+    "description": "College of Physical Culture and Sports provides quality secondary vocational education, training specialists in sports and physical culture, development of practical skills and formation of a healthy lifestyle",
     "demoNotification": "Demo data is being used. When connected to the backend, actual data will be displayed.",
     "viewProfile": "View Profile",
     "noContent": "Content not found",
@@ -6437,8 +6438,9 @@
     }
   },
   "doctorate": {
-    "title": "Doctoral Studies",
+    "title": "Doctorate",
     "subtitle": "Advanced research and scientific achievements",
+    "description": "Doctorate provides an opportunity for conducting advanced scientific research, training highly qualified scientists and developing innovative approaches in the field of physical culture and sports",
     "deadlinesTitle": "📅 Upcoming Deadlines",
     "buttons": {
       "moreDetails": "More Details"
@@ -6642,8 +6644,9 @@
     ]
   },
   "master": {
-    "title": "MASTER'S/GRADUATE PROGRAMS",
+    "title": "Master's/Graduate Program",
     "subtitle": "Advanced education for future leaders in physical culture and sports",
+    "description": "Master's and graduate programs provide an opportunity for in-depth study in the field of physical culture and sports, training of scientific personnel and development of research skills",
     "learnMore": "Learn More",
     "applyNow": "Apply Now",
     "downloadBrochure": "Download Brochure",
