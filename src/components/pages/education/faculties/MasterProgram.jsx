@@ -15,7 +15,7 @@ const DepartmentTabs = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/general-departments/categories/?lang=${i18n.language}`);
+        const response = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/education/master-categories/?lang=${i18n.language}`);
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -57,7 +57,7 @@ const DepartmentTabs = () => {
       setLoadingDetails(true);
       setErrorDetails(null);
       try {
-        const url = `https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/general-departments/categories/${activeTab}/?lang=${i18n.language}`;
+        const url = `https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/education/master-categories/${activeTab}/?lang=${i18n.language}`;
         console.log('Fetching department details from:', url);
         
         const response = await fetch(url);
