@@ -23,22 +23,16 @@ const BoardOfTrustees = () => {
         setLoading(true);
         const lang = i18n.language;
 
-        console.log('🔍 Fetching BoardOfTrustees data with lang:', lang);
+        
 
         const [trusteesData, statsData] = await Promise.all([
           apiService.getBoardOfTrustees(lang),
           apiService.getBoardOfTrusteesStats(lang)
         ]);
 
-        console.log('📊 BoardOfTrustees data received:', {
-          trustees: trusteesData?.length,
-          stats: statsData?.length,
-          trusteesData,
-          statsData
-        });
+        
 
-        console.log('Is trusteesData array?', Array.isArray(trusteesData));
-        console.log('Is statsData array?', Array.isArray(statsData));
+        
 
         setTrustees(trusteesData || []);
         setStats(statsData || []);
@@ -145,21 +139,10 @@ const BoardOfTrustees = () => {
   }
 
   // No data state
-  console.log('🔎 Before render check:', {
-    trustees,
-    trusteesLength: trustees.length,
-    trusteesIsArray: Array.isArray(trustees),
-    loading,
-    error
-  });
+  
 
   if (trustees.length === 0) {
-    console.log('🚨 BoardOfTrustees: No data, state:', {
-      trusteesLength: trustees.length,
-      loading,
-      error,
-      trustees: trustees
-    });
+    
     return (
       <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 flex items-center justify-center">
         <div className="text-center">
@@ -171,11 +154,7 @@ const BoardOfTrustees = () => {
 
   const currentTrustee = trustees[activeTrustee];
 
-  console.log('🎯 Current trustee:', {
-    activeTrustee,
-    currentTrustee,
-    trusteesLength: trustees.length
-  });
+  
 
   if (!currentTrustee) {
     console.error('❌ currentTrustee is undefined!', { activeTrustee, trustees });
@@ -188,7 +167,7 @@ const BoardOfTrustees = () => {
     );
   }
 
-  console.log('✅ RENDERING BoardOfTrustees component with currentTrustee:', currentTrustee.name);
+  
 
   return (
     <section

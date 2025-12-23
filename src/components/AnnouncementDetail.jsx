@@ -29,12 +29,12 @@ const AnnouncementDetailPage = () => {
         setLoading(true);
         setError(null);
 
-        console.log("Fetching announcement with ID:", id);
+        
         const currentLanguage = i18n.language;
         const response = await axios.get(
           `${API_BASE_URL}/api/announcements/${id}/?lang=${currentLanguage}`
         );
-        console.log("Announcement API Response:", response.data);
+        
 
         if (response.data.success) {
           const announcementItem = response.data.announcement;
@@ -69,9 +69,7 @@ const AnnouncementDetailPage = () => {
           // Сохраняем массив URL для отображения
           announcementItem.images_url = galleryImages.map((img) => img.url);
 
-          console.log("Gallery images processed:", announcementItem.images_url);
-          console.log("Urgency value:", announcementItem.urgency); // DEBUG
-          console.log("Full announcement data:", announcementItem); // DEBUG
+          
           setAnnouncementData(announcementItem);
         } else {
           setError(t("announcements.detail.errors.notFound"));
@@ -135,7 +133,7 @@ const AnnouncementDetailPage = () => {
         alert(t("announcements.detail.share.copied"));
       }
     } catch (err) {
-      console.log(t("announcements.detail.share.error"), err);
+      
     }
   };
 
@@ -442,7 +440,7 @@ const AnnouncementDetailPage = () => {
                         t("announcements.detail.defaultCategory")}
                     </span>
                     {/* DEBUG: Показываем urgency */}
-                    {console.log("Rendering urgency:", data.urgency)}
+            
                     <span
                       className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-semibold border ${getUrgencyBadge(
                         data.urgency

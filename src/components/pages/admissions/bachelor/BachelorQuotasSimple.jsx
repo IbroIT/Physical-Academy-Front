@@ -20,12 +20,6 @@ const BachelorQuotas = () => {
   const additionalSupport = quotasData?.additional_support || [];
   const processSteps = quotasData?.process_steps || [];
 
-  // Базовая отладочная информация
-  console.log('BachelorQuotas - Data loaded:', !!quotasData, 'Loading:', loading, 'Error:', error);
-  if (quotasData) {
-    console.log('BachelorQuotas - Quotas count:', quotas.length, 'Stats count:', quotaStats.length, 'Support count:', additionalSupport.length, 'Steps count:', processSteps.length);
-  }
-
   // Intersection Observer для анимаций
   useEffect(() => {
     const observer = new IntersectionObserver(

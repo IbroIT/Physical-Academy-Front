@@ -173,7 +173,7 @@ export const useDocuments = (filters = {}) => {
       if (err.message.includes("500") && i18n.language !== "ru") {
         // If there's a server error with non-Russian language, try Russian as fallback
         try {
-          console.log("Attempting fallback to Russian language...");
+          
           const fallbackResult = await apiService.getDocuments("ru", filters);
           setData(fallbackResult);
           setError("Language not fully supported, showing Russian content");
@@ -283,10 +283,7 @@ export const useBachelorQuotas = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log(
-        "useBachelorQuotas - fetching data with language:",
-        i18n.language
-      );
+      
 
       // Добавляем timeout
       const timeoutPromise = new Promise((_, reject) =>
@@ -298,7 +295,7 @@ export const useBachelorQuotas = () => {
         timeoutPromise,
       ]);
 
-      console.log("useBachelorQuotas - received result:", result);
+      
       setData(result);
     } catch (err) {
       console.error("useBachelorQuotas - error:", err);

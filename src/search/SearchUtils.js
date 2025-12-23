@@ -188,12 +188,7 @@ export const buildSearchIndex = () => {
   searchIndex = Array.from(new Set(index.map(item => item.id)))
     .map(id => index.find(item => item.id === id));
 
-  console.log(`🔍 Построен индекс для ${searchIndex.length} записей`);
-  console.log(`🌍 Распределение по языкам:`);
-  Object.keys(locales).forEach(lang => {
-    const count = searchIndex.filter(item => item.language === lang).length;
-    console.log(`   ${lang.toUpperCase()}: ${count} записей`);
-  });
+  
   
   return searchIndex;
 };

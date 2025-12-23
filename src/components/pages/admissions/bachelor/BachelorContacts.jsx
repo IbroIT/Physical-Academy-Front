@@ -101,7 +101,7 @@ const BachelorContacts = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Here would be form submission logic
-    console.log('Form submitted:', formData);
+    
     // Reset form
     setFormData({ email: '', message: '' });
   };

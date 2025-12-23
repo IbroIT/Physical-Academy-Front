@@ -43,7 +43,7 @@ const CollegeInfo = () => {
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      console.log("Programs data:", data);
+      
       return data?.results || data || [];
     } catch (error) {
       console.error("Error fetching programs:", error);
@@ -136,13 +136,7 @@ const CollegeInfo = () => {
           fetchEvents(lang),
         ]);
 
-      console.log("All loaded data:", {
-        programs,
-        requirements,
-        steps,
-        statistics,
-        events,
-      });
+      
 
       setBackendData({
         programs: programs || [],

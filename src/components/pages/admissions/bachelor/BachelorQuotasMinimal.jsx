@@ -4,7 +4,7 @@ import { useBachelorQuotas } from '../../../../hooks/useApi';
 const BachelorQuotasMinimal = () => {
   const { quotasData, loading, error } = useBachelorQuotas();
 
-  console.log('Minimal Component - Data:', quotasData, 'Loading:', loading, 'Error:', error);
+  
 
   if (loading) {
     return <div style={{ color: 'white', padding: '20px', backgroundColor: '#1e40af' }}>Загрузка...</div>;

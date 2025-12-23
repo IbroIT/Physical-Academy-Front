@@ -52,7 +52,7 @@ const EventDetailsModal = ({ event, isOpen, onClose }) => {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        console.log('Ошибка при использовании Web Share API:', err);
+        
       }
     } else {
       navigator.clipboard.writeText(window.location.href).then(() => {

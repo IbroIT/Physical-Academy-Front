@@ -50,10 +50,10 @@ const NewsDetailPage = () => {
         setLoading(true);
         setError(null);
 
-        console.log("Fetching news with ID:", id);
+        
 
         const response = await axios.get(`${API_BASE_URL}/api/news/${id}/`);
-        console.log("API Response:", response.data);
+        
 
         if (response.data.success) {
           const newsItem = response.data.news;
@@ -88,7 +88,7 @@ const NewsDetailPage = () => {
           // Сохраняем массив URL для отображения
           newsItem.images_url = galleryImages.map((img) => img.url);
 
-          console.log("Gallery images processed:", newsItem.images_url);
+          
           setNewsData(newsItem);
         } else {
           setError(t("newsDetail.errors.notFound"));
@@ -130,7 +130,7 @@ const NewsDetailPage = () => {
         alert(t("newsDetail.share.copied"));
       }
     } catch (err) {
-      console.log(t("newsDetail.share.error"), err);
+      
     }
   };
 

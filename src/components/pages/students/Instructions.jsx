@@ -58,14 +58,14 @@ const Instructions = () => {
       // Пробуем последовательно разные эндпоинты
       for (const endpoint of endpoints) {
         try {
-          console.log(`Trying endpoint: ${endpoint}`);
+          
           response = await fetch(endpoint);
           
           if (response.ok) {
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
               data = await response.json();
-              console.log('Successfully fetched data from:', endpoint, data);
+              
               break;
             }
           }
@@ -405,8 +405,7 @@ const Instructions = () => {
     </div>
   );
 
-  console.log('Current backend data:', backendData);
-  console.log('Filtered documents:', filteredDocuments);
+  
 
   return (
     <section

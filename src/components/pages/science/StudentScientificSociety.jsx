@@ -36,7 +36,7 @@ const StudentScientificSociety = () => {
       setBackendData(prev => ({ ...prev, loading: true, error: null }));
       
       const lang = getApiLanguage();
-      console.log('🔄 Fetching data for language:', lang);
+      
       
       const API_URL = import.meta.env.VITE_API_URL;
 
@@ -64,7 +64,7 @@ const StudentScientificSociety = () => {
             });
             
             const fullUrl = `${url}?${params}`;
-            console.log('📡 Fetching:', fullUrl);
+            
             
             const response = await fetch(fullUrl, {
               method: 'GET',
@@ -81,7 +81,7 @@ const StudentScientificSociety = () => {
             }
             
             const data = await response.json();
-            console.log(`✅ Data from ${url}:`, data.results ? data.results.length : 'no results');
+            
             return data;
           } catch (error) {
             console.error(`❌ Error fetching ${url}:`, error);
@@ -103,7 +103,7 @@ const StudentScientificSociety = () => {
         error: null
       });
 
-      console.log('🎉 Data loaded successfully for language:', lang);
+      
 
     } catch (error) {
       console.error('💥 Error fetching data:', error);
@@ -117,7 +117,7 @@ const StudentScientificSociety = () => {
 
   // Загрузка данных при монтировании и изменении языка - УЛУЧШЕННАЯ ВЕРСИЯ
   useEffect(() => {
-    console.log('🌐 Language changed to:', i18n.language);
+    
     fetchBackendData();
   }, [i18n.language]); // Убираем fetchBackendData из зависимостей
 
@@ -131,7 +131,7 @@ const StudentScientificSociety = () => {
   // Упрощаем обработчик изменения языка
   useEffect(() => {
     const handleLanguageChanged = () => {
-      console.log('🔁 Language changed, refetching data...');
+      
       fetchBackendData();
     };
 
@@ -180,7 +180,7 @@ const StudentScientificSociety = () => {
   // Получение основной информации - УПРОЩЕННАЯ ВЕРСИЯ
   const societyData = useMemo(() => {
     const info = backendData.info[0] || {};
-    console.log('📊 Current society data:', info);
+    
     
     // Используем fallback на переводы если данные с бэкенда пустые
     const hasBackendData = backendData.info.length > 0;
@@ -220,7 +220,7 @@ const StudentScientificSociety = () => {
       value: safeString(stat.value, '0'),
       label: safeString(stat.label, 'Stat')
     }));
-    console.log('📈 Stats data:', data);
+    
     return data;
   }, [backendData.stats, i18n.language]);
 
@@ -231,7 +231,7 @@ const StudentScientificSociety = () => {
       description: safeString(feature.description, 'Description'),
       icon: safeString(feature.icon, '🔬')
     }));
-    console.log('🔧 Features data:', data);
+    
     return data;
   }, [backendData.features, i18n.language]);
 

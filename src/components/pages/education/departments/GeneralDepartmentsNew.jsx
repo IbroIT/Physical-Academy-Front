@@ -20,7 +20,6 @@ const DepartmentTabs = () => {
           throw new Error('Failed to fetch categories');
         }
         const data = await response.json();
-        console.log('Categories API response:', data); // Для отладки
         
         // Обработка различных форматов ответа API
         let categoriesArray = [];
@@ -58,16 +57,13 @@ const DepartmentTabs = () => {
       setErrorDetails(null);
       try {
         const url = `https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/general-departments/categories/${activeTab}/?lang=${i18n.language}`;
-        console.log('Fetching department details from:', url);
         
         const response = await fetch(url);
-        console.log('Department details response status:', response.status);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch department details: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
-        console.log('Department details data:', data);
         
         // Обработка различных форматов ответа API
         let departmentData = data;
@@ -86,7 +82,6 @@ const DepartmentTabs = () => {
           }
         }
         
-        console.log('Processed department data:', departmentData);
         setDepartmentDetails(departmentData);
       } catch (err) {
         console.error('Error fetching department details:', err);
@@ -317,9 +312,7 @@ const DepartmentTabs = () => {
                 <div className="text-center py-8">
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                     <h3 className="text-yellow-800 font-semibold mb-2">Информация о кафедре не найдена</h3>
-                    <p className="text-yellow-700 text-sm">
-                      Возможно, API вернул пустой ответ или данные в неожиданном формате.
-                    </p>
+                    
                     <details className="mt-2">
                       <summary className="text-yellow-600 cursor-pointer text-sm">Показать отладочную информацию</summary>
                       <pre className="text-xs text-yellow-800 mt-2 bg-yellow-100 p-2 rounded overflow-auto">
