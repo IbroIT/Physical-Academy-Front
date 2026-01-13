@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 const NewsDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(); // Добавляем i18n
   const [newsData, setNewsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,6 +15,9 @@ const NewsDetailPage = () => {
   const [imageLoaded, setImageLoaded] = useState({});
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  
+  // Реф для отслеживания текущего языка
+  const currentLang = useRef(i18n.language);
 
   // Базовый URL API из переменных окружения
   const API_BASE_URL =
@@ -43,75 +46,99 @@ const NewsDetailPage = () => {
     });
   };
 
-  // Загрузка данных с бэкенда
-  useEffect(() => {
-    const fetchNewsDetail = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  // Функция загрузки данных
+  const fetchNewsDetail = async (lang = i18n.language) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        
-
-        const response = await axios.get(`${API_BASE_URL}/api/news/${id}/`);
-        
-
-        if (response.data.success) {
-          const newsItem = response.data.news;
-
-          // Формируем массив изображений для галереи
-          const galleryImages = [];
-
-          // Добавляем главное изображение первым
-          if (newsItem.image_url) {
-            galleryImages.push({
-              url: newsItem.image_url,
-              isMain: true,
-            });
-          }
-
-          // Добавляем изображения из галереи
-          if (
-            newsItem.gallery_images &&
-            Array.isArray(newsItem.gallery_images)
-          ) {
-            newsItem.gallery_images.forEach((img) => {
-              if (img.image_url) {
-                galleryImages.push({
-                  url: img.image_url,
-                  order: img.order,
-                  isMain: false,
-                });
-              }
-            });
-          }
-
-          // Сохраняем массив URL для отображения
-          newsItem.images_url = galleryImages.map((img) => img.url);
-
-          
-          setNewsData(newsItem);
-        } else {
-          setError(t("newsDetail.errors.notFound"));
+      const response = await axios.get(`${API_BASE_URL}/api/news/${id}/`, {
+        params: {
+          lang: lang // Добавляем параметр языка в запрос
+        },
+        headers: {
+          'Accept-Language': lang // Добавляем заголовок Accept-Language
         }
-      } catch (err) {
-        console.error("API Error:", err);
-        setError(
-          `${t("newsDetail.errors.loading")}: ${
-            err.response?.data?.message || err.message
-          }`
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+      });
 
+      if (response.data.success) {
+        const newsItem = response.data.news;
+
+        // Формируем массив изображений для галереи
+        const galleryImages = [];
+
+        // Добавляем главное изображение первым
+        if (newsItem.image_url) {
+          galleryImages.push({
+            url: newsItem.image_url,
+            isMain: true,
+          });
+        }
+
+        // Добавляем изображения из галереи
+        if (
+          newsItem.gallery_images &&
+          Array.isArray(newsItem.gallery_images)
+        ) {
+          newsItem.gallery_images.forEach((img) => {
+            if (img.image_url) {
+              galleryImages.push({
+                url: img.image_url,
+                order: img.order,
+                isMain: false,
+              });
+            }
+          });
+        }
+
+        // Сохраняем массив URL для отображения
+        newsItem.images_url = galleryImages.map((img) => img.url);
+
+        // Сохраняем текущий язык в данных
+        newsItem.currentLang = lang;
+        
+        setNewsData(newsItem);
+      } else {
+        setError(t("newsDetail.errors.notFound"));
+      }
+    } catch (err) {
+      console.error("API Error:", err);
+      setError(
+        `${t("newsDetail.errors.loading")}: ${
+          err.response?.data?.message || err.message
+        }`
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Загрузка данных при изменении id или языка
+  useEffect(() => {
     if (id) {
-      fetchNewsDetail();
+      fetchNewsDetail(i18n.language);
     } else {
       setError(t("newsDetail.errors.noId"));
       setLoading(false);
     }
-  }, [id, t]);
+  }, [id, i18n.language]); // Добавляем i18n.language в зависимости
+
+  // Отслеживание изменения языка
+  useEffect(() => {
+    const handleLanguageChanged = (lng) => {
+      // Если язык изменился и у нас есть данные, перезагружаем их
+      if (currentLang.current !== lng && newsData) {
+        currentLang.current = lng;
+        fetchNewsDetail(lng);
+      }
+    };
+
+    i18n.on('languageChanged', handleLanguageChanged);
+    
+    return () => {
+      i18n.off('languageChanged', handleLanguageChanged);
+    };
+  }, [i18n, newsData]);
 
   const handleShare = async () => {
     if (!newsData) return;
@@ -130,16 +157,17 @@ const NewsDetailPage = () => {
         alert(t("newsDetail.share.copied"));
       }
     } catch (err) {
-      
+      console.error("Ошибка при попытке поделиться:", err);
     }
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("ru-RU", {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat(i18n.language, { // Используем текущий язык для форматирования даты
       year: "numeric",
       month: "long",
       day: "numeric",
-    });
+    }).format(date);
   };
 
   // Функция для получения полного URL изображения
@@ -535,6 +563,7 @@ const NewsDetailPage = () => {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   strokeLinecap="round"
@@ -726,7 +755,7 @@ const NewsDetailPage = () => {
                 )}
               </div>
 
-              {/* Thumbnail Strip - ПЕРЕНЕСЕНО ВВЕРХ */}
+              {/* Thumbnail Strip */}
               {images.length > 1 && (
                 <div className="absolute bottom-20 sm:bottom-24 md:bottom-28 left-1/2 transform -translate-x-1/2 flex gap-1 sm:gap-2 max-w-full overflow-x-auto py-1 sm:py-2 px-2 sm:px-4">
                   {images.map((image, index) => (
@@ -737,14 +766,14 @@ const NewsDetailPage = () => {
                         number: index + 1,
                       })}
                       className={`
-                  object-cover rounded cursor-pointer transition-all duration-300
-                  ${
-                    index === currentImageIndex
-                      ? "ring-2 sm:ring-4 ring-cyan-500 scale-105"
-                      : "opacity-60 hover:opacity-100 hover:scale-105"
-                  }
-                  w-10 h-10 xs:w-12 xs:h-12 sm:w-14 sm:h-14 md:w-16 md:h-16
-                `}
+                        object-cover rounded cursor-pointer transition-all duration-300
+                        ${
+                          index === currentImageIndex
+                            ? "ring-2 sm:ring-4 ring-cyan-500 scale-105"
+                            : "opacity-60 hover:opacity-100 hover:scale-105"
+                        }
+                        w-10 h-10 xs:w-12 xs:h-12 sm:w-14 sm:h-14 md:w-16 md:h-16
+                      `}
                       onClick={() => setCurrentImageIndex(index)}
                       whileHover={{ scale: 1.05 }}
                     />
@@ -752,7 +781,7 @@ const NewsDetailPage = () => {
                 </div>
               )}
 
-              {/* Image Counter and Info - ПЕРЕНЕСЕНО ВНИЗ, под миниатюрами */}
+              {/* Image Counter and Info */}
               <div className="absolute bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 flex flex-col sm:flex-row items-center gap-1 sm:gap-2 md:gap-4 w-full px-2 sm:px-0">
                 <div className="bg-black/70 text-white px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 rounded-full text-xs sm:text-sm backdrop-blur-sm text-center">
                   {t("newsDetail.lightbox.counter", {
