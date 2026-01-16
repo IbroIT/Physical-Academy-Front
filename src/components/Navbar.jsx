@@ -95,7 +95,6 @@ const Navbar = ({ currentLanguage, languages = [], changeLanguage }) => {
             { title: t('nav.rectorate', 'Ректорат'), link: '/academy/leadership/rectorate' },
             { title: t('nav.trade_union', 'Профсоюз'), link: '/academy/leadership/trade-union' },
             { title: t('nav.commissions', 'Комиссии'), link: '/academy/leadership/commissions' },
-            { title: t('nav.academic_structure', 'Учебная структура'), link: '/academy/structure/academic' },
             { title: t('nav.administrative_structure', 'Административная структура'), link: '/academy/structure/administrative' },
             { title: t('nav.administrative_units', 'Административные подразделения'), link: '/academy/structure/units' },
             { title: t('nav.documents', 'Документы'), link: '/academy/documents' },
