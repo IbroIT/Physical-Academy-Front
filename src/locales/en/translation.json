@@ -117,60 +117,63 @@
       "fullContent": "This is fallback content that is shown when server data is unavailable. Please check your internet connection and try again.",
       "category": "General",
       "author": "Editorial",
-      "tags": ["news", "information"],
+      "tags": [
+        "news",
+        "information"
+      ],
       "readTime": "2 min read"
     }
   },
-"vestnik": {
-      "errorTitle": "Data Loading Error",
-      "retry": "Retry",
-      "title": "Scientific Bulletin",
-      "subtitle": "Advanced Research in Physical Culture and Sports",
-      "views": {
-        "current": "Current Issue",
-        "archive": "Archive",
-        "metrics": "Metrics"
-      },
-      "current": {
-        "noIssue": "Issue Not Found",
-        "noIssueDescription": "There is currently no active issue",
-        "newBadge": "NEW",
-        "currentIssue": "CURRENT ISSUE",
-        "defaultDescription": "Scientific journal with latest research and publications in physical culture, sports and health",
-        "releaseDate": "Release Date",
-        "articlesCount": "Number of Articles",
-        "volume": "Volume",
-        "issue": "Issue",
-        "issueNumber": "Issue Number",
-        "articles": "articles"
-      },
-      "archive": {
-        "title": "Issue Archive",
-        "allYears": "All Years",
-        "vestnik": "Bulletin",
-        "noIssues": {
-          "title": "No Issues Found",
-          "description": "Try selecting another year to view"
-        }
-      },
-      "metrics": {
-        "title": "Journal Metrics",
-        "noData": "Metrics data unavailable",
-        "about": {
-          "title": "About Journal Metrics",
-          "description": "Our metrics reflect the quality and impact of the journal in the scientific community. We continuously work to improve indicators and raise publication standards.",
-          "learnMore": "Learn more about metrics",
-          "journalPolicy": "Journal Policy"
-        }
-      },
-      "actions": {
-        "downloadPDF": "Download PDF",
-        "readOnline": "Read Online",
-        "forAuthors": "For Authors",
-        "openIssue": "Open Issue",
-        "open": "Open"
+  "vestnik": {
+    "errorTitle": "Data Loading Error",
+    "retry": "Retry",
+    "title": "Bulletin",
+    "subtitle": "Advanced Research in Physical Culture and Sports",
+    "views": {
+      "current": "Current Issue",
+      "archive": "Archive",
+      "metrics": "Metrics"
+    },
+    "current": {
+      "noIssue": "Issue Not Found",
+      "noIssueDescription": "There is currently no active issue",
+      "newBadge": "NEW",
+      "currentIssue": "CURRENT ISSUE",
+      "defaultDescription": "Scientific journal with latest research and publications in physical culture, sports and health",
+      "releaseDate": "Release Date",
+      "articlesCount": "Number of Articles",
+      "volume": "Volume",
+      "issue": "Issue",
+      "issueNumber": "Issue Number",
+      "articles": "articles"
+    },
+    "archive": {
+      "title": "Issue Archive",
+      "allYears": "All Years",
+      "vestnik": "Bulletin",
+      "noIssues": {
+        "title": "No Issues Found",
+        "description": "Try selecting another year to view"
       }
     },
+    "metrics": {
+      "title": "Journal Metrics",
+      "noData": "Metrics data unavailable",
+      "about": {
+        "title": "About Journal Metrics",
+        "description": "Our metrics reflect the quality and impact of the journal in the scientific community. We continuously work to improve indicators and raise publication standards.",
+        "learnMore": "Learn more about metrics",
+        "journalPolicy": "Journal Policy"
+      }
+    },
+    "actions": {
+      "downloadPDF": "Download PDF",
+      "readOnline": "Read Online",
+      "forAuthors": "For Authors",
+      "openIssue": "Open Issue",
+      "open": "Open"
+    }
+  },
   "academy": {
     "mission": {
       "badge": "Our Philosophy",
@@ -545,7 +548,7 @@
       "studentsDesc": "Active extracurricular activities and events"
     }
   },
- "accreditation": {
+  "accreditation": {
     "title": "Accreditations",
     "subtitle": "International and national accreditations confirming the quality of education",
     "totalAccreditations": "Total Accreditations",
@@ -658,7 +661,7 @@
     "showLess": "Show Less",
     "showMore": "Show More",
     "experience": "Experience",
-  "years": "years",
+    "years": "years",
     "director": "Director",
     "specialization": "Specialization",
     "bio": "Biography",
@@ -1563,14 +1566,12 @@
     "keyFeatures": "Key Features",
     "requestInfo": "Request Information",
     "formSuccess": "Your request submitted successfully! We'll contact you shortly.",
-    
     "stats": {
       "employment": "Graduate employment",
       "professors": "Professors & Teachers",
       "researchLabs": "Research Laboratories",
       "funding": "Research Funding"
     },
-
     "master": {
       "generalInfo": {
         "description": "Our master's programs combine fundamental scientific knowledge with practical training in physical culture, sports and rehabilitation. Students get in-depth knowledge in chosen specialization and develop research competencies.",
@@ -1588,22 +1589,38 @@
         {
           "name": "Sports Science & Training",
           "field": "Theory & Methods of Sports Training",
-          "tags": ["Biomechanics", "Physiology", "Sports Psychology"]
+          "tags": [
+            "Biomechanics",
+            "Physiology",
+            "Sports Psychology"
+          ]
         },
         {
           "name": "Physical Rehabilitation",
           "field": "Restorative Medicine & Kinesitherapy",
-          "tags": ["Rehabilitation", "Kinesiology", "Occupational Therapy"]
+          "tags": [
+            "Rehabilitation",
+            "Kinesiology",
+            "Occupational Therapy"
+          ]
         },
         {
           "name": "Sports Management",
           "field": "Sports Organization Management",
-          "tags": ["Management", "Marketing", "Sports Economics"]
+          "tags": [
+            "Management",
+            "Marketing",
+            "Sports Economics"
+          ]
         },
         {
           "name": "Adaptive Physical Culture",
           "field": "Work with Special Needs",
-          "tags": ["Inclusion", "Adaptation", "Rehabilitation"]
+          "tags": [
+            "Inclusion",
+            "Adaptation",
+            "Rehabilitation"
+          ]
         }
       ],
       "requirements": [
@@ -1677,7 +1694,6 @@
         }
       ]
     },
-
     "phd": {
       "generalInfo": {
         "description": "PhD programs aim to train highly qualified scientists capable of conducting independent scientific research and contributing to sports science development. Programs combine deep theoretical preparation with practical research.",
@@ -1695,22 +1711,38 @@
         {
           "name": "Theory & Methods of Physical Education",
           "field": "Pedagogical Sciences",
-          "tags": ["Methodology", "Didactics", "Pedagogy"]
+          "tags": [
+            "Methodology",
+            "Didactics",
+            "Pedagogy"
+          ]
         },
         {
           "name": "Biomechanics & Sports Medicine",
           "field": "Medical-Biological Sciences",
-          "tags": ["Biomechanics", "Medicine", "Rehabilitation"]
+          "tags": [
+            "Biomechanics",
+            "Medicine",
+            "Rehabilitation"
+          ]
         },
         {
           "name": "Sports Activity Psychology",
           "field": "Psychological Sciences",
-          "tags": ["Psychology", "Motivation", "Mental Preparation"]
+          "tags": [
+            "Psychology",
+            "Motivation",
+            "Mental Preparation"
+          ]
         },
         {
           "name": "Sports Sociology & Economics",
           "field": "Socio-Economic Sciences",
-          "tags": ["Sociology", "Economics", "Management"]
+          "tags": [
+            "Sociology",
+            "Economics",
+            "Management"
+          ]
         }
       ],
       "requirements": [
@@ -1784,7 +1816,6 @@
         }
       ]
     },
-
     "commonInfo": {
       "contactPerson": "Ivanova Maria Petrovna",
       "position": "Head of Postgraduate & Master's Department",
@@ -1792,7 +1823,6 @@
       "phone": "+7 (495) 123-45-67",
       "address": "Moscow, Sportivnaya St., 10, room 305"
     },
-
     "form": {
       "name": "Full Name",
       "email": "Email",
@@ -1805,18 +1835,18 @@
   },
   "events": {
     "actions": {
-    "details": "Details",
-    "register": "Register",
-    "addToCalendar": "Add to Calendar",
-    "share": "Share"
-  },
-  "details": {
-    "aboutEvent": "About the Event",
-    "basicInfo": "Basic Information",
-    "registrationInfo": "Registration",
-    "organizer": "Organizer",
-    "additionalInfo": "Additional Information"
-  },
+      "details": "Details",
+      "register": "Register",
+      "addToCalendar": "Add to Calendar",
+      "share": "Share"
+    },
+    "details": {
+      "aboutEvent": "About the Event",
+      "basicInfo": "Basic Information",
+      "registrationInfo": "Registration",
+      "organizer": "Organizer",
+      "additionalInfo": "Additional Information"
+    },
     "title": "University Events",
     "subtitle": "Participate in conferences, workshops, sports and cultural events of our university",
     "noEvents": "No events found",
@@ -1829,16 +1859,36 @@
       "workshop": "Workshop",
       "exhibition": "Exhibition",
       "list": [
-        { "id": "all", "name": "All Events" },
-        { "id": "conference", "name": "Conferences" },
-        { "id": "workshop", "name": "Workshops" },
-        { "id": "hackathon", "name": "Hackathons" },
-        { "id": "sports", "name": "Sports" },
-        { "id": "exhibition", "name": "Exhibitions" },
-        { "id": "open_day", "name": "Open Days" }
+        {
+          "id": "all",
+          "name": "All Events"
+        },
+        {
+          "id": "conference",
+          "name": "Conferences"
+        },
+        {
+          "id": "workshop",
+          "name": "Workshops"
+        },
+        {
+          "id": "hackathon",
+          "name": "Hackathons"
+        },
+        {
+          "id": "sports",
+          "name": "Sports"
+        },
+        {
+          "id": "exhibition",
+          "name": "Exhibitions"
+        },
+        {
+          "id": "open_day",
+          "name": "Open Days"
+        }
       ]
     },
-    
     "departments": {
       "cs": "Computer Science Faculty",
       "all": "All Faculties",
@@ -2000,56 +2050,56 @@
           }
         },
         "patents": {
-  "title": "Intellectual Property Portfolio",
-  "buttonText": "View Full Patent Details",
-  "dateLabel": "Filed:",
-  "modal": {
-    "statusLabel": "Status",
-    "yearLabel": "Year",
-    "filedLabel": "Filed",
-    "technologiesTitle": "Key Technologies",
-    "applicationsTitle": "Applications",
-    "downloadButton": "Download Patent PDF",
-    "contactButton": "Contact IP Department",
-    "detailedDescription": "Detailed Description",
-    "defaultTechnologies": [
-      "Blockchain Verification",
-      "Cryptographic Security",
-      "Smart Contracts",
-      "Distributed Ledger"
-    ],
-    "defaultApplications": [
-      "IP Rights Management",
-      "Digital Asset Protection",
-      "Royalty Distribution",
-      "Cross-border Verification"
-    ]
-  },
-  "items": [
-    {
-      "title": "Blockchain IP Verification System",
-      "number": "US20240012345A1",
-      "description": "A revolutionary system for verifying intellectual property rights using blockchain technology with enhanced security features and automated validation processes.",
-      "fullDescription": "This patent describes a comprehensive system for intellectual property verification leveraging blockchain technology. It includes methods for timestamping, cryptographic proof generation, and automated validation processes that ensure the integrity and authenticity of IP assets. The system is designed to be scalable and interoperable across different blockchain networks.",
-      "status": "Granted",
-      "year": "2024",
-      "date": "2024-03-15",
-      "icon": "🔒",
-      "technologies": [
-        "Blockchain Verification",
-        "Cryptographic Security",
-        "Smart Contracts",
-        "Distributed Ledger"
-      ],
-      "applications": [
-        "IP Rights Management",
-        "Digital Asset Protection",
-        "Royalty Distribution",
-        "Cross-border Verification"
-      ]
-    }
-  ]
-},
+          "title": "Intellectual Property Portfolio",
+          "buttonText": "View Full Patent Details",
+          "dateLabel": "Filed:",
+          "modal": {
+            "statusLabel": "Status",
+            "yearLabel": "Year",
+            "filedLabel": "Filed",
+            "technologiesTitle": "Key Technologies",
+            "applicationsTitle": "Applications",
+            "downloadButton": "Download Patent PDF",
+            "contactButton": "Contact IP Department",
+            "detailedDescription": "Detailed Description",
+            "defaultTechnologies": [
+              "Blockchain Verification",
+              "Cryptographic Security",
+              "Smart Contracts",
+              "Distributed Ledger"
+            ],
+            "defaultApplications": [
+              "IP Rights Management",
+              "Digital Asset Protection",
+              "Royalty Distribution",
+              "Cross-border Verification"
+            ]
+          },
+          "items": [
+            {
+              "title": "Blockchain IP Verification System",
+              "number": "US20240012345A1",
+              "description": "A revolutionary system for verifying intellectual property rights using blockchain technology with enhanced security features and automated validation processes.",
+              "fullDescription": "This patent describes a comprehensive system for intellectual property verification leveraging blockchain technology. It includes methods for timestamping, cryptographic proof generation, and automated validation processes that ensure the integrity and authenticity of IP assets. The system is designed to be scalable and interoperable across different blockchain networks.",
+              "status": "Granted",
+              "year": "2024",
+              "date": "2024-03-15",
+              "icon": "🔒",
+              "technologies": [
+                "Blockchain Verification",
+                "Cryptographic Security",
+                "Smart Contracts",
+                "Distributed Ledger"
+              ],
+              "applications": [
+                "IP Rights Management",
+                "Digital Asset Protection",
+                "Royalty Distribution",
+                "Cross-border Verification"
+              ]
+            }
+          ]
+        },
         "blockchain": {
           "title": "Blockchain Technology",
           "featuresTitle": "Core Features",
@@ -2128,13 +2178,11 @@
         "subtitle": "Clarivate Analytics - World Standards of Scientific Indexing",
         "titleIcon": "🔵",
         "loading": "Loading Web of Science data...",
-        
         "timeRanges": {
           "1year": "1 year",
-          "3years": "3 years", 
+          "3years": "3 years",
           "5years": "5 years"
         },
-
         "categoriesTitle": "Publications by Category",
         "categoriesIcon": "📚",
         "collaborationsTitle": "International Collaboration",
@@ -2144,7 +2192,6 @@
         "topJournalsTitle": "Q1/Q2 Journals",
         "topJournalsIcon": "🏅",
         "topJournalsPublications": "publications",
-
         "additionalMetrics": [
           {
             "icon": "📈",
@@ -2153,7 +2200,7 @@
             "key": "impactFactor"
           },
           {
-            "icon": "🔗", 
+            "icon": "🔗",
             "title": "H-Index",
             "description": "for selected period",
             "key": "hIndex"
@@ -2165,7 +2212,6 @@
             "key": "highlyCited"
           }
         ],
-
         "cta": {
           "title": "Need detailed analytics?",
           "description": "Get full report on publication activity with detailed analytics",
@@ -2174,7 +2220,6 @@
             "contact": "Contact Department"
           }
         },
-
         "metrics": {
           "1year": {
             "main": {
@@ -2185,7 +2230,7 @@
                 "value": "45"
               },
               "citations": {
-                "label": "Citations", 
+                "label": "Citations",
                 "description": "Total number of citations",
                 "icon": "🔗",
                 "value": "680"
@@ -2193,7 +2238,7 @@
               "hIndex": {
                 "label": "H-Index",
                 "description": "Scientific influence index",
-                "icon": "📊", 
+                "icon": "📊",
                 "value": "12"
               },
               "if": {
@@ -2204,23 +2249,70 @@
               }
             },
             "categories": [
-              { "name": "Physical Culture", "count": 15 },
-              { "name": "Sports Medicine", "count": 12 },
-              { "name": "Biomechanics", "count": 8 },
-              { "name": "Sports Psychology", "count": 6 },
-              { "name": "Nutrition & Dietetics", "count": 4 }
+              {
+                "name": "Physical Culture",
+                "count": 15
+              },
+              {
+                "name": "Sports Medicine",
+                "count": 12
+              },
+              {
+                "name": "Biomechanics",
+                "count": 8
+              },
+              {
+                "name": "Sports Psychology",
+                "count": 6
+              },
+              {
+                "name": "Nutrition & Dietetics",
+                "count": 4
+              }
             ],
             "collaborations": [
-              { "country": "USA", "institutions": 8, "publications": 18, "flag": "🇺🇸" },
-              { "country": "Germany", "institutions": 6, "publications": 12, "flag": "🇩🇪" },
-              { "country": "UK", "institutions": 5, "publications": 9, "flag": "🇬🇧" },
-              { "country": "Canada", "institutions": 3, "publications": 6, "flag": "🇨🇦" }
+              {
+                "country": "USA",
+                "institutions": 8,
+                "publications": 18,
+                "flag": "🇺🇸"
+              },
+              {
+                "country": "Germany",
+                "institutions": 6,
+                "publications": 12,
+                "flag": "🇩🇪"
+              },
+              {
+                "country": "UK",
+                "institutions": 5,
+                "publications": 9,
+                "flag": "🇬🇧"
+              },
+              {
+                "country": "Canada",
+                "institutions": 3,
+                "publications": 6,
+                "flag": "🇨🇦"
+              }
             ],
             "topJournals": [
-              { "quartile": "Q1", "count": 28 },
-              { "quartile": "Q2", "count": 12 },
-              { "quartile": "Q3", "count": 4 },
-              { "quartile": "Q4", "count": 1 }
+              {
+                "quartile": "Q1",
+                "count": 28
+              },
+              {
+                "quartile": "Q2",
+                "count": 12
+              },
+              {
+                "quartile": "Q3",
+                "count": 4
+              },
+              {
+                "quartile": "Q4",
+                "count": 1
+              }
             ],
             "impactFactor": "3.2",
             "hIndex": "12",
@@ -2236,7 +2328,7 @@
               },
               "citations": {
                 "label": "Citations",
-                "description": "Total number of citations", 
+                "description": "Total number of citations",
                 "icon": "🔗",
                 "value": "1850"
               },
@@ -2249,31 +2341,78 @@
               "if": {
                 "label": "Impact Factor",
                 "description": "Average journal impact factor",
-                "icon": "⭐", 
+                "icon": "⭐",
                 "value": "3.4"
               }
             },
             "categories": [
-              { "name": "Physical Culture", "count": 38 },
-              { "name": "Sports Medicine", "count": 32 },
-              { "name": "Biomechanics", "count": 25 },
-              { "name": "Sports Psychology", "count": 18 },
-              { "name": "Nutrition & Dietetics", "count": 7 }
+              {
+                "name": "Physical Culture",
+                "count": 38
+              },
+              {
+                "name": "Sports Medicine",
+                "count": 32
+              },
+              {
+                "name": "Biomechanics",
+                "count": 25
+              },
+              {
+                "name": "Sports Psychology",
+                "count": 18
+              },
+              {
+                "name": "Nutrition & Dietetics",
+                "count": 7
+              }
             ],
             "collaborations": [
-              { "country": "USA", "institutions": 12, "publications": 35, "flag": "🇺🇸" },
-              { "country": "Germany", "institutions": 8, "publications": 22, "flag": "🇩🇪" },
-              { "country": "UK", "institutions": 6, "publications": 18, "flag": "🇬🇧" },
-              { "country": "Canada", "institutions": 4, "publications": 12, "flag": "🇨🇦" }
+              {
+                "country": "USA",
+                "institutions": 12,
+                "publications": 35,
+                "flag": "🇺🇸"
+              },
+              {
+                "country": "Germany",
+                "institutions": 8,
+                "publications": 22,
+                "flag": "🇩🇪"
+              },
+              {
+                "country": "UK",
+                "institutions": 6,
+                "publications": 18,
+                "flag": "🇬🇧"
+              },
+              {
+                "country": "Canada",
+                "institutions": 4,
+                "publications": 12,
+                "flag": "🇨🇦"
+              }
             ],
             "topJournals": [
-              { "quartile": "Q1", "count": 65 },
-              { "quartile": "Q2", "count": 35 },
-              { "quartile": "Q3", "count": 15 },
-              { "quartile": "Q4", "count": 5 }
+              {
+                "quartile": "Q1",
+                "count": 65
+              },
+              {
+                "quartile": "Q2",
+                "count": 35
+              },
+              {
+                "quartile": "Q3",
+                "count": 15
+              },
+              {
+                "quartile": "Q4",
+                "count": 5
+              }
             ],
             "impactFactor": "3.4",
-            "hIndex": "15", 
+            "hIndex": "15",
             "highlyCited": "15"
           },
           "5years": {
@@ -2281,7 +2420,7 @@
               "publications": {
                 "label": "Publications",
                 "description": "Number of scientific articles for period",
-                "icon": "📄", 
+                "icon": "📄",
                 "value": "210"
               },
               "citations": {
@@ -2291,7 +2430,7 @@
                 "value": "3200"
               },
               "hIndex": {
-                "label": "H-Index", 
+                "label": "H-Index",
                 "description": "Scientific influence index",
                 "icon": "📊",
                 "value": "18"
@@ -2304,23 +2443,70 @@
               }
             },
             "categories": [
-              { "name": "Physical Culture", "count": 68 },
-              { "name": "Sports Medicine", "count": 55 },
-              { "name": "Biomechanics", "count": 42 },
-              { "name": "Sports Psychology", "count": 30 },
-              { "name": "Nutrition & Dietetics", "count": 15 }
+              {
+                "name": "Physical Culture",
+                "count": 68
+              },
+              {
+                "name": "Sports Medicine",
+                "count": 55
+              },
+              {
+                "name": "Biomechanics",
+                "count": 42
+              },
+              {
+                "name": "Sports Psychology",
+                "count": 30
+              },
+              {
+                "name": "Nutrition & Dietetics",
+                "count": 15
+              }
             ],
             "collaborations": [
-              { "country": "USA", "institutions": 15, "publications": 58, "flag": "🇺🇸" },
-              { "country": "Germany", "institutions": 10, "publications": 35, "flag": "🇩🇪" },
-              { "country": "UK", "institutions": 8, "publications": 28, "flag": "🇬🇧" },
-              { "country": "Canada", "institutions": 6, "publications": 22, "flag": "🇨🇦" }
+              {
+                "country": "USA",
+                "institutions": 15,
+                "publications": 58,
+                "flag": "🇺🇸"
+              },
+              {
+                "country": "Germany",
+                "institutions": 10,
+                "publications": 35,
+                "flag": "🇩🇪"
+              },
+              {
+                "country": "UK",
+                "institutions": 8,
+                "publications": 28,
+                "flag": "🇬🇧"
+              },
+              {
+                "country": "Canada",
+                "institutions": 6,
+                "publications": 22,
+                "flag": "🇨🇦"
+              }
             ],
             "topJournals": [
-              { "quartile": "Q1", "count": 125 },
-              { "quartile": "Q2", "count": 60 },
-              { "quartile": "Q3", "count": 20 },
-              { "quartile": "Q4", "count": 5 }
+              {
+                "quartile": "Q1",
+                "count": 125
+              },
+              {
+                "quartile": "Q2",
+                "count": 60
+              },
+              {
+                "quartile": "Q3",
+                "count": 20
+              },
+              {
+                "quartile": "Q4",
+                "count": 5
+              }
             ],
             "impactFactor": "3.6",
             "hIndex": "18",
@@ -2395,17 +2581,26 @@
           "topCited": [
             {
               "title": "Advanced techniques in sports physiology",
-              "authors": ["Ivanov A.", "Petrov B."],
+              "authors": [
+                "Ivanov A.",
+                "Petrov B."
+              ],
               "citations": 150
             },
             {
               "title": "Biomechanics of athletic movements",
-              "authors": ["Sidorova C.", "Kozlov D."],
+              "authors": [
+                "Sidorova C.",
+                "Kozlov D."
+              ],
               "citations": 120
             },
             {
               "title": "Nutrition strategies for athletes",
-              "authors": ["Smith J.", "Johnson K."],
+              "authors": [
+                "Smith J.",
+                "Johnson K."
+              ],
               "citations": 98
             }
           ],
@@ -2487,13 +2682,21 @@
           {
             "id": 1,
             "title": "Innovative methods of training highly qualified athletes",
-            "authors": ["Ivanov A.V.", "Petrova M.K.", "Sidorov V.P."],
+            "authors": [
+              "Ivanov A.V.",
+              "Petrova M.K.",
+              "Sidorov V.P."
+            ],
             "abstract": "Research dedicated to development and implementation of innovative training methods for athletes using modern technologies and biomechanical analysis.",
             "journal": "Theory and Practice of Physical Culture",
             "year": "2023",
             "citations": 45,
             "type": "Scientific Article",
-            "keywords": ["sports training", "biomechanics", "innovations"],
+            "keywords": [
+              "sports training",
+              "biomechanics",
+              "innovations"
+            ],
             "doi": "10.1234/example.2023.1",
             "date": "15.03.2023",
             "pdfLink": "#",
@@ -2502,13 +2705,20 @@
           {
             "id": 2,
             "title": "Influence of psychological preparation on results in team sports",
-            "authors": ["Kuznetsova E.N.", "Nikolaev S.M."],
+            "authors": [
+              "Kuznetsova E.N.",
+              "Nikolaev S.M."
+            ],
             "abstract": "Analysis of psychological factors influence on athlete performance in team sports and development of psychological training methods.",
             "journal": "Sports Psychology",
             "year": "2023",
             "citations": 32,
             "type": "Scientific Article",
-            "keywords": ["psychology", "team sports", "motivation"],
+            "keywords": [
+              "psychology",
+              "team sports",
+              "motivation"
+            ],
             "doi": "10.1234/example.2023.2",
             "date": "20.04.2023",
             "pdfLink": "#",
@@ -2517,13 +2727,21 @@
           {
             "id": 3,
             "title": "Biomechanical analysis of sprinters' running technique",
-            "authors": ["Orlova T.K.", "Vasiliev P.D.", "Morozov A.S."],
+            "authors": [
+              "Orlova T.K.",
+              "Vasiliev P.D.",
+              "Morozov A.S."
+            ],
             "abstract": "Comprehensive biomechanical analysis of highly qualified sprinters' running technique using modern video recording methods and computer analysis.",
             "journal": "Sports Biomechanics",
             "year": "2022",
             "citations": 67,
             "type": "Scientific Article",
-            "keywords": ["biomechanics", "sprint", "running technique"],
+            "keywords": [
+              "biomechanics",
+              "sprint",
+              "running technique"
+            ],
             "doi": "10.1234/example.2022.3",
             "date": "10.11.2022",
             "pdfLink": "#",
@@ -2532,13 +2750,20 @@
           {
             "id": 4,
             "title": "Modern approaches to rehabilitation after sports injuries",
-            "authors": ["Smirnov V.A.", "Kovaleva M.P."],
+            "authors": [
+              "Smirnov V.A.",
+              "Kovaleva M.P."
+            ],
             "abstract": "Development and testing of modern rehabilitation methods for athletes after musculoskeletal injuries using physiotherapy and kinesiotherapy.",
             "journal": "Sports Medicine",
             "year": "2022",
             "citations": 89,
             "type": "Scientific Article",
-            "keywords": ["rehabilitation", "sports injuries", "physiotherapy"],
+            "keywords": [
+              "rehabilitation",
+              "sports injuries",
+              "physiotherapy"
+            ],
             "doi": "10.1234/example.2022.4",
             "date": "05.09.2022",
             "pdfLink": "#",
@@ -2767,42 +2992,66 @@
         "name": "Ivanov Petr Sergeevich",
         "position": "Professor",
         "qualification": "Honored Coach of Russia",
-        "specializations": ["Football", "Sports Training", "Tactics"]
+        "specializations": [
+          "Football",
+          "Sports Training",
+          "Tactics"
+        ]
       },
       {
         "avatar": "SM",
         "name": "Sidorova Maria Vladimirovna",
         "position": "Associate Professor",
         "qualification": "International Class Master of Sports",
-        "specializations": ["Swimming", "Biomechanics", "Rehabilitation"]
+        "specializations": [
+          "Swimming",
+          "Biomechanics",
+          "Rehabilitation"
+        ]
       },
       {
         "avatar": "PA",
         "name": "Petrov Alexey Dmitrievich",
         "position": "Senior Lecturer",
         "qualification": "International Category Referee",
-        "specializations": ["Basketball", "Refereeing", "Organization"]
+        "specializations": [
+          "Basketball",
+          "Refereeing",
+          "Organization"
+        ]
       },
       {
         "avatar": "KE",
         "name": "Kuznetsova Elena Ivanovna",
         "position": "Professor",
         "qualification": "Doctor of Pedagogical Sciences",
-        "specializations": ["Psychology", "Motivation", "Leadership"]
+        "specializations": [
+          "Psychology",
+          "Motivation",
+          "Leadership"
+        ]
       },
       {
         "avatar": "NV",
         "name": "Nikolaev Vladimir Petrovich",
         "position": "Associate Professor",
         "qualification": "Honored Worker of Physical Culture",
-        "specializations": ["Athletics", "Methodology", "Selection"]
+        "specializations": [
+          "Athletics",
+          "Methodology",
+          "Selection"
+        ]
       },
       {
         "avatar": "OS",
         "name": "Orlova Svetlana Mikhailovna",
         "position": "Lecturer",
         "qualification": "Master of Sports in Gymnastics",
-        "specializations": ["Gymnastics", "Choreography", "Flexibility"]
+        "specializations": [
+          "Gymnastics",
+          "Choreography",
+          "Flexibility"
+        ]
       }
     ],
     "achievements": {
@@ -2884,11 +3133,31 @@
     "name": "Correspondence Education",
     "fullDescription": "Modern distance education with flexible schedule and individual approach",
     "tabs": [
-      { "id": "about", "label": "About Faculty", "icon": "🌐" },
-      { "id": "programs", "label": "Programs", "icon": "📱" },
-      { "id": "technology", "label": "Technologies", "icon": "💻" },
-      { "id": "process", "label": "Learning Process", "icon": "🔄" },
-      { "id": "contacts", "label": "Contacts", "icon": "📞" }
+      {
+        "id": "about",
+        "label": "About Faculty",
+        "icon": "🌐"
+      },
+      {
+        "id": "programs",
+        "label": "Programs",
+        "icon": "📱"
+      },
+      {
+        "id": "technology",
+        "label": "Technologies",
+        "icon": "💻"
+      },
+      {
+        "id": "process",
+        "label": "Learning Process",
+        "icon": "🔄"
+      },
+      {
+        "id": "contacts",
+        "label": "Contacts",
+        "icon": "📞"
+      }
     ],
     "features": [
       {
@@ -3094,7 +3363,6 @@
   "militaryTraining": {
     "name": "Military Training",
     "fullDescription": "Elite officer training program through modern combat methods and strategic education",
-    
     "tabs": {
       "about": "About Faculty",
       "programs": "Programs",
@@ -3103,14 +3371,28 @@
       "command": "Command",
       "contacts": "Contacts"
     },
-
     "stats": [
-      { "value": "500+", "label": "Cadets", "icon": "🎖️" },
-      { "value": "15+", "label": "Programs", "icon": "⚔️" },
-      { "value": "25", "label": "Teachers", "icon": "🏅" },
-      { "value": "10", "label": "Specialties", "icon": "🎯" }
+      {
+        "value": "500+",
+        "label": "Cadets",
+        "icon": "🎖️"
+      },
+      {
+        "value": "15+",
+        "label": "Programs",
+        "icon": "⚔️"
+      },
+      {
+        "value": "25",
+        "label": "Teachers",
+        "icon": "🏅"
+      },
+      {
+        "value": "10",
+        "label": "Specialties",
+        "icon": "🎯"
+      }
     ],
-
     "about": {
       "description": "Elite officer training program combining advanced combat methods with fundamental military education. Training conducted according to modern standards with emphasis on practical skills.",
       "features": [
@@ -3121,14 +3403,24 @@
         "Strategic planning and analysis"
       ]
     },
-
     "ranks": [
-      { "name": "Cadet", "category": "Initial training" },
-      { "name": "Junior Lieutenant", "category": "Graduation rank" },
-      { "name": "Lieutenant", "category": "First officer" },
-      { "name": "Senior Lieutenant", "category": "Command" }
+      {
+        "name": "Cadet",
+        "category": "Initial training"
+      },
+      {
+        "name": "Junior Lieutenant",
+        "category": "Graduation rank"
+      },
+      {
+        "name": "Lieutenant",
+        "category": "First officer"
+      },
+      {
+        "name": "Senior Lieutenant",
+        "category": "Command"
+      }
     ],
-
     "programs": [
       {
         "name": "Tactical Training",
@@ -3176,31 +3468,44 @@
         ]
       }
     ],
-
     "specialties": [
       {
         "name": "Platoon Commander",
         "category": "Tactical Command",
         "icon": "👨‍✈️",
         "description": "Training commanders for platoon management in combat conditions, including operation planning and tactical leadership.",
-        "skills": ["Leadership", "Tactical Planning", "Personnel Management", "Decision Making"]
+        "skills": [
+          "Leadership",
+          "Tactical Planning",
+          "Personnel Management",
+          "Decision Making"
+        ]
       },
       {
         "name": "Sniper",
         "category": "Special Training",
         "icon": "🎯",
         "description": "Training highly qualified snipers for special tasks at long distances.",
-        "skills": ["Accurate Shooting", "Camouflage", "Observation", "Tracking"]
+        "skills": [
+          "Accurate Shooting",
+          "Camouflage",
+          "Observation",
+          "Tracking"
+        ]
       },
       {
         "name": "Sapper",
         "category": "Engineering Training",
         "icon": "💣",
         "description": "Specialization in demining and explosive engineering for unit safety.",
-        "skills": ["Demining", "Explosive Engineering", "Safety", "Threat Analysis"]
+        "skills": [
+          "Demining",
+          "Explosive Engineering",
+          "Safety",
+          "Threat Analysis"
+        ]
       }
     ],
-
     "facilities": [
       {
         "name": "Tactical Training Ground",
@@ -3221,7 +3526,6 @@
         "icon": "🏃‍♂️"
       }
     ],
-
     "trainingPrograms": [
       {
         "name": "Basic Course",
@@ -3239,7 +3543,6 @@
         "description": "Training future unit commanders"
       }
     ],
-
     "command": [
       {
         "name": "Ivanov A.S.",
@@ -3247,7 +3550,11 @@
         "position": "Faculty Head",
         "education": "Higher Military Education",
         "avatar": "👨‍✈️",
-        "specializations": ["Strategy", "Tactics", "Management"]
+        "specializations": [
+          "Strategy",
+          "Tactics",
+          "Management"
+        ]
       },
       {
         "name": "Petrov V.I.",
@@ -3255,7 +3562,10 @@
         "position": "Deputy Head",
         "education": "Military Academy",
         "avatar": "🎖️",
-        "specializations": ["Operational Art", "Logistics"]
+        "specializations": [
+          "Operational Art",
+          "Logistics"
+        ]
       },
       {
         "name": "Sidorov M.P.",
@@ -3263,17 +3573,18 @@
         "position": "Academic Department Head",
         "education": "Higher Pedagogical Education",
         "avatar": "📚",
-        "specializations": ["Methodology", "Pedagogy"]
+        "specializations": [
+          "Methodology",
+          "Pedagogy"
+        ]
       }
     ],
-
     "contacts": {
       "phone": "+996 (312) 57 04 89",
       "email": " sport_akadem@mail.ru",
       "address": "Bishkek, Akhunbaeva St, 97",
       "workingHours": "Mon-Fri: 8:00-17:00"
     },
-
     "dean": {
       "name": "Ivanov Alexander Sergeevich",
       "rank": "Colonel",
@@ -3322,7 +3633,10 @@
           "lastUpdated": "15.03.2024",
           "pages": 24,
           "downloads": 342,
-          "tags": ["safety", "training"],
+          "tags": [
+            "safety",
+            "training"
+          ],
           "downloadUrl": "#"
         },
         {
@@ -3336,7 +3650,10 @@
           "lastUpdated": "01.03.2024",
           "pages": 8,
           "downloads": 567,
-          "tags": ["schedule", "training"],
+          "tags": [
+            "schedule",
+            "training"
+          ],
           "downloadUrl": "#"
         }
       ],
@@ -3362,17 +3679,44 @@
       "subtitle": "International study opportunities at partner universities worldwide",
       "filters": {
         "regions": [
-          { "id": "all", "name": "All Regions" },
-          { "id": "europe", "name": "Europe" },
-          { "id": "asia", "name": "Asia" },
-          { "id": "america", "name": "America" },
-          { "id": "oceania", "name": "Oceania" }
+          {
+            "id": "all",
+            "name": "All Regions"
+          },
+          {
+            "id": "europe",
+            "name": "Europe"
+          },
+          {
+            "id": "asia",
+            "name": "Asia"
+          },
+          {
+            "id": "america",
+            "name": "America"
+          },
+          {
+            "id": "oceania",
+            "name": "Oceania"
+          }
         ],
         "durations": [
-          { "id": "all", "name": "Any Duration" },
-          { "id": "semester", "name": "Semester" },
-          { "id": "year", "name": "Year" },
-          { "id": "summer", "name": "Summer Program" }
+          {
+            "id": "all",
+            "name": "Any Duration"
+          },
+          {
+            "id": "semester",
+            "name": "Semester"
+          },
+          {
+            "id": "year",
+            "name": "Year"
+          },
+          {
+            "id": "summer",
+            "name": "Summer Program"
+          }
         ]
       },
       "stats": [
@@ -3602,7 +3946,11 @@
           "icon": "🎓",
           "title": "Academic Resources",
           "description": "Study materials, libraries, online courses and educational platforms for successful studies",
-          "tags": ["studies", "library", "courses"],
+          "tags": [
+            "studies",
+            "library",
+            "courses"
+          ],
           "links": [
             {
               "text": "University Electronic Library",
@@ -3623,7 +3971,11 @@
           "icon": "🏠",
           "title": "Student Campus",
           "description": "Information about dormitories, cafeterias, sports facilities and campus infrastructure",
-          "tags": ["campus", "dormitory", "cafeteria"],
+          "tags": [
+            "campus",
+            "dormitory",
+            "cafeteria"
+          ],
           "links": [
             {
               "text": "Dormitory Room Booking",
@@ -3644,7 +3996,11 @@
           "icon": "💰",
           "title": "Financial Support",
           "description": "Scholarships, grants, financial aid and student support programs",
-          "tags": ["scholarship", "grants", "finance"],
+          "tags": [
+            "scholarship",
+            "grants",
+            "finance"
+          ],
           "links": [
             {
               "text": "Scholarship Types and Conditions",
@@ -3665,7 +4021,11 @@
           "icon": "🌍",
           "title": "International Programs",
           "description": "Exchange programs, internships abroad, international grants and academic mobility",
-          "tags": ["exchange", "internships", "international"],
+          "tags": [
+            "exchange",
+            "internships",
+            "international"
+          ],
           "links": [
             {
               "text": "Student Exchange Programs",
@@ -3686,7 +4046,11 @@
           "icon": "💼",
           "title": "Career and Employment",
           "description": "Career center, vacancies, internships, job fairs and career consultations",
-          "tags": ["career", "work", "internships"],
+          "tags": [
+            "career",
+            "work",
+            "internships"
+          ],
           "links": [
             {
               "text": "Student Job Database",
@@ -3707,7 +4071,11 @@
           "icon": "🏥",
           "title": "Health and Wellbeing",
           "description": "Medical services, psychological support, sports programs and wellness",
-          "tags": ["health", "medical", "psychology"],
+          "tags": [
+            "health",
+            "medical",
+            "psychology"
+          ],
           "links": [
             {
               "text": "Student Clinic",
@@ -3916,10 +4284,22 @@
         "science": "Science"
       },
       "stats": [
-        { "value": "25+", "label": "Clubs" },
-        { "value": "800+", "label": "Members" },
-        { "value": "50+", "label": "Events" },
-        { "value": "12", "label": "Directions" }
+        {
+          "value": "25+",
+          "label": "Clubs"
+        },
+        {
+          "value": "800+",
+          "label": "Members"
+        },
+        {
+          "value": "50+",
+          "label": "Events"
+        },
+        {
+          "value": "12",
+          "label": "Directions"
+        }
       ],
       "list": [
         {
@@ -3932,14 +4312,31 @@
           "icon": "💻",
           "status": "active",
           "leaders": [
-            { "name": "Maria Petrova", "role": "Club President" },
-            { "name": "Alexey Sidorov", "role": "Tech Lead" }
+            {
+              "name": "Maria Petrova",
+              "role": "Club President"
+            },
+            {
+              "name": "Alexey Sidorov",
+              "role": "Tech Lead"
+            }
           ],
           "upcomingEvents": [
-            { "name": "Web Development Hackathon", "date": "15.03.2024" },
-            { "name": "React Workshop", "date": "22.03.2024" }
+            {
+              "name": "Web Development Hackathon",
+              "date": "15.03.2024"
+            },
+            {
+              "name": "React Workshop",
+              "date": "22.03.2024"
+            }
           ],
-          "tags": ["programming", "web", "mobile", "ai"]
+          "tags": [
+            "programming",
+            "web",
+            "mobile",
+            "ai"
+          ]
         }
       ]
     },
@@ -4029,7 +4426,11 @@
           "email": "ivan.petrov@sports-academy.edu",
           "phone": "+996 (312) 57 04 90",
           "telegram": "@ivan_petrov",
-          "tags": ["Leadership", "Basketball", "Volunteering"],
+          "tags": [
+            "Leadership",
+            "Basketball",
+            "Volunteering"
+          ],
           "responsibilities": [
             "Council work coordination",
             "Student interests representation",
@@ -4052,7 +4453,11 @@
           "email": "maria.sidorova@sports-academy.edu",
           "phone": "+7 (999) 234-56-78",
           "telegram": "@maria_sidorova",
-          "tags": ["Swimming", "Organization", "Events"],
+          "tags": [
+            "Swimming",
+            "Organization",
+            "Events"
+          ],
           "responsibilities": [
             "Event coordination",
             "Volunteer work",
@@ -4383,9 +4788,17 @@
           "type": "Internal Resource",
           "access": "free",
           "rating": "4.8",
-          "tags": ["books", "articles", "research"],
+          "tags": [
+            "books",
+            "articles",
+            "research"
+          ],
           "lastUpdated": "2 days ago",
-          "features": ["Search", "Favorites", "Download"]
+          "features": [
+            "Search",
+            "Favorites",
+            "Download"
+          ]
         },
         {
           "name": "Testing System",
@@ -4397,9 +4810,17 @@
           "type": "Internal Resource",
           "access": "login",
           "rating": "4.5",
-          "tags": ["tests", "exams", "grades"],
+          "tags": [
+            "tests",
+            "exams",
+            "grades"
+          ],
           "lastUpdated": "1 week ago",
-          "features": ["Timer", "Results", "Statistics"]
+          "features": [
+            "Timer",
+            "Results",
+            "Statistics"
+          ]
         },
         {
           "name": "Campus Map",
@@ -4411,9 +4832,17 @@
           "type": "Internal Resource",
           "access": "free",
           "rating": "4.9",
-          "tags": ["map", "navigation", "buildings"],
+          "tags": [
+            "map",
+            "navigation",
+            "buildings"
+          ],
           "lastUpdated": "month ago",
-          "features": ["Search", "Routes", "3D View"]
+          "features": [
+            "Search",
+            "Routes",
+            "3D View"
+          ]
         },
         {
           "name": "Scholarship Portal",
@@ -4425,9 +4854,17 @@
           "type": "Internal Resource",
           "access": "login",
           "rating": "4.7",
-          "tags": ["scholarships", "grants", "finance"],
+          "tags": [
+            "scholarships",
+            "grants",
+            "finance"
+          ],
           "lastUpdated": "3 days ago",
-          "features": ["Applications", "Status", "History"]
+          "features": [
+            "Applications",
+            "Status",
+            "History"
+          ]
         },
         {
           "name": "International Programs",
@@ -4439,9 +4876,17 @@
           "type": "Internal Resource",
           "access": "login",
           "rating": "4.6",
-          "tags": ["exchange", "internships", "abroad"],
+          "tags": [
+            "exchange",
+            "internships",
+            "abroad"
+          ],
           "lastUpdated": "2 weeks ago",
-          "features": ["Search", "Applications", "Consultations"]
+          "features": [
+            "Search",
+            "Applications",
+            "Consultations"
+          ]
         },
         {
           "name": "Career Center",
@@ -4453,9 +4898,17 @@
           "type": "Internal Resource",
           "access": "login",
           "rating": "4.8",
-          "tags": ["jobs", "internships", "resumes"],
+          "tags": [
+            "jobs",
+            "internships",
+            "resumes"
+          ],
           "lastUpdated": "5 days ago",
-          "features": ["Vacancies", "Events", "Consultations"]
+          "features": [
+            "Vacancies",
+            "Events",
+            "Consultations"
+          ]
         }
       ]
     }
@@ -4473,18 +4926,36 @@
         "title": "Phones",
         "description": "Only during business hours",
         "numbers": [
-          { "label": "Admissions Office", "number": "+996 (312) 57 04 89" },
-          { "label": "Sports Department", "number": "+996 (312) 57 04 90" },
-          { "label": "Medical Office", "number": "+996 (312) 57 04 91" }
+          {
+            "label": "Admissions Office",
+            "number": "+996 (312) 57 04 89"
+          },
+          {
+            "label": "Sports Department",
+            "number": "+996 (312) 57 04 90"
+          },
+          {
+            "label": "Medical Office",
+            "number": "+996 (312) 57 04 91"
+          }
         ]
       },
       "email": {
         "title": "Email",
         "description": "Quick response within 2 hours",
         "addresses": [
-          { "label": "General Questions", "address": "sport_akadem@mail.ru" },
-          { "label": "Admissions", "address": "sport_akadem@mail.ru" },
-          { "label": "Coaching", "address": "sport_akadem@mail.ru" }
+          {
+            "label": "General Questions",
+            "address": "sport_akadem@mail.ru"
+          },
+          {
+            "label": "Admissions",
+            "address": "sport_akadem@mail.ru"
+          },
+          {
+            "label": "Coaching",
+            "address": "sport_akadem@mail.ru"
+          }
         ]
       },
       "hours": {
@@ -4837,12 +5308,19 @@
     "badge": "Pedagogical Education",
     "about": {
       "missionTitle": "Faculty Mission",
-      "advantagesTitle": "Key Advantages", 
+      "advantagesTitle": "Key Advantages",
       "achievementsTitle": "Our Achievements",
       "mission": "Mission text...",
-      "advantages": ["Advantage 1", "Advantage 2"],
+      "advantages": [
+        "Advantage 1",
+        "Advantage 2"
+      ],
       "achievements": [
-        {"value": "50+", "label": "Champions", "icon": "🏆"}
+        {
+          "value": "50+",
+          "label": "Champions",
+          "icon": "🏆"
+        }
       ]
     },
     "stats": [
@@ -4894,13 +5372,21 @@
           "name": "Sports Pedagogy",
           "description": "Teaching and upbringing methods in sports activities",
           "icon": "👨‍🏫",
-          "competencies": ["Training Methodology", "Sports Psychology", "Age Pedagogy"]
+          "competencies": [
+            "Training Methodology",
+            "Sports Psychology",
+            "Age Pedagogy"
+          ]
         },
         {
           "name": "Physical Rehabilitation",
           "description": "Recovery and rehabilitation of athletes after injuries",
           "icon": "💪",
-          "competencies": ["Rehabilitation", "Kinesiology", "Sports Medicine"]
+          "competencies": [
+            "Rehabilitation",
+            "Kinesiology",
+            "Sports Medicine"
+          ]
         }
       ],
       "sports": [
@@ -4950,14 +5436,20 @@
         "position": "Professor",
         "qualification": "Doctor of Pedagogical Sciences",
         "avatar": "IP",
-        "specializations": ["Sports Pedagogy", "Training Methodology"]
+        "specializations": [
+          "Sports Pedagogy",
+          "Training Methodology"
+        ]
       },
       {
         "name": "Maria Sidorova",
         "position": "Associate Professor",
         "qualification": "Candidate of Biological Sciences",
         "avatar": "MS",
-        "specializations": ["Sports Physiology", "Rehabilitation"]
+        "specializations": [
+          "Sports Physiology",
+          "Rehabilitation"
+        ]
       }
     ],
     "contacts": {
@@ -4976,25 +5468,25 @@
       }
     }
   },
-"wos": {
-      "title": "Web of Science",
-      "subtitle": "Research metrics and publication data", 
-      "loading": "Loading Web of Science data...",
-      "institutions": "institutions",
-      "publications": "publications",
-      "journal_quartiles": "Publications by Journal Quartile",
-      "by_category": "Publications by Category",
-      "collaborations": "International Collaboration",
-      "categoriesIcon": "📈",
-      "categoriesTitle": "Publications by Category",
-      "collaborationsIcon": "🌍", 
-      "collaborationsTitle": "International Collaboration",
-      "collaborationsInstitutions": "institutions",
-      "collaborationsPublications": "publications",
-      "topJournalsIcon": "⭐",
-      "topJournalsTitle": "Publications by Journal Quartile",
-      "titleIcon": "📊"
-    },
+  "wos": {
+    "title": "Web of Science",
+    "subtitle": "Research metrics and publication data",
+    "loading": "Loading Web of Science data...",
+    "institutions": "institutions",
+    "publications": "publications",
+    "journal_quartiles": "Publications by Journal Quartile",
+    "by_category": "Publications by Category",
+    "collaborations": "International Collaboration",
+    "categoriesIcon": "📈",
+    "categoriesTitle": "Publications by Category",
+    "collaborationsIcon": "🌍",
+    "collaborationsTitle": "International Collaboration",
+    "collaborationsInstitutions": "institutions",
+    "collaborationsPublications": "publications",
+    "topJournalsIcon": "⭐",
+    "topJournalsTitle": "Publications by Journal Quartile",
+    "titleIcon": "📊"
+  },
   "error": {
     "failed_to_load": "Failed to load data",
     "retry": "Retry",
@@ -5193,7 +5685,6 @@
   "departments": {
     "title": "Academy Structure",
     "subtitle": "Comprehensive organizational system and all academy departments",
-    
     "categories": {
       "title": "Categories",
       "academic": "Academic",
@@ -5202,14 +5693,12 @@
       "student": "Student",
       "technical": "Technical"
     },
-
     "stats": {
       "departments": "Departments",
       "staff": "Staff",
       "faculties": "Faculties",
       "campuses": "Campuses"
     },
-
     "search": {
       "placeholder": "Search departments...",
       "results": "Found: {{count}}",
@@ -5219,19 +5708,14 @@
       },
       "clear": "Clear Search"
     },
-
     "categoryDescription": "{{category}} direction departments",
-
     "found": "found",
-
     "departmentHead": "Department Head",
-
     "contact": {
       "head": "Head",
       "phone": "Phone",
       "location": "Location"
     },
-
     "functions": {
       "title": "Main Functions",
       "education": {
@@ -5251,11 +5735,9 @@
         "description": "Administrative management of academy"
       }
     },
-
     "overview": {
       "title": "Main Activity Directions"
     },
-
     "list": [
       {
         "id": 1,
@@ -5597,7 +6079,7 @@
     "subtitle": "Years of excellence in sports education and athlete training",
     "students": "Active Students",
     "graduates": "Successful Graduates",
-    "sports": "Sports Disciplines", 
+    "sports": "Sports Disciplines",
     "champions": "Professional Champions",
     "scrollHint": "Scroll to learn more"
   },
@@ -5714,7 +6196,10 @@
         "category": "General",
         "department": "Administration",
         "author": "University Administration",
-        "tags": ["university", "announcement"],
+        "tags": [
+          "university",
+          "announcement"
+        ],
         "readTime": "2 min read"
       },
       "notFound": "Announcement Not Found",
@@ -5869,7 +6354,7 @@
         "department": "Department of Sports Management",
         "achievements": [
           "Doctor of Pedagogical Sciences",
-          "Master of Sports in Athletics", 
+          "Master of Sports in Athletics",
           "Author of 15 scientific works",
           "Expert in sports law"
         ]
@@ -6041,22 +6526,22 @@
     },
     "events": {
       "actions": {
-    "details": "Details",
-    "share": "Share",
-    "shareSuccess": "Link copied to clipboard",
-    "copyLink": "Copy the link:"
-  },
-  "details": {
-    "aboutEvent": "About the Event",
-    "basicInfo": "Basic Information",
-    "additionalInfo": "Additional Information",
-    "organizer": "Organizer"
-  },
-  "labels": {
-    "audience": "Audience",
-    "format": "Format",
-    "duration": "Duration"
-  },
+        "details": "Details",
+        "share": "Share",
+        "shareSuccess": "Link copied to clipboard",
+        "copyLink": "Copy the link:"
+      },
+      "details": {
+        "aboutEvent": "About the Event",
+        "basicInfo": "Basic Information",
+        "additionalInfo": "Additional Information",
+        "organizer": "Organizer"
+      },
+      "labels": {
+        "audience": "Audience",
+        "format": "Format",
+        "duration": "Duration"
+      },
       "title": "Union Events",
       "upcoming": "Upcoming",
       "participants": "participants",
@@ -6131,11 +6616,26 @@
     "responsibilities": "Responsibilities",
     "contactInfo": "Contact information",
     "filters": [
-      { "id": "all", "name": "All Commissions" },
-      { "id": "education", "name": "Educational" },
-      { "id": "science", "name": "Scientific" },
-      { "id": "sports", "name": "Sports" },
-      { "id": "quality", "name": "Quality Control" }
+      {
+        "id": "all",
+        "name": "All Commissions"
+      },
+      {
+        "id": "education",
+        "name": "Educational"
+      },
+      {
+        "id": "science",
+        "name": "Scientific"
+      },
+      {
+        "id": "sports",
+        "name": "Sports"
+      },
+      {
+        "id": "quality",
+        "name": "Quality Control"
+      }
     ],
     "list": [
       {
@@ -6147,11 +6647,24 @@
         "icon": "📚",
         "members": 12,
         "projects": 8,
-        "tags": ["Methodologies", "Curriculum", "Standards"],
+        "tags": [
+          "Methodologies",
+          "Curriculum",
+          "Standards"
+        ],
         "metrics": [
-          { "label": "Program Quality", "value": 95 },
-          { "label": "Innovations", "value": 88 },
-          { "label": "Timeliness", "value": 92 }
+          {
+            "label": "Program Quality",
+            "value": 95
+          },
+          {
+            "label": "Innovations",
+            "value": 88
+          },
+          {
+            "label": "Timeliness",
+            "value": 92
+          }
         ],
         "contact": {
           "email": "education@academy-sport.ru",
@@ -6168,11 +6681,24 @@
         "icon": "🔬",
         "members": 15,
         "projects": 12,
-        "tags": ["Research", "Publications", "Grants"],
+        "tags": [
+          "Research",
+          "Publications",
+          "Grants"
+        ],
         "metrics": [
-          { "label": "Scientific Activity", "value": 90 },
-          { "label": "Citations", "value": 85 },
-          { "label": "Innovations", "value": 93 }
+          {
+            "label": "Scientific Activity",
+            "value": 90
+          },
+          {
+            "label": "Citations",
+            "value": 85
+          },
+          {
+            "label": "Innovations",
+            "value": 93
+          }
         ],
         "contact": {
           "email": "science@academy-sport.ru",
@@ -6189,11 +6715,24 @@
         "icon": "🏆",
         "members": 20,
         "projects": 15,
-        "tags": ["Competitions", "Training", "Events"],
+        "tags": [
+          "Competitions",
+          "Training",
+          "Events"
+        ],
         "metrics": [
-          { "label": "Student Coverage", "value": 87 },
-          { "label": "Effectiveness", "value": 94 },
-          { "label": "Organization", "value": 91 }
+          {
+            "label": "Student Coverage",
+            "value": 87
+          },
+          {
+            "label": "Effectiveness",
+            "value": 94
+          },
+          {
+            "label": "Organization",
+            "value": 91
+          }
         ],
         "contact": {
           "email": "sports@academy-sport.ru",
@@ -6210,11 +6749,24 @@
         "icon": "⭐",
         "members": 10,
         "projects": 6,
-        "tags": ["Accreditation", "Standards", "Audit"],
+        "tags": [
+          "Accreditation",
+          "Standards",
+          "Audit"
+        ],
         "metrics": [
-          { "label": "Standards Compliance", "value": 98 },
-          { "label": "Timely Inspections", "value": 95 },
-          { "label": "Satisfaction", "value": 89 }
+          {
+            "label": "Standards Compliance",
+            "value": 98
+          },
+          {
+            "label": "Timely Inspections",
+            "value": 95
+          },
+          {
+            "label": "Satisfaction",
+            "value": 89
+          }
         ],
         "contact": {
           "email": "quality@academy-sport.ru",
@@ -6231,11 +6783,24 @@
         "icon": "🌍",
         "members": 8,
         "projects": 10,
-        "tags": ["Partnerships", "Exchanges", "Grants"],
+        "tags": [
+          "Partnerships",
+          "Exchanges",
+          "Grants"
+        ],
         "metrics": [
-          { "label": "International Connections", "value": 82 },
-          { "label": "Project Success", "value": 88 },
-          { "label": "Reputation", "value": 90 }
+          {
+            "label": "International Connections",
+            "value": 82
+          },
+          {
+            "label": "Project Success",
+            "value": 88
+          },
+          {
+            "label": "Reputation",
+            "value": 90
+          }
         ],
         "contact": {
           "email": "international@academy-sport.ru",
@@ -6252,11 +6817,24 @@
         "icon": "💡",
         "members": 14,
         "projects": 9,
-        "tags": ["Technologies", "Innovations", "Developments"],
+        "tags": [
+          "Technologies",
+          "Innovations",
+          "Developments"
+        ],
         "metrics": [
-          { "label": "Innovation Implementation", "value": 86 },
-          { "label": "Efficiency", "value": 89 },
-          { "label": "Prospects", "value": 92 }
+          {
+            "label": "Innovation Implementation",
+            "value": 86
+          },
+          {
+            "label": "Efficiency",
+            "value": 89
+          },
+          {
+            "label": "Prospects",
+            "value": 92
+          }
         ],
         "contact": {
           "email": "innovation@academy-sport.ru",
@@ -6343,8 +6921,8 @@
   },
   "administrativeUnits": {
     "staffCount": "Staff count",
-  "workingHoursTime": "Working hours",
-  "receptionHoursTime": "Reception hours",
+    "workingHoursTime": "Working hours",
+    "receptionHoursTime": "Reception hours",
     "badge": "Administration",
     "title": "Administrative Departments",
     "subtitle": "Academy management structure ensuring effective organization of educational process and scientific activities",
@@ -6446,10 +7024,22 @@
       "moreDetails": "More Details"
     },
     "tabs": [
-      { "id": "about", "name": "About Program" },
-      { "id": "programs", "name": "Programs" },
-      { "id": "admission", "name": "Admission" },
-      { "id": "research", "name": "Research" }
+      {
+        "id": "about",
+        "name": "About Program"
+      },
+      {
+        "id": "programs",
+        "name": "Programs"
+      },
+      {
+        "id": "admission",
+        "name": "Admission"
+      },
+      {
+        "id": "research",
+        "name": "Research"
+      }
     ],
     "about": {
       "title": "About Doctoral Studies",
@@ -6486,21 +7076,33 @@
           "name": "Doctor of Philosophy (PhD) in Sports Sciences",
           "description": "In-depth research in physiology, biomechanics and sports psychology",
           "duration": "3-4 years",
-          "tags": ["Research", "Academy", "Science"]
+          "tags": [
+            "Research",
+            "Academy",
+            "Science"
+          ]
         },
         {
           "id": 2,
           "name": "Doctor of Pedagogical Sciences",
           "description": "Research of modern teaching methods and athlete training",
           "duration": "3 years",
-          "tags": ["Education", "Methodologies", "Pedagogy"]
+          "tags": [
+            "Education",
+            "Methodologies",
+            "Pedagogy"
+          ]
         },
         {
           "id": 3,
           "name": "Doctor of Medical Sciences in Sports Medicine",
           "description": "Scientific research in sports traumatology and rehabilitation",
           "duration": "4 years",
-          "tags": ["Medicine", "Rehabilitation", "Health"]
+          "tags": [
+            "Medicine",
+            "Rehabilitation",
+            "Health"
+          ]
         }
       ]
     },
@@ -6757,10 +7359,22 @@
       }
     ],
     "tabs": [
-      { "id": "about", "name": "About SSS" },
-      { "id": "projects", "name": "Projects" },
-      { "id": "events", "name": "Events" },
-      { "id": "join", "name": "How to Join" }
+      {
+        "id": "about",
+        "name": "About SSS"
+      },
+      {
+        "id": "projects",
+        "name": "Projects"
+      },
+      {
+        "id": "events",
+        "name": "Events"
+      },
+      {
+        "id": "join",
+        "name": "How to Join"
+      }
     ],
     "about": {
       "title": "About Student Scientific Society",
@@ -6797,7 +7411,11 @@
           "shortDescription": "Analysis of complex motor action techniques",
           "description": "Comprehensive research of biomechanical characteristics of sports movements using modern equipment",
           "icon": "🏃",
-          "tags": ["Biomechanics", "Analysis", "Technologies"]
+          "tags": [
+            "Biomechanics",
+            "Analysis",
+            "Technologies"
+          ]
         },
         {
           "id": 2,
@@ -6805,7 +7423,11 @@
           "shortDescription": "Research of mental aspects of success",
           "description": "Study of psychological factors affecting sports results and mental preparation methods",
           "icon": "🧠",
-          "tags": ["Psychology", "Motivation", "Mentality"]
+          "tags": [
+            "Psychology",
+            "Motivation",
+            "Mentality"
+          ]
         },
         {
           "id": 3,
@@ -6813,7 +7435,11 @@
           "shortDescription": "Genetic markers of sports talent",
           "description": "Research of genetic prerequisites for sports abilities and predispositions",
           "icon": "🧬",
-          "tags": ["Genetics", "Talent", "Heredity"]
+          "tags": [
+            "Genetics",
+            "Talent",
+            "Heredity"
+          ]
         },
         {
           "id": 4,
@@ -6821,7 +7447,11 @@
           "shortDescription": "Technologies in sports training",
           "description": "Development and implementation of digital solutions for optimizing training process",
           "icon": "💻",
-          "tags": ["Technologies", "Analytics", "Innovations"]
+          "tags": [
+            "Technologies",
+            "Analytics",
+            "Innovations"
+          ]
         }
       ]
     },
@@ -6893,8 +7523,7 @@
           "title": "Start of Work",
           "description": "Participation in SSS projects and events"
         }
-      ]
-      ,
+      ],
       "readyTitle": "📝 Ready to join?",
       "applyButton": "Apply Now",
       "askButton": "Ask a Question"
@@ -7765,7 +8394,12 @@
           "description": "Software development and project management",
           "head": "Dr. A.S. Ivanov",
           "students": "420",
-          "specializations": ["Backend", "Frontend", "Mobile", "DevOps"]
+          "specializations": [
+            "Backend",
+            "Frontend",
+            "Mobile",
+            "DevOps"
+          ]
         },
         {
           "id": "data-science",
@@ -7774,7 +8408,12 @@
           "description": "Data analysis, machine learning and artificial intelligence",
           "head": "Dr. M.K. Petrova",
           "students": "280",
-          "specializations": ["ML", "Big Data", "AI", "Analytics"]
+          "specializations": [
+            "ML",
+            "Big Data",
+            "AI",
+            "Analytics"
+          ]
         },
         {
           "id": "cybersecurity",
@@ -7783,7 +8422,12 @@
           "description": "Information protection and system cybersecurity",
           "head": "Ph.D. V.P. Sidorov",
           "students": "190",
-          "specializations": ["Pentest", "SOC", "Forensics", "Compliance"]
+          "specializations": [
+            "Pentest",
+            "SOC",
+            "Forensics",
+            "Compliance"
+          ]
         },
         {
           "id": "networks",
@@ -7792,7 +8436,12 @@
           "description": "Design and administration of computer networks",
           "head": "Ph.D. D.A. Kuznetsov",
           "students": "150",
-          "specializations": ["Cisco", "Cloud", "IoT", "5G"]
+          "specializations": [
+            "Cisco",
+            "Cloud",
+            "IoT",
+            "5G"
+          ]
         }
       ]
     },
@@ -7808,7 +8457,12 @@
           "description": "Training fullstack developers and software architects",
           "duration": "4 years",
           "format": "Full-time",
-          "features": ["Java/Python", "Web Development", "Databases", "Agile"]
+          "features": [
+            "Java/Python",
+            "Web Development",
+            "Databases",
+            "Agile"
+          ]
         },
         {
           "id": "bachelor-data",
@@ -7818,7 +8472,12 @@
           "description": "Data analysis and machine learning for business",
           "duration": "4 years",
           "format": "Full-time",
-          "features": ["Python/R", "ML Algorithms", "Statistics", "Visualization"]
+          "features": [
+            "Python/R",
+            "ML Algorithms",
+            "Statistics",
+            "Visualization"
+          ]
         },
         {
           "id": "master-cyber",
@@ -7828,7 +8487,12 @@
           "description": "Advanced training for information security specialists",
           "duration": "2 years",
           "format": "Full-time/Part-time",
-          "features": ["Ethical Hacking", "Cryptography", "Risk Management", "Compliance"]
+          "features": [
+            "Ethical Hacking",
+            "Cryptography",
+            "Risk Management",
+            "Compliance"
+          ]
         }
       ]
     },
@@ -8020,7 +8684,7 @@
       "participation": "Student Participation"
     }
   },
-   "instructions": {
+  "instructions": {
     "title": "Instructions & Documents",
     "subtitle": "Academic documents and instructions for students",
     "searchPlaceholder": "Search documents...",
@@ -8046,7 +8710,7 @@
       "download": "Download"
     }
   },
-   "scholarship": {
+  "scholarship": {
     "title": "Scholarship Programs",
     "subtitle": "Financial support for talented and motivated students",
     "programs": "Scholarship Programs",
@@ -8097,12 +8761,12 @@
     "retry": "Try Again"
   },
   "structure": {
-  "hierarchicalView": "Hierarchical view",
-  "flatView": "Flat view",
-  "active": "Active",
-  "all": "All"
-},
-"scopus": {
+    "hierarchicalView": "Hierarchical view",
+    "flatView": "Flat view",
+    "active": "Active",
+    "all": "All"
+  },
+  "scopus": {
     "title": "Scopus Publications",
     "subtitle": "Scientific publications and research metrics in Scopus database",
     "researchMetrics": "Research Metrics",
@@ -8176,7 +8840,7 @@
         "content": "We reserve the right to terminate access for violations of these terms or inappropriate behavior."
       }
     }
-  }, 
+  },
   "search": {
     "title": "Academy Search",
     "subtitle": "Find the information you need quickly and easily",

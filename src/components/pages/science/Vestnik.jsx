@@ -10,7 +10,6 @@ const Vestnik = () => {
   const [activeIssue, setActiveIssue] = useState(0);
   const sectionRef = useRef(null);
 
-  // Состояния для данных с бэкенда
   const [backendData, setBackendData] = useState({
     stats: [],
     featuredIssues: [],
@@ -20,7 +19,6 @@ const Vestnik = () => {
     error: null
   });
 
-  // Получение текущего языка для API
   const getApiLanguage = useCallback(() => {
     const langMap = {
       'en': 'en',
@@ -30,13 +28,11 @@ const Vestnik = () => {
     return langMap[i18n.language] || 'ru';
   }, [i18n.language]);
 
-  // Функция для загрузки данных с бэкенда
   const fetchBackendData = useCallback(async () => {
     try {
       setBackendData(prev => ({ ...prev, loading: true, error: null }));
-      
+
       const lang = getApiLanguage();
-      
       const API_URL = import.meta.env.VITE_API_URL;
 
       const endpoints = [
@@ -46,24 +42,21 @@ const Vestnik = () => {
         `${API_URL}/api/science/vestnik-articles/?lang=${lang}&ordering=-id`
       ];
 
-
       const responses = await Promise.all(
         endpoints.map(async (url) => {
           try {
             const response = await fetch(url);
-            
-            // Проверяем content-type
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
               const text = await response.text();
               console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
               return { results: [] };
             }
-            
+
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             return await response.json();
           } catch (error) {
             console.error(`Error fetching ${url}:`, error);
@@ -91,7 +84,6 @@ const Vestnik = () => {
     }
   }, [getApiLanguage]);
 
-  // Загрузка данных при монтировании и изменении языка
   useEffect(() => {
     fetchBackendData();
   }, [fetchBackendData]);
@@ -109,7 +101,6 @@ const Vestnik = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Auto-switching issues in archive
   useEffect(() => {
     if (currentView === "archive" && backendData.recentIssues.length > 0) {
       const interval = setInterval(() => {
@@ -119,18 +110,6 @@ const Vestnik = () => {
     }
   }, [currentView, backendData.recentIssues]);
 
-  const views = [
-    { id: "current", label: t("vestnik.views.current"), icon: "🌟" },
-    { id: "archive", label: t("vestnik.views.archive"), icon: "📚" },
-    { id: "metrics", label: t("vestnik.views.metrics"), icon: "📊" },
-  ];
-
-  // Get unique years for archive filtering
-  const archiveYears = backendData.recentIssues.length > 0
-    ? [...new Set(backendData.recentIssues.map((issue) => issue.year))]
-    : [];
-
-  // Компонент загрузки
   const LoadingSkeleton = () => (
     <div className="animate-pulse space-y-4">
       <div className="bg-white/10 rounded-2xl h-8 mb-4"></div>
@@ -143,7 +122,6 @@ const Vestnik = () => {
     </div>
   );
 
-  // Компонент ошибки
   const ErrorMessage = ({ onRetry }) => (
     <div className="text-center py-8">
       <div className="text-red-400 text-6xl mb-4">⚠️</div>
@@ -167,23 +145,18 @@ const Vestnik = () => {
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
     >
-      {/* Анимированный фон */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
         <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
 
-        {/* Научные символы */}
         <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">📰</div>
-        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">
-          🔬
-        </div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">🔬</div>
         <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">📚</div>
         <div className="absolute top-2/3 right-1/3 text-5xl opacity-5">⚗️</div>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
@@ -199,99 +172,206 @@ const Vestnik = () => {
           </p>
         </motion.div>
 
-        {/* Main Content */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.5 }}
-          className="bg-white/5 rounded-3xl backdrop-blur-lg border border-white/20 shadow-2xl overflow-hidden"
+          className="bg-white/5 rounded-3xl backdrop-blur-lg border border-white/20 shadow-2xl overflow-hidden p-6 lg:p-8"
         >
-          {/* View Navigation */}
-          <div className="border-b border-white/20 bg-white/5">
-            <div className="flex overflow-x-auto scrollbar-hide px-4">
-              {views.map((view) => (
-                <motion.button
-                  key={view.id}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setCurrentView(view.id)}
-                  className={`flex items-center space-x-2 flex-shrink-0 px-6 py-4 font-semibold text-sm transition-all duration-200 border-b-2 ${
-                    currentView === view.id
-                      ? "border-emerald-400 text-white bg-white/10"
-                      : "border-transparent text-blue-200 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  <span className="text-lg">{view.icon}</span>
-                  <span>{view.label}</span>
-                </motion.button>
-              ))}
-            </div>
-          </div>
-
-          {/* View Content */}
-          <div className="p-6 lg:p-8">
-            {backendData.error ? (
-              <ErrorMessage onRetry={fetchBackendData} />
-            ) : (
-              <AnimatePresence mode="wait">
-                {currentView === "current" && (
-                  <CurrentIssue
-                    data={backendData.featuredIssues.length > 0 ? backendData.featuredIssues[0] : null}
-                    loading={backendData.loading}
-                    t={t}
-                  />
-                )}
-                {currentView === "archive" && (
-                  <Archive
-                    data={backendData.recentIssues}
-                    selectedYear={selectedYear}
-                    onYearChange={setSelectedYear}
-                    years={archiveYears}
-                    activeIssue={activeIssue}
-                    onIssueChange={setActiveIssue}
-                    loading={backendData.loading}
-                    t={t}
-                  />
-                )}
-                {currentView === "metrics" && (
-                  <Metrics
-                    data={backendData.stats}
-                    loading={backendData.loading}
-                    t={t}
-                  />
-                )}
-              </AnimatePresence>
-            )}
-          </div>
+          {backendData.error ? (
+            <ErrorMessage onRetry={fetchBackendData} />
+          ) : (
+            <AnimatePresence mode="wait">
+              {/* Показываем только контент текущего выпуска без переключения между вкладками */}
+              <CurrentIssue
+                data={backendData.featuredIssues.length > 0 ? backendData.featuredIssues[0] : null}
+                loading={backendData.loading}
+                t={t}
+              />
+            </AnimatePresence>
+          )}
         </motion.div>
       </div>
     </section>
   );
 };
-
 const CurrentIssue = ({ data, loading, t }) => {
-  if (loading) {
-    return <LoadingSkeleton />;
-  }
+  const [expandedYear, setExpandedYear] = useState(2026);
+  const [selectedIssue, setSelectedIssue] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
 
-  if (!data) {
+  // Данные для аккордеона годов
+  const yearsData = [
+    {
+      year: 2026,
+      issues: [
+        {
+          id: 1,
+          title: "Выпуск 1: Современные технологии в спорте",
+          content: "Этот выпуск посвящен современным технологиям в спортивной подготовке. Включает статьи о биомеханике, спортивной аналитике и цифровых платформах для тренировок.",
+          pdf: "/pdf/vestnik-2026-1.pdf"
+        },
+        {
+          id: 2,
+          title: "Выпуск 2: Инновации в спортивном образовании",
+          content: "Исследования инновационных подходов в подготовке спортивных специалистов. Цифровизация учебного процесса и современные педагогические методики.",
+          pdf: "/pdf/vestnik-2026-2.pdf"
+        }
+      ]
+    },
+    {
+      year: 2025,
+      issues: [
+        {
+          id: 3,
+          title: "Выпуск 1: Научные исследования в физической культуре",
+          content: "Научные исследования в области физиологии спорта, биохимии мышечной деятельности и психологии спортивных достижений.",
+          pdf: "/pdf/vestnik-2025-1.pdf"
+        },
+        {
+          id: 4,
+          title: "Выпуск 2: Спортивная медицина и реабилитация",
+          content: "Современные подходы в спортивной медицине, реабилитации после травм и профилактике спортивных повреждений.",
+          pdf: "/pdf/vestnik-2025-2.pdf"
+        }
+      ]
+    },
+    {
+      year: 2024,
+      issues: [
+        {
+          id: 5,
+          title: "Выпуск 1: Методология спортивной подготовки",
+          content: "Исследования эффективных методик спортивной подготовки, периодизации тренировок и управления нагрузками.",
+          pdf: "/pdf/vestnik-2024-1.pdf"
+        },
+        {
+          id: 6,
+          title: "Выпуск 2: Питание и биохимия в спорте",
+          content: "Современные подходы к спортивному питанию, биохимические процессы при физических нагрузках и восстановление.",
+          pdf: "/pdf/vestnik-2024-2.pdf"
+        }
+      ]
+    },
+    {
+      year: 2023,
+      issues: [
+        {
+          id: 7,
+          title: "Выпуск 1: Психология спортивных достижений",
+          content: "Исследования психологических факторов, влияющих на спортивные результаты, мотивации и ментальной подготовки.",
+          pdf: "/pdf/vestnik-2023-1.pdf"
+        },
+        {
+          id: 8,
+          title: "Выпуск 2: Спортивный менеджмент и маркетинг",
+          content: "Актуальные вопросы управления спортивными организациями, маркетинга спортивных событий и брендинга.",
+          pdf: "/pdf/vestnik-2023-2.pdf"
+        }
+      ]
+    },
+    {
+      year: 2022,
+      issues: [
+        {
+          id: 9,
+          title: "Выпуск 1: Адаптивная физическая культура",
+          content: "Исследования в области адаптивной физической культуры, реабилитации инвалидов и инклюзивного спорта.",
+          pdf: "/pdf/vestnik-2022-1.pdf"
+        },
+        {
+          id: 10,
+          title: "Выпуск 2: Детско-юношеский спорт",
+          content: "Методики подготовки юных спортсменов, возрастные особенности тренировок и спортивный отбор.",
+          pdf: "/pdf/vestnik-2022-2.pdf"
+        }
+      ]
+    },
+    {
+      year: 2021,
+      issues: [
+        {
+          id: 11,
+          title: "Выпуск 1: Здоровье и фитнес",
+          content: "Исследования влияния физической активности на здоровье, методики фитнес-тренировок и профилактики заболеваний.",
+          pdf: "/pdf/vestnik-2021-1.pdf"
+        },
+        {
+          id: 12,
+          title: "Выпуск 2: Спортивное оборудование и технологии",
+          content: "Инновационное спортивное оборудование, измерительные технологии и приборы для контроля тренировочного процесса.",
+          pdf: "/pdf/vestnik-2021-2.pdf"
+        }
+      ]
+    },
+    {
+      year: 2020,
+      issues: [
+        {
+          id: 13,
+          title: "Выпуск 1: История и философия спорта",
+          content: "Историческое развитие физической культуры, философские аспекты спорта и олимпийского движения.",
+          pdf: "/pdf/vestnik-2020-1.pdf"
+        },
+        {
+          id: 14,
+          title: "Выпуск 2: Социология спорта",
+          content: "Социологические исследования спорта как социального феномена, влияние спорта на общество и культуру.",
+          pdf: "/pdf/vestnik-2020-2.pdf"
+        }
+      ]
+    }
+  ];
+
+  // Функция для обработки клика по году
+  const handleYearClick = (year) => {
+    if (expandedYear === year) {
+      setExpandedYear(null);
+      setSelectedIssue(null);
+      setPdfFile(null);
+    } else {
+      setExpandedYear(year);
+      const yearData = yearsData.find(y => y.year === year);
+      if (yearData && yearData.issues.length > 0) {
+        handleIssueClick(yearData.issues[0]);
+      }
+    }
+  };
+
+  // Функция для обработки клика по выпуску
+  const handleIssueClick = (issue) => {
+    setSelectedIssue(issue);
+    setPdfFile(issue.pdf);
+  };
+
+  if (loading) {
     return (
-      <motion.div
-        key="current"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="text-center py-16 bg-white/5 rounded-2xl border border-white/10"
-      >
-        <div className="text-yellow-400 text-xl mb-2">📰</div>
-        <div className="text-white text-xl mb-2">
-          {t("vestnik.current.noIssue")}
+      <div className="animate-pulse space-y-4">
+        <div className="bg-white/10 rounded-2xl h-8 mb-4"></div>
+        <div className="bg-white/10 rounded-2xl h-4 mb-2"></div>
+        <div className="bg-white/10 rounded-2xl h-4 w-3/4"></div>
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          <div className="bg-white/10 rounded-2xl h-20"></div>
+          <div className="bg-white/10 rounded-2xl h-20"></div>
         </div>
-        <div className="text-blue-200">
-          {t("vestnik.current.noIssueDescription")}
-        </div>
-      </motion.div>
+      </div>
     );
   }
+
+  // Уберите эту проверку или используйте временные данные
+  const displayData = data || {
+    id: 1,
+    title: "Вестник КГА: Современные исследования в физической культуре",
+    volume_number: "15",
+    issue_number: "3",
+    year: "2024",
+    description: "Научный журнал, публикующий актуальные исследования в области физической культуры, спорта и здоровья.",
+    publication_date: "2024-10-15",
+    articles_count: 12,
+    issn_print: "1234-5678",
+    issn_online: "9876-5432",
+    pdf_file: "/pdf/vestnik-current.pdf"
+  };
 
   return (
     <motion.div
@@ -302,114 +382,231 @@ const CurrentIssue = ({ data, loading, t }) => {
       transition={{ duration: 0.3 }}
       className="space-y-8"
     >
-      <div className="flex flex-col lg:flex-row items-start gap-8">
+      <div className="flex flex-col lg:flex-row gap-8">
         <motion.div
-          className="flex-shrink-0"
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.3 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="lg:w-1/4"
         >
-          <div className="relative">
-            <div className="w-48 h-64 bg-gradient-to-br from-blue-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center border-2 border-emerald-400/30 backdrop-blur-sm group">
-              <span className="text-6xl text-emerald-400">📰</span>
+          <div className="bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 p-6 h-full">
+            <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <span className="text-emerald-400">📅</span>
+              {t("vestnik.current.yearsArchive", "Архив по годам")}
+            </h4>
+
+            <div className="space-y-2">
+              {yearsData.map((yearData) => (
+                <div key={yearData.year} className="mb-2">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleYearClick(yearData.year)}
+                    className={`w-full flex justify-between items-center px-4 py-3 rounded-xl transition-all duration-200 ${expandedYear === yearData.year
+                      ? "bg-gradient-to-r from-blue-500/20 to-emerald-500/20 border border-emerald-400/30"
+                      : "bg-white/5 hover:bg-white/10 border border-white/10"
+                      }`}
+                  >
+                    <span className="text-lg font-semibold text-white">
+                      {yearData.year}
+                    </span>
+                    <motion.span
+                      animate={{ rotate: expandedYear === yearData.year ? 45 : 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-2xl font-bold text-emerald-400"
+                    >
+                      {expandedYear === yearData.year ? "−" : "+"}
+                    </motion.span>
+                  </motion.button>
+
+                  <AnimatePresence>
+                    {expandedYear === yearData.year && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-2 ml-4 pl-4 border-l-2 border-emerald-400/30 space-y-2 overflow-hidden"
+                      >
+                        {yearData.issues.map((issue) => (
+                          <motion.button
+                            key={issue.id}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => handleIssueClick(issue)}
+                            className={`w-full text-left px-3 py-2 rounded-lg transition-all ${selectedIssue?.id === issue.id
+                              ? "bg-emerald-500/20 text-white"
+                              : "text-blue-200 hover:bg-white/5"
+                              }`}
+                          >
+                            <div className="text-sm font-medium">{issue.title}</div>
+                            <div className="text-xs opacity-70 mt-1">📄 PDF</div>
+                          </motion.button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
             </div>
-            <motion.div
-              className="absolute -top-3 -right-3 bg-red-500 text-white px-3 py-1 rounded-full font-bold text-xs shadow-lg"
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              {t("vestnik.current.newBadge")}
-            </motion.div>
           </div>
         </motion.div>
 
-        <div className="flex-grow space-y-6">
-          <div className="inline-block px-4 py-2 bg-gradient-to-r from-blue-500 to-emerald-500 text-white rounded-full text-sm font-medium backdrop-blur-sm">
-            {t("vestnik.current.currentIssue")}
-          </div>
-
-          <h3 className="text-3xl lg:text-4xl font-bold text-white">
-            {data.title || 
-             `Вестник том ${data.volume_number || "X"} №${data.issue_number || "X"} (${data.year || "XXXX"})`}
-          </h3>
-
-          <p className="text-blue-100 text-lg leading-relaxed">
-            {data.description || t("vestnik.current.defaultDescription")}
-          </p>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              {
-                value: data.publication_date
-                  ? new Date(data.publication_date).toLocaleDateString()
-                  : data.year || new Date().getFullYear().toString(),
-                label: t("vestnik.current.releaseDate"),
-                color: "blue",
-                icon: "📅",
-              },
-              {
-                value: data.issn_print || data.issn_online || "ISSN",
-                label: "ISSN",
-                color: "green",
-                icon: "🏷️",
-              },
-              {
-                value: data.articles_count?.toString() || "0",
-                label: t("vestnik.current.articlesCount"),
-                color: "purple",
-                icon: "📄",
-              },
-              {
-                value: `${t("vestnik.current.volume")} ${data.volume_number || "X"} ${t("vestnik.current.issue")} ${data.issue_number || "X"}`,
-                label: t("vestnik.current.issueNumber"),
-                color: "orange",
-                icon: "📏",
-              },
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white/5 rounded-xl p-4 text-center backdrop-blur-sm border border-white/10 hover:border-emerald-400/30 transition-all duration-300"
-              >
-                <div className="text-lg mb-1">{stat.icon}</div>
-                <div
-                  className={`text-xl font-bold mb-1 ${
-                    stat.color === "blue"
-                      ? "text-blue-400"
-                      : stat.color === "green"
-                      ? "text-emerald-400"
-                      : stat.color === "purple"
-                      ? "text-purple-400"
-                      : "text-orange-400"
-                  }`}
-                >
-                  {stat.value}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="lg:w-2/4"
+        >
+          <div className="bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 p-6 h-full">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-xl font-bold text-white flex items-center gap-2">
+                <span className="text-emerald-400">📖</span>
+                {selectedIssue ?
+                  t("vestnik.current.issueContent", "Содержание выпуска") :
+                  t("vestnik.current.selectIssue", "Выберите выпуск")}
+              </h4>
+              {selectedIssue && (
+                <div className="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-lg text-sm font-medium">
+                  {t("vestnik.current.selected", "Выбрано")}
                 </div>
-                <div className="text-blue-200 text-sm font-medium">
-                  {stat.label}
+              )}
+            </div>
+
+            {selectedIssue ? (
+              <motion.div
+                key={selectedIssue.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <div>
+                  <h5 className="text-2xl font-bold text-white mb-3">
+                    {selectedIssue.title}
+                  </h5>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm font-medium mb-4">
+                    <span>📅</span>
+                    <span>{expandedYear} {t("vestnik.current.year", "год")}</span>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-xl p-6 border border-emerald-400/20">
+                  <p className="text-blue-100 text-lg leading-relaxed whitespace-pre-line">
+                    {selectedIssue.content}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 rounded-xl p-4 text-center">
+                    <div className="text-2xl mb-2">📊</div>
+                    <div className="text-sm text-blue-200 mb-1">
+                      {t("vestnik.current.pages", "Страниц")}
+                    </div>
+                    <div className="text-xl font-bold text-emerald-400">120</div>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-4 text-center">
+                    <div className="text-2xl mb-2">📈</div>
+                    <div className="text-sm text-blue-200 mb-1">
+                      {t("vestnik.current.citations", "Цитирований")}
+                    </div>
+                    <div className="text-xl font-bold text-emerald-400">45</div>
+                  </div>
                 </div>
               </motion.div>
-            ))}
+            ) : (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4 text-emerald-400 opacity-50">📚</div>
+                <h4 className="text-xl font-semibold text-white mb-2">
+                  {t("vestnik.current.selectIssueTitle", "Выберите выпуск")}
+                </h4>
+                <p className="text-blue-200">
+                  {t("vestnik.current.selectIssueDescription", "Нажмите на выпуск в левой панели, чтобы увидеть его содержимое")}
+                </p>
+              </div>
+            )}
           </div>
+        </motion.div>
 
-          <div className="flex flex-wrap gap-4">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => data.pdf_file && window.open(data.pdf_file, "_blank")}
-              disabled={!data.pdf_file}
-              className={`px-6 py-3 rounded-xl transition-all shadow-lg font-medium flex items-center gap-2 ${
-                data.pdf_file
-                  ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white hover:from-blue-600 hover:to-emerald-600"
-                  : "bg-gray-500 text-gray-300 cursor-not-allowed"
-              }`}
-            >
-              <span>📥</span>
-              <span>{t("vestnik.actions.downloadPDF")}</span>
-            </motion.button>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+          className="lg:w-1/4"
+        >
+          <div className="bg-white/5 rounded-2xl backdrop-blur-sm border border-white/10 p-6 h-full">
+            <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <span className="text-emerald-400">📄</span>
+              {t("vestnik.current.pdfViewer", "Просмотр PDF")}
+            </h4>
+
+            {pdfFile ? (
+              <motion.div
+                key={pdfFile}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="space-y-6"
+              >
+                <div className="relative">
+                  <div className="bg-gradient-to-br from-blue-500/20 to-emerald-500/20 rounded-2xl aspect-[3/4] flex flex-col items-center justify-center border-2 border-emerald-400/30 backdrop-blur-sm">
+                    <div className="text-6xl mb-4 text-emerald-400">📰</div>
+                    <div className="text-white font-bold text-lg text-center px-4">
+                      {selectedIssue?.title}
+                    </div>
+                    <div className="text-blue-200 text-sm mt-2">
+                      {expandedYear} {t("vestnik.current.year", "год")}
+                    </div>
+                  </div>
+                  <div className="absolute -top-2 -right-2 bg-red-500 text-white px-3 py-1 rounded-full font-bold text-xs shadow-lg">
+                    PDF
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-blue-200 text-sm">
+                        {t("vestnik.current.fileSize", "Размер файла")}
+                      </span>
+                      <span className="text-emerald-400 font-bold">5.2 MB</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-blue-200 text-sm">
+                        {t("vestnik.current.pages", "Страниц")}
+                      </span>
+                      <span className="text-emerald-400 font-bold">120</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    
+  
+                
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => window.open(pdfFile, "_blank")}
+                      className="w-full bg-white/10 text-white py-3 rounded-xl font-medium hover:bg-white/20 transition-all border border-white/20 flex items-center justify-center gap-2"
+                    >
+                      <span>👁️</span>
+                      <span>{t("vestnik.actions.preview", "Предпросмотр")}</span>
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4 text-emerald-400 opacity-50">📄</div>
+                <h4 className="text-xl font-semibold text-white mb-2">
+                  {t("vestnik.current.noPdfTitle", "PDF не выбран")}
+                </h4>
+                <p className="text-blue-200">
+                  {t("vestnik.current.noPdfDescription", "Выберите выпуск для просмотра PDF файла")}
+                </p>
+              </div>
+            )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );
@@ -426,7 +623,17 @@ const Archive = ({
   t,
 }) => {
   if (loading) {
-    return <LoadingSkeleton />;
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="bg-white/10 rounded-2xl h-8 mb-4"></div>
+        <div className="bg-white/10 rounded-2xl h-4 mb-2"></div>
+        <div className="bg-white/10 rounded-2xl h-4 w-3/4"></div>
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          <div className="bg-white/10 rounded-2xl h-20"></div>
+          <div className="bg-white/10 rounded-2xl h-20"></div>
+        </div>
+      </div>
+    );
   }
 
   const filteredData = selectedYear === "all"
@@ -447,17 +654,15 @@ const Archive = ({
           {t("vestnik.archive.title")}
         </h3>
 
-        {/* Year Filter */}
         <div className="flex flex-wrap gap-2">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => onYearChange("all")}
-            className={`px-4 py-2 rounded-lg font-medium transition-all backdrop-blur-sm border ${
-              selectedYear === "all"
-                ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-transparent shadow-lg"
-                : "bg-white/5 text-blue-200 border-white/10 hover:border-emerald-400/30"
-            }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-all backdrop-blur-sm border ${selectedYear === "all"
+              ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-transparent shadow-lg"
+              : "bg-white/5 text-blue-200 border-white/10 hover:border-emerald-400/30"
+              }`}
           >
             {t("vestnik.archive.allYears")}
           </motion.button>
@@ -467,11 +672,10 @@ const Archive = ({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => onYearChange(year)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all backdrop-blur-sm border ${
-                selectedYear === year
-                  ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-transparent shadow-lg"
-                  : "bg-white/5 text-blue-200 border-white/10 hover:border-emerald-400/30"
-              }`}
+              className={`px-4 py-2 rounded-lg font-medium transition-all backdrop-blur-sm border ${selectedYear === year
+                ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white border-transparent shadow-lg"
+                : "bg-white/5 text-blue-200 border-white/10 hover:border-emerald-400/30"
+                }`}
             >
               {year}
             </motion.button>
@@ -481,7 +685,6 @@ const Archive = ({
 
       {filteredData.length > 0 ? (
         <>
-          {/* Featured Issue */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -530,7 +733,6 @@ const Archive = ({
             </div>
           </motion.div>
 
-          {/* All Issues Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredData.map((issue, index) => (
               <motion.div
@@ -540,11 +742,10 @@ const Archive = ({
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ scale: 1.02, y: -5 }}
                 onClick={() => onIssueChange(index)}
-                className={`bg-white/5 rounded-2xl p-6 backdrop-blur-sm border transition-all duration-300 cursor-pointer ${
-                  activeIssue === index
-                    ? "border-emerald-400/50 bg-gradient-to-r from-blue-500/10 to-emerald-500/10"
-                    : "border-white/10 hover:border-emerald-400/30"
-                }`}
+                className={`bg-white/5 rounded-2xl p-6 backdrop-blur-sm border transition-all duration-300 cursor-pointer ${activeIssue === index
+                  ? "border-emerald-400/50 bg-gradient-to-r from-blue-500/10 to-emerald-500/10"
+                  : "border-white/10 hover:border-emerald-400/30"
+                  }`}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -559,11 +760,10 @@ const Archive = ({
                     </p>
                   </div>
                   <span
-                    className={`text-2xl transition-all ${
-                      activeIssue === index
-                        ? "text-emerald-400 scale-110"
-                        : "text-blue-400"
-                    }`}
+                    className={`text-2xl transition-all ${activeIssue === index
+                      ? "text-emerald-400 scale-110"
+                      : "text-blue-400"
+                      }`}
                   >
                     📘
                   </span>
@@ -601,11 +801,10 @@ const Archive = ({
                       }
                     }}
                     disabled={!issue.pdf_file}
-                    className={`px-4 py-2 rounded-lg transition-all text-sm font-medium shadow-lg ${
-                      issue.pdf_file
-                        ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white hover:from-blue-600 hover:to-emerald-600"
-                        : "bg-gray-500 text-gray-300 cursor-not-allowed"
-                    }`}
+                    className={`px-4 py-2 rounded-lg transition-all text-sm font-medium shadow-lg ${issue.pdf_file
+                      ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white hover:from-blue-600 hover:to-emerald-600"
+                      : "bg-gray-500 text-gray-300 cursor-not-allowed"
+                      }`}
                   >
                     {t("vestnik.actions.open")}
                   </motion.button>
@@ -635,7 +834,17 @@ const Archive = ({
 
 const Metrics = ({ data, loading, t }) => {
   if (loading) {
-    return <LoadingSkeleton />;
+    return (
+      <div className="animate-pulse space-y-4">
+        <div className="bg-white/10 rounded-2xl h-8 mb-4"></div>
+        <div className="bg-white/10 rounded-2xl h-4 mb-2"></div>
+        <div className="bg-white/10 rounded-2xl h-4 w-3/4"></div>
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          <div className="bg-white/10 rounded-2xl h-20"></div>
+          <div className="bg-white/10 rounded-2xl h-20"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -679,18 +888,5 @@ const Metrics = ({ data, loading, t }) => {
     </motion.div>
   );
 };
-
-// Reuse the LoadingSkeleton component from above
-const LoadingSkeleton = () => (
-  <div className="animate-pulse space-y-4">
-    <div className="bg-white/10 rounded-2xl h-8 mb-4"></div>
-    <div className="bg-white/10 rounded-2xl h-4 mb-2"></div>
-    <div className="bg-white/10 rounded-2xl h-4 w-3/4"></div>
-    <div className="grid grid-cols-2 gap-4 mt-6">
-      <div className="bg-white/10 rounded-2xl h-20"></div>
-      <div className="bg-white/10 rounded-2xl h-20"></div>
-    </div>
-  </div>
-);
 
 export default Vestnik;
