@@ -172,7 +172,22 @@
       "volume": "Том",
       "issue": "Чыгарылыш",
       "issueNumber": "Чыгарылыш номуру",
-      "articles": "макала"
+      "articles": "макала",
+      "yearsArchive": "Жылдар боюнча архив",
+      "issueContent": "Чыгарылыш мазмуну",
+      "selectIssue": "Чыгарылыш тандаңыз",
+      "selected": "Тандалган",
+      "year": "жыл",
+      "pages": "Барактар",
+      "citations": "Цитаталар",
+      "selectIssueTitle": "Чыгарылыш тандаңыз",
+      "selectIssueDescription": "Мазмунун көрүү үчүн сол панелден чыгарылышты басыңыз",
+      "pdfViewer": "PDF көрүүчү",
+      "noPdfTitle": "PDF тандалган жок",
+      "noPdfDescription": "PDF файлын көрүү үчүн чыгарылыш тандаңыз",
+      "fileSize": "Файлдын өлчөмү",
+      "noDataTitle": "Маалыматтар табылган жок",
+      "noDataDescription": "Вестник маалыматтарын жүктөө ийгиликсиз болду"
     },
     "archive": {
       "title": "Чыгарылыштар архиви",
@@ -198,7 +213,8 @@
       "readOnline": "Онлайн окуу",
       "forAuthors": "Авторлор үчүн",
       "openIssue": "Чыгарылышты ачуу",
-      "open": "Ачуу"
+      "open": "Ачуу",
+      "preview": "Алдын ала көрүү"
     }
   },
   "academy": {

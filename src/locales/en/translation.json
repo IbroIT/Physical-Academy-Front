@@ -145,7 +145,22 @@
       "volume": "Volume",
       "issue": "Issue",
       "issueNumber": "Issue Number",
-      "articles": "articles"
+      "articles": "articles",
+      "yearsArchive": "Archive by Years",
+      "issueContent": "Issue Content",
+      "selectIssue": "Select Issue",
+      "selected": "Selected",
+      "year": "year",
+      "pages": "Pages",
+      "citations": "Citations",
+      "selectIssueTitle": "Select Issue",
+      "selectIssueDescription": "Click on an issue in the left panel to see its content",
+      "pdfViewer": "PDF Viewer",
+      "noPdfTitle": "PDF Not Selected",
+      "noPdfDescription": "Select an issue to view the PDF file",
+      "fileSize": "File Size",
+      "noDataTitle": "Data Not Found",
+      "noDataDescription": "Failed to load bulletin data"
     },
     "archive": {
       "title": "Issue Archive",
@@ -171,7 +186,8 @@
       "readOnline": "Read Online",
       "forAuthors": "For Authors",
       "openIssue": "Open Issue",
-      "open": "Open"
+      "open": "Open",
+      "preview": "Preview"
     }
   },
   "academy": {
