@@ -35,41 +35,17 @@ const Vestnik = () => {
       const lang = getApiLanguage();
       const API_URL = import.meta.env.VITE_API_URL;
 
-      const endpoints = [
-        `${API_URL}/api/science/vestnik-stats/?lang=${lang}`,
-        `${API_URL}/api/science/vestnik-issues/?lang=${lang}&is_featured=true`,
-        `${API_URL}/api/science/vestnik-issues/?lang=${lang}&ordering=-publication_date`,
-        `${API_URL}/api/science/vestnik-articles/?lang=${lang}&ordering=-id`
-      ];
-
-      const responses = await Promise.all(
-        endpoints.map(async (url) => {
-          try {
-            const response = await fetch(url);
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-              const text = await response.text();
-              console.warn(`Non-JSON response from ${url}:`, text.substring(0, 200));
-              return { results: [] };
-            }
-
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.json();
-          } catch (error) {
-            console.error(`Error fetching ${url}:`, error);
-            return { results: [] };
-          }
-        })
-      );
+      const response = await fetch(`${API_URL}/api/science/vestnik-page/?lang=${lang}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
 
       setBackendData({
-        stats: responses[0].results || [],
-        featuredIssues: responses[1].results || [],
-        recentIssues: responses[2].results || [],
-        recentArticles: responses[3].results || [],
+        stats: [],
+        featuredIssues: data.results || [],
+        recentIssues: [],
+        recentArticles: [],
         loading: false,
         error: null
       });
@@ -86,7 +62,7 @@ const Vestnik = () => {
 
   useEffect(() => {
     fetchBackendData();
-  }, [fetchBackendData]);
+  }, [fetchBackendData, i18n.language]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -182,9 +158,8 @@ const Vestnik = () => {
             <ErrorMessage onRetry={fetchBackendData} />
           ) : (
             <AnimatePresence mode="wait">
-              {/* Показываем только контент текущего выпуска без переключения между вкладками */}
               <CurrentIssue
-                data={backendData.featuredIssues.length > 0 ? backendData.featuredIssues[0] : null}
+                data={backendData.featuredIssues}
                 loading={backendData.loading}
                 t={t}
               />
@@ -196,132 +171,9 @@ const Vestnik = () => {
   );
 };
 const CurrentIssue = ({ data, loading, t }) => {
-  const [expandedYear, setExpandedYear] = useState(2026);
+  const [expandedYear, setExpandedYear] = useState(null);
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [pdfFile, setPdfFile] = useState(null);
-
-  // Данные для аккордеона годов
-  const yearsData = [
-    {
-      year: 2026,
-      issues: [
-        {
-          id: 1,
-          title: "Выпуск 1: Современные технологии в спорте",
-          content: "Этот выпуск посвящен современным технологиям в спортивной подготовке. Включает статьи о биомеханике, спортивной аналитике и цифровых платформах для тренировок.",
-          pdf: "/pdf/vestnik-2026-1.pdf"
-        },
-        {
-          id: 2,
-          title: "Выпуск 2: Инновации в спортивном образовании",
-          content: "Исследования инновационных подходов в подготовке спортивных специалистов. Цифровизация учебного процесса и современные педагогические методики.",
-          pdf: "/pdf/vestnik-2026-2.pdf"
-        }
-      ]
-    },
-    {
-      year: 2025,
-      issues: [
-        {
-          id: 3,
-          title: "Выпуск 1: Научные исследования в физической культуре",
-          content: "Научные исследования в области физиологии спорта, биохимии мышечной деятельности и психологии спортивных достижений.",
-          pdf: "/pdf/vestnik-2025-1.pdf"
-        },
-        {
-          id: 4,
-          title: "Выпуск 2: Спортивная медицина и реабилитация",
-          content: "Современные подходы в спортивной медицине, реабилитации после травм и профилактике спортивных повреждений.",
-          pdf: "/pdf/vestnik-2025-2.pdf"
-        }
-      ]
-    },
-    {
-      year: 2024,
-      issues: [
-        {
-          id: 5,
-          title: "Выпуск 1: Методология спортивной подготовки",
-          content: "Исследования эффективных методик спортивной подготовки, периодизации тренировок и управления нагрузками.",
-          pdf: "/pdf/vestnik-2024-1.pdf"
-        },
-        {
-          id: 6,
-          title: "Выпуск 2: Питание и биохимия в спорте",
-          content: "Современные подходы к спортивному питанию, биохимические процессы при физических нагрузках и восстановление.",
-          pdf: "/pdf/vestnik-2024-2.pdf"
-        }
-      ]
-    },
-    {
-      year: 2023,
-      issues: [
-        {
-          id: 7,
-          title: "Выпуск 1: Психология спортивных достижений",
-          content: "Исследования психологических факторов, влияющих на спортивные результаты, мотивации и ментальной подготовки.",
-          pdf: "/pdf/vestnik-2023-1.pdf"
-        },
-        {
-          id: 8,
-          title: "Выпуск 2: Спортивный менеджмент и маркетинг",
-          content: "Актуальные вопросы управления спортивными организациями, маркетинга спортивных событий и брендинга.",
-          pdf: "/pdf/vestnik-2023-2.pdf"
-        }
-      ]
-    },
-    {
-      year: 2022,
-      issues: [
-        {
-          id: 9,
-          title: "Выпуск 1: Адаптивная физическая культура",
-          content: "Исследования в области адаптивной физической культуры, реабилитации инвалидов и инклюзивного спорта.",
-          pdf: "/pdf/vestnik-2022-1.pdf"
-        },
-        {
-          id: 10,
-          title: "Выпуск 2: Детско-юношеский спорт",
-          content: "Методики подготовки юных спортсменов, возрастные особенности тренировок и спортивный отбор.",
-          pdf: "/pdf/vestnik-2022-2.pdf"
-        }
-      ]
-    },
-    {
-      year: 2021,
-      issues: [
-        {
-          id: 11,
-          title: "Выпуск 1: Здоровье и фитнес",
-          content: "Исследования влияния физической активности на здоровье, методики фитнес-тренировок и профилактики заболеваний.",
-          pdf: "/pdf/vestnik-2021-1.pdf"
-        },
-        {
-          id: 12,
-          title: "Выпуск 2: Спортивное оборудование и технологии",
-          content: "Инновационное спортивное оборудование, измерительные технологии и приборы для контроля тренировочного процесса.",
-          pdf: "/pdf/vestnik-2021-2.pdf"
-        }
-      ]
-    },
-    {
-      year: 2020,
-      issues: [
-        {
-          id: 13,
-          title: "Выпуск 1: История и философия спорта",
-          content: "Историческое развитие физической культуры, философские аспекты спорта и олимпийского движения.",
-          pdf: "/pdf/vestnik-2020-1.pdf"
-        },
-        {
-          id: 14,
-          title: "Выпуск 2: Социология спорта",
-          content: "Социологические исследования спорта как социального феномена, влияние спорта на общество и культуру.",
-          pdf: "/pdf/vestnik-2020-2.pdf"
-        }
-      ]
-    }
-  ];
 
   // Функция для обработки клика по году
   const handleYearClick = (year) => {
@@ -331,9 +183,9 @@ const CurrentIssue = ({ data, loading, t }) => {
       setPdfFile(null);
     } else {
       setExpandedYear(year);
-      const yearData = yearsData.find(y => y.year === year);
-      if (yearData && yearData.issues.length > 0) {
-        handleIssueClick(yearData.issues[0]);
+      const yearData = data.find(y => y.year === year);
+      if (yearData && yearData.releases.length > 0) {
+        handleIssueClick(yearData.releases[0]);
       }
     }
   };
@@ -358,20 +210,20 @@ const CurrentIssue = ({ data, loading, t }) => {
     );
   }
 
-  // Уберите эту проверку или используйте временные данные
-  const displayData = data || {
-    id: 1,
-    title: "Вестник КГА: Современные исследования в физической культуре",
-    volume_number: "15",
-    issue_number: "3",
-    year: "2024",
-    description: "Научный журнал, публикующий актуальные исследования в области физической культуры, спорта и здоровья.",
-    publication_date: "2024-10-15",
-    articles_count: 12,
-    issn_print: "1234-5678",
-    issn_online: "9876-5432",
-    pdf_file: "/pdf/vestnik-current.pdf"
-  };
+  // Если данных нет, показать сообщение
+  if (!data || data.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-blue-400 text-6xl mb-4">📚</div>
+        <h2 className="text-2xl text-white mb-4">
+          {t('vestnik.current.noDataTitle', 'Данные не найдены')}
+        </h2>
+        <p className="text-blue-200">
+          {t('vestnik.current.noDataDescription', 'Не удалось загрузить данные вестника')}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -396,7 +248,7 @@ const CurrentIssue = ({ data, loading, t }) => {
             </h4>
 
             <div className="space-y-2">
-              {yearsData.map((yearData) => (
+              {data.map((yearData) => (
                 <div key={yearData.year} className="mb-2">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -428,7 +280,7 @@ const CurrentIssue = ({ data, loading, t }) => {
                         transition={{ duration: 0.3 }}
                         className="mt-2 ml-4 pl-4 border-l-2 border-emerald-400/30 space-y-2 overflow-hidden"
                       >
-                        {yearData.issues.map((issue) => (
+                        {yearData.releases.map((issue) => (
                           <motion.button
                             key={issue.id}
                             whileHover={{ scale: 1.02 }}
@@ -485,33 +337,12 @@ const CurrentIssue = ({ data, loading, t }) => {
                   <h5 className="text-2xl font-bold text-white mb-3">
                     {selectedIssue.title}
                   </h5>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 text-blue-300 rounded-lg text-sm font-medium mb-4">
-                    <span>📅</span>
-                    <span>{expandedYear} {t("vestnik.current.year", "год")}</span>
-                  </div>
                 </div>
 
                 <div className="bg-gradient-to-r from-blue-500/10 to-emerald-500/10 rounded-xl p-6 border border-emerald-400/20">
                   <p className="text-blue-100 text-lg leading-relaxed whitespace-pre-line">
-                    {selectedIssue.content}
+                    {selectedIssue.description}
                   </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/5 rounded-xl p-4 text-center">
-                    <div className="text-2xl mb-2">📊</div>
-                    <div className="text-sm text-blue-200 mb-1">
-                      {t("vestnik.current.pages", "Страниц")}
-                    </div>
-                    <div className="text-xl font-bold text-emerald-400">120</div>
-                  </div>
-                  <div className="bg-white/5 rounded-xl p-4 text-center">
-                    <div className="text-2xl mb-2">📈</div>
-                    <div className="text-sm text-blue-200 mb-1">
-                      {t("vestnik.current.citations", "Цитирований")}
-                    </div>
-                    <div className="text-xl font-bold text-emerald-400">45</div>
-                  </div>
                 </div>
               </motion.div>
             ) : (
@@ -563,20 +394,6 @@ const CurrentIssue = ({ data, loading, t }) => {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-white/5 rounded-xl p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-blue-200 text-sm">
-                        {t("vestnik.current.fileSize", "Размер файла")}
-                      </span>
-                      <span className="text-emerald-400 font-bold">5.2 MB</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-blue-200 text-sm">
-                        {t("vestnik.current.pages", "Страниц")}
-                      </span>
-                      <span className="text-emerald-400 font-bold">120</span>
-                    </div>
-                  </div>
 
                   <div className="flex flex-col gap-3">
                     
@@ -588,7 +405,6 @@ const CurrentIssue = ({ data, loading, t }) => {
                       onClick={() => window.open(pdfFile, "_blank")}
                       className="w-full bg-white/10 text-white py-3 rounded-xl font-medium hover:bg-white/20 transition-all border border-white/20 flex items-center justify-center gap-2"
                     >
-                      <span>👁️</span>
                       <span>{t("vestnik.actions.preview", "Предпросмотр")}</span>
                     </motion.button>
                   </div>

@@ -143,15 +143,24 @@
       "articlesCount": "Number of articles",
       "volume": "Volume",
       "issue": "Issue",
+<<<<<<< HEAD
       "issueNumber": "Issue number",
       "articles": "articles",
       "yearsArchive": "Archive by years",
       "issueContent": "Issue contents",
       "selectIssue": "Select issue",
+=======
+      "issueNumber": "Issue Number",
+      "articles": "articles",
+      "yearsArchive": "Archive by Years",
+      "issueContent": "Issue Content",
+      "selectIssue": "Select Issue",
+>>>>>>> e2a62dcf53c633b47667e26b0c3260c72472e4db
       "selected": "Selected",
       "year": "year",
       "pages": "Pages",
       "citations": "Citations",
+<<<<<<< HEAD
       "selectIssueTitle": "Select issue",
       "selectIssueDescription": "Click on an issue in the left panel to see its contents",
       "pdfViewer": "PDF viewer",
@@ -186,6 +195,16 @@
       "issueContent2020_1": "Pedagogical research, educational methods and innovations in teaching.",
       "issueTitle2020_2": "Issue 2: Sociology and psychology",
       "issueContent2020_2": "Sociological and psychological research, study of social behavior and mental health issues."
+=======
+      "selectIssueTitle": "Select Issue",
+      "selectIssueDescription": "Click on an issue in the left panel to see its content",
+      "pdfViewer": "PDF Viewer",
+      "noPdfTitle": "PDF Not Selected",
+      "noPdfDescription": "Select an issue to view the PDF file",
+      "fileSize": "File Size",
+      "noDataTitle": "Data Not Found",
+      "noDataDescription": "Failed to load bulletin data"
+>>>>>>> e2a62dcf53c633b47667e26b0c3260c72472e4db
     },
     "archive": {
       "title": "Issues archive",
@@ -208,9 +227,15 @@
     },
     "actions": {
       "downloadPDF": "Download PDF",
+<<<<<<< HEAD
       "readOnline": "Read online",
       "forAuthors": "For authors",
       "openIssue": "Open issue",
+=======
+      "readOnline": "Read Online",
+      "forAuthors": "For Authors",
+      "openIssue": "Open Issue",
+>>>>>>> e2a62dcf53c633b47667e26b0c3260c72472e4db
       "open": "Open",
       "preview": "Preview"
     }
