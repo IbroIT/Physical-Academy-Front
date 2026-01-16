@@ -125,53 +125,94 @@
     }
   },
   "vestnik": {
-    "errorTitle": "Data Loading Error",
+    "errorTitle": "Error loading data",
     "retry": "Retry",
     "title": "Bulletin",
-    "subtitle": "Advanced Research in Physical Culture and Sports",
+    "subtitle": "Advanced research in physical culture and sports",
     "views": {
-      "current": "Current Issue",
+      "current": "Current issue",
       "archive": "Archive",
       "metrics": "Metrics"
     },
     "current": {
-      "noIssue": "Issue Not Found",
+      "noIssue": "Issue not found",
       "noIssueDescription": "There is currently no active issue",
       "newBadge": "NEW",
-      "currentIssue": "CURRENT ISSUE",
       "defaultDescription": "Scientific journal with latest research and publications in physical culture, sports and health",
-      "releaseDate": "Release Date",
-      "articlesCount": "Number of Articles",
+      "releaseDate": "Release date",
+      "articlesCount": "Number of articles",
       "volume": "Volume",
       "issue": "Issue",
-      "issueNumber": "Issue Number",
-      "articles": "articles"
+      "issueNumber": "Issue number",
+      "articles": "articles",
+      "yearsArchive": "Archive by years",
+      "issueContent": "Issue contents",
+      "selectIssue": "Select issue",
+      "selected": "Selected",
+      "year": "year",
+      "pages": "Pages",
+      "citations": "Citations",
+      "selectIssueTitle": "Select issue",
+      "selectIssueDescription": "Click on an issue in the left panel to see its contents",
+      "pdfViewer": "PDF viewer",
+      "noPdfTitle": "PDF not selected",
+      "noPdfDescription": "Select an issue to view PDF file",
+      "fileSize": "File size",
+      "issueTitle2026_1": "Issue 1: Modern technologies",
+      "issueContent2026_1": "This issue is dedicated to modern technologies and their applications in various spheres of life. Includes articles about artificial intelligence, blockchain and robotics.",
+      "issueTitle2026_2": "Issue 2: Innovations in education",
+      "issueContent2026_2": "The issue contains research on innovative approaches in education, digitalization of the learning process and modern pedagogical methods.",
+      "issueTitle2025_1": "Issue 1: Scientific research",
+      "issueContent2025_1": "Scientific research in physics, chemistry and biology. Articles cover latest discoveries and developments.",
+      "issueTitle2025_2": "Issue 2: Medical innovations",
+      "issueContent2025_2": "Modern medical technologies, pharmaceutical developments and new treatment methods.",
+      "issueTitle2024_1": "Issue 1: Economic research",
+      "issueContent2024_1": "Research in economics, finance and business management. Analysis of market trends and economic development.",
+      "issueTitle2024_2": "Issue 2: Ecology and sustainable development",
+      "issueContent2024_2": "Environmental issues, sustainable development strategies and conservation of natural resources.",
+      "issueTitle2023_1": "Issue 1: Artificial intelligence",
+      "issueContent2023_1": "Development of artificial intelligence, machine learning algorithms and their practical applications.",
+      "issueTitle2023_2": "Issue 2: Cybersecurity",
+      "issueContent2023_2": "Current issues in cybersecurity, data protection and information security technologies.",
+      "issueTitle2022_1": "Issue 1: Humanities",
+      "issueContent2022_1": "Research in history, philosophy, cultural studies and social sciences.",
+      "issueTitle2022_2": "Issue 2: Legal research",
+      "issueContent2022_2": "Analysis of legal issues, legislative developments and judicial practice.",
+      "issueTitle2021_1": "Issue 1: Agricultural sciences",
+      "issueContent2021_1": "Research in agriculture, agro-technologies and food security issues.",
+      "issueTitle2021_2": "Issue 2: Engineering and technological sciences",
+      "issueContent2021_2": "Engineering developments, technological innovations and industrial applications.",
+      "issueTitle2020_1": "Issue 1: Education and pedagogy",
+      "issueContent2020_1": "Pedagogical research, educational methods and innovations in teaching.",
+      "issueTitle2020_2": "Issue 2: Sociology and psychology",
+      "issueContent2020_2": "Sociological and psychological research, study of social behavior and mental health issues."
     },
     "archive": {
-      "title": "Issue Archive",
-      "allYears": "All Years",
+      "title": "Issues archive",
+      "allYears": "All years",
       "vestnik": "Bulletin",
       "noIssues": {
-        "title": "No Issues Found",
+        "title": "Issues not found",
         "description": "Try selecting another year to view"
       }
     },
     "metrics": {
-      "title": "Journal Metrics",
+      "title": "Journal metrics",
       "noData": "Metrics data unavailable",
       "about": {
-        "title": "About Journal Metrics",
-        "description": "Our metrics reflect the quality and impact of the journal in the scientific community. We continuously work to improve indicators and raise publication standards.",
+        "title": "About journal metrics",
+        "description": "Our metrics reflect the quality and impact of the journal in the scientific community. We constantly work on improving indicators and raising publication standards.",
         "learnMore": "Learn more about metrics",
-        "journalPolicy": "Journal Policy"
+        "journalPolicy": "Journal policy"
       }
     },
     "actions": {
       "downloadPDF": "Download PDF",
-      "readOnline": "Read Online",
-      "forAuthors": "For Authors",
-      "openIssue": "Open Issue",
-      "open": "Open"
+      "readOnline": "Read online",
+      "forAuthors": "For authors",
+      "openIssue": "Open issue",
+      "open": "Open",
+      "preview": "Preview"
     }
   },
   "academy": {
@@ -9338,5 +9379,73 @@
         "pedagogyDesc": "Sports pedagogy and psychology"
       }
     }
+  },
+  "departmentTabs": {
+    "title": "Departments",
+    "description": "Information about the departments of our educational institution",
+    "content": {
+      "about": "About the Department",
+      "mission": "Mission",
+      "strategy": "Strategy",
+      "leadership": "Leadership",
+      "teachers": "Teaching Staff",
+      "specializations": "Specializations",
+      "photo_gallery": "Photo Gallery"
+    },
+    "tabs": {
+      "general_info": "General Information",
+      "mission_strategy": "Mission and Strategy",
+      "leadership": "Leadership",
+      "teachers": "Teaching Staff",
+      "specializations": "Specializations",
+      "photo_gallery": "Photo Gallery"
+    },
+    "leadership": {
+      "title": "Department Leadership",
+      "description": "Highly qualified specialists ensuring the educational process"
+    },
+    "teachers": {
+      "title": "Teaching Staff",
+      "description": "Highly qualified teachers with many years of experience",
+      "subjects": "Subjects Taught",
+      "achievements": "Achievements",
+      "experience": "Work Experience",
+      "education": "Education"
+    },
+    "mission": {
+      "title": "Mission and Strategy",
+      "mission_text": "Training highly qualified specialists in the field of physical culture and sports who can contribute to the development of a healthy society through education, scientific research and professional activities.",
+      "strategy_title": "Strategic Goals",
+      "goals": [
+        "Providing quality education in accordance with international standards",
+        "Development of scientific research in the field of physical culture and sports",
+        "Training specialists who meet modern labor market requirements",
+        "Creating conditions for comprehensive personal development of students",
+        "Strengthening material and technical base and infrastructure",
+        "Development of international cooperation and academic mobility"
+      ],
+      "strategy_text": "Our strategy is aimed at creating an educational environment that stimulates innovation, critical thinking and professional growth."
+    },
+    "messages": {
+      "loading": "Loading...",
+      "loading_departments": "Loading departments...",
+      "loading_department": "Loading department information...",
+      "no_data": "No data available",
+      "no_info": "Information will be added soon",
+      "error": "Error loading data",
+      "view_pdf": "View PDF Document",
+      "open_new_tab": "Open in new tab",
+      "click_to_view": "Click to view",
+      "updated_annually": "Document updated annually",
+      "download_pdf": "Download PDF",
+      "view_resume": "View Resume"
+    },
+    "pdf_modal": {
+      "title": "PDF Document: Mission and Strategy"
+    }
+  },
+  "collegeSports": {
+    "title": "Faculty Departments",
+    "description": "Explore information about our departments, teaching staff and educational programs"
   }
 }
