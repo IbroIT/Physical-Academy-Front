@@ -143,59 +143,15 @@
       "articlesCount": "Number of articles",
       "volume": "Volume",
       "issue": "Issue",
-<<<<<<< HEAD
-      "issueNumber": "Issue number",
-      "articles": "articles",
-      "yearsArchive": "Archive by years",
-      "issueContent": "Issue contents",
-      "selectIssue": "Select issue",
-=======
       "issueNumber": "Issue Number",
       "articles": "articles",
       "yearsArchive": "Archive by Years",
       "issueContent": "Issue Content",
       "selectIssue": "Select Issue",
->>>>>>> e2a62dcf53c633b47667e26b0c3260c72472e4db
       "selected": "Selected",
       "year": "year",
       "pages": "Pages",
       "citations": "Citations",
-<<<<<<< HEAD
-      "selectIssueTitle": "Select issue",
-      "selectIssueDescription": "Click on an issue in the left panel to see its contents",
-      "pdfViewer": "PDF viewer",
-      "noPdfTitle": "PDF not selected",
-      "noPdfDescription": "Select an issue to view PDF file",
-      "fileSize": "File size",
-      "issueTitle2026_1": "Issue 1: Modern technologies",
-      "issueContent2026_1": "This issue is dedicated to modern technologies and their applications in various spheres of life. Includes articles about artificial intelligence, blockchain and robotics.",
-      "issueTitle2026_2": "Issue 2: Innovations in education",
-      "issueContent2026_2": "The issue contains research on innovative approaches in education, digitalization of the learning process and modern pedagogical methods.",
-      "issueTitle2025_1": "Issue 1: Scientific research",
-      "issueContent2025_1": "Scientific research in physics, chemistry and biology. Articles cover latest discoveries and developments.",
-      "issueTitle2025_2": "Issue 2: Medical innovations",
-      "issueContent2025_2": "Modern medical technologies, pharmaceutical developments and new treatment methods.",
-      "issueTitle2024_1": "Issue 1: Economic research",
-      "issueContent2024_1": "Research in economics, finance and business management. Analysis of market trends and economic development.",
-      "issueTitle2024_2": "Issue 2: Ecology and sustainable development",
-      "issueContent2024_2": "Environmental issues, sustainable development strategies and conservation of natural resources.",
-      "issueTitle2023_1": "Issue 1: Artificial intelligence",
-      "issueContent2023_1": "Development of artificial intelligence, machine learning algorithms and their practical applications.",
-      "issueTitle2023_2": "Issue 2: Cybersecurity",
-      "issueContent2023_2": "Current issues in cybersecurity, data protection and information security technologies.",
-      "issueTitle2022_1": "Issue 1: Humanities",
-      "issueContent2022_1": "Research in history, philosophy, cultural studies and social sciences.",
-      "issueTitle2022_2": "Issue 2: Legal research",
-      "issueContent2022_2": "Analysis of legal issues, legislative developments and judicial practice.",
-      "issueTitle2021_1": "Issue 1: Agricultural sciences",
-      "issueContent2021_1": "Research in agriculture, agro-technologies and food security issues.",
-      "issueTitle2021_2": "Issue 2: Engineering and technological sciences",
-      "issueContent2021_2": "Engineering developments, technological innovations and industrial applications.",
-      "issueTitle2020_1": "Issue 1: Education and pedagogy",
-      "issueContent2020_1": "Pedagogical research, educational methods and innovations in teaching.",
-      "issueTitle2020_2": "Issue 2: Sociology and psychology",
-      "issueContent2020_2": "Sociological and psychological research, study of social behavior and mental health issues."
-=======
       "selectIssueTitle": "Select Issue",
       "selectIssueDescription": "Click on an issue in the left panel to see its content",
       "pdfViewer": "PDF Viewer",
@@ -204,7 +160,6 @@
       "fileSize": "File Size",
       "noDataTitle": "Data Not Found",
       "noDataDescription": "Failed to load bulletin data"
->>>>>>> e2a62dcf53c633b47667e26b0c3260c72472e4db
     },
     "archive": {
       "title": "Issues archive",
@@ -227,15 +182,9 @@
     },
     "actions": {
       "downloadPDF": "Download PDF",
-<<<<<<< HEAD
-      "readOnline": "Read online",
-      "forAuthors": "For authors",
-      "openIssue": "Open issue",
-=======
       "readOnline": "Read Online",
       "forAuthors": "For Authors",
       "openIssue": "Open Issue",
->>>>>>> e2a62dcf53c633b47667e26b0c3260c72472e4db
       "open": "Open",
       "preview": "Preview"
     }
