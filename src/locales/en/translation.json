@@ -564,23 +564,18 @@
     }
   },
   "accreditation": {
-    "title": "Accreditations",
-    "subtitle": "International and national accreditations confirming the quality of education",
-    "totalAccreditations": "Total Accreditations",
-    "international": "International",
-    "all": "All",
-    "validity": "Validity Period",
-    "certificateNumber": "Certificate Number",
-    "showMore": "Show More",
-    "showLess": "Show Less",
-    "fullDescription": "Full Description",
-    "type": "Accreditation Type",
-    "certificate": "Certificate",
-    "noAccreditations": "No accreditations available",
-    "noAccreditationsDescription": "There are no accreditations at the moment",
-    "noFilteredAccreditations": "No accreditations found for the selected filter",
-    "errorTitle": "Failed to load data",
-    "retry": "Try Again"
+    "title": "Accreditation and Licensing",
+    "subtitle": "Documents confirming the academy's compliance with state and international education quality standards",
+    "loading": "Loading documents...",
+    "errorTitle": "Error loading data",
+    "retryButton": "Try again",
+    "pdfDocument": "PDF Document",
+    "clickToView": "Click to view",
+    "noDocuments": "No documents found",
+    "noDocumentsDescription": "Accreditation documents are currently unavailable",
+    "selected": "Selected",
+    "clickToViewPdf": "Click to view PDF document",
+    "viewPdf": "View PDF"
   },
   "academicStructure": {
     "title": "Academic Structure",
@@ -5984,6 +5979,7 @@
     "loading": "Loading...",
     "error": "Error Occurred",
     "success": "Success",
+    "viewPdf": "View PDF",
     "errors": {
       "apiError": "Error loading data from the server. Please try again later."
     }

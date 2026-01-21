@@ -1,23 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const Accreditation = () => {
   const { t, i18n } = useTranslation();
-  const [activeAccreditation, setActiveAccreditation] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [expandedAccreditation, setExpandedAccreditation] = useState(null);
-  const [selectedType, setSelectedType] = useState('all');
-  const API_URL = import.meta.env.VITE_API_URL;
-
-  // Состояния для данных с бэкенда
-  const [backendData, setBackendData] = useState({
-    accreditations: [],
-    loading: false,
-    error: null
-  });
-  
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sectionRef = useRef(null);
+  
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // Получение текущего языка для API
   const getApiLanguage = useCallback(() => {
@@ -29,45 +23,33 @@ const Accreditation = () => {
     return langMap[i18n.language] || 'ru';
   }, [i18n.language]);
 
-  // Функция для загрузки данных с бэкенда
-  const fetchBackendData = useCallback(async () => {
+  // Загрузка данных с API
+  const fetchDocuments = useCallback(async () => {
     try {
-      setBackendData(prev => ({ 
-        ...prev, 
-        loading: true, 
-        error: null 
-      }));
+      setLoading(true);
+      setError(null);
       
       const lang = getApiLanguage();
       const response = await fetch(`${API_URL}/api/academy/accreditations/?lang=${lang}`);
-
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
-      
-      setBackendData({
-        accreditations: data.results || [],
-        loading: false,
-        error: null
-      });
-
+      setDocuments(data.results || []);
     } catch (error) {
       console.error('Error fetching accreditation data:', error);
-      setBackendData(prev => ({
-        ...prev,
-        loading: false,
-        error: error.message
-      }));
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
-  }, [getApiLanguage]);
+  }, [API_URL, getApiLanguage]);
 
   // Загрузка данных при монтировании и изменении языка
   useEffect(() => {
-    fetchBackendData();
-  }, [fetchBackendData]);
+    fetchDocuments();
+  }, [fetchDocuments]);
 
   // Intersection Observer для анимаций
   useEffect(() => {
@@ -83,90 +65,76 @@ const Accreditation = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Автопереключение аккредитаций
-  useEffect(() => {
-    const filteredAccreditations = getFilteredAccreditations();
-    if (filteredAccreditations.length > 1) {
-      const interval = setInterval(() => {
-        setActiveAccreditation(prev => (prev + 1) % filteredAccreditations.length);
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [backendData.accreditations, selectedType]);
-
-  const toggleAccreditation = (index) => {
-    setExpandedAccreditation(expandedAccreditation === index ? null : index);
+  const handleDocumentClick = (document) => {
+    setSelectedDocument(document);
   };
 
-  // Получение уникальных типов аккредитаций
-  const getAccreditationTypes = () => {
-    const types = backendData.accreditations.map(acc => acc.accreditation_type?.name).filter(Boolean);
-    return ['all', ...new Set(types)];
-  };
-
-  // Фильтрация аккредитаций по типу
-  const getFilteredAccreditations = () => {
-    if (selectedType === 'all') {
-      return backendData.accreditations;
+  const handleViewPDF = () => {
+    if (selectedDocument?.pdf) {
+      window.open(selectedDocument.pdf, '_blank');
     }
-    return backendData.accreditations.filter(acc => acc.accreditation_type?.name === selectedType);
   };
 
   // Компонент загрузки
-  const LoadingSkeleton = () => (
-    <div className="animate-pulse space-y-6">
-      <div className="bg-white/10 rounded-2xl h-8 mb-4"></div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map((item) => (
-          <div key={item} className="bg-white/5 rounded-3xl p-6 space-y-4">
-            <div className="bg-white/10 rounded-2xl h-48"></div>
-            <div className="bg-white/10 rounded-2xl h-4"></div>
-            <div className="bg-white/10 rounded-2xl h-4 w-3/4"></div>
-          </div>
-        ))}
-      </div>
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center py-16">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <p className="ml-4 text-blue-200">{t('accreditation.loading')}</p>
     </div>
   );
 
   // Компонент ошибки
-  const ErrorMessage = ({ onRetry }) => (
+  const ErrorMessage = () => (
     <div className="text-center py-12">
       <div className="text-red-400 text-6xl mb-4">⚠️</div>
-      <h2 className="text-2xl text-white mb-4">
-        {t('accreditation.errorTitle')}
-      </h2>
-      <p className="text-blue-200 mb-6">
-        {backendData.error}
-      </p>
+      <h3 className="text-xl text-white mb-4">{t('accreditation.errorTitle')}</h3>
+      <p className="text-blue-200 mb-6">{error}</p>
       <button
-        onClick={onRetry}
-        className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+        onClick={fetchDocuments}
+        className="px-6 py-3 bg-gradient-to-r from-blue-500 to-emerald-500 text-white rounded-xl hover:shadow-lg transition-all duration-300"
       >
-        {t('accreditation.retry')}
+        {t('accreditation.retryButton')}
       </button>
     </div>
   );
 
-  // Функция для получения иконки типа аккредитации
-  const getAccreditationIcon = (typeName) => {
-    const iconMap = {
-      'международный': '🌍',
-      'национальный': '🇰🇬',
-      'региональный': '🏛️',
-      'default': '🏅'
-    };
+  // Функция для получения подходящей иконки для каждого документа
+  const getDocumentIcon = (document) => {
+    // Определяем тип документа по названию
+    const name = document.name?.toLowerCase() || '';
     
-    // Поиск по ключам (частичное совпадение)
-    for (const [key, icon] of Object.entries(iconMap)) {
-      if (typeName?.toLowerCase().includes(key)) {
-        return icon;
-      }
+    if (name.includes('лицензи') || name.includes('license')) {
+      return (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M9,12L11,14L15,10L13,8L11,10L9,8V12M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>
+        </svg>
+      );
+    } else if (name.includes('аккредитац') || name.includes('accreditation')) {
+      return (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      );
+    } else if (name.includes('iso') || name.includes('сертификат') || name.includes('certificate')) {
+      return (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z"/>
+        </svg>
+      );
+    } else if (name.includes('член') || name.includes('member') || name.includes('международн') || name.includes('international')) {
+      return (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z"/>
+        </svg>
+      );
+    } else {
+      return (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+        </svg>
+      );
     }
-    return iconMap.default;
   };
-
-  const filteredAccreditations = getFilteredAccreditations();
-  const accreditationTypes = getAccreditationTypes();
 
   return (
     <section 
@@ -180,10 +148,26 @@ const Accreditation = () => {
         <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
         
         {/* Символы аккредитации */}
-        <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">🏅</div>
-        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">📜</div>
-        <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">⭐</div>
-        <div className="absolute top-1/3 left-1/3 text-5xl opacity-5">🌍</div>
+        <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">
+          <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">
+          <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+          </svg>
+        </div>
+        <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">
+          <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+        <div className="absolute top-1/3 left-1/3 text-5xl opacity-5">
+          <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z"/>
+          </svg>
+        </div>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
@@ -203,285 +187,140 @@ const Accreditation = () => {
           </p>
         </motion.div>
 
-        {backendData.error ? (
-          <ErrorMessage onRetry={fetchBackendData} />
+        {/* Список документов */}
+        {loading ? (
+          <LoadingSpinner />
+        ) : error ? (
+          <ErrorMessage />
         ) : (
-          <>
-            {/* Фильтры по типам */}
-            {accreditationTypes.length > 1 && (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="flex justify-center mb-8 lg:mb-12"
-              >
-                <div className="bg-white/5 rounded-2xl p-2 backdrop-blur-lg border border-white/20 shadow-2xl">
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {accreditationTypes.map((type) => (
-                      <motion.button
-                        key={type}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => {
-                          setSelectedType(type);
-                          setActiveAccreditation(0);
-                        }}
-                        className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
-                          selectedType === type
-                            ? 'bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-lg'
-                            : 'text-blue-200 hover:text-white hover:bg-white/10'
-                        }`}
-                      >
-                        <span className="text-lg">
-                          {type === 'all' ? '📋' : getAccreditationIcon(type)}
-                        </span>
-                        <span>
-                          {type === 'all' 
-                            ? t('accreditation.all') 
-                            : type
-                          }
-                        </span>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Активная аккредитация */}
-            {filteredAccreditations.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={isVisible ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="mb-12 lg:mb-16"
-              >
-                <motion.div
-                  key={activeAccreditation}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-white/20"
-                >
-                  <div className="flex flex-col lg:flex-row gap-8 items-center">
-                    {/* Фото аккредитации */}
-                    <div className="flex-shrink-0 w-full lg:w-96">
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className="relative rounded-2xl overflow-hidden shadow-2xl"
-                      >
-                        <img
-                          src={filteredAccreditations[activeAccreditation]?.photo}
-                          alt={filteredAccreditations[activeAccreditation]?.organization}
-                          className="w-full h-64 lg:h-80 object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                        {filteredAccreditations[activeAccreditation]?.logo && (
-                          <div className="absolute bottom-4 right-4 w-16 h-16 bg-white rounded-xl p-2 shadow-lg">
-                            <img
-                              src={filteredAccreditations[activeAccreditation]?.logo}
-                              alt="Logo"
-                              className="w-full h-full object-contain"
-                            />
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="max-w-4xl mx-auto"
+          >
+            {documents.length > 0 ? (
+              <div className="space-y-6">
+                {documents.map((document, index) => (
+                  <motion.div
+                    key={document.id || index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`bg-white/5 rounded-3xl backdrop-blur-sm border transition-all duration-300 overflow-hidden cursor-pointer ${
+                      selectedDocument?.id === document.id
+                        ? 'bg-white/10 border-emerald-400/50 shadow-2xl transform scale-[1.02]'
+                        : 'border-white/10 hover:bg-white/10 hover:border-emerald-400/30 hover:transform hover:scale-[1.01]'
+                    }`}
+                    onClick={() => handleDocumentClick(document)}
+                    whileHover={{ scale: 1.01 }}
+                  >
+                    <div className="p-6 lg:p-8">
+                      <div className="flex items-start space-x-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-xl flex items-center justify-center text-white">
+                            {getDocumentIcon(document)}
                           </div>
-                        )}
-                      </motion.div>
-                    </div>
-
-                    {/* Информация об аккредитации */}
-                    <div className="flex-1 text-center lg:text-left">
-                      <div className="flex items-center justify-center lg:justify-start space-x-3 mb-4">
-                        <span className="text-2xl">
-                          {getAccreditationIcon(filteredAccreditations[activeAccreditation]?.accreditation_type?.name)}
-                        </span>
-                        <span className="bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-sm font-semibold">
-                          {filteredAccreditations[activeAccreditation]?.accreditation_type?.name}
-                        </span>
-                      </div>
-                      
-                      <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-                        {filteredAccreditations[activeAccreditation]?.organization}
-                      </h3>
-                      
-                      <p className="text-blue-200 mb-6 leading-relaxed">
-                        {filteredAccreditations[activeAccreditation]?.description}
-                      </p>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                          <h4 className="font-bold text-blue-300 mb-2 text-sm">
-                            {t('accreditation.validity')}
-                          </h4>
-                          <p className="text-white font-semibold">
-                            {filteredAccreditations[activeAccreditation]?.validity}
-                          </p>
                         </div>
-                        <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                          <h4 className="font-bold text-emerald-300 mb-2 text-sm">
-                            {t('accreditation.certificateNumber')}
-                          </h4>
-                          <p className="text-white font-semibold font-mono">
-                            {filteredAccreditations[activeAccreditation]?.certificate_number}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-
-            {/* Все аккредитации */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.7 }}
-            >
-              {backendData.loading ? (
-                <LoadingSkeleton />
-              ) : filteredAccreditations.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                  {filteredAccreditations.map((accreditation, index) => (
-                    <motion.div
-                      key={accreditation.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className={`bg-white/5 rounded-3xl backdrop-blur-sm border cursor-pointer transition-all duration-300 overflow-hidden ${
-                        activeAccreditation === index
-                          ? 'bg-white/10 border-emerald-400/50 shadow-2xl'
-                          : 'border-white/10 hover:bg-white/10 hover:border-emerald-400/30'
-                      }`}
-                      onClick={() => {
-                        setActiveAccreditation(index);
-                        setExpandedAccreditation(expandedAccreditation === index ? null : index);
-                      }}
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      {/* Карточка аккредитации */}
-                      <div className="relative">
-                        <img
-                          src={accreditation.photo}
-                          alt={accreditation.organization}
-                          className="w-full h-48 object-cover"
-                        />
-                        <div className="absolute top-4 left-4 bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center space-x-2">
-                          <span>{getAccreditationIcon(accreditation.accreditation_type?.name)}</span>
-                          <span>{accreditation.accreditation_type?.name}</span>
-                        </div>
-                        {accreditation.logo && (
-                          <div className="absolute bottom-4 right-4 w-12 h-12 bg-white rounded-lg p-1 shadow-lg">
-                            <img
-                              src={accreditation.logo}
-                              alt="Logo"
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="p-6">
-                        <h4 className="font-bold text-white text-lg mb-3 line-clamp-2">
-                          {accreditation.organization}
-                        </h4>
                         
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-emerald-300 text-sm font-semibold">
-                            {accreditation.validity}
-                          </span>
-                          <span className="text-blue-300 text-xs font-mono bg-white/10 px-2 py-1 rounded">
-                            #{accreditation.certificate_number}
-                          </span>
-                        </div>
-
-                        <p className="text-blue-200 text-sm line-clamp-3 mb-4">
-                          {accreditation.description}
-                        </p>
-
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleAccreditation(index);
-                          }}
-                          className="w-full flex items-center justify-center space-x-2 py-2 bg-white/5 rounded-xl border border-white/10 hover:border-emerald-400/30 transition-all duration-300"
-                        >
-                          <span className="text-blue-300 text-sm">
-                            {expandedAccreditation === index 
-                              ? t('accreditation.showLess') 
-                              : t('accreditation.showMore')
-                            }
-                          </span>
-                          <svg
-                            className={`w-4 h-4 text-blue-300 transition-transform duration-300 ${
-                              expandedAccreditation === index ? 'rotate-180' : ''
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </button>
-                      </div>
-
-                      {/* Раскрывающаяся детальная информация */}
-                      <AnimatePresence>
-                        {expandedAccreditation === index && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <div className="px-6 pb-6 border-t border-white/10 pt-4">
-                              <div className="space-y-4">
-                                <div>
-                                  <h5 className="font-semibold text-white mb-2">
-                                    {t('accreditation.fullDescription')}
-                                  </h5>
-                                  <p className="text-blue-100 text-sm leading-relaxed">
-                                    {accreditation.description}
-                                  </p>
-                                </div>
-                                
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  <div className="bg-white/5 rounded-xl p-3">
-                                    <p className="text-blue-300 mb-1">{t('accreditation.type')}</p>
-                                    <p className="text-white font-semibold">
-                                      {accreditation.accreditation_type?.name}
-                                    </p>
-                                  </div>
-                                  <div className="bg-white/5 rounded-xl p-3">
-                                    <p className="text-emerald-300 mb-1">{t('accreditation.certificate')}</p>
-                                    <p className="text-white font-semibold font-mono">
-                                      {accreditation.certificate_number}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg lg:text-xl font-bold text-white mb-3 leading-tight">
+                            {document.name}
+                          </h3>
+                          
+                          <div 
+                            className="text-blue-200 text-sm lg:text-base leading-relaxed prose prose-invert max-w-none [&>strong]:text-white [&>strong]:font-semibold [&>em]:text-blue-100 [&>p]:mb-2 [&>ul]:list-disc [&>ul]:ml-4 [&>ol]:list-decimal [&>ol]:ml-4 [&>li]:mb-1"
+                            dangerouslySetInnerHTML={{ __html: document.description }}
+                          />
+                          
+                          <div className="mt-4 flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs text-emerald-300 bg-emerald-500/20 px-2 py-1 rounded-full">
+                                {t('accreditation.pdfDocument')}
+                              </span>
                             </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  ))}
+                            
+                            <div className="flex items-center space-x-2 text-blue-300 text-sm">
+                              <span>{t('accreditation.clickToView')}</span>
+                              <svg 
+                                className="w-4 h-4" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4 text-blue-300">📄</div>
+                <h3 className="text-xl text-white mb-2">{t('accreditation.noDocuments')}</h3>
+                <p className="text-blue-200">{t('accreditation.noDocumentsDescription')}</p>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Кнопка просмотра PDF */}
+        {selectedDocument && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50"
+          >
+            <div className="bg-gradient-to-r from-blue-500 to-emerald-500 rounded-2xl p-1 shadow-2xl">
+              <div className="bg-slate-900/90 rounded-xl px-6 py-4 backdrop-blur-sm">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-1">
+                    <p className="text-white font-semibold text-sm">
+                      {t('accreditation.selected')}: {selectedDocument.name}
+                    </p>
+                    <p className="text-blue-200 text-xs">
+                      {t('accreditation.clickToViewPdf')}
+                    </p>
+                  </div>
+                  
+                  <button
+                    onClick={handleViewPDF}
+                    className="bg-gradient-to-r from-blue-500 to-emerald-500 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                  >
+                    <svg 
+                      className="w-5 h-5" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>{t('accreditation.viewPdf')}</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setSelectedDocument(null)}
+                    className="text-gray-400 hover:text-white transition-colors p-2"
+                  >
+                    <svg 
+                      className="w-5 h-5" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4 text-blue-300">🏅</div>
-                  <h3 className="text-xl text-white mb-2">
-                    {t('accreditation.noAccreditations')}
-                  </h3>
-                  <p className="text-blue-200">
-                    {selectedType === 'all' 
-                      ? t('accreditation.noAccreditationsDescription')
-                      : t('accreditation.noFilteredAccreditations')
-                    }
-                  </p>
-                </div>
-              )}
-            </motion.div>
-          </>
+              </div>
+            </div>
+          </motion.div>
         )}
       </div>
     </section>
