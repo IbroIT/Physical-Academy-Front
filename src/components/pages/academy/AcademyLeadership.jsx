@@ -1,616 +1,254 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useLeadership, useDirectors } from "../../../hooks/useApi";
-import {
-  PageLoading,
-  ErrorDisplay,
-  EmptyState,
-  CardSkeleton,
-} from "../../common/Loading";
+import apiService from "../../../services/api";
 
 const AcademyLeadership = () => {
-  const { t } = useTranslation();
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [selectedType, setSelectedType] = useState("");
-  const [expandedCard, setExpandedCard] = useState(null);
+  const { t, i18n } = useTranslation();
+  const [leadership, setLeadership] = useState([]);
+  const [selectedPosition, setSelectedPosition] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
-  const [counterValues, setCounterValues] = useState([0, 0, 0, 0]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sectionRef = useRef(null);
-  const hasAnimated = useRef(false);
 
-  // API hooks
-  const filters = selectedType ? { leadership_type: selectedType } : {};
-  const { leadership, loading, error, refetch } = useLeadership(filters);
-  const { data: directors, loading: directorsLoading } = useDirectors();
+  // Fetch leadership data from API
+  useEffect(() => {
+    const fetchLeadership = async () => {
+      try {
+        setLoading(true);
+        const lang = i18n.language;
 
-  const categories = [
-    {
-      key: "all",
-      icon: "👥",
-      apiFilter: "",
-      color: "from-blue-500 to-blue-600",
-    },
-    {
-      key: "rector",
-      icon: "👑",
-      apiFilter: "",
-      color: "from-green-500 to-green-600",
-    },
-    {
-      key: "vice_rector",
-      icon: "🌟",
-      apiFilter: "",
-      color: "from-blue-500 to-green-500",
-    },
-    {
-      key: "director",
-      icon: "🏛️",
-      apiFilter: "",
-      color: "from-green-500 to-blue-500",
-    },
-    {
-      key: "dean",
-      icon: "📚",
-      apiFilter: "",
-      color: "from-blue-500 to-blue-600",
-    },
-    {
-      key: "department_head",
-      icon: "🎓",
-      apiFilter: "",
-      color: "from-green-500 to-green-600",
-    },
-  ];
+        const data = await apiService.getLeadership(lang);
+        setLeadership(data || []);
+
+        // Set first position as selected by default
+        if (data && data.length > 0) {
+          setSelectedPosition(data[0]);
+        }
+
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching leadership data:', err);
+        setError(t('error.loadingData', 'Ошибка загрузки данных'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeadership();
+  }, [i18n.language, t]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated.current) {
-          setIsVisible(true);
-          hasAnimated.current = true;
-          startCounters();
-        }
+        setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
 
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
-  // Set visible when data is loaded
-  useEffect(() => {
-    if (!loading && leadership.length > 0) {
-      setIsVisible(true);
-    }
-  }, [loading, leadership]);
-
-  const startCounters = () => {
-    const currentData = getCurrentData();
-    const targetValues = [
-      currentData.length,
-      currentData.filter(
-        (p) =>
-          p.leadership_type === "rector" || p.leadership_type === "director"
-      ).length,
-      currentData.filter((p) => p.department).length,
-      categories.length,
-    ];
-
-    const duration = 2000;
-
-    targetValues.forEach((target, index) => {
-      const startTime = performance.now();
-      const updateCounter = (currentTime) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-        const currentValue = Math.floor(easeOutQuart * target);
-
-        setCounterValues((prev) => {
-          const newValues = [...prev];
-          newValues[index] = currentValue;
-          return newValues;
-        });
-
-        if (progress < 1) {
-          requestAnimationFrame(updateCounter);
-        }
-      };
-      requestAnimationFrame(updateCounter);
-    });
-  };
-
-  const handleCategoryChange = (category) => {
-    setActiveCategory(category.key);
-    setSelectedType(category.apiFilter);
-    setExpandedCard(null);
-  };
-
-  const toggleCardExpand = (id) => {
-    setExpandedCard(expandedCard === id ? null : id);
-  };
-
-  // Функция для генерации placeholder фото на основе имени
-  const generateInitials = (name) => {
-    return name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase();
-  };
-
-  // Получаем данные для отображения
-  const getCurrentData = () => {
-    return leadership || [];
-  };
-
-  const currentData = getCurrentData();
-  const isLoading = loading;
-
-  if (isLoading && currentData.length === 0) {
+  // Loading state
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 flex items-center justify-center">
-        <PageLoading
-          message={t("leadership.loading", "Загрузка руководства...")}
-        />
-      </div>
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">{t('loading', 'Загрузка...')}</p>
+        </div>
+      </section>
     );
   }
 
+  // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          <ErrorDisplay
-            error={error}
-            onRetry={refetch}
-            className="max-w-md mx-auto"
-          />
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
+        <div className="bg-red-500/20 border border-red-500 rounded-lg p-6 max-w-md">
+          <p className="text-white text-center">{error}</p>
         </div>
-      </div>
+      </section>
     );
   }
 
-  const stats = [
-    {
-      value: counterValues[0],
-      label: t("leadership.stats.total", "Всего"),
-      color: "from-blue-500 to-blue-600",
-      icon: "👥",
-    },
-    {
-      value: counterValues[1],
-      label: t("leadership.stats.directors", "Директоров"),
-      color: "from-green-500 to-green-600",
-      icon: "👑",
-    },
-    {
-      value: counterValues[2],
-      label: t("leadership.stats.departments", "Отделов"),
-      color: "from-blue-500 to-green-500",
-      icon: "🏢",
-    },
-    {
-      value: counterValues[3],
-      label: t("leadership.stats.categories", "Категорий"),
-      color: "from-green-500 to-blue-500",
-      icon: "📊",
-    },
-  ];
+  // No data state
+  if (leadership.length === 0) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl">{t('noData', 'Нет данных')}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 overflow-hidden"
+      className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
     >
       {/* Анимированный фон */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-600/10 via-transparent to-transparent"></div>
-        <div className="absolute top-20 left-10 w-32 h-32 bg-green-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/3 right-20 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl animate-bounce delay-1000"></div>
+        <div className="absolute bottom-32 left-1/4 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+
+        {/* Символы */}
+        <div className="absolute top-1/4 right-1/4 text-6xl opacity-5">
+          <svg className="w-16 h-16 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <div className="absolute bottom-1/3 left-1/4 text-5xl opacity-5">
+          <svg className="w-12 h-12 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <div className="absolute top-1/2 left-1/2 text-4xl opacity-5">
+          <svg className="w-10 h-10 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        </div>
+        <div className="absolute top-1/3 left-1/3 text-5xl opacity-5">
+          <svg className="w-12 h-12 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        </div>
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Заголовок */}
-        <div
-          className={`text-center mb-12 md:mb-16 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
-            {t("leadership.title", "РУКОВОДСТВО АКАДЕМИИ")}
+        <div className="text-center mb-12 lg:mb-16">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
+            {t('leadership.title') || 'Руководство академии'}
           </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-green-400 mx-auto mb-6 md:mb-8"></div>
-          <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto px-4 leading-relaxed">
-            {t(
-              "leadership.subtitle",
-              "Профессиональная команда опытных руководителей и преподавателей"
-            )}
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
+          <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
+            {t('leadership.subtitle') || 'Профессиональная команда опытных руководителей и преподавателей'}
           </p>
         </div>
 
-        {/* Статистика */}
-        <div
-          className={`grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16 transition-all duration-1000 delay-300 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="group relative bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 border border-white/20 shadow-2xl transition-all duration-500 hover:scale-105 hover:border-green-400/30 text-center"
-            >
-              {/* Иконка */}
-              <div
-                className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center text-2xl mb-4 mx-auto group-hover:scale-110 transition-transform duration-300`}
-              >
-                {stat.icon}
-              </div>
-
-              {/* Число с анимацией */}
-              <div className="text-3xl md:text-4xl font-bold text-white mb-2 font-mono">
-                {stat.value}
-              </div>
-
-              {/* Описание */}
-              <div className="text-blue-100 font-medium text-sm md:text-base">
-                {stat.label}
-              </div>
-
-              {/* Декоративные элементы */}
-              <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-ping"></div>
-            </div>
-          ))}
-        </div>
-
-        {/* Навигация по категориям */}
-        <div
-          className={`flex flex-wrap justify-center gap-3 mb-12 transition-all duration-1000 delay-500 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-2 border border-white/20 shadow-lg">
-            <div className="flex flex-wrap justify-center gap-2">
-              {categories.map((category) => {
-                const isActive = activeCategory === category.key;
-
-                return (
+        {/* Основной контент */}
+        <div className="flex flex-col lg:flex-row-reverse gap-8 max-w-7xl mx-auto">
+          {/* Правая часть - Должности */}
+          <div className="lg:w-1/3">
+            <div className="sticky top-8">
+              <div className="space-y-3">
+                {leadership.map((person, index) => (
                   <button
-                    key={category.key}
-                    onClick={() => handleCategoryChange(category)}
-                    className={`flex items-center px-5 py-3 rounded-xl transition-all duration-300 font-medium ${
-                      isActive
-                        ? `bg-gradient-to-r ${category.color} text-white shadow-lg transform scale-105`
-                        : `text-blue-100 hover:text-white hover:bg-white/10`
+                    key={person.id}
+                    onClick={() => setSelectedPosition(person)}
+                    className={`w-full text-left p-4 rounded-2xl border transition-all duration-300 ${
+                      selectedPosition?.id === person.id
+                        ? 'bg-gradient-to-r from-blue-500 to-emerald-500 border-white/30 shadow-2xl transform scale-105'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:transform hover:scale-102'
                     }`}
                   >
-                    <span className="text-lg mr-2">{category.icon}</span>
-                    <span>
-                      {t(
-                        `leadership.categories.${category.key}`,
-                        category.key.replace("_", " ")
-                      )}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Содержимое категории */}
-        <div
-          className={`mb-16 transition-all duration-1000 delay-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 p-6 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20">
-            <div className="flex items-center mb-4 sm:mb-0">
-              <span className="text-4xl mr-4">
-                {categories.find((cat) => cat.key === activeCategory)?.icon}
-              </span>
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white">
-                  {t(
-                    `leadership.categories.${activeCategory}`,
-                    activeCategory.replace("_", " ")
-                  )}
-                </h2>
-                <p className="text-blue-100 mt-1">
-                  {t(
-                    "leadership.categoryDescription",
-                    "Профессиональные руководители и преподаватели"
-                  )}
-                </p>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${
+                        selectedPosition?.id === person.id
+                          ? 'bg-white/20'
+                          : 'bg-white/10'
+                      }`}>
+                        <svg className="w-6 h-6 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className={`font-semibold ${
+                          selectedPosition?.id === person.id
+                            ? 'text-white'
+                            : 'text-blue-100'
+                        }`}>
+                          {person.position}
+                        </h4>
+                        <p className={`text-sm truncate ${
+                          selectedPosition?.id === person.id
+                            ? 'text-white/80'
+                            : 'text-blue-200'
+                        }`}>
+                          {person.name}
+                        </p>
+                      </div>
+                      <div className={`transform transition-transform ${
+                        selectedPosition?.id === person.id ? '-rotate-90' : ''
+                      }`}>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                    </button>
+                ))}
               </div>
             </div>
-            <div className="text-sm text-blue-100 bg-white/10 px-4 py-2 rounded-xl border border-white/20">
-              {isLoading ? (
-                <span className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-400 mr-2"></div>
-                  {t("leadership.loading", "Загрузка...")}
-                </span>
-              ) : (
-                `${currentData.length} ${t(
-                  "leadership.employees",
-                  "сотрудников"
-                )}`
-              )}
-            </div>
           </div>
 
-          {/* Сетка сотрудников */}
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }, (_, index) => (
-                <CardSkeleton key={index} />
-              ))}
-            </div>
-          ) : currentData.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentData.map((person, index) => (
-                <div
-                  key={person.id || index}
-                  className="group bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 hover:border-green-400/30 transition-all duration-500 overflow-hidden cursor-pointer hover:scale-102"
-                  onClick={() => toggleCardExpand(person.id || index)}
-                >
-                  <div className="p-6">
-                    {/* Фото и основная информация */}
-                    <div className="flex items-center gap-4 mb-4">
-                      {/* Фото сотрудника */}
-                      <div className="flex-shrink-0">
-                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-r from-blue-500/20 to-green-500/20 border-2 border-white/20 overflow-hidden group-hover:border-green-400/50 transition-colors relative">
-                          {person.image_url || person.image ? (
-                            <img
-                              src={person.image_url || person.image}
-                              alt={person.name}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                                e.target.nextSibling.style.display = "flex";
-                              }}
-                            />
-                          ) : null}
-                          <div
-                            className={`w-full h-full bg-gradient-to-br from-blue-500/30 to-green-500/30 flex items-center justify-center ${
-                              person.image_url || person.image
-                                ? "hidden"
-                                : "flex"
-                            }`}
-                          >
-                            <span className="text-lg font-bold text-white">
-                              {generateInitials(person.name)}
-                            </span>
-                          </div>
-
-                          {/* Декоративный элемент */}
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        </div>
+          {/* Левая часть - Информация о выбранном человеке */}
+          <div className="flex-1 lg:w-2/3">
+            {selectedPosition && (
+              <div className="bg-white/5 rounded-3xl backdrop-blur-sm border border-white/10 p-8 lg:p-10">
+                {/* Верхняя часть с фото и основной информацией */}
+                <div className="flex flex-col md:flex-row gap-6 mb-8">
+                  {/* Фото */}
+                  <div className="flex-shrink-0 mx-auto md:mx-0">
+                    {selectedPosition.image_url ? (
+                      <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-3xl overflow-hidden border-4 border-white/20 shadow-2xl">
+                        <img
+                          src={selectedPosition.image_url}
+                          alt={selectedPosition.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-
-                      {/* Имя и должность */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-white truncate group-hover:text-green-300 transition-colors">
-                          {person.name}
-                        </h3>
-                        <div className="bg-white/10 rounded-xl px-3 py-1 border border-white/20 mt-1 group-hover:border-green-400/30 transition-colors">
-                          <p className="text-blue-100 font-semibold text-sm truncate group-hover:text-white">
-                            {person.position}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Краткая информация */}
-                    <div className="space-y-2">
-                      {/* Education */}
-                      {person.education && (
-                        <div className="flex items-center gap-2 text-sm text-blue-100 group-hover:text-white transition-colors">
-                          <span className="text-green-300">🎓</span>
-                          <span>{person.education}</span>
-                        </div>
-                      )}
-
-                      {/* Department */}
-                      {person.department && (
-                        <div className="flex items-center gap-2 text-sm text-blue-100 group-hover:text-white transition-colors">
-                          <span className="text-green-300">🏢</span>
-                          <span>{person.department}</span>
-                        </div>
-                      )}
-
-                      {/* Experience Years */}
-                      {person.experience_years && (
-                        <div className="flex items-center gap-2 text-sm text-blue-100 group-hover:text-white transition-colors">
-                          <span className="text-green-300">⏱️</span>
-                          <span>
-                            {t("leadership.experience", "Опыт")}:{" "}
-                            {person.experience_years}{" "}
-                            {t("leadership.years", "лет")}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Статус и теги */}
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      {person.leadership_type && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                          {person.icon || "📊"}{" "}
-                          {person.leadership_type_display ||
-                            person.leadership_type}
-                        </span>
-                      )}
-                      {(person.leadership_type === "rector" ||
-                        person.leadership_type === "director") && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-400/30">
-                          👑 {t("leadership.director", "Руководитель")}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Кнопка раскрытия */}
-                    <div className="flex justify-center mt-4">
-                      <button className="flex items-center gap-1 text-green-300 text-sm font-medium hover:text-green-400 transition-colors group">
-                        <span>
-                          {expandedCard === (person.id || index)
-                            ? t("leadership.showLess", "Свернуть")
-                            : t("leadership.showMore", "Подробнее")}
-                        </span>
-                        <svg
-                          className={`w-4 h-4 transform transition-transform group-hover:scale-110 ${
-                            expandedCard === (person.id || index)
-                              ? "rotate-180"
-                              : ""
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
+                    ) : (
+                      <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-3xl bg-gradient-to-br from-blue-500/30 to-emerald-500/30 flex items-center justify-center border-4 border-white/20 shadow-2xl">
+                        <svg className="w-16 h-16 lg:w-20 lg:h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                      </button>
-                    </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Раскрытая информация */}
-                  {expandedCard === (person.id || index) && (
-                    <div className="border-t border-white/10 bg-white/5 p-6 space-y-4 animate-fadeIn">
-                      {/* Education */}
-                      {person.education && (
-                        <div className="flex items-start gap-3 group">
-                          <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-purple-500/30 transition-colors">
-                            <span className="text-purple-300">🎓</span>
-                          </div>
-                          <div>
-                            <div className="text-sm font-medium text-white">
-                              {t("leadership.education", "Образование")}
-                            </div>
-                            <div className="text-sm text-blue-100 group-hover:text-white transition-colors">
-                              {person.education}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Bio */}
-                      {person.bio && (
-                        <div className="flex items-start gap-3 group">
-                          <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500/30 transition-colors">
-                            <span className="text-blue-300">📝</span>
-                          </div>
-                          <div>
-                            <div className="text-sm font-medium text-white mb-1">
-                              {t("leadership.bio", "Биография")}
-                            </div>
-                            <div className="text-sm text-blue-100 leading-relaxed group-hover:text-white transition-colors">
-                              {person.bio}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Achievements */}
-                      {person.achievements &&
-                        person.achievements.length > 0 && (
-                          <div className="flex items-start gap-3 group">
-                            <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-500/30 transition-colors">
-                              <span className="text-yellow-300">🏆</span>
-                            </div>
-                            <div className="flex-1">
-                              <div className="text-sm font-medium text-white mb-2">
-                                {t("leadership.achievements", "Достижения")}
-                              </div>
-                              <ul className="text-sm text-blue-100 space-y-1 group-hover:text-white transition-colors">
-                                {person.achievements.map((achievement, idx) => (
-                                  <li
-                                    key={idx}
-                                    className="flex items-start group/item"
-                                  >
-                                    <span className="mr-2 text-green-400 group-hover/item:text-green-300 transition-colors">
-                                      •
-                                    </span>
-                                    <span>{achievement}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          </div>
-                        )}
-
-                      {/* Contact Information */}
-                      {(person.email || person.phone) && (
-                        <div className="flex items-start gap-3 group">
-                          <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-green-500/30 transition-colors">
-                            <span className="text-green-300">📞</span>
-                          </div>
-                          <div>
-                            <div className="text-sm font-medium text-white mb-2">
-                              {t("leadership.contacts", "Контакты")}
-                            </div>
-                            <div className="space-y-1">
-                              {person.email && (
-                                <div className="flex items-center gap-2 text-sm group/item">
-                                  <span className="text-blue-300">📧</span>
-                                  <a
-                                    href={`mailto:${person.email}`}
-                                    className="text-green-300 hover:text-green-400 hover:underline transition-colors"
-                                  >
-                                    {person.email}
-                                  </a>
-                                </div>
-                              )}
-                              {person.phone && (
-                                <div className="flex items-center gap-2 text-sm group/item">
-                                  <span className="text-blue-300">📱</span>
-                                  <a
-                                    href={`tel:${person.phone}`}
-                                    className="text-green-300 hover:text-green-400 hover:underline transition-colors"
-                                  >
-                                    {person.phone}
-                                  </a>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                  {/* Основная информация */}
+                  <div className="flex-1 text-center md:text-left">
+                    <h2 className="text-2xl lg:text-3xl font-bold text-white mb-3">
+                      {selectedPosition.name}
+                    </h2>
+                    <div className="bg-gradient-to-r from-blue-500/20 to-emerald-500/20 rounded-2xl px-4 py-3 mb-4 border border-white/10">
+                      <p className="text-lg font-semibold text-blue-100">
+                        {selectedPosition.position}
+                      </p>
                     </div>
-                  )}
+                  </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              message={t("leadership.noData", "Данные не найдены")}
-              icon={<div className="text-6xl mb-4">👥</div>}
-              action={
-                <button
-                  onClick={() => setActiveCategory("all")}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105"
-                >
-                  {t("leadership.viewAll", "Посмотреть всех сотрудников")}
-                </button>
-              }
-            />
-          )}
+
+                {/* Биография как HTML */}
+                {selectedPosition.bio && (
+                  <div className="mb-8">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                      <svg className="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      {t('leadership.bio', 'Биография')}
+                    </h3>
+                    <div
+                      className="text-blue-100 leading-relaxed text-base lg:text-lg prose prose-invert max-w-none"
+                      dangerouslySetInnerHTML={{ __html: selectedPosition.bio }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* Плавающие элементы для десктопа */}
-      <div className="absolute bottom-20 left-5 w-6 h-6 bg-green-400/20 rounded-full animate-bounce hidden md:block"></div>
-      <div className="absolute top-20 right-5 w-4 h-4 bg-blue-400/20 rounded-full animate-ping hidden md:block"></div>
     </section>
   );
 };

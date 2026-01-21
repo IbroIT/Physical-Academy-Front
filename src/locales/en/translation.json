@@ -662,9 +662,9 @@
     ]
   },
   "leadership": {
-    "badge": "Leadership",
-    "title": "ACADEMY LEADERSHIP",
-    "subtitle": "Professional team of experienced managers and teachers",
+    "badge": "Rectorate",
+    "title": "ACADEMY RECTORATE",
+    "subtitle": "Senior leadership of the academy responsible for strategic development and management",
     "loading": "Loading leadership...",
     "categoryDescription": "Professional managers and teachers",
     "employees": "employees",
@@ -678,6 +678,7 @@
     "achievements": "Achievements",
     "contacts": "Contacts",
     "noData": "No data found",
+    "positions": "Positions",
     "viewAll": "View All Employees",
     "stats": {
       "total": "Total",
