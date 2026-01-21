@@ -1,30 +1,13 @@
-// Commissions.jsx - Integrated with API
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
-import apiService from "../../../services/api";
+// AuditCommission.jsx - Static component
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import apiService from '../../../services/api';
 
-const Commissions = () => {
+const AuditCommission = () => {
   const { t, i18n } = useTranslation();
-  const [activeCommission, setActiveCommission] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const [filter, setFilter] = useState("all");
-  const [commissions, setCommissions] = useState([]);
+  const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const sectionRef = useRef(null);
-
-  // Filter options - recreate when language changes
-  const filters = useMemo(
-    () => [
-      { id: "all", label: t("filters.all", "Все комиссии") },
-      { id: "methodical", label: t("filters.methodical", "Методические") },
-      { id: "academic", label: t("filters.academic", "Академические") },
-      { id: "quality", label: t("filters.quality", "Качество") },
-      { id: "student", label: t("filters.student", "Студенческие") },
-    ],
-    [t, i18n.language]
-  );
 
   // Fetch data from API
   useEffect(() => {
@@ -32,56 +15,30 @@ const Commissions = () => {
       try {
         setLoading(true);
         const lang = i18n.language;
-        const category = filter === "all" ? null : filter;
 
-        const commissionsData = await apiService.getCommissions(lang, category);
-        setCommissions(commissionsData);
+        const response = await apiService.getAuditCommission(lang);
+        // API returns array, take first item
+        const contentData = Array.isArray(response) && response.length > 0 ? response[0] : null;
+        setContent(contentData);
         setError(null);
-        // Set visible immediately after data loads
-        setIsVisible(true);
       } catch (err) {
-        console.error("Error fetching Commissions data:", err);
-        setError(t("error.loadingData", "Ошибка загрузки данных"));
+        console.error('Error fetching Audit Commission data:', err);
+        setError(t('error.loadingData', 'Ошибка загрузки данных'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [i18n.language, filter, t]);
-
-  const filteredCommissions = commissions;
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.2 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  // Автопереключение активной комиссии
-  useEffect(() => {
-    if (filteredCommissions.length === 0) return;
-
-    const interval = setInterval(() => {
-      setActiveCommission((prev) => (prev + 1) % filteredCommissions.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [filteredCommissions.length]);
+  }, [i18n.language, t]);
 
   // Loading state
   if (loading) {
     return (
-      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-800 py-20 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-xl">{t("loading", "Загрузка...")}</p>
+          <p className="text-white text-xl">{t('loading', 'Загрузка...')}</p>
         </div>
       </section>
     );
@@ -90,7 +47,7 @@ const Commissions = () => {
   // Error state
   if (error) {
     return (
-      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 flex items-center justify-center">
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-800 py-20 flex items-center justify-center">
         <div className="bg-red-500/20 border border-red-500 rounded-lg p-6 max-w-md">
           <p className="text-white text-center">{error}</p>
         </div>
@@ -98,233 +55,48 @@ const Commissions = () => {
     );
   }
 
-  return (
-    <section
-      ref={sectionRef}
-      className="relative min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-emerald-900 py-16 lg:py-24 overflow-hidden"
-    >
-      {/* Анимированный фон с частицами */}
-      <div className="absolute inset-0">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 right-20 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl animate-bounce delay-1000"></div>
-        <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+  // No data state
+  if (!content || !content.text) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-800 py-20 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl">{t('noData', 'Нет данных')}</p>
+        </div>
+      </section>
+    );
+  }
 
-        {/* Градиентные линии */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent"></div>
+  return (
+    <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-800 py-20 overflow-hidden">
+      {/* Анимированный фон */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-emerald-400 rounded-full mix-blend-screen filter blur-xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-48 h-48 bg-blue-300 rounded-full mix-blend-screen filter blur-xl animate-bounce"></div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        {/* Заголовок */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 lg:mb-20"
-        >
-          <motion.h2
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight"
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            {t("commissions.title")}
-          </motion.h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-blue-400 to-emerald-400 mx-auto mb-6 rounded-full"></div>
-          <p className="text-lg md:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-            {t("commissions.subtitle")}
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <h2 className="text-5xl font-bold text-white mb-6 tracking-tight">
+            {t('commissions.title', 'Ревизиционная комиссия')}
+          </h2>
+          <div className="w-24 h-1 bg-emerald-400 mx-auto mb-6"></div>
+          <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+            {t('commissions.subtitle', 'Контроль финансовой деятельности и обеспечение прозрачности')}
           </p>
-        </motion.div>
+        </div>
 
-        {/* Фильтры */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-3 mb-12 lg:mb-16"
-        >
-          {filters.map((filterItem) => (
-            <button
-              key={filterItem.id}
-              onClick={() => setFilter(filterItem.id)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
-                filter === filterItem.id
-                  ? "bg-gradient-to-r from-blue-500 to-emerald-500 text-white shadow-2xl shadow-blue-500/30"
-                  : "bg-white/10 text-blue-100 backdrop-blur-sm border border-white/20 hover:bg-white/20"
-              }`}
-            >
-              {filterItem.label}
-            </button>
-          ))}
-        </motion.div>
-
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-          {/* Список комиссий */}
-          <div className="space-y-6">
-            <AnimatePresence mode="wait">
-              {filteredCommissions.map((commission, index) => (
-                <motion.div
-                  key={commission.id}
-                  layout
-                  initial={{ opacity: 0, x: -50, scale: 0.9 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: 50, scale: 0.9 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className={`p-6 rounded-2xl backdrop-blur-lg border-2 transition-all duration-500 cursor-pointer group ${
-                    activeCommission === index
-                      ? "bg-white/20 border-emerald-400 shadow-2xl scale-105"
-                      : "bg-white/10 border-white/20 hover:bg-white/15 hover:border-blue-300"
-                  }`}
-                  onMouseEnter={() => setActiveCommission(index)}
-                  onClick={() => setActiveCommission(index)}
-                >
-                  <div className="flex items-start space-x-4">
-                    <div
-                      className={`flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold transition-all duration-300 group-hover:scale-110 ${
-                        activeCommission === index
-                          ? "bg-gradient-to-r from-emerald-500 to-blue-500 shadow-lg"
-                          : "bg-gradient-to-r from-blue-600 to-emerald-600"
-                      }`}
-                    >
-                      {commission.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <h3 className="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">
-                          {commission.name}
-                        </h3>
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-blue-100 backdrop-blur-sm">
-                          {commission.category_display || commission.category}
-                        </span>
-                      </div>
-                      <p className="text-blue-200 mt-2 line-clamp-2">
-                        {commission.description}
-                      </p>
-
-                      {/* Дополнительная информация при активности */}
-                      <AnimatePresence>
-                        {activeCommission === index && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className="mt-4 space-y-3"
-                          >
-                            <div className="flex flex-wrap gap-2">
-                              {commission.responsibilities?.map(
-                                (responsibility, responsibilityIndex) => (
-                                  <span
-                                    key={responsibilityIndex}
-                                    className="px-3 py-1 bg-white/10 rounded-full text-sm text-blue-200 backdrop-blur-sm border border-white/10"
-                                  >
-                                    {responsibility}
-                                  </span>
-                                )
-                              )}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+        {/* Контент комиссии */}
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
+            <div
+              className="prose prose-invert prose-lg max-w-none text-blue-100 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: content.text }}
+            />
           </div>
-
-          {/* Детализация активной комиссии */}
-          <motion.div
-            key={activeCommission}
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="sticky top-8"
-          >
-            <div className="bg-gradient-to-br from-white/10 to-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-lg border border-white/20 shadow-2xl">
-              {filteredCommissions[activeCommission] && (
-                <>
-                  <div className="text-center mb-8">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-blue-500 to-emerald-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                      {filteredCommissions[activeCommission].icon}
-                    </div>
-                    <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">
-                      {filteredCommissions[activeCommission].name}
-                    </h3>
-                    <p className="text-emerald-300 text-lg">
-                      {t("commissions.chairman", "Председатель")}:{" "}
-                      {filteredCommissions[activeCommission].chairman}
-                    </p>
-                  </div>
-
-                  {/* Обязанности комиссии */}
-                  {filteredCommissions[activeCommission].responsibilities &&
-                    filteredCommissions[activeCommission].responsibilities
-                      .length > 0 && (
-                      <div className="space-y-4 mb-8">
-                        <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-                          <span className="w-2 h-2 bg-blue-400 rounded-full mr-3"></span>
-                          {t("commissions.responsibilities", "Обязанности")}
-                        </h4>
-                        <div className="grid gap-3">
-                          {filteredCommissions[
-                            activeCommission
-                          ].responsibilities.map((responsibility, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-start bg-white/5 rounded-lg p-4 backdrop-blur-sm border border-white/10"
-                            >
-                              <span className="text-emerald-400 mr-3 text-lg">
-                                ✓
-                              </span>
-                              <span className="text-blue-100">
-                                {responsibility}
-                              </span>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                  {/* Контактная информация */}
-                  {(filteredCommissions[activeCommission].email ||
-                    filteredCommissions[activeCommission].phone ||
-                    filteredCommissions[activeCommission].chairman) && (
-                    <div className="bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-                      <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
-                        <span className="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
-                        {t("commissions.contactInfo", "Контактная информация")}
-                      </h4>
-                      <div className="space-y-3 text-blue-200">
-                        {filteredCommissions[activeCommission].chairman && (
-                          <p>
-                            👥 {t("commissions.chairman", "Председатель")}:{" "}
-                            {filteredCommissions[activeCommission].chairman}
-                          </p>
-                        )}
-                        {filteredCommissions[activeCommission].email && (
-                          <p>
-                            📧 {filteredCommissions[activeCommission].email}
-                          </p>
-                        )}
-                        {filteredCommissions[activeCommission].phone && (
-                          <p>
-                            📞 {filteredCommissions[activeCommission].phone}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </motion.div>
         </div>
       </div>
     </section>
   );
 };
 
-export default Commissions;
+export default AuditCommission;
