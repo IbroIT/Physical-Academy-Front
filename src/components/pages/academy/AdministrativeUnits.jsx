@@ -1,34 +1,75 @@
 // AdministrativeUnits.jsx - Integrated with API
-import { div } from 'framer-motion/client';
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import apiService from '../../../services/api';
 
 const AdministrativeUnits = () => {
   const { t, i18n } = useTranslation();
   const sectionRef = useRef(null);
   const [activeDepartment, setActiveDepartment] = useState(null);
+  const [departments, setDepartments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const departments = [
-    {
-      id: 1,
-      title: 'Название отдела 1',
-      description: 'описание отдела 1',  
-    },
-    {
-      id: 2,
-      title: 'Название отдела 2',
-      description: 'описание отдела 2',  
-    },
-    {
-      id: 3,
-      title: 'Название отдела 3',
-      description: 'описание отдела 3',  
-    },
-  ];
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const lang = i18n.language;
+
+        const response = await apiService.getAdministrativeUnits(lang);
+        // API returns array of results
+        setDepartments(Array.isArray(response) ? response : []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching Administrative Units data:', err);
+        setError(t('error.loadingData', 'Ошибка загрузки данных'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [i18n.language, t]);
 
   const toggleDepartment = (id) => {
     setActiveDepartment(prev => (prev === id ? null : id));
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">{t('loading', 'Загрузка...')}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 flex items-center justify-center">
+        <div className="bg-red-500/20 border border-red-500 rounded-lg p-6 max-w-md">
+          <p className="text-white text-center">{error}</p>
+        </div>
+      </section>
+    );
+  }
+
+  // No data state
+  if (!departments || departments.length === 0) {
+    return (
+      <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-green-900 py-12 md:py-20 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl">{t('noData', 'Нет данных')}</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -62,7 +103,7 @@ const AdministrativeUnits = () => {
                 className="w-full text-left px-6 py-4 flex justify-between items-center"
               >
                 <h3 className="text-xl font-semibold text-amber-50">
-                  {dep.title}
+                  {dep.name}
                 </h3>
                 <span
                   className={`text-green-300 text-2xl transition-transform duration-300 ${
@@ -79,9 +120,10 @@ const AdministrativeUnits = () => {
                     : 'max-h-0 opacity-0'
                 }`}
               >
-                <p className="px-6 pb-4 text-blue-100">
-                  {dep.description}
-                </p>
+                <div
+                  className="px-6 pb-4 text-blue-100 prose prose-invert max-w-none text-left"
+                  dangerouslySetInnerHTML={{ __html: dep.text }}
+                />
               </div>
             </div>
           ))}

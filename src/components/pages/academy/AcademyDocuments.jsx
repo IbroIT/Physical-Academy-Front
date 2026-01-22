@@ -37,7 +37,7 @@ const AcademyMission = () => {
 
       const lang = getApiLanguage();
       const API_URL = import.meta.env.VITE_API_URL;
-      const url = `${API_URL}/api/academy/missions/?lang=${lang}`;
+      const url = `${API_URL}/api/leadership-structure/documents/?lang=${lang}`;
 
       const response = await fetch(url);
 
@@ -235,15 +235,15 @@ const AcademyMission = () => {
               animate="visible"
               className="space-y-4"
             >
-              {backendData.missions.map((mission, index) => (
+              {backendData.missions.map((documents, index) => (
                 <motion.div
-                  key={mission.id}
+                  key={documents.id}
                   variants={itemVariants}
-                  onClick={() => selectMission(mission)}
+                  onClick={() => selectMission(documents)}
                   className={`bg-white/5 backdrop-blur-lg rounded-xl p-6 border transition-all duration-300 cursor-pointer hover:-translate-y-1 ${
-                    selectedMission?.id === mission.id
+                    selectedMission?.id === documents.id
                       ? "border-emerald-400/50 bg-white/10"
-                      : mission.pdf
+                      : documents.pdf
                       ? "border-white/20 hover:border-emerald-400/50 hover:bg-white/10"
                       : "border-white/10 opacity-75"
                   }`}
@@ -251,11 +251,11 @@ const AcademyMission = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <h3 className="text-xl lg:text-2xl font-bold text-white mb-3">
-                        {mission.title}
+                        {documents.name}
                       </h3>
 
                       {/* Кнопка PDF появляется при выборе элемента */}
-                      {selectedMission?.id === mission.id && mission.pdf && (
+                      {selectedMission?.id === documents.id && documents.pdf && (
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -265,7 +265,7 @@ const AcademyMission = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              openPdf(mission.pdf);
+                              openPdf(documents.pdf);
                             }}
                             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-blue-500 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                           >
@@ -279,10 +279,10 @@ const AcademyMission = () => {
                     </div>
                     
                     {/* Иконка PDF справа */}
-                    {mission.pdf && (
+                    {documents.pdf && (
                       <div className="flex-shrink-0 ml-4">
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-emerald-400 transition-all duration-300 ${
-                          selectedMission?.id === mission.id ? "bg-emerald-500/30" : "bg-emerald-500/20"
+                          selectedMission?.id === documents.id ? "bg-emerald-500/30" : "bg-emerald-500/20"
                         }`}>
                           <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />

@@ -290,6 +290,14 @@ class ApiService {
     return data.results || [];
   }
 
+  async getTradeUnion(language = "ru") {
+    const langParam = this.getLanguageParam(language);
+    const data = await this.request(
+      `/leadership-structure/profsoyuz/?lang=${langParam}`
+    );
+    return data.results || [];
+  }
+
   // Commissions
   async getCommissions(language = "ru", category = null) {
     const langParam = this.getLanguageParam(language);
@@ -1012,6 +1020,7 @@ export const getTradeUnionEvents =
   apiService.getTradeUnionEvents.bind(apiService);
 export const getTradeUnionStats =
   apiService.getTradeUnionStats.bind(apiService);
+export const getTradeUnion = apiService.getTradeUnion.bind(apiService);
 export const getCommissions = apiService.getCommissions.bind(apiService);
 export const getAdministrativeDepartments =
   apiService.getAdministrativeDepartments.bind(apiService);

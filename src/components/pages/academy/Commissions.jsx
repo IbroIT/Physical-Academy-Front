@@ -1,11 +1,11 @@
-// AuditCommission.jsx - Static component
+// Commissions.jsx - Static component
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import apiService from '../../../services/api';
 
-const AuditCommission = () => {
+const Commissions = () => {
   const { t, i18n } = useTranslation();
-  const [content, setContent] = useState(null);
+  const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -16,13 +16,12 @@ const AuditCommission = () => {
         setLoading(true);
         const lang = i18n.language;
 
-        const response = await apiService.getAuditCommission(lang);
-        // API returns array, take first item
-        const contentData = Array.isArray(response) && response.length > 0 ? response[0] : null;
-        setContent(contentData);
+        const response = await apiService.getCommissions(lang);
+        // API returns array of results
+        setContent(Array.isArray(response) ? response : []);
         setError(null);
       } catch (err) {
-        console.error('Error fetching Audit Commission data:', err);
+        console.error('Error fetching Commissions data:', err);
         setError(t('error.loadingData', 'Ошибка загрузки данных'));
       } finally {
         setLoading(false);
@@ -56,7 +55,7 @@ const AuditCommission = () => {
   }
 
   // No data state
-  if (!content || !content.text) {
+  if (!content || content.length === 0) {
     return (
       <section className="relative min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-emerald-800 py-20 flex items-center justify-center">
         <div className="text-center">
@@ -77,26 +76,28 @@ const AuditCommission = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-white mb-6 tracking-tight">
-            {t('commissions.title', 'Ревизиционная комиссия')}
+            {t('commissions.title', 'Комиссии')}
           </h2>
           <div className="w-24 h-1 bg-emerald-400 mx-auto mb-6"></div>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-            {t('commissions.subtitle', 'Контроль финансовой деятельности и обеспечение прозрачности')}
+            {t('commissions.subtitle', 'Рабочие комиссии и комитеты академии')}
           </p>
         </div>
 
-        {/* Контент комиссии */}
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
-            <div
-              className="prose prose-invert prose-lg max-w-none text-blue-100 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: content.text }}
-            />
-          </div>
+        {/* Контент комиссий */}
+        <div className="max-w-6xl mx-auto space-y-6">
+          {content.map((item, index) => (
+            <div key={item.id || index} className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
+              <div
+                className="prose prose-invert prose-lg max-w-none text-blue-100 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: item.text }}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </section>
   );
 };
 
-export default AuditCommission;
+export default Commissions;
