@@ -37,8 +37,7 @@ const DepartmentTabs = () => {
   const [errorPhotoGallery, setErrorPhotoGallery] = useState(null);
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
-  // Состояние для выпадающей кнопки PDF в миссии
-  const [showPdfButton, setShowPdfButton] = useState(false);
+  const [missionStrategyPdfStates, setMissionStrategyPdfStates] = useState({});
 
   // Массив случайных PDF файлов для демонстрации
   const randomPdfFiles = [
@@ -134,46 +133,76 @@ const DepartmentTabs = () => {
         setTabsData(allTabsData);
         
         // Загружаем данные для "Общая информация"
-        const aboutResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/about/?lang=${lang}`);
+        setLoadingAbout(true);
+        setErrorAbout(null);
+        const aboutResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/college/about/?lang=${lang}`);
         if (aboutResponse.ok) {
           const aboutData = await aboutResponse.json();
           setAboutData(aboutData.sort((a, b) => a.order - b.order));
+        } else {
+          setErrorAbout('Failed to load about data');
         }
+        setLoadingAbout(false);
         
         // Загружаем данные для "Миссия и стратегия"
-        const missionResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/mission-strategy/?lang=${lang}`);
+        setLoadingMissionStrategy(true);
+        setErrorMissionStrategy(null);
+        const missionResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/college/mission-strategy/?lang=${lang}`);
         if (missionResponse.ok) {
           const missionData = await missionResponse.json();
           setMissionStrategyData(missionData.sort((a, b) => a.order - b.order));
+        } else {
+          setErrorMissionStrategy('Failed to load mission strategy data');
         }
+        setLoadingMissionStrategy(false);
         
-        // Загружаем данные для "Руководство" - используем тот же API что и в FacultyInfoComponent
-        const leadershipResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/management/?lang=${lang}`);
+        // Загружаем данные для "Руководство" - используем новый API колледжа
+        setLoadingLeadership(true);
+        setErrorLeadership(null);
+        const leadershipResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/college/management/?lang=${lang}`);
         if (leadershipResponse.ok) {
           const leadershipData = await leadershipResponse.json();
           setLeadershipData(leadershipData.sort((a, b) => a.order - b.order));
+        } else {
+          setErrorLeadership('Failed to load leadership data');
         }
+        setLoadingLeadership(false);
         
-        // Загружаем данные для "Преподаватели" - используем тот же API что и в FacultyInfoComponent
-        const teachersResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/teachers/?lang=${lang}`);
+        // Загружаем данные для "Преподаватели" - используем новый API колледжа
+        setLoadingTeachers(true);
+        setErrorTeachers(null);
+        const teachersResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/college/teachers/?lang=${lang}`);
         if (teachersResponse.ok) {
           const teachersData = await teachersResponse.json();
           setTeachersData(teachersData.sort((a, b) => a.order - b.order));
+        } else {
+          setErrorTeachers('Failed to load teachers data');
         }
+        setLoadingTeachers(false);
         
         // Загружаем данные для "Специализации"
-        const specializationsResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/specializations/?lang=${lang}`);
+        setLoadingSpecializations(true);
+        setErrorSpecializations(null);
+        const specializationsResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/college/specializations/?lang=${lang}`);
         if (specializationsResponse.ok) {
           const specializationsData = await specializationsResponse.json();
           setSpecializationsData(specializationsData.sort((a, b) => a.order - b.order));
+        } else {
+          setErrorSpecializations('Failed to load specializations data');
         }
+        setLoadingSpecializations(false);
         
         // Загружаем данные для "Фотогалерея"
-        const galleryResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/pedagogical/gallery-cards/?lang=${lang}`);
+        setLoadingPhotoGallery(true);
+        setErrorPhotoGallery(null);
+        const galleryResponse = await fetch(`https://physical-academy-backend-3dccb860f75a.herokuapp.com/api/faculties/college/gallery-cards/?lang=${lang}`);
         if (galleryResponse.ok) {
           const galleryData = await galleryResponse.json();
           setPhotoGalleryData(galleryData.results || galleryData);
+        } else {
+          setErrorPhotoGallery('Failed to load photo gallery data');
         }
+        setLoadingPhotoGallery(false);
         
       } catch (err) {
         console.error('Error fetching static tabs data:', err);
@@ -404,57 +433,59 @@ const DepartmentTabs = () => {
         }
 
         return (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {missionStrategyData.length > 0 ? (
               missionStrategyData.map((item) => {
-                const [itemShowPdf, setItemShowPdf] = useState(false);
-                
+                const showPdf = missionStrategyPdfStates[item.id] || false;
+
                 return (
-                  <div key={item.id} className="relative">
-                    <div 
+                  <div key={item.id} className="space-y-4">
+                    {/* Название миссии/стратегии */}
+                    <div
                       className="bg-white rounded-xl border border-blue-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:border-blue-300"
-                      onClick={() => setItemShowPdf(!itemShowPdf)}
+                      onClick={() => setMissionStrategyPdfStates(prev => ({
+                        ...prev,
+                        [item.id]: !prev[item.id]
+                      }))}
                     >
-                      <div className="prose prose-lg max-w-none">
-                        <div 
-                          className="text-gray-700 leading-relaxed"
-                          dangerouslySetInnerHTML={{ __html: item.text }}
-                        />
-                      </div>
-                      
-                      {/* Стрелочка для индикации */}
-                      <div className="absolute top-4 right-4">
-                        <svg 
-                          className={`w-5 h-5 text-blue-500 transform transition-transform duration-300 ${itemShowPdf ? 'rotate-180' : ''}`}
-                          fill="none" 
-                          stroke="currentColor" 
+                      <h3 className="text-xl font-bold text-blue-900 flex items-center justify-between">
+                        {item.title}
+                        <svg
+                          className={`w-5 h-5 text-blue-500 transform transition-transform duration-300 ${showPdf ? 'rotate-180' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
                           viewBox="0 0 24 24"
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
-                      </div>
+                      </h3>
                     </div>
-                    
-                    {/* Выпадающая кнопка PDF */}
-                    {itemShowPdf && (
-                      <div className="mt-2 animate-[slideDown_0.3s_ease-out]">
-                        <div className="bg-blue-50 rounded-lg border border-blue-200 p-4">
-                          <button
-                            onClick={openPdfModal}
-                            className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-500 to-green-500 text-white py-3 px-6 rounded-lg font-medium hover:from-blue-600 hover:to-green-600 transition-all duration-300 transform hover:scale-[1.02]"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            {t('departmentTabs.messages.view_pdf')}
-                            <span className="text-blue-200 ml-auto text-sm">
-                              {t('departmentTabs.messages.open_new_tab')}
-                            </span>
-                          </button>
-                          <p className="text-sm text-gray-500 mt-2 text-center">
-                            {t('departmentTabs.messages.click_to_view')}
-                          </p>
-                        </div>
+
+                    {/* Кнопка PDF */}
+                    {showPdf && (
+                      <div className="animate-[slideDown_0.3s_ease-out] space-y-2">
+                        {(() => {
+                          const currentLang = i18n.language;
+                          const pdfField = currentLang === 'kg' ? item.pdf_kg : currentLang === 'en' ? item.pdf_en : item.pdf_ru;
+                          
+                          if (pdfField) {
+                            return (
+                              <a
+                                href={pdfField}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-[1.02]"
+                              >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                {t('departmentTabs.messages.view_pdf')}
+                              </a>
+                            );
+                          }
+                          return null;
+                        })()}
                       </div>
                     )}
                   </div>
@@ -463,66 +494,9 @@ const DepartmentTabs = () => {
             ) : (
               <div className="text-center py-8">
                 <div className="bg-white rounded-xl border border-blue-200 p-8 shadow-lg max-w-2xl mx-auto">
-                  <div 
-                    className="cursor-pointer"
-                    onClick={() => setShowPdfButton(!showPdfButton)}
-                  >
-                    <h3 className="text-2xl font-bold text-blue-900 mb-4 flex items-center justify-center gap-2">
-                      {t('departmentTabs.mission.title')}
-                      <svg 
-                        className={`w-5 h-5 text-blue-500 transform transition-transform duration-300 ${showPdfButton ? 'rotate-180' : ''}`}
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </h3>
-                    
-                    <div className="prose prose-lg max-w-none text-left mb-6">
-                      <div className="text-gray-700 leading-relaxed space-y-4">
-                        <p>
-                          <strong>{t('departmentTabs.content.mission')}:</strong> {t('departmentTabs.mission.mission_text')}
-                        </p>
-                        <p>
-                          <strong>{t('departmentTabs.mission.strategy_title')}:</strong>
-                        </p>
-                        <ul className="list-disc pl-5 space-y-2">
-                          {t('departmentTabs.mission.goals', { returnObjects: true }).map((goal, index) => (
-                            <li key={index}>{goal}</li>
-                          ))}
-                        </ul>
-                        <p>
-                          {t('departmentTabs.mission.strategy_text')}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <p className="text-sm text-gray-500 italic mt-4">
-                      {t('departmentTabs.messages.click_to_view')} PDF ↓
-                    </p>
+                  <div className="text-gray-500">
+                    {t('departmentTabs.messages.no_data')}
                   </div>
-                  
-                  {/* Выпадающая кнопка PDF для демо данных */}
-                  {showPdfButton && (
-                    <div className="mt-6 pt-6 border-t border-blue-100 animate-[slideDown_0.3s_ease-out]">
-                      <button
-                        onClick={openPdfModal}
-                        className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-500 to-green-500 text-white py-3 px-6 rounded-lg font-medium hover:from-blue-600 hover:to-green-600 transition-all duration-300 transform hover:scale-[1.02]"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        {t('departmentTabs.messages.view_pdf')}
-                        <span className="text-blue-200 ml-auto text-sm">
-                          {t('departmentTabs.messages.open_new_tab')}
-                        </span>
-                      </button>
-                      <p className="text-sm text-gray-500 mt-2 text-center">
-                        {t('departmentTabs.messages.updated_annually')}
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -547,10 +521,6 @@ const DepartmentTabs = () => {
 
         return (
           <div className="space-y-8">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-blue-900">{t('departmentTabs.leadership.title')}</h3>
-              <p className="text-gray-600 mt-2">{t('departmentTabs.leadership.description')}</p>
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {leadershipData.map((person) => (
@@ -594,57 +564,57 @@ const DepartmentTabs = () => {
           </div>
         );
  case 'teachers':
-        if (loadingLeadership) {
+        if (loadingTeachers) {
           return (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
             </div>
           );
         }
-        if (errorLeadership) {
+        if (errorTeachers) {
           return (
             <div className="text-center py-12">
-              <p className="text-red-500">{t('departmentTabs.messages.error')}: {errorLeadership}</p>
+              <p className="text-red-500">{t('departmentTabs.messages.error')}: {errorTeachers}</p>
             </div>
           );
         }
 
         return (
           <div className="space-y-8">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-blue-900">{t('departmentTabs.leadership.title')}</h3>
-              <p className="text-gray-600 mt-2">{t('departmentTabs.leadership.description')}</p>
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {leadershipData.map((person) => (
-                <div key={person.id} className="bg-white rounded-xl border border-blue-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
+              {teachersData.map((teacher) => (
+                <div key={teacher.id} className="bg-white rounded-xl border border-blue-200 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 transform">
                   <div className="w-24 h-24 rounded-full overflow-hidden mb-4 mx-auto border-4 border-blue-100">
                     <img 
-                      src={getImageUrl(person.photo)} 
-                      alt={person.name} 
+                      src={getImageUrl(teacher.photo)} 
+                      alt={teacher.name} 
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <h3 className="text-xl font-bold text-blue-900 mb-2 text-center">{person.name}</h3>
-                  <p className="text-gray-600 mb-3 text-center font-medium">{person.role}</p>
+                  <h3 className="text-xl font-bold text-blue-900 mb-2 text-center">{teacher.name}</h3>
+                  <p className="text-gray-600 mb-3 text-center font-medium">{teacher.subject}</p>
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                      <span>{person.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      <span>{person.email}</span>
-                    </div>
+                    {teacher.phone && (
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        <span>{teacher.phone}</span>
+                      </div>
+                    )}
+                    {teacher.email && (
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span>{teacher.email}</span>
+                      </div>
+                    )}
                   </div>
-                  {person.resume && (
+                  {teacher.resume && (
                     <a
-                      href={person.resume}
+                      href={teacher.resume}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full bg-gradient-to-r from-blue-500 to-green-500 text-white py-2 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-green-600 transition-all duration-300 text-center block"
