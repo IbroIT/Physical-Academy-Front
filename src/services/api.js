@@ -228,7 +228,15 @@ class ApiService {
     const data = await this.request(
       `/leadership-structure/board-of-trustees/?lang=${langParam}`
     );
-    return data.results || [];
+    return data.results || data || [];
+  }
+
+  async getBoardOfTrusteesDocuments(language = "ru") {
+    const langParam = this.getLanguageParam(language);
+    const data = await this.request(
+      `/leadership-structure/board-of-trustees-documents/?lang=${langParam}`
+    );
+    return data.results || data || [];
   }
 
   async getBoardOfTrusteesStats(language = "ru") {
@@ -1127,6 +1135,8 @@ export const searchOrganizationStructure =
 // Leadership Structure exports
 export const getBoardOfTrustees =
   apiService.getBoardOfTrustees.bind(apiService);
+export const getBoardOfTrusteesDocuments =
+  apiService.getBoardOfTrusteesDocuments.bind(apiService);
 export const getBoardOfTrusteesStats =
   apiService.getBoardOfTrusteesStats.bind(apiService);
 export const getAuditCommission =
