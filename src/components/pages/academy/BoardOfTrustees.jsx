@@ -82,20 +82,6 @@ const BoardOfTrustees = () => {
               className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl overflow-hidden transform transition-all duration-500 hover:scale-105 hover:border-green-400/30"
             >
               <div className="p-6 text-center">
-                {/* Фото */}
-                <div className="mb-6">
-                  {trustee.image_url ? (
-                    <img
-                      src={trustee.image_url}
-                      alt={trustee.name}
-                      className="w-32 h-32 rounded-full object-cover mx-auto border-4 border-white/20 shadow-lg"
-                    />
-                  ) : (
-                    <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-green-500 flex items-center justify-center mx-auto border-4 border-white/20 shadow-lg">
-                      <span className="text-4xl text-white">👤</span>
-                    </div>
-                  )}
-                </div>
 
                 {/* Имя */}
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
